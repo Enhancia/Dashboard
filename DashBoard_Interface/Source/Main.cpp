@@ -9,14 +9,15 @@
 */
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "MainComponent.h"
+#include "DashBoardInterface.h"
+#include "DashCommon.h"
 
 //==============================================================================
-class DashBoard_Interface  : public JUCEApplication
+class Neova_DashBoard_Interface  : public JUCEApplication
 {
 public:
     //==============================================================================
-    DashBoard_Interface() {}
+    Neova_DashBoard_Interface() {}
 
     const String getApplicationName() override       { return "Plume Dash Board [Interface]"; }
     const String getApplicationVersion() override    { return ProjectInfo::versionString; }
@@ -25,7 +26,7 @@ public:
     //==============================================================================
     void initialise (const String& commandLine) override
     {
-        mainWindow.reset (new MainWindow (getApplicationName(), bgColour));
+        mainWindow.reset (new MainWindow (getApplicationName() /*, hubData*/));
 
         commandManager.registerAllCommandsForTarget (this);
         commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
@@ -56,13 +57,13 @@ public:
     class MainWindow    : public DocumentWindow
     {
     public:
-        MainWindow (String name, Colour& col)
+        MainWindow (String name /*, HubData& data*/)
             : DocumentWindow (name, Desktop::getInstance().getDefaultLookAndFeel()
                                                           .findColour (ResizableWindow::backgroundColourId),
                                     DocumentWindow::allButtons)
         {
             setUsingNativeTitleBar (true);
-            setContentOwned (new MainComponent (col), true);
+            setContentOwned (new DashBoardInterface (/*data*/), true);
             
             setResizable (false, false);
             centreWithSize (getWidth(), getHeight());
@@ -82,8 +83,12 @@ public:
     //==============================================================================
     void getAllCommands (Array<CommandID> &commands) override
     {
-        int commandIDs[] = { 1, // SetBlue
-                             2  // SetRed
+        using namespace neova_dash::commands;
+
+        int commandIDs[] = {  flashHub,
+                              upgradeHub,
+                              upgradeRing,
+                              uploadConfigToHub
                             };
 
         commands.addArray (commandIDs, numElementsInArray (commandIDs));
@@ -91,15 +96,23 @@ public:
 
     void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override
     {
+        using namespace neova_dash::commands;
+
         switch (commandID)
         {
-            case 1:
-                result.setInfo ("Set Blue", "Sets bg colour to blue", "Colour", 0);
-                result.addDefaultKeypress ('b', ModifierKeys (ModifierKeys::noModifiers));
+            case flashHub:
+                result.setInfo ("Flash Hub", "Saves Hub's temp config in its flash memory", "Hub Data Set", 0);
                 break;
-            case 2:
-				result.setInfo("Set Red", "Sets bg colour to red", "Colour", 0);
-				result.addDefaultKeypress('r', ModifierKeys(ModifierKeys::noModifiers));
+            case uploadConfigToHub:
+                result.setInfo ("Upload Config To Hub", "Sets the hub to the dashboard's config", "Hub Data Set", 0);
+                break;
+            case upgradeHub:
+				result.setInfo ("Upgrade Hub Firmware", "Updgrades the hub firmware to the most recent version",
+                                                        "Firm Update", 0);
+                break;
+            case upgradeRing:
+                result.setInfo ("Upgrade Ring Firmware", "Updgrades the ring firmware to the most recent version",
+                                                         "Firm Update", 0);
                 break;
             default:
                 break;
@@ -108,37 +121,38 @@ public:
 
     bool perform (const InvocationInfo& info) override
     {
+        using namespace neova_dash::commands;
+        DBG ("Back performs : " << commandManager.getNameOfCommand (info.commandID));
+
         switch (info.commandID)
         {
-            case (1):
-                DBG ("Executes 1");
-                bgColour = Colour (0xff202080);
-				commandManager.invokeDirectly (3, true);
-				return true;
-            case (2):
-                DBG ("Executes 2");
-                bgColour = Colour (0xff802020);
-				commandManager.invokeDirectly (3, true);
-				return true;
+            case flashHub:
+                return true;
+
+            case uploadConfigToHub:
+                return true;
+
+            case upgradeHub:
+                return true;
+
+            case upgradeRing:
+                return true;
+
             default:
                 return false;
         }
     }
 
-	Colour& getColourRef() { return bgColour; }
-
     //==============================================================================
     ApplicationCommandManager commandManager;
 
 private:
-    Colour bgColour = Colour (0xff808080);
-
     std::unique_ptr<MainWindow> mainWindow;
 };
 
 //==============================================================================
-static DashBoard_Interface& getApp() { return *dynamic_cast<DashBoard_Interface*> (JUCEApplication::getInstance()); }
+static Neova_DashBoard_Interface& getApp() { return *dynamic_cast<Neova_DashBoard_Interface*> (JUCEApplication::getInstance()); }
 ApplicationCommandManager& getCommandManager() { return getApp().commandManager; }
 
 //==============================================================================
-START_JUCE_APPLICATION (DashBoard_Interface)
+START_JUCE_APPLICATION (Neova_DashBoard_Interface)
