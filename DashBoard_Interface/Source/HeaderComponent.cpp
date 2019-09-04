@@ -62,11 +62,12 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
 
 	g.drawRect (juce::Rectangle<int>(2, 4).withPosition ({batteryArea.getRight(), batteryArea.getY() + 2}), 1);
 
-	if (batteryValueRef <= 0.2f) g.setColour (Colours::red);
+	float battery = jmax (jmin (batteryValueRef, 1.0f), 0.0f);
 
-    g.fillRect (batteryArea.reduced (2.0f)
+	if (battery <= 0.2f) g.setColour (Colours::red);
+	else if (battery == 1.0f) g.setColour (Colours::lime);
+
+    g.fillRect (batteryArea.reduced (2)
     					   .withRight (batteryArea.getX() + 2
-    					   				   + (batteryArea.getWidth() - 4) * jmax (jmin (batteryValueRef,
-    					   				   												1.0f),
-    					   				   										  0.0f)));
+    					   				   + int ((batteryArea.getWidth() - 4) * battery)));
 }

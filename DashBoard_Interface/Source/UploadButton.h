@@ -16,18 +16,24 @@
 //==============================================================================
 /*
 */
-class UploadButton : public Component
+class UploadButton : public Button
 {
 public:
     //==============================================================================
-    UploadButton();
+    UploadButton (ApplicationCommandManager& cm);
     ~UploadButton();
 
     //==============================================================================
-    void paint (Graphics&) override;
     void resized() override;
 
 private:
+    //==============================================================================
+	void paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
+	void clicked() override;
+
+	//==============================================================================
+    ApplicationCommandManager& commandManager;
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UploadButton)
 };

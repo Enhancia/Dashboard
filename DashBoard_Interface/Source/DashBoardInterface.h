@@ -14,6 +14,7 @@
 #include "GesturePanel.h"
 #include "HeaderComponent.h"
 #include "PresetSelectorComponent.h"
+#include "UploadButton.h"
 
 ApplicationCommandManager& getCommandManager();
 
@@ -45,7 +46,7 @@ private:
     std::unique_ptr<HeaderComponent> header;
     std::unique_ptr<PresetSelectorComponent> presetSelector;
     std::unique_ptr<GesturePanel> gesturePanel;
-    //std::unique_ptr<UploadButton> uploadButton;
+    std::unique_ptr<UploadButton> uploadButton;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DashBoardInterface)

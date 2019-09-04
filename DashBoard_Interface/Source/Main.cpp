@@ -32,9 +32,11 @@ public:
         commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
                                                         (mainWindow->getContentComponent()));
 
-		for (int i = 0; i <= commandManager.getNumCommands(); i++)
+		for (int i = neova_dash::commands::flashHub; i <= commandManager.getNumCommands(); i++)
 		{
-			DBG (i << " " << commandManager.getNameOfCommand (i));
+            String s = commandManager.getNameOfCommand (i);
+
+			if (!s.isEmpty()) DBG (i << " " << s);
 		}
     }
 

@@ -21,6 +21,9 @@ DashBoardInterface::DashBoardInterface()
     gesturePanel = std::make_unique<GesturePanel>();
     addAndMakeVisible (*gesturePanel);
 
+    uploadButton = std::make_unique<UploadButton> (getCommandManager());
+    addAndMakeVisible (*uploadButton);
+
     // Sets settings
     setSize (neova_dash::ui::DASHBOARD_WIDTH, neova_dash::ui::DASHBOARD_HEIGHT);
 }
@@ -30,6 +33,7 @@ DashBoardInterface::~DashBoardInterface()
     header = nullptr;
     presetSelector = nullptr;
     gesturePanel = nullptr;
+    uploadButton = nullptr;
 }
 
 //==============================================================================
@@ -58,8 +62,11 @@ void DashBoardInterface::resized()
 
     gesturePanel->setBounds (area.removeFromBottom (area.getHeight()/2).reduced (2*MARGIN));
     header->setBounds (area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL, MARGIN));
+
     presetSelector->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight())
                                   .reduced (2*MARGIN));
+    uploadButton->setBounds (area.withSize (area.getWidth()/7, area.getHeight()/2)
+                                 .withSizeKeepingCentre (area.getWidth()/5, HEADER_HEIGHT));
 }
 
 //==============================================================================
