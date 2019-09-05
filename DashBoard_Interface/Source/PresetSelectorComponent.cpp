@@ -14,12 +14,13 @@
 //==============================================================================
 // PresetSelectorComponent
 
-PresetSelectorComponent::PresetSelectorComponent()
+PresetSelectorComponent::PresetSelectorComponent (ConfigData& data) : configData (data)
 {
 	// Creates Toggles And Lights
 	for (int i =0; i < 4; i++)
 	{
 		toggles.add (new PresetToggle (i));
+		toggles.getLast()->addListener (this);
 		addAndMakeVisible (toggles.getLast());
 
 		leds.add (new GestureLED (i));
@@ -29,6 +30,11 @@ PresetSelectorComponent::PresetSelectorComponent()
 
 PresetSelectorComponent::~PresetSelectorComponent()
 {
+	for (int i =0; i < toggles.size(); i++)
+	{
+		toggles[i]->removeListener (this);
+	}
+
 	toggles.clear();
 	leds.clear();
 }
@@ -57,7 +63,7 @@ void PresetSelectorComponent::resized()
 {
 	auto area = getLocalBounds().reduced (neova_dash::ui::MARGIN*3, neova_dash::ui::MARGIN*4)
 								.withTop (getHeight()*2/3);
-	const float columnWidth = area.toFloat().getWidth() / toggles.size();
+	const int columnWidth = area.getWidth() / toggles.size();
 
 	for (int column = 0; column < toggles.size(); column++)
 	{
@@ -74,8 +80,14 @@ void PresetSelectorComponent::buttonClicked (Button* bttn)
 	if (auto presetToggle = dynamic_cast<PresetToggle*> (bttn))
 	{
 		// Sets a new current preset value
+		if (presetToggle->id != currentPreset)
+		{
+			configData.setDataAndUploadToHub (ConfigData::selectedPreset, float (presetToggle->id));
+
+			currentPreset = presetToggle->id; // TO DELETE IF UPDATE LOGIC
+		}
 	}
-}	
+}
 
 //==============================================================================
 // PresetToggle

@@ -26,7 +26,7 @@ public:
     //==============================================================================
     void initialise (const String& commandLine) override
     {
-        mainWindow.reset (new MainWindow (getApplicationName() /*, hubData*/));
+        mainWindow.reset (new MainWindow (getApplicationName(), configData));
 
         commandManager.registerAllCommandsForTarget (this);
         commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
@@ -59,13 +59,13 @@ public:
     class MainWindow    : public DocumentWindow
     {
     public:
-        MainWindow (String name /*, HubData& data*/)
+        MainWindow (String name , ConfigData& data)
             : DocumentWindow (name, Desktop::getInstance().getDefaultLookAndFeel()
                                                           .findColour (ResizableWindow::backgroundColourId),
                                     DocumentWindow::allButtons)
         {
             setUsingNativeTitleBar (true);
-            setContentOwned (new DashBoardInterface (/*data*/), true);
+            setContentOwned (new DashBoardInterface (data), true);
             
             setResizable (false, false);
             centreWithSize (getWidth(), getHeight());
@@ -150,6 +150,7 @@ public:
 
 private:
     std::unique_ptr<MainWindow> mainWindow;
+    ConfigData configData; 
 };
 
 //==============================================================================

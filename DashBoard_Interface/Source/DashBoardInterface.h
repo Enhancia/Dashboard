@@ -24,7 +24,7 @@ class DashBoardInterface   : public Component,
 {
 public:
     //==============================================================================
-    DashBoardInterface();
+    DashBoardInterface (ConfigData& data);
     ~DashBoardInterface();
 
     //==============================================================================
@@ -47,6 +47,9 @@ private:
     std::unique_ptr<PresetSelectorComponent> presetSelector;
     std::unique_ptr<GesturePanel> gesturePanel;
     std::unique_ptr<UploadButton> uploadButton;
+    
+    //==============================================================================
+    ConfigData& configData;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DashBoardInterface)

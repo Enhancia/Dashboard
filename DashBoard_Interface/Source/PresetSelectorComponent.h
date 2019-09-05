@@ -21,7 +21,7 @@ class PresetSelectorComponent    : public Component,
 {
 public:
     //==============================================================================
-    PresetSelectorComponent();
+    PresetSelectorComponent (ConfigData& data);
     ~PresetSelectorComponent();
 
     //==============================================================================
@@ -42,13 +42,13 @@ private:
 
         //==========================================================================
         void resized() override;
+   
+        //==========================================================================
+        const int id;
 
     private:
         //==========================================================================
         void paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
-
-        //==========================================================================
-        const int id;
 
         //==========================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetToggle)
@@ -65,13 +65,18 @@ private:
         void paint (Graphics&) override;
         void resized() override;
 
-    private:
         //==========================================================================
         const int id;
-
+    
+    private:
         //==========================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GestureLED)
     };
+
+    //==============================================================================
+    int currentPreset = -1;
+    
+    ConfigData& configData;
 
     //==============================================================================
     OwnedArray<PresetToggle> toggles;

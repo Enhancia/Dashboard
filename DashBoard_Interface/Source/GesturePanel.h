@@ -20,7 +20,7 @@ class GesturePanel    : public Component
 {
 public:
     //==============================================================================
-    GesturePanel();
+    GesturePanel (ConfigData& data);
     ~GesturePanel();
 
     //==============================================================================
@@ -28,6 +28,9 @@ public:
     void resized() override;
 
 private:
+    //==============================================================================
+    ConfigData& configData;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GesturePanel)
 };

@@ -9,16 +9,16 @@
 #include "DashBoardInterface.h"
 
 //==============================================================================
-DashBoardInterface::DashBoardInterface()
+DashBoardInterface::DashBoardInterface (ConfigData& data) : configData (data)
 {
     // Creates Components
     header = std::make_unique<HeaderComponent>();
     addAndMakeVisible (*header);
 
-    presetSelector = std::make_unique<PresetSelectorComponent>();
+    presetSelector = std::make_unique<PresetSelectorComponent> (configData);
     addAndMakeVisible (*presetSelector);
 
-    gesturePanel = std::make_unique<GesturePanel>();
+    gesturePanel = std::make_unique<GesturePanel> (configData);
     addAndMakeVisible (*gesturePanel);
 
     uploadButton = std::make_unique<UploadButton> (getCommandManager());
@@ -74,11 +74,9 @@ void DashBoardInterface::mouseDown (const MouseEvent& event)
 {
 	if (event.mods.isLeftButtonDown())
 	{
-		//getCommandManager().invokeDirectly (1, true);
 	}
 	else if (event.mods.isRightButtonDown())
 	{
-		//getCommandManager().invokeDirectly (2, true);
 	}
 }
 
