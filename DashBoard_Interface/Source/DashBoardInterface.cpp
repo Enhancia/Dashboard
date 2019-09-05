@@ -9,16 +9,16 @@
 #include "DashBoardInterface.h"
 
 //==============================================================================
-DashBoardInterface::DashBoardInterface (ConfigData& data) : configData (data)
+DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (data)
 {
     // Creates Components
     header = std::make_unique<HeaderComponent>();
     addAndMakeVisible (*header);
 
-    presetSelector = std::make_unique<PresetSelectorComponent> (configData);
+    presetSelector = std::make_unique<PresetSelectorComponent> (hubConfig);
     addAndMakeVisible (*presetSelector);
 
-    gesturePanel = std::make_unique<GesturePanel> (configData);
+    gesturePanel = std::make_unique<GesturePanel> (hubConfig);
     addAndMakeVisible (*gesturePanel);
 
     uploadButton = std::make_unique<UploadButton> (getCommandManager());

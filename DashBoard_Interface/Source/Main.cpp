@@ -26,7 +26,7 @@ public:
     //==============================================================================
     void initialise (const String& commandLine) override
     {
-        mainWindow.reset (new MainWindow (getApplicationName(), configData));
+        mainWindow.reset (new MainWindow (getApplicationName(), hubConfig));
 
         commandManager.registerAllCommandsForTarget (this);
         commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
@@ -59,7 +59,7 @@ public:
     class MainWindow    : public DocumentWindow
     {
     public:
-        MainWindow (String name , ConfigData& data)
+        MainWindow (String name , HubConfiguration& data)
             : DocumentWindow (name, Desktop::getInstance().getDefaultLookAndFeel()
                                                           .findColour (ResizableWindow::backgroundColourId),
                                     DocumentWindow::allButtons)
@@ -150,7 +150,7 @@ public:
 
 private:
     std::unique_ptr<MainWindow> mainWindow;
-    ConfigData configData; 
+    HubConfiguration hubConfig;
 };
 
 //==============================================================================

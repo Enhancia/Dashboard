@@ -14,7 +14,7 @@
 //==============================================================================
 // PresetSelectorComponent
 
-PresetSelectorComponent::PresetSelectorComponent (ConfigData& data) : configData (data)
+PresetSelectorComponent::PresetSelectorComponent (HubConfiguration& data) : hubConfig (data)
 {
 	// Creates Toggles And Lights
 	for (int i =0; i < 4; i++)
@@ -82,7 +82,7 @@ void PresetSelectorComponent::buttonClicked (Button* bttn)
 		// Sets a new current preset value
 		if (presetToggle->id != currentPreset)
 		{
-			configData.setDataAndUploadToHub (ConfigData::selectedPreset, float (presetToggle->id));
+			hubConfig.setPreset (presetToggle->id);
 
 			currentPreset = presetToggle->id; // TO DELETE IF UPDATE LOGIC
 		}

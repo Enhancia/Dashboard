@@ -12,7 +12,7 @@
 #include "GesturePanel.h"
 
 //==============================================================================
-GesturePanel::GesturePanel (ConfigData& data) : configData (data)
+GesturePanel::GesturePanel (HubConfiguration& data) : hubConfig (data)
 {
 }
 

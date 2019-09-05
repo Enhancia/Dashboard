@@ -24,7 +24,7 @@ class DashBoardInterface   : public Component,
 {
 public:
     //==============================================================================
-    DashBoardInterface (ConfigData& data);
+    DashBoardInterface (HubConfiguration& data);
     ~DashBoardInterface();
 
     //==============================================================================
@@ -49,7 +49,7 @@ private:
     std::unique_ptr<UploadButton> uploadButton;
     
     //==============================================================================
-    ConfigData& configData;
+    HubConfiguration& hubConfig;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DashBoardInterface)

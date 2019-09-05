@@ -11,7 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "ConfigData.h"
+#include "HubConfiguration.h"
 
 namespace neova_dash
 {

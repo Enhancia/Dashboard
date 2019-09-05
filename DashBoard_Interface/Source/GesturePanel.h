@@ -20,7 +20,7 @@ class GesturePanel    : public Component
 {
 public:
     //==============================================================================
-    GesturePanel (ConfigData& data);
+    GesturePanel (HubConfiguration& data);
     ~GesturePanel();
 
     //==============================================================================
@@ -29,7 +29,7 @@ public:
 
 private:
     //==============================================================================
-    ConfigData& configData;
+    HubConfiguration& hubConfig;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GesturePanel)

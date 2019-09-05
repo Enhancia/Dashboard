@@ -21,7 +21,7 @@ class PresetSelectorComponent    : public Component,
 {
 public:
     //==============================================================================
-    PresetSelectorComponent (ConfigData& data);
+    PresetSelectorComponent (HubConfiguration& data);
     ~PresetSelectorComponent();
 
     //==============================================================================
@@ -76,7 +76,7 @@ private:
     //==============================================================================
     int currentPreset = -1;
     
-    ConfigData& configData;
+    HubConfiguration& hubConfig;
 
     //==============================================================================
     OwnedArray<PresetToggle> toggles;
