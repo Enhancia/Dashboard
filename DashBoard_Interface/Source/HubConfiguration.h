@@ -94,7 +94,11 @@ public:
     void setFloatValueAndUpload (const int gestureNumber, const floatDataId dataId, const float newFloatValue);
     //float getData (dataID dataToGet);
     
-    void setPreset (const int gestureNumberToSelect);  
+    void setPreset (const int gestureNumberToSelect);
+    const int getSelectedPreset();
+
+    GestureData& getGestureData (const int gestureNumber, const int presetNumber = selectedPreset);
+
     //const String getHubFirm();
     //const String getRingFirm();
 

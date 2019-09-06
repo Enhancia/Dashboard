@@ -49,3 +49,43 @@ void HubConfiguration::setPreset (const int gestureNumberToSelect)
 	selectedPreset = gestureNumberToSelect;
 	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);	
 }
+
+const int HubConfiguration::getSelectedPreset()
+{
+	return selectedPreset;
+}
+
+GestureData& HubConfiguration::getGestureData (const int gestureNumber, const int presetNumber)
+{
+	PresetData preset;
+
+	switch (presetNumber)
+	{
+		case (1):
+			preset = config.presetData1;
+			break;
+		case (2):
+			preset = config.presetData2;
+			break;
+		case (3):
+			preset = config.presetData3;
+			break;
+		default:
+			preset = config.presetData0;
+	}
+
+	switch (gestureNumber)
+	{
+		case (1):
+			return preset.gestureData1;
+
+		case (2):
+			return preset.gestureData2;
+		
+		case (3):
+			return preset.gestureData3;
+		
+		default:
+			return preset.gestureData0;
+	}
+}
