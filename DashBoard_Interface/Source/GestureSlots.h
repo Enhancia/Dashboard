@@ -10,10 +10,11 @@
 
 #pragma once
 
-#include "../../../JuceLibraryCode/JuceHeader.h"
+#include "../JuceLibraryCode/JuceHeader.h"
 #include "DashCommon.h"
+#include "HubConfiguration.h"
 
-class GestureComponent : public PlumeComponent,
+class GestureComponent : public Component,
                          private Label::Listener
 {
 public:
@@ -25,10 +26,6 @@ public:
     ~GestureComponent();
 
     //==============================================================================
-    const String getInfoString() override;
-    void update() override;
-
-    //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
 
@@ -38,7 +35,6 @@ public:
     void mouseDrag (const MouseEvent &event) override;
 
     //==============================================================================
-    Gesture& getGesture();
     bool isSelected() const;
     void setSelected (bool);
     void setHighlighted (bool);
@@ -47,7 +43,7 @@ public:
 
     //==============================================================================
     const int id;
-    const neova_dash::gesture::type type;
+    const int type;
 
 private:
     //==============================================================================
@@ -58,7 +54,7 @@ private:
     //==============================================================================
     HubConfiguration& hubConfig;
     ScopedPointer<Label> gestureNameLabel;
-    ScopedPointer<PlumeShapeButton> muteButton;
+    ScopedPointer<ShapeButton> muteButton;
     
     bool on = bool (hubConfig.getGestureData (id).on);
     bool selected = false, highlighted = false, solo = false;
@@ -72,7 +68,7 @@ private:
 };
 
 
-class EmptyGestureSlotComponent : public PlumeComponent
+class EmptyGestureSlotComponent : public Component
 {
 public:
     //==============================================================================
@@ -81,10 +77,6 @@ public:
                                                          const int& draggedGestureReference,
                                                          const int& draggedOverSlotReference);
     ~EmptyGestureSlotComponent();
-
-    //==============================================================================
-    const String getInfoString() override;
-    void update() override;
 
     //==============================================================================
     void paint (Graphics&) override;

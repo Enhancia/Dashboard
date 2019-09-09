@@ -17,12 +17,17 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
 
     presetSelector = std::make_unique<PresetSelectorComponent> (hubConfig);
     addAndMakeVisible (*presetSelector);
-
+	/*
     gesturePanel = std::make_unique<GesturePanel> (hubConfig);
-    addAndMakeVisible (*gesturePanel);
+    addAndMakeVisible (*gesturePanel);*/
 
     uploadButton = std::make_unique<UploadButton> (getCommandManager());
     addAndMakeVisible (*uploadButton);
+
+    newGesturePanel = std::make_unique<NewGesturePanel> (hubConfig);
+    addAndMakeVisible (*newGesturePanel);
+    //newGesturePanel->hidePanel();
+
 
     // Sets settings
     setSize (neova_dash::ui::DASHBOARD_WIDTH, neova_dash::ui::DASHBOARD_HEIGHT);
@@ -32,7 +37,8 @@ DashBoardInterface::~DashBoardInterface()
 {
     header = nullptr;
     presetSelector = nullptr;
-    gesturePanel = nullptr;
+    newGesturePanel = nullptr;
+    //gesturePanel = nullptr;
     uploadButton = nullptr;
 }
 
@@ -60,7 +66,11 @@ void DashBoardInterface::resized()
 
     auto area = getLocalBounds();
 
-    gesturePanel->setBounds (area.removeFromBottom (area.getHeight()/2).reduced (2*MARGIN));
+	auto gPanelArea = area.removeFromBottom(area.getHeight() / 2);
+
+    //gesturePanel->setBounds (gPanelArea.reduced (2*MARGIN));
+    newGesturePanel->setBounds (gPanelArea.reduced (MARGIN));
+
     header->setBounds (area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL, MARGIN));
 
     presetSelector->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight())

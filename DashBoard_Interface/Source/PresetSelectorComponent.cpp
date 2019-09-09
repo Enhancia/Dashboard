@@ -23,7 +23,7 @@ PresetSelectorComponent::PresetSelectorComponent (HubConfiguration& data) : hubC
 		toggles.getLast()->addListener (this);
 		addAndMakeVisible (toggles.getLast());
 
-		leds.add (new GestureLED (i));
+		leds.add (new GestureLED (i, hubConfig));
 		addAndMakeVisible (leds.getLast());
 	}
 }
@@ -85,6 +85,7 @@ void PresetSelectorComponent::buttonClicked (Button* bttn)
 			hubConfig.setPreset (presetToggle->id);
 
 			currentPreset = presetToggle->id; // TO DELETE IF UPDATE LOGIC
+			repaint();
 		}
 	}
 }
@@ -123,7 +124,7 @@ void PresetSelectorComponent::PresetToggle::paintButton (Graphics& g, bool shoul
 	// Button Draw
 	g.setColour (neova_dash::colour::mainText.interpolatedWith (Colour (0xff313131),
 																getToggleState()
-																	? 0.0f : shouldDrawButtonAsHighlighted ? 0.3f
+																	? 0.0f : shouldDrawButtonAsHighlighted ? 0.4f
 																										   : 0.6f));
 	g.drawEllipse (ellipseArea.toFloat(), 1.5f);
 
@@ -132,7 +133,8 @@ void PresetSelectorComponent::PresetToggle::paintButton (Graphics& g, bool shoul
 //==============================================================================
 // GestureLED
 
-PresetSelectorComponent::GestureLED::GestureLED (const int ledNum) : id (ledNum)
+PresetSelectorComponent::GestureLED::GestureLED (const int ledNum, HubConfiguration& config)
+	: id (ledNum), hubConfig (config)
 {
 }
 PresetSelectorComponent::GestureLED::~GestureLED()
@@ -143,17 +145,27 @@ void PresetSelectorComponent::GestureLED::paint (Graphics& g)
 	auto ledArea = Rectangle<float> (float (jmin (getHeight(), getWidth())),
 									 float (jmin (getHeight(), getWidth()))).withCentre (getLocalBounds().getCentre()
 																			                             .toFloat());
-	Colour ledColour (Colours::lightblue);
 
-	ColourGradient ledGrad (ledColour.withAlpha (0.6f), getLocalBounds().getCentre().toFloat(),
-							Colour (0), getLocalBounds().getCentre().translated (0, 5).toFloat(),
-							true);
+	if (hubConfig.getGestureData (id).type != int (neova_dash::gesture::none))
+	{
+		Colour ledColour (neova_dash::gesture::getHighlightColour
+			                 (neova_dash::gesture::intToGestureType (hubConfig.getGestureData (id).type)));
 
-	g.setColour (ledColour);
-	g.fillEllipse (Rectangle<float>(3.0f, 3.0f).withCentre (ledArea.getCentre()));
+		ColourGradient ledGrad (ledColour.withAlpha (0.6f), getLocalBounds().getCentre().toFloat(),
+								Colour (0), getLocalBounds().getCentre().translated (0, 5).toFloat(),
+								true);
 
-	g.setGradientFill (ledGrad);
-	g.fillEllipse (ledArea);
+		g.setColour (ledColour);
+		g.fillEllipse (Rectangle<float>(3.0f, 3.0f).withCentre (ledArea.getCentre()));
+
+		g.setGradientFill (ledGrad);
+		g.fillEllipse (ledArea);
+	}
+	else
+	{
+		g.setColour (Colour (0x80000000));
+		g.fillEllipse (Rectangle<float>(3.0f, 3.0f).withCentre (ledArea.getCentre()));
+	}
 }
 void PresetSelectorComponent::GestureLED::resized()
 {

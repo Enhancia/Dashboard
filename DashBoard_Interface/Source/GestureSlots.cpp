@@ -10,9 +10,6 @@
 
 #include "GestureSlots.h"
 
-
-#include "GesturePanelSlots.h"
-
 //==============================================================================
 // Gesture Component
 
@@ -21,7 +18,7 @@ GestureComponent::GestureComponent (HubConfiguration& hubCfg, const int gestNum,
                                                               const int& draggedGestureReference,
                                                               const int& draggedOverSlotReference)
     : hubConfig (hubCfg),
-      id (gestNum), type (hubConfig.getGestureData (id).type)
+      id (gestNum), type (hubConfig.getGestureData (id).type),
       dragMode (dragModeReference),
       draggedGesture (draggedGestureReference),
       draggedOverSlot (draggedOverSlotReference)
@@ -37,40 +34,30 @@ GestureComponent::~GestureComponent()
     muteButton = nullptr;
 }
 
-const String GestureComponent::getInfoString()
-{
-    return "Type : " + neova_dash::gesture::getTypeString (type, true) + "\n\n" +
-           "State : " + (hubConfig.getGestureData (id).on ? "Enabled" : "Disabled")
-}
-
-void GestureComponent::update()
-{
-    gestureNameLabel->setText (neova_dash::gesture::getTypeString (type, true).toUpperCase(), sendNotification);
-    muteButton->setToggleState (bool (hubConfig.getGestureData (id)), sendNotification);
-    repaint();
-}
-
 void GestureComponent::paint (Graphics& g)
 {
     // BackGround + Header Fill
-    g.setColour (getPlumeColour (basePanelBackground));
+    g.setColour (neova_dash::colour::gestureBackground);
     g.fillRoundedRectangle (getLocalBounds().toFloat(), 10.0f);
 
     g.saveState();
     g.reduceClipRegion (0, 0, getWidth(), 30);
-    g.setColour (getPlumeColour (basePanelHeaderFill));
+    g.setColour (neova_dash::colour::gestureHeader);
     g.fillRoundedRectangle (getLocalBounds().toFloat(), 10.0f);
     g.restoreState();
 
     // Outline
     if (dragMode && draggedGesture != id && draggedOverSlot == id)
     {
-        g.setColour (neova_dash::gesture::getGestureColour (hubConfig.getGestureData (draggedGesture).type));
+        g.setColour (neova_dash::gesture::getHighlightColour
+		                (static_cast <neova_dash::gesture::GestureType>
+							(hubConfig.getGestureData (draggedGesture).type)));
+
         g.drawRoundedRectangle (getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 3.0f);
     }
     else if (selected)
     {
-        g.setColour (neova_dash::gesture::getGestureColour (type));
+        g.setColour (neova_dash::gesture::getHighlightColour (static_cast <neova_dash::gesture::GestureType> (type)));
         g.drawRoundedRectangle (getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 1.0f);
     }
 
@@ -80,7 +67,7 @@ void GestureComponent::paint (Graphics& g)
     auto stateArea = area.removeFromBottom (25)
                          .reduced (neova_dash::ui::MARGIN*3, neova_dash::ui::MARGIN_SMALL);
 
-    g.setFont (neova_dash::font::dashFont.withHeight (12.0f));
+    g.setFont (Font().withHeight (12.0f));
     g.setColour (neova_dash::colour::subText);
     
     g.drawText (hubConfig.getGestureData (id).type == neova_dash::gesture::pitchBend || neova_dash::gesture::vibrato
@@ -146,11 +133,15 @@ void GestureComponent::startNameEntry()
 
 void GestureComponent::createLabel()
 {
-    addAndMakeVisible (gestureNameLabel = new Label ("gestureNameLabel", hubConfig.getTypeString (type).toUpperCase()));
+    addAndMakeVisible (gestureNameLabel = new Label ("gestureNameLabel",
+		                                             neova_dash::gesture::getTypeString
+													     (neova_dash::gesture::intToGestureType(type),
+														  true).toUpperCase()));
+
     gestureNameLabel->setEditable (false, false, false);
     gestureNameLabel->setColour (Label::backgroundColourId, Colour (0x00000000));
-    gestureNameLabel->setColour (Label::textColourId, getPlumeColour (basePanelMainText));
-    gestureNameLabel->setFont (PLUME::font::plumeFontBold.withHeight (15.0f));
+    gestureNameLabel->setColour (Label::textColourId, neova_dash::colour::mainText);
+    gestureNameLabel->setFont (Font().withHeight (15.0f));
     gestureNameLabel->setJustificationType (Justification::centred);
     gestureNameLabel->setInterceptsMouseClicks (false, false);
     gestureNameLabel->addListener (this);
@@ -158,17 +149,24 @@ void GestureComponent::createLabel()
 
 void GestureComponent::createButton()
 {
-    addAndMakeVisible (muteButton = new PlumeShapeButton ("Mute Button",
-                                                          neova_dash::colour::dashboardBackground,
-                                                          neova_dash::colour::inactiveGesture,
-                                                          neova_dash::gesture::getHighlightColour (type)));
+    addAndMakeVisible (muteButton = new ShapeButton ("Mute Button",
+                                                     Colour (0),
+                                                     Colour (0),
+                                                     Colour (0)));
 
-    muteButton->setShape (PLUME::path::createPath (PLUME::path::onOff), false, true, false);
+    // TO DELETE
+    Path muteButtonPath;
+    muteButtonPath.addRectangle (Rectangle<float> (10.0f, 10.0f));
+
+	using namespace neova_dash;
+
+    muteButton->setShape (muteButtonPath, false, true, false);
+    muteButton->setOutline (gesture::getHighlightColour (gesture::intToGestureType (type)), 1.5f);
     muteButton->setToggleState (hubConfig.getGestureData (id).on, dontSendNotification);
     muteButton->setClickingTogglesState (true);
     muteButton->onClick = [this] ()
     {
-        hubConfig.setUint8ValueandUpload (id, HubConfiguration::on, uint8 (muteButton->getToggleState() ? 1 : 0));
+        hubConfig.setUint8ValueAndUpload (id, HubConfiguration::on, uint8 (muteButton->getToggleState() ? 1 : 0));
     
         if (selected)
         {
@@ -243,7 +241,7 @@ void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
 EmptyGestureSlotComponent::EmptyGestureSlotComponent (HubConfiguration& hubCfg, const int slotId,
                                                                                 const bool& dragModeReference,
                                                                                 const int& draggedGestureReference,
-                                                                                const int& draggedOverSlotReference);
+                                                                                const int& draggedOverSlotReference)
     : id (slotId), hubConfig (hubCfg),
                    dragMode (dragModeReference),
                    draggedGesture (draggedGestureReference),
@@ -251,14 +249,6 @@ EmptyGestureSlotComponent::EmptyGestureSlotComponent (HubConfiguration& hubCfg, 
 {
 }
 EmptyGestureSlotComponent::~EmptyGestureSlotComponent()
-{
-}
-
-const String EmptyGestureSlotComponent::getInfoString()
-{
-    return String();
-}
-void EmptyGestureSlotComponent::update()
 {
 }
 
@@ -275,14 +265,14 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
 
     if (highlighted)
     {
-        g.setColour (getPlumeColour (emptySlotBackground));
+        g.setColour (neova_dash::colour::emptySlotBackground);
         g.fillRoundedRectangle (getLocalBounds().toFloat(), 10.0f);
     }
 
-
     if (dragMode && draggedGesture != id && draggedOverSlot == id)
     {
-        g.setColour (neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (draggedGesture).type));
+        g.setColour (neova_dash::gesture::getHighlightColour
+                        (neova_dash::gesture::intToGestureType (hubConfig.getGestureData (draggedGesture).type)));
     }
     else
     {
@@ -296,7 +286,8 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
     // Outline
     if (dragMode && draggedGesture != id && draggedOverSlot == id)
     {
-        g.setColour (getHighlightColour (hubConfig.getGestureData (draggedGesture).type));
+        g.setColour (neova_dash::gesture::getHighlightColour
+                        (neova_dash::gesture::intToGestureType (hubConfig.getGestureData (draggedGesture).type)));
 		g.drawRoundedRectangle(getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 3.0f);
     }
 

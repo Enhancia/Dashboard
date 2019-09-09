@@ -81,18 +81,43 @@ public:
     void setMidiChannelAndUpload (const uint8 newMidiChannel);
     void setUint8ValueAndUpload (const int gestureNumber, const uint8DataId dataId, const uint8 newUint8Value);
     void setFloatValueAndUpload (const int gestureNumber, const floatDataId dataId, const float newFloatValue);
-    //float getData (dataID dataToGet);
+
+    void setDefaultGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType, const int presetNumber);
+    void setDefaultGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType);
     
+    //==============================================================================
     void setPreset (const int gestureNumberToSelect);
     const int getSelectedPreset();
 
     GestureData& getGestureData (const int gestureNumber, const int presetNumber);
 	GestureData& getGestureData (const int gestureNumber);
 
+    //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber, const int presetNumber);
+    //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber);
+
     //const String getHubFirm();
     //const String getRingFirm();
 
 private:
+    //==============================================================================
+    void setDefaultConfig(); // TEST PURPOSE!! Maybe TO DELETE since the dashboard should match the hub anyways..
+
+    void setGestureData (int presetNum, int gestureNum,
+                                        uint8 newOn,
+                                        uint8 newType,
+                                        uint8 newMidiLow,
+                                        uint8 newMidiHigh,
+                                        uint8 newCc,
+                                        bool uploadToHub = false);
+
+    void setGestureParameters (int presetNum, int gestureNum, float value0,
+                                                              float value1,
+                                                              float value2 = 0.0f,
+                                                              float value3 = 0.0f,
+                                                              float value4 = 0.0f,
+                                                              float value5 = 0.0f,
+                                                              bool uploadToHub = false);
+
     //==============================================================================
 	ApplicationCommandManager& commandManager = getCommandManager();
 	int selectedPreset = -1;
