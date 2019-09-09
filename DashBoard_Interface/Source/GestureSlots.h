@@ -33,10 +33,6 @@ public:
     void resized() override;
 
     //==============================================================================
-    void editorShown (Label* lbl, TextEditor& ted) override;
-    void labelTextChanged (Label* lbl) override;
-
-    //==============================================================================
     void mouseEnter (const MouseEvent &event) override;
     void mouseExit (const MouseEvent &event) override;
     void mouseDrag (const MouseEvent &event) override;
@@ -51,15 +47,12 @@ public:
 
     //==============================================================================
     const int id;
+    const neova_dash::gesture::type type;
 
 private:
     //==============================================================================
     void createLabel();
     void createButton();
-    void paintParameterSlotDisplay (Graphics& g, juce::Rectangle<int> area,
-                                                 const int numRows,
-                                                 const int numColumns,
-                                                 const int margin = 0);
     void drawGesturePath (Graphics& g, juce::Rectangle<int> area);
 
     //==============================================================================
@@ -108,7 +101,7 @@ private:
     //==============================================================================
     bool highlighted = false;
     
-    GestureArray& gestureArray;
+    HubConfiguration& hubConfig;
     const bool& dragMode;
     const int& draggedGesture;
     const int& draggedOverSlot;

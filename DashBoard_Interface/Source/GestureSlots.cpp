@@ -16,12 +16,12 @@
 //==============================================================================
 // Gesture Component
 
-GestureComponent::GestureComponent (Gesture& gest, GestureArray& gestArray,
-                                    const bool& dragModeReference,
-                                    const int& draggedGestureReference,
-                                    const int& draggedOverSlotReference)
-    : gesture (gest), gestureArray (gestArray),
-      id (gest.id),
+GestureComponent::GestureComponent (HubConfiguration& hubCfg, const int gestNum,
+                                                              const bool& dragModeReference,
+                                                              const int& draggedGestureReference,
+                                                              const int& draggedOverSlotReference)
+    : hubConfig (hubCfg),
+      id (gestNum), type (hubConfig.getGestureData (id).type)
       dragMode (dragModeReference),
       draggedGesture (draggedGestureReference),
       draggedOverSlot (draggedOverSlotReference)
@@ -39,16 +39,14 @@ GestureComponent::~GestureComponent()
 
 const String GestureComponent::getInfoString()
 {
-    return gesture.getName() + " | " + gesture.getTypeString (true) + "\n\n" +
-           "State : " + (gesture.isActive() ? "Enabled" : "Disabled") +
-           " | Mode : " + (gesture.generatesMidi() ? "MIDI\n" : "Parameters\n")
-           + "\n" + gesture.getDescription();
+    return "Type : " + neova_dash::gesture::getTypeString (type, true) + "\n\n" +
+           "State : " + (hubConfig.getGestureData (id).on ? "Enabled" : "Disabled")
 }
 
 void GestureComponent::update()
 {
-    gestureNameLabel->setText (gesture.getName().toUpperCase(), sendNotification);
-    muteButton->setToggleState (gesture.isActive(), sendNotification);
+    gestureNameLabel->setText (neova_dash::gesture::getTypeString (type, true).toUpperCase(), sendNotification);
+    muteButton->setToggleState (bool (hubConfig.getGestureData (id)), sendNotification);
     repaint();
 }
 
@@ -67,12 +65,12 @@ void GestureComponent::paint (Graphics& g)
     // Outline
     if (dragMode && draggedGesture != id && draggedOverSlot == id)
     {
-        g.setColour (gestureArray.getGesture (draggedGesture)->getHighlightColour());
+        g.setColour (neova_dash::gesture::getGestureColour (hubConfig.getGestureData (draggedGesture).type));
         g.drawRoundedRectangle (getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 3.0f);
     }
     else if (selected)
     {
-        g.setColour (gesture.getHighlightColour());
+        g.setColour (neova_dash::gesture::getGestureColour (type));
         g.drawRoundedRectangle (getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 1.0f);
     }
 
@@ -80,21 +78,15 @@ void GestureComponent::paint (Graphics& g)
 
     // Bottom display
     auto stateArea = area.removeFromBottom (25)
-                         .reduced (PLUME::UI::MARGIN*3, PLUME::UI::MARGIN_SMALL);
+                         .reduced (neova_dash::ui::MARGIN*3, neova_dash::ui::MARGIN_SMALL);
 
-    g.setFont (PLUME::font::plumeFontLight.withHeight (12.0f));
-    g.setColour (getPlumeColour (basePanelSubText));
+    g.setFont (neova_dash::font::dashFont.withHeight (12.0f));
+    g.setColour (neova_dash::colour::subText);
     
-    if (gesture.generatesMidi())
-    {
-        g.drawText (gesture.midiType == Gesture::pitch ? "Pitch MIDI"
-                                                       : "CC " + String (gesture.getCc()) + " MIDI",
-                    stateArea, Justification::centred, true);
-    }
-    else
-    {
-        paintParameterSlotDisplay (g, stateArea, 1, 6, PLUME::UI::MARGIN);
-    }
+    g.drawText (hubConfig.getGestureData (id).type == neova_dash::gesture::pitchBend || neova_dash::gesture::vibrato
+                                                        ?  "Pitch MIDI"
+                                                        : "CC " + String (hubConfig.getGestureData (id).cc) + " MIDI",
+                stateArea, Justification::centred, true);
     
     // Gesture Image
     drawGesturePath (g, area);
@@ -112,22 +104,8 @@ void GestureComponent::resized()
     auto headerArea = getLocalBounds().removeFromTop (30);
 
     gestureNameLabel->setBounds (headerArea.withSizeKeepingCentre (getWidth()*2/3, 25));
-    muteButton->setBounds (headerArea.removeFromRight (30 + PLUME::UI::MARGIN)
+    muteButton->setBounds (headerArea.removeFromRight (30 + neova_dash::ui::MARGIN)
                                      .withSizeKeepingCentre (18, 18));
-}
-void GestureComponent::editorShown (Label* lbl, TextEditor& ted)
-{
-    ted.setColour (TextEditor::highlightColourId, Colour (0xff101010));
-    ted.setColour (TextEditor::textColourId, Colour (0xff959595));
-    ted.setJustification (Justification::centred);
-}
-
-void GestureComponent::labelTextChanged (Label* lbl)
-{
-    gesture.setName (gestureNameLabel->getText());
-    gestureNameLabel->setText (gesture.getName(), dontSendNotification);
-    
-    dynamic_cast<PlumeComponent*> (getParentComponent())->update();
 }
 
 void GestureComponent::mouseEnter (const MouseEvent &event)
@@ -142,10 +120,6 @@ void GestureComponent::mouseDrag (const MouseEvent &event)
 {
 }
 
-Gesture& GestureComponent::getGesture()
-{
-    return gesture;
-}
 bool GestureComponent::isSelected() const
 {
     return selected;
@@ -172,7 +146,7 @@ void GestureComponent::startNameEntry()
 
 void GestureComponent::createLabel()
 {
-    addAndMakeVisible (gestureNameLabel = new Label ("gestureNameLabel", gesture.getName().toUpperCase()));
+    addAndMakeVisible (gestureNameLabel = new Label ("gestureNameLabel", hubConfig.getTypeString (type).toUpperCase()));
     gestureNameLabel->setEditable (false, false, false);
     gestureNameLabel->setColour (Label::backgroundColourId, Colour (0x00000000));
     gestureNameLabel->setColour (Label::textColourId, getPlumeColour (basePanelMainText));
@@ -185,58 +159,26 @@ void GestureComponent::createLabel()
 void GestureComponent::createButton()
 {
     addAndMakeVisible (muteButton = new PlumeShapeButton ("Mute Button",
-                                                          getPlumeColour (plumeBackground),
-                                                          getPlumeColour (mutedHighlight),
-                                                          Gesture::getHighlightColour (gesture.type)));
+                                                          neova_dash::colour::dashboardBackground,
+                                                          neova_dash::colour::inactiveGesture,
+                                                          neova_dash::gesture::getHighlightColour (type)));
 
     muteButton->setShape (PLUME::path::createPath (PLUME::path::onOff), false, true, false);
-    muteButton->setToggleState (gesture.isActive(), dontSendNotification);
+    muteButton->setToggleState (hubConfig.getGestureData (id).on, dontSendNotification);
     muteButton->setClickingTogglesState (true);
     muteButton->onClick = [this] ()
-    { 
-        gesture.setActive (muteButton->getToggleState());
-        
+    {
+        hubConfig.setUint8ValueandUpload (id, HubConfiguration::on, uint8 (muteButton->getToggleState() ? 1 : 0));
+    
         if (selected)
         {
             if (auto* closeButton = dynamic_cast<Button*> (getParentComponent()
     														  ->findChildWithID ("Close Button")))
-    			closeButton->setToggleState (gesture.isActive(), dontSendNotification);
+    			closeButton->setToggleState (hubConfig.getGestureData (id).on, dontSendNotification);
         }
 
         repaint();
     };
-}
-
-void GestureComponent::paintParameterSlotDisplay  (Graphics& g, juce::Rectangle<int> area,
-                                                            const int numRows,
-                                                            const int numColumns,
-                                                            const int sideLength)
-{
-    /*  Hitting this assert means you're trying to paint this object with a number of
-        parameters that doesn't match the actual maximum number of parameters allowed
-        for a gesture.
-    */
-    jassert (numRows * numColumns == PLUME::MAX_PARAMETER);
-
-    int rowHeight = area.getHeight()/numRows;
-    int columnWidth = area.getWidth()/numColumns;
-
-    for (int row=0; row < numRows; row++)
-    {
-        auto columnArea = area.removeFromTop (rowHeight);
-
-        for (int column=0; column < numColumns; column++)
-        {
-            int slotSide = jmin (sideLength, rowHeight - 8, columnWidth - 8);
-            auto slotArea = columnArea.removeFromLeft (columnWidth)
-                                      .withSizeKeepingCentre (slotSide, slotSide);
-
-            g.setColour ((row*numColumns) + column < gesture.getParameterArray().size() ?
-                            gesture.getHighlightColour() :
-                            getPlumeColour (plumeBackground));
-            g.fillRoundedRectangle (slotArea.toFloat(), sideLength / 3.5f);
-        }
-    }
 }
 
 void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
@@ -246,11 +188,12 @@ void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
     // Icon Fill
     Path iconFill;
 
-    if (gesture.type == Gesture::tilt) iconFill = PLUME::path::createPath (PLUME::path::handTilt);
-    else if (gesture.type == Gesture::roll) iconFill = PLUME::path::createPath (PLUME::path::handRoll);
+    /*
+    if (type == Gesture::tilt) iconFill = PLUME::path::createPath (PLUME::path::handTilt);
+    else if (type == Gesture::roll) iconFill = PLUME::path::createPath (PLUME::path::handRoll);
     else iconFill = PLUME::path::createPath (PLUME::path::handFingerDown);
 
-    auto areaFloat = (gesture.type == Gesture::tilt || gesture.type == Gesture::roll)
+    auto areaFloat = (type == Gesture::tilt || type == Gesture::roll)
                           ? area.reduced (area.getWidth()/8, area.getHeight()/4).toFloat()
                           : area.reduced (area.getWidth()/4, area.getHeight()/8).toFloat();
 
@@ -258,7 +201,7 @@ void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
                          areaFloat.getWidth(), areaFloat.getHeight(), true);
 
     g.fillPath (iconFill);
-
+    */
     // Icon stroke
     /*
     Path iconStroke;
@@ -297,12 +240,11 @@ void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
 //==============================================================================
 // Gesture Slot 
 
-EmptyGestureSlotComponent::EmptyGestureSlotComponent (const int slotId,
-                                                      GestureArray& gestArray,
-                                                      const bool& dragModeReference,
-                                                      const int& draggedGestureReference,
-                                                      const int& draggedOverSlotReference)
-    : id (slotId), gestureArray (gestArray),
+EmptyGestureSlotComponent::EmptyGestureSlotComponent (HubConfiguration& hubCfg, const int slotId,
+                                                                                const bool& dragModeReference,
+                                                                                const int& draggedGestureReference,
+                                                                                const int& draggedOverSlotReference);
+    : id (slotId), hubConfig (hubCfg),
                    dragMode (dragModeReference),
                    draggedGesture (draggedGestureReference),
                    draggedOverSlot (draggedOverSlotReference)
@@ -340,11 +282,11 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
 
     if (dragMode && draggedGesture != id && draggedOverSlot == id)
     {
-        g.setColour (gestureArray.getGesture (draggedGesture)->getHighlightColour());
+        g.setColour (neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (draggedGesture).type));
     }
     else
     {
-        g.setColour (getPlumeColour (emptySlotOutline));
+        g.setColour (neova_dash::colour::emptySlotOutline);
     }
 
     // Plus Icon
@@ -354,13 +296,13 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
     // Outline
     if (dragMode && draggedGesture != id && draggedOverSlot == id)
     {
-        g.setColour (gestureArray.getGesture (draggedGesture)->getHighlightColour());
+        g.setColour (getHighlightColour (hubConfig.getGestureData (draggedGesture).type));
 		g.drawRoundedRectangle(getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 3.0f);
     }
 
     else //if (highlighted)
     {
-        g.setColour (getPlumeColour (emptySlotOutline));
+        g.setColour (neova_dash::colour::emptySlotOutline);
         PathStrokeType outlineStroke (1.0f, PathStrokeType::mitered, PathStrokeType::butt);
         Path dashedOutline;
 		const float dashLengths[] = {5.0f, 5.0f};

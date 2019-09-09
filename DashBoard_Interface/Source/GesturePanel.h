@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DashCommon.h"
+#include "HubConfiguration.h"
 
 //==============================================================================
 /*

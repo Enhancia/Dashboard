@@ -55,7 +55,7 @@ const int HubConfiguration::getSelectedPreset()
 	return selectedPreset;
 }
 
-GestureData& HubConfiguration::getGestureData (const int gestureNumber, const int presetNumber)
+HubConfiguration::GestureData& HubConfiguration::getGestureData (const int gestureNumber, const int presetNumber)
 {
 	PresetData preset;
 
@@ -88,4 +88,9 @@ GestureData& HubConfiguration::getGestureData (const int gestureNumber, const in
 		default:
 			return preset.gestureData0;
 	}
+}
+
+HubConfiguration::GestureData& HubConfiguration::getGestureData (const int gestureNumber)
+{
+	return getGestureData (gestureNumber, selectedPreset);
 }

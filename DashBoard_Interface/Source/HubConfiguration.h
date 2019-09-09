@@ -22,7 +22,7 @@ public:
     struct GestureData // values for each gesture
     {
     	uint8 on = 1;
-    	uint8 type = HubConfiguration::none;
+    	uint8 type = neova_dash::gesture::none;
     	uint8 midiLow = 0;
     	uint8 midiHigh = 127;
     	uint8 cc = 0;
@@ -37,10 +37,10 @@ public:
 
     struct PresetData
     {
-    	GestureData gesture0;
-    	GestureData gesture1;
-    	GestureData gesture2;
-    	GestureData gesture3;
+    	GestureData gestureData0;
+    	GestureData gestureData1;
+    	GestureData gestureData2;
+    	GestureData gestureData3;
     };
 
     struct ConfigData
@@ -54,17 +54,6 @@ public:
     };
 
     //==============================================================================
-    enum gestureType // Possible types of gestures
-    {
-    	none = 0,
-
-    	vibrato,
-    	pitchBend,
-    	tilt,
-    	roll,
-    	wave
-    };
-
     enum uint8DataId
     {
     	on = 0,
@@ -97,7 +86,8 @@ public:
     void setPreset (const int gestureNumberToSelect);
     const int getSelectedPreset();
 
-    GestureData& getGestureData (const int gestureNumber, const int presetNumber = selectedPreset);
+    GestureData& getGestureData (const int gestureNumber, const int presetNumber);
+	GestureData& getGestureData (const int gestureNumber);
 
     //const String getHubFirm();
     //const String getRingFirm();
