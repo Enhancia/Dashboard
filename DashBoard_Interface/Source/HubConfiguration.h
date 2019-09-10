@@ -21,6 +21,9 @@ public:
     //==============================================================================
     struct GestureData // values for each gesture
     {
+        GestureData() = default;
+        GestureData (GestureData& other);
+
     	uint8 on = 1;
     	uint8 type = neova_dash::gesture::none;
     	uint8 midiLow = 0;
@@ -84,10 +87,17 @@ public:
 
     void setDefaultGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType, const int presetNumber);
     void setDefaultGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType);
+
+    void moveGestureToId (const int idToMoveFrom, const int idToMoveTo);
+    void duplicateGesture (const int idToDuplicateFrom, const bool prioritizeHigherId = true);
+    void swapGestures (const int id1, const int id2);
     
     //==============================================================================
     void setPreset (const int gestureNumberToSelect);
     const int getSelectedPreset();
+
+    PresetData& getPresetData (const int presetNumber);
+    PresetData& getPresetData();
 
     GestureData& getGestureData (const int gestureNumber, const int presetNumber);
 	GestureData& getGestureData (const int gestureNumber);
@@ -117,6 +127,9 @@ private:
                                                               float value4 = 0.0f,
                                                               float value5 = 0.0f,
                                                               bool uploadToHub = false);
+
+    int findClosestIdToDuplicate (int idToDuplicateFrom, bool prioritizeHigherId);
+    bool isIdAvailable (const int idToCheck);
 
     //==============================================================================
 	ApplicationCommandManager& commandManager = getCommandManager();

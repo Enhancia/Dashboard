@@ -30,11 +30,19 @@ namespace neova_dash
 
     namespace ui
     {
+        // UI display constant sizes, in px
         const int MARGIN           = 8;
         const int MARGIN_SMALL     = 3;
         const int DASHBOARD_WIDTH  = 1266*3/4;
         const int DASHBOARD_HEIGHT = 1100*3/4;
         const int HEADER_HEIGHT    = 55;
+
+        const int FRAMERATE = 60; // Display frequency in Hz
+
+        extern void paintTiledPath (Graphics&, Path&, juce::Rectangle<float>,
+                                               const float, const float,
+                                               const Colour, const Colour,
+                                               const float);
     };
 
     namespace colour
@@ -77,11 +85,12 @@ namespace neova_dash
             none
         };
 
-        extern neova_dash::gesture::GestureType intToGestureType (int typeInt);
-        extern const String getTypeString (neova_dash::gesture::GestureType type, bool withSpacingAndCase);
-        extern const String getDescriptionString (neova_dash::gesture::GestureType type);
-        extern const Colour getHighlightColour (neova_dash::gesture::GestureType type);
-        extern const Colour getHighlightColour (int typeInt);
+        extern GestureType intToGestureType (const int typeInt);
+        extern const String getTypeString (const GestureType type, const bool withSpacingAndCase);
+        extern const String getTypeString (const int typeInt, const bool withSpacingAndCase);
+        extern const String getDescriptionString (const GestureType type);
+        extern const Colour getHighlightColour (const GestureType type);
+        extern const Colour getHighlightColour (const int typeInt);
     };
 
     namespace font

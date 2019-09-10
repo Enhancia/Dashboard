@@ -12,21 +12,21 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DashCommon.h"
+
 #include "HubConfiguration.h"
 #include "GestureSlots.h"
-//#include "NewGesturePanel"
+#include "NewGesturePanel.h"
+#include "GestureSettingsComponent.h"
 
 //==============================================================================
 /*
 */
 class GesturePanel    : public Component,
-                        public Timer,
-                        private Button::Listener,
-                        private AudioProcessorValueTreeState::Listener
+                        public Timer
 {
 public:
     //==============================================================================
-    GesturePanel (HubConfiguration& data, /*NewGesturePanel& newGest,*/
+    GesturePanel (HubConfiguration& data, NewGesturePanel& newGest,
                   int freqHz = 60);
     ~GesturePanel();
 
@@ -42,17 +42,10 @@ public:
     //==============================================================================
     // Callbacks
     void timerCallback() override;
-    void buttonClicked (Button*) override;
-    void parameterChanged (const String &parameterID, float newValue) override;
 
     void mouseUp (const MouseEvent &event) override;
     void mouseDrag (const MouseEvent &event) override;
     bool keyPressed (const KeyPress &key) override;
-
-    //==============================================================================
-    void removeListenerForAllParameters();
-    void addParameterListenerForGestureId (const int id);
-    void removeParameterListenerForGestureId (const int id);
 
     //==============================================================================
     void initialiseGestureSlots();
@@ -79,20 +72,16 @@ private:
     void handleLeftClickDrag (const MouseEvent &event);
 
     //==============================================================================
-    void setSettingsVisible (bool shouldBeVisible);
-
-    //==============================================================================
     void startDragMode (int slotBeingDragged);
     void endDragMode();
 
     //==============================================================================
     OwnedArray<Component> gestureSlots;
-    //ScopedPointer<GestureSettingsComponent> gestureSettings;
+    ScopedPointer<GestureSettingsComponent> gestureSettings;
 
     //==============================================================================
     int selectedGesture = -1;
     int freq;
-    bool settingsVisible = true;
 
     //==============================================================================
     bool dragMode = false;

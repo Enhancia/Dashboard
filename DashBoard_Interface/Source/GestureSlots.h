@@ -14,8 +14,7 @@
 #include "DashCommon.h"
 #include "HubConfiguration.h"
 
-class GestureComponent : public Component,
-                         private Label::Listener
+class GestureComponent : public Component
 {
 public:
     //==============================================================================

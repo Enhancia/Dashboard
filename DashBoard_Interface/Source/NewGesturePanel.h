@@ -24,7 +24,7 @@ class NewGesturePanel    : public Component,
 {
 public:
     //==============================================================================
-    explicit NewGesturePanel (HubConfiguration& config);
+    explicit NewGesturePanel (HubConfiguration& config, ApplicationCommandManager& commandManager);
     ~NewGesturePanel();
 
     //==============================================================================
@@ -45,7 +45,7 @@ public:
     void createNewGesture();
     void showPanelForGestureID (const int gestureID);
     void hidePanel (const bool resetSelectedSlot = false);
-    void updateGesturePanel();
+    void updateInterface();
     const int getLastSelectedSlot();
 
 private:
@@ -93,6 +93,7 @@ private:
 
     //==============================================================================
     HubConfiguration& hubConfig;
+    ApplicationCommandManager& commandManager;
     
     //==============================================================================
     ScopedPointer<ShapeButton> closeButton;

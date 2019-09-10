@@ -11,7 +11,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DashCommon.h"
 
-//#include "GesturePanel.h"
+#include "GesturePanel.h"
 #include "NewGesturePanel.h"
 #include "HeaderComponent.h"
 #include "PresetSelectorComponent.h"
@@ -46,7 +46,7 @@ private:
     //==============================================================================
     std::unique_ptr<HeaderComponent> header;
     std::unique_ptr<PresetSelectorComponent> presetSelector;
-    //std::unique_ptr<GesturePanel> gesturePanel;
+    std::unique_ptr<GesturePanel> gesturePanel;
     std::unique_ptr<NewGesturePanel> newGesturePanel;
     std::unique_ptr<UploadButton> uploadButton;
     

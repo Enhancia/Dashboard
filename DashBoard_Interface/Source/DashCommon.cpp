@@ -12,9 +12,71 @@
 
 namespace neova_dash
 {
+
+namespace ui
+{
+	void paintTiledPath (Graphics& g, Path& pathToTile, juce::Rectangle<float> bounds,
+                                      const float columnWidth, const float rowHeight,
+                                      const Colour fillColour, const Colour strokeColour,
+                                      const float strokeThickness)
+    {
+        // Making sure the bounds are sensible
+        jassert (bounds.getWidth() > 0.0f && bounds.getHeight() > 0.0f);
+        jassert (columnWidth > 0.0f && rowHeight > 0.0f);
+
+        if (bounds.getWidth() <= 0.0f || bounds.getHeight() <= 0.0f
+               || columnWidth <= 0.0f || rowHeight <= 0.0f)
+        {
+            return;
+        }
+        
+        Path pathRescaled = pathToTile;
+        Path tiledPath;
+
+        // sets the right initial position and size for the path
+        pathRescaled.scaleToFit (pathToTile.getBounds().getWidth() > columnWidth
+                                   ? bounds.getX() : bounds.getX() + columnWidth/2.0f
+                                                                   - pathToTile.getBounds()
+                                                                               .getWidth()/2,
+
+                                 pathToTile.getBounds().getHeight() > rowHeight
+                                   ? bounds.getY() : bounds.getY() + rowHeight/2.0f
+                                                                   - pathToTile.getBounds()
+                                                                               .getHeight()/2,
+
+                                 pathToTile.getBounds().getWidth() > columnWidth
+                                     ? columnWidth : pathToTile.getBounds().getWidth(),
+
+                                 pathToTile.getBounds().getHeight() > rowHeight
+                                     ? rowHeight : pathToTile.getBounds().getHeight(),
+                               
+                               true);
+
+        for (int row = 0; row * rowHeight < bounds.getHeight(); row++)
+        {
+            for (int col = 0; col * columnWidth < bounds.getWidth(); col++)
+            {
+                tiledPath.addPath (pathRescaled, AffineTransform::translation (col * columnWidth,
+                                                                               row * rowHeight));
+            }   
+        }
+
+        g.saveState();
+        g.reduceClipRegion (bounds.toNearestIntEdges());
+
+        g.setColour (fillColour);
+        g.fillPath (tiledPath);
+
+        g.setColour (strokeColour);
+        g.strokePath (tiledPath, PathStrokeType (strokeThickness));
+
+        g.restoreState();
+    }
+}; // namespace ui
+
 namespace gesture
 {
-	neova_dash::gesture::GestureType intToGestureType (int typeInt)
+	neova_dash::gesture::GestureType intToGestureType (const int typeInt)
 	{
 		switch (typeInt)
 		{
@@ -27,7 +89,7 @@ namespace gesture
 		}
 	}
 
-	const String getTypeString (neova_dash::gesture::GestureType type, bool withSpacingAndCase)
+	const String getTypeString (const neova_dash::gesture::GestureType type, const bool withSpacingAndCase)
 	{
 		switch (type)
 		{
@@ -50,8 +112,12 @@ namespace gesture
 				return "none";
 		}
 	}
+	const String getTypeString (const int typeInt, const bool withSpacingAndCase)
+	{
+		return getTypeString (intToGestureType (typeInt), withSpacingAndCase);
+	}
 
-	const String getDescriptionString (neova_dash::gesture::GestureType type)
+	const String getDescriptionString (const neova_dash::gesture::GestureType type)
 	{
 		switch (type)
 		{
@@ -77,7 +143,7 @@ namespace gesture
 		}
 	}
 
-	const Colour getHighlightColour (neova_dash::gesture::GestureType type)
+	const Colour getHighlightColour (const neova_dash::gesture::GestureType type)
 	{
 		switch (type)
 		{
@@ -101,7 +167,7 @@ namespace gesture
 		}	
 	}
 
-    const Colour getHighlightColour (int typeInt)
+    const Colour getHighlightColour (const int typeInt)
     {
     	return getHighlightColour (intToGestureType (typeInt));
     }

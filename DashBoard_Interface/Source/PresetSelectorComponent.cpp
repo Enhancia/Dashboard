@@ -14,7 +14,8 @@
 //==============================================================================
 // PresetSelectorComponent
 
-PresetSelectorComponent::PresetSelectorComponent (HubConfiguration& data) : hubConfig (data)
+PresetSelectorComponent::PresetSelectorComponent (HubConfiguration& config, ApplicationCommandManager& manager)
+    : hubConfig (config), commandManager (manager)
 {
 	// Creates Toggles And Lights
 	for (int i =0; i < 4; i++)
@@ -84,8 +85,9 @@ void PresetSelectorComponent::buttonClicked (Button* bttn)
 		{
 			hubConfig.setPreset (presetToggle->id);
 
-			currentPreset = presetToggle->id; // TO DELETE IF UPDATE LOGIC
-			repaint();
+			// TO DELETE IF UPDATE LOGIC
+			currentPreset = presetToggle->id; 
+			commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
 		}
 	}
 }

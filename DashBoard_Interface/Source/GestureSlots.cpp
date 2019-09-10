@@ -18,7 +18,7 @@ GestureComponent::GestureComponent (HubConfiguration& hubCfg, const int gestNum,
                                                               const int& draggedGestureReference,
                                                               const int& draggedOverSlotReference)
     : hubConfig (hubCfg),
-      id (gestNum), type (hubConfig.getGestureData (id).type),
+      id (gestNum), type (hubCfg.getGestureData (id).type),
       dragMode (dragModeReference),
       draggedGesture (draggedGestureReference),
       draggedOverSlot (draggedOverSlotReference)
@@ -29,7 +29,6 @@ GestureComponent::GestureComponent (HubConfiguration& hubCfg, const int gestNum,
 
 GestureComponent::~GestureComponent()
 {
-    gestureNameLabel->removeListener (this);
     gestureNameLabel = nullptr;
     muteButton = nullptr;
 }
@@ -70,9 +69,10 @@ void GestureComponent::paint (Graphics& g)
     g.setFont (Font().withHeight (12.0f));
     g.setColour (neova_dash::colour::subText);
     
-    g.drawText (hubConfig.getGestureData (id).type == neova_dash::gesture::pitchBend || neova_dash::gesture::vibrato
-                                                        ?  "Pitch MIDI"
-                                                        : "CC " + String (hubConfig.getGestureData (id).cc) + " MIDI",
+    g.drawText ((   hubConfig.getGestureData (id).type == neova_dash::gesture::pitchBend
+                 || hubConfig.getGestureData (id).type == neova_dash::gesture::vibrato)
+                    ?  "Pitch MIDI" : "CC " + String (hubConfig.getGestureData (id).cc) + " MIDI",
+                    
                 stateArea, Justification::centred, true);
     
     // Gesture Image
@@ -144,7 +144,6 @@ void GestureComponent::createLabel()
     gestureNameLabel->setFont (Font().withHeight (15.0f));
     gestureNameLabel->setJustificationType (Justification::centred);
     gestureNameLabel->setInterceptsMouseClicks (false, false);
-    gestureNameLabel->addListener (this);
 }
 
 void GestureComponent::createButton()

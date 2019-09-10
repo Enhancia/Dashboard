@@ -10,7 +10,8 @@
 
 #include "NewGesturePanel.h"
 
-NewGesturePanel::NewGesturePanel (HubConfiguration& config): hubConfig (config)
+NewGesturePanel::NewGesturePanel (HubConfiguration& config, ApplicationCommandManager& manager)
+    : hubConfig (config), commandManager (manager)
 {
   	createCloseButton();
   	createGestureSelectorButtons();
@@ -138,7 +139,7 @@ void NewGesturePanel::createNewGesture()
     using namespace neova_dash::gesture;
     hubConfig.setDefaultGestureValues (selectedGestureSlot, intToGestureType (selectedGestureType));
 
-  	updateGesturePanel();
+  	updateInterface();
 }
 
 void NewGesturePanel::labelTextChanged (Label* lbl)
@@ -177,13 +178,9 @@ void NewGesturePanel::hidePanel (const bool resetSelectedSlot)
     setVisible (false);
 }
 
-void NewGesturePanel::updateGesturePanel()
+void NewGesturePanel::updateInterface()
 {
-  /*
-    if (auto* gesturePanel = dynamic_cast<PlumeComponent*> (getParentComponent()->findChildWithID ("gesturePanel")))
-    {
-    	gesturePanel->update();
-    }*/
+    commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
 }
 
 const int NewGesturePanel::getLastSelectedSlot()

@@ -10,17 +10,18 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "GesturePanel.h"
-#include "GestureSettingsComponent.h"
 
 //==============================================================================
 GesturePanel::GesturePanel (HubConfiguration& data, NewGesturePanel& newGest,
-                            int freqHz);
+                            int freqHz)
                             : hubConfig (data), newGesturePanel (newGest),
                               freq (freqHz)
 {
     setComponentID ("gesturePanel");
     setWantsKeyboardFocus (true);
-
+    addAndMakeVisible (gestureSettings = new GestureSettingsComponent (int (hubConfig.getGestureData (selectedGesture)
+                                                                                     .type),
+                                                                       hubConfig));
     initialiseGestureSlots();
 
     startTimerHz (freq);
@@ -31,7 +32,6 @@ GesturePanel::~GesturePanel()
     stopTimer();
     unselectCurrentGesture();
     newGesturePanel.hidePanel (true);
-    removeListenerForAllParameters();
 }
 
 //==============================================================================
@@ -44,30 +44,28 @@ void GesturePanel::update()
         updateSlotIfNeeded (lastSlot);
         newGesturePanel.hidePanel();
 
-        renameGestureInSlot (lastSlot);
+        //renameGestureInSlot (lastSlot); OLD, no rename anymore
     }
 
     stopTimer();
 
-    for (int i=0; i<PLUME::NUM_GEST; i++)
+    /* OLD, doesn't fit changing a preset into account
+    for (int i=0; i<neova_dash::gesture::NUM_GEST; i++)
     {
         updateSlotIfNeeded (i);
-    }
+    }*/
+    initialiseGestureSlots();
 
     if (selectedGesture != -1)
     {
-        gestureSettings->update();
-        gestureSettings->updateMappedParameters();
-
-        closeButton->setToggleState (gestureArray.getGesture (selectedGesture)->isActive(),
-                                     dontSendNotification);
+        gestureSettings->updateComponents();
     }
 
     startTimerHz (freq);
 }
 
 //==============================================================================
-void GesturePanel::paint (Graphics&)
+void GesturePanel::paint (Graphics& g)
 {
 }
 
@@ -88,19 +86,12 @@ void GesturePanel::paintOverChildren (Graphics&)
 
 void GesturePanel::resized()
 {
-    using namespace PLUME::UI;
+    using namespace neova_dash::ui;
 
     auto area = getLocalBounds();
-    resizeSlotsAndTrimAreaAccordingly (area, MARGIN, MARGIN_SMALL);
+    resizeSlotsAndTrimAreaAccordingly (area, 4*MARGIN, 2*MARGIN);
     
-    if (settingsVisible)
-    {
-        gestureSettings->setBounds (area.reduced (MARGIN, MARGIN_SMALL));
-        /*
-        closeButton->setBounds (gestureSettings->getBounds().withLeft (gestureSettings->getRight() - MARGIN - 30)
-                                                            .withBottom (gestureSettings->getY() + 30)
-                                                            .reduced (5));*/
-    }
+    gestureSettings->setBounds (area.reduced (2*MARGIN, 2*MARGIN));
 }
 
 void GesturePanel::timerCallback()
@@ -108,14 +99,6 @@ void GesturePanel::timerCallback()
     if (gestureSettings != nullptr)
     {
         gestureSettings->updateDisplay();
-    }
-}
-
-void GesturePanel::buttonClicked (Button* bttn)
-{
-    if (bttn == closeButton)
-    {
-        unselectCurrentGesture();
     }
 }
 
@@ -256,20 +239,20 @@ bool GesturePanel::keyPressed (const KeyPress &key)
 
 void GesturePanel::initialiseGestureSlots()
 {
-    for (int i=0; i<PLUME::NUM_GEST; i++)
+    gestureSlots.clear();
+    
+    for (int i=0; i<neova_dash::gesture::NUM_GEST; i++)
     {
-        if (Gesture* gestureToCreateComponentFor = gestureArray.getGesture (i))
+        if (hubConfig.getGestureData (i).type != uint8 (neova_dash::gesture::none))
         {
-            gestureSlots.add (new GestureComponent (*gestureToCreateComponentFor, gestureArray,
+            gestureSlots.add (new GestureComponent (hubConfig, i,
                                                     dragMode, draggedGestureComponentId, draggedOverSlotId));
-            addParameterListenerForGestureId (i);
         }
         else
         {
-            gestureSlots.add (new EmptyGestureSlotComponent (i, gestureArray,
-                                                                dragMode,
-                                                                draggedGestureComponentId,
-                                                                draggedOverSlotId));
+            gestureSlots.add (new EmptyGestureSlotComponent (hubConfig, i,
+                                                             dragMode, draggedGestureComponentId,
+                                                                       draggedOverSlotId));
         }
 
         addAndMakeVisible (gestureSlots.getLast());
@@ -279,20 +262,15 @@ void GesturePanel::initialiseGestureSlots()
 
 void GesturePanel::resizeSlotsAndTrimAreaAccordingly (juce::Rectangle<int>& area, int marginX, int marginY)
 {
-    using namespace PLUME::UI;
-    if (PLUME::NUM_GEST == 0 || gestureSlots.size() == 0) return;
+    using namespace neova_dash::ui;
+    if (neova_dash::gesture::NUM_GEST == 0 || gestureSlots.size() == 0) return;
 
     // There should be an even number of gestures for the grid of gesture slots to make sense...
-    jassert (PLUME::NUM_GEST%2 == 0);
-    int numRows = PLUME::NUM_GEST/2;
+    jassert (neova_dash::gesture::NUM_GEST%2 == 0);
+    int numRows = neova_dash::gesture::NUM_GEST/2;
 
     int tempWidth = area.getWidth()/4;
-
-    
-    if (!settingsVisible)
-    {
-        area.reduce (tempWidth/2, 0);
-    }
+    area.reduce (tempWidth/4, 0);
 
     auto column1 = area.removeFromLeft (tempWidth);
     auto column2 = area.removeFromRight (tempWidth);
@@ -314,11 +292,10 @@ void GesturePanel::updateSlotIfNeeded (int slotToCheck)
     // 1st check, if a gesture was deleted (slot is GestureComponent but should be empty)
     if (auto* gestureComponent = dynamic_cast<GestureComponent*> (gestureSlots[slotToCheck]))
     {
-        if (gestureArray.getGesture (slotToCheck) == nullptr)
+        if (hubConfig.getGestureData (slotToCheck).type == uint8 (neova_dash::gesture::none))
         {
-            removeParameterListenerForGestureId (slotToCheck);
-            gestureSlots.set (slotToCheck, new EmptyGestureSlotComponent (slotToCheck,
-                                                                          gestureArray,
+            gestureSlots.set (slotToCheck, new EmptyGestureSlotComponent (hubConfig,
+                                                                          slotToCheck,
                                                                           dragMode,
                                                                           draggedGestureComponentId,
                                                                           draggedOverSlotId),
@@ -333,12 +310,10 @@ void GesturePanel::updateSlotIfNeeded (int slotToCheck)
     // 2nd check, if a gesture was created (slot is empty but should be a gestureComponent)
     else if (auto* emptySlot = dynamic_cast<EmptyGestureSlotComponent*> (gestureSlots[slotToCheck]))
     {
-        if (auto* gestureThatWasCreated = gestureArray.getGesture (slotToCheck))
+        if (hubConfig.getGestureData (slotToCheck).type != uint8 (neova_dash::gesture::none))
         {
-            addParameterListenerForGestureId (slotToCheck);
-
-            gestureSlots.set (slotToCheck, new GestureComponent (*gestureThatWasCreated,
-                                                                 gestureArray,
+            gestureSlots.set (slotToCheck, new GestureComponent (hubConfig,
+                                                                 slotToCheck,
                                                                  dragMode,
                                                                  draggedGestureComponentId,
                                                                  draggedOverSlotId),
@@ -366,7 +341,7 @@ void GesturePanel::moveGestureToId (int idToMoveFrom, int idToMoveTo)
     
     if (mustChangeSelection) unselectCurrentGesture();
 
-    gestureArray.moveGestureToId (idToMoveFrom, idToMoveTo);
+    hubConfig.moveGestureToId (idToMoveFrom, idToMoveTo);
 	update();
 
     if (mustChangeSelection)
@@ -387,16 +362,16 @@ void GesturePanel::swapGestures (int firstId, int secondId)
     }
 
     // Deletes GestureComponents for the 2 slots
-    gestureSlots.set (firstId, new EmptyGestureSlotComponent (firstId, gestureArray,
-                                                                       dragMode,
-                                                                       draggedGestureComponentId,
-                                                                       draggedOverSlotId), true);
-    gestureSlots.set (secondId, new EmptyGestureSlotComponent (secondId, gestureArray,
+    gestureSlots.set (firstId, new EmptyGestureSlotComponent (hubConfig, firstId,
                                                                          dragMode,
                                                                          draggedGestureComponentId,
                                                                          draggedOverSlotId), true);
+    gestureSlots.set (secondId, new EmptyGestureSlotComponent (hubConfig, secondId,
+                                                                          dragMode,
+                                                                          draggedGestureComponentId,
+                                                                          draggedOverSlotId), true);
 
-    gestureArray.swapGestures (firstId, secondId);
+    hubConfig.swapGestures (firstId, secondId);
     update();
     
     if (mustChangeSelection) selectGestureExclusive (idToSelect);
@@ -406,7 +381,8 @@ void GesturePanel::renameGestureInSlot (int slotNumber)
 {
     if (auto* gestureComponent = dynamic_cast<GestureComponent*> (gestureSlots[slotNumber]))
     {
-        gestureComponent->startNameEntry();
+        DBG ("Renaming?? We don't do that here..");
+        //gestureComponent->startNameEntry();
     }
     else
     {
@@ -418,17 +394,17 @@ void GesturePanel::renameGestureInSlot (int slotNumber)
 
 void GesturePanel::removeGestureAndGestureComponent (int gestureId)
 {
-    if (gestureId < 0 || gestureId > PLUME::NUM_GEST) return;
+    if (gestureId < 0 || gestureId > neova_dash::gesture::NUM_GEST) return;
     stopTimer();
 
     if (gestureId == selectedGesture)
     {
         unselectCurrentGesture();
-        gestureSettings.reset (nullptr);
+        gestureSettings.reset (new GestureSettingsComponent (neova_dash::gesture::NUM_GEST + 1,
+                                                             hubConfig));
     }
 
-    removeParameterListenerForGestureId (gestureId);
-    gestureArray.removeGesture (gestureId);
+    hubConfig.setDefaultGestureValues (gestureId, neova_dash::gesture::none);
     updateSlotIfNeeded (gestureId);
 
     if (!isTimerRunning()) startTimerHz (freq);
@@ -445,7 +421,6 @@ void GesturePanel::switchGestureSelectionState (GestureComponent& gestureCompone
     {
         gestureComponentToSwitch.setSelected (false);
         selectedGesture = -1;
-        setSettingsVisible (false);
     }
     else
     {
@@ -464,16 +439,13 @@ void GesturePanel::selectGestureExclusive (GestureComponent& gestureComponentToS
             if (gestureComponent != &gestureComponentToSelect && gestureComponent->isSelected())
             {
                 gestureComponent->setSelected (false);
-                gestureArray.getGesture (gestureComponent->id)->removeAllChangeListeners();
             }
         }
     }
 
-    gestureSettings.reset (new GestureSettingsComponent (gestureComponentToSelect.getGesture(),
-                                                         gestureArray, wrapper, *closeButton));
+    gestureSettings.reset (new GestureSettingsComponent (gestureComponentToSelect.id, hubConfig));
 
     selectedGesture = gestureComponentToSelect.id;
-    setSettingsVisible (true);
 }
 
 void GesturePanel::selectGestureExclusive (const int idToSelect)
@@ -502,12 +474,9 @@ void GesturePanel::unselectCurrentGesture()
 
         gestureComponentToUnselect->setSelected (false);
 
-        if (auto* gestureToUnselect = gestureArray.getGesture (selectedGesture))
-            gestureToUnselect->removeAllChangeListeners();
-
         selectedGesture = -1;
-        setSettingsVisible (false);
-        gestureSettings.reset (nullptr);
+        gestureSettings.reset (new GestureSettingsComponent (neova_dash::gesture::NUM_GEST + 1,
+			                                                 hubConfig));
 
         return;
     }
@@ -524,9 +493,9 @@ void GesturePanel::createMenuForGestureId (int id)
 {
     PopupMenu gestureMenu;
 
-    gestureMenu.addItem (1, "Rename", true);
-    gestureMenu.addItem (2, "Duplicate", true);
-    gestureMenu.addItem (3, "Delete", true);
+    //gestureMenu.addItem (1, "Rename", true);
+    gestureMenu.addItem (1, "Duplicate", true);
+    gestureMenu.addItem (2, "Delete", true);
     
     handleMenuResult (id,
                       gestureMenu.showMenu (PopupMenu::Options().withParentComponent (getParentComponent())
@@ -542,125 +511,17 @@ void GesturePanel::handleMenuResult (int gestureId, const int menuResult)
         case 0: // No choice
             break;
             
-        case 1: // Rename gesture
-            renameGestureInSlot (gestureId);
-            break;
-            
-        case 2: // Duplicate
-            gestureArray.duplicateGesture (gestureId);
+        case 1: // Duplicate
+            hubConfig.duplicateGesture (gestureId);
             update();
             selectGestureExclusive (gestureId);
             break;
 
-        case 3: // Delete gesture
+        case 2: // Delete gesture
             removeGestureAndGestureComponent (gestureId);
             update();
     }
 }
-
-void GesturePanel::setSettingsVisible (bool shouldBeVisible)
-{
-    if (!shouldBeVisible)
-    {
-        gestureSettings->setVisible (false);
-        closeButton->setVisible (false);
-        settingsVisible = false;
-        resized();
-        repaint();
-
-        return;
-    }
-
-    if (shouldBeVisible && gestureSettings != nullptr)
-    {
-        addAndMakeVisible (gestureSettings, 0);
-        closeButton->setVisible (true);
-        settingsVisible = true;
-        resized();
-        repaint();
-
-        return;
-    }
-
-    /* Plume attempted to show the gesture settings panel when it was not instanciated!
-       There should be a call similar to the following one before calling this method if you want
-       to display the settings panel:
-            gestureSettings.reset ( [gesture that was selected] , gestureArray, wrapper); 
-    */
-    jassertfalse;
-}
-
-void GesturePanel::createAndAddCloseButton()
-{
-    addAndMakeVisible (closeButton = new PlumeShapeButton ("Close Settings Button",
-                                                                getPlumeColour (plumeBackground),
-                                                                Colour (0xff00ff00),
-                                                                Colour (0xffff0000)),
-                      -1);
-    closeButton->setComponentID ("Close Button");
-
-    Path p;
-    p.startNewSubPath (0, 0);
-    p.lineTo (PLUME::UI::MARGIN_SMALL, PLUME::UI::MARGIN_SMALL);
-    p.startNewSubPath (0, PLUME::UI::MARGIN_SMALL);
-    p.lineTo (PLUME::UI::MARGIN_SMALL, 0);
-
-    closeButton->setShape (p, false, true, false);
-    closeButton->setToggleState (true, dontSendNotification);
-    closeButton->addListener (this);
-}
-
-void GesturePanel::removeListenerForAllParameters()
-{
-    for (auto* gesture : gestureArray.getArray())
-    {
-		removeParameterListenerForGestureId (gesture->id);
-    }
-}
-
-void GesturePanel::addParameterListenerForGestureId (const int id)
-{
-    for (int i = 0; i<PLUME::param::numParams; i++)
-    {
-        parameters.addParameterListener (String (id) + PLUME::param::paramIds[i], this);
-    }
-}
-
-void GesturePanel::removeParameterListenerForGestureId (const int id)
-{
-    for (int i = 0; i<PLUME::param::numParams; i++)
-    {
-        parameters.removeParameterListener (String (id) + PLUME::param::paramIds[i], this);
-    }
-}
-
-void GesturePanel::parameterChanged (const String& parameterID, float)
-{
-    // if the ID is "x_value" or "x_vibrato_intensity": doesn't update
-    // (only the MovingCursor object in the the GestureTunerComponent is updated)
-    if (parameterID.endsWith ("ue") || parameterID.endsWith ("y") || !PLUME::UI::ANIMATE_UI_FLAG) return;
-    
-    const int gestureId = parameterID.substring(0,1).getIntValue();
-    
-    if (auto* gestureComponentToUpdate = dynamic_cast<GestureComponent*> (gestureSlots[gestureId]))
-    {
-        if (gestureComponentToUpdate->id == gestureId)
-        {
-			const MessageManagerLock mmLock;
-
-			gestureComponentToUpdate->update();
-
-            if (gestureSettings != nullptr)
-            {
-                if (gestureSettings->getGestureId() == gestureId)
-                {
-                    gestureSettings->update (parameterID.substring (1, parameterID.length()));
-                }
-            }
-        }
-    }
-}
-
 
 void GesturePanel::startDragMode (int slotBeingDragged)
 {
@@ -672,8 +533,6 @@ void GesturePanel::startDragMode (int slotBeingDragged)
     {
         slot->repaint();
     }
-
-
 }
 
 void GesturePanel::endDragMode()

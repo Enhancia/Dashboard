@@ -15,18 +15,21 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     header = std::make_unique<HeaderComponent>();
     addAndMakeVisible (*header);
 
-    presetSelector = std::make_unique<PresetSelectorComponent> (hubConfig);
+    presetSelector = std::make_unique<PresetSelectorComponent> (hubConfig, getCommandManager());
     addAndMakeVisible (*presetSelector);
-	/*
-    gesturePanel = std::make_unique<GesturePanel> (hubConfig);
-    addAndMakeVisible (*gesturePanel);*/
-
+	
     uploadButton = std::make_unique<UploadButton> (getCommandManager());
     addAndMakeVisible (*uploadButton);
 
-    newGesturePanel = std::make_unique<NewGesturePanel> (hubConfig);
+    newGesturePanel = std::make_unique<NewGesturePanel> (hubConfig, getCommandManager());
     addAndMakeVisible (*newGesturePanel);
-    //newGesturePanel->hidePanel();
+
+    gesturePanel = std::make_unique<GesturePanel> (hubConfig, *newGesturePanel, neova_dash::ui::FRAMERATE);
+    addAndMakeVisible (*gesturePanel);
+
+    // Top panel properties
+    newGesturePanel->hidePanel();
+    newGesturePanel->setAlwaysOnTop (true);
 
 
     // Sets settings
@@ -68,8 +71,8 @@ void DashBoardInterface::resized()
 
 	auto gPanelArea = area.removeFromBottom(area.getHeight() / 2);
 
-    //gesturePanel->setBounds (gPanelArea.reduced (2*MARGIN));
-    newGesturePanel->setBounds (gPanelArea.reduced (MARGIN));
+    gesturePanel->setBounds (gPanelArea.reduced (0, MARGIN));
+    newGesturePanel->setBounds (gPanelArea.reduced (0, MARGIN));
 
     header->setBounds (area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL, MARGIN));
 
@@ -113,7 +116,7 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
     switch (commandID)
     {
         case updateDashInterface:
-            result.setInfo ("Repaint", "Repaints Interface", "Interface", 0);
+            result.setInfo ("Update", "Udpates Interface To Current Hub Configuration", "Interface", 0);
             break;
         default:
             break;
@@ -129,6 +132,7 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
     {
         case updateDashInterface:
 			repaint();
+            gesturePanel->update();
 			return true;
         default:
             return false;
