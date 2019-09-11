@@ -43,7 +43,7 @@ PresetSelectorComponent::~PresetSelectorComponent()
 void PresetSelectorComponent::paint (Graphics& g)
 {
 	// TEMP (should be replaced with actual HUB image (Might be general background or this comp background))
-	
+	/*
 	ColourGradient gradFill = ColourGradient::vertical (Colour (0xff3a3a3a),
 														Colour (0xff313131),
 														getLocalBounds());
@@ -57,22 +57,59 @@ void PresetSelectorComponent::paint (Graphics& g)
  	// HUB
 	g.setGradientFill (gradFill);
     g.fillRoundedRectangle (getLocalBounds().reduced (neova_dash::ui::MARGIN*2).toFloat(), 60.0f);
+	*/
 
+	g.drawImage (hubImage, getLocalBounds().toFloat(),
+						   RectanglePlacement::yBottom);
+
+	//g.drawRect (getLocalBounds().withTop (getHeight()*2/3));
 }
 
 void PresetSelectorComponent::resized()
 {
-	auto area = getLocalBounds().reduced (neova_dash::ui::MARGIN*3, neova_dash::ui::MARGIN*4)
-								.withTop (getHeight()*2/3);
+	using namespace neova_dash::ui;
+	auto area = getLocalBounds().reduced (48, 62)
+								.withTop (242)
+								.translated (-1, 0);
+
 	const int columnWidth = area.getWidth() / toggles.size();
 
 	for (int column = 0; column < toggles.size(); column++)
 	{
-		auto columnArea = area.removeFromLeft (columnWidth).reduced (neova_dash::ui::MARGIN_SMALL*3);
+		auto columnArea = area.removeFromLeft (columnWidth);
+		int columnXMargin = MARGIN;
+
+		if (column == 0)                       columnArea.removeFromRight (columnXMargin);
+		else if (column == toggles.size() - 1) columnArea.removeFromLeft (columnXMargin);
+		else                                   columnArea.reduce (columnXMargin*2/3, 0);
+
 		if (column == 1 || column == 2) columnArea.translate (0, 22);
+		if (column == 2 || column == 3) columnArea.translate (4, 0);
 
 		toggles[column]->setBounds (columnArea);
 		leds[column]->setBounds (columnArea.withHeight (20).translated (0, -23));
+	}
+}
+
+void PresetSelectorComponent::update()
+{
+	repaintLEDs();
+	updateToggles();
+}
+
+void PresetSelectorComponent::repaintLEDs()
+{
+	for (int i =0; i < leds.size(); i++)
+	{
+		leds[i]->repaint();
+	}
+}
+
+void PresetSelectorComponent::updateToggles()
+{
+	for (int i =0; i < toggles.size(); i++)
+	{
+		toggles[i]->setToggleState (i == hubConfig.getSelectedPreset(), dontSendNotification);
 	}
 }
 
@@ -116,19 +153,20 @@ void PresetSelectorComponent::PresetToggle::paintButton (Graphics& g, bool shoul
 								   				  jmin (getWidth(), getHeight())/2 })
 								   .reduced (1);
 
+	/*
 	//Shadow Draw
 	g.setColour (Colours::black.withAlpha (0.2f));
 	g.drawEllipse (ellipseArea.toFloat()
 							  .withTrimmedRight (1.5f)
 							  .withTrimmedBottom (1.5f),
 				   1.5f);
+	*/
 
 	// Button Draw
-	g.setColour (neova_dash::colour::mainText.interpolatedWith (Colour (0xff313131),
-																getToggleState()
-																	? 0.0f : shouldDrawButtonAsHighlighted ? 0.4f
-																										   : 0.6f));
-	g.drawEllipse (ellipseArea.toFloat(), 1.5f);
+	g.setColour (neova_dash::colour::mainText.withAlpha (getToggleState() ? 0.6f
+																		  : shouldDrawButtonAsHighlighted ? 0.3f
+																										  : 0.0f));
+	g.drawEllipse (ellipseArea.toFloat(), 2.0f);
 
 }
 
@@ -151,7 +189,8 @@ void PresetSelectorComponent::GestureLED::paint (Graphics& g)
 	if (hubConfig.getGestureData (id).type != int (neova_dash::gesture::none))
 	{
 		Colour ledColour (neova_dash::gesture::getHighlightColour
-			                 (neova_dash::gesture::intToGestureType (hubConfig.getGestureData (id).type)));
+			                 (neova_dash::gesture::intToGestureType (hubConfig.getGestureData (id).type),
+			                  hubConfig.getGestureData (id).on == 0 ? false : true));
 
 		ColourGradient ledGrad (ledColour.withAlpha (0.6f), getLocalBounds().getCentre().toFloat(),
 								Colour (0), getLocalBounds().getCentre().translated (0, 5).toFloat(),

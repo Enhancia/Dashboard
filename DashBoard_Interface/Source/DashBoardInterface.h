@@ -54,5 +54,8 @@ private:
     HubConfiguration& hubConfig;
 
     //==============================================================================
+    Image backgroundImage = ImageFileFormat::loadFrom (DashData::HUBBG_png, DashData::HUBBG_pngSize);
+
+    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DashBoardInterface)
 };

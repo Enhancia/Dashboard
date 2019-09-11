@@ -24,7 +24,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     newGesturePanel = std::make_unique<NewGesturePanel> (hubConfig, getCommandManager());
     addAndMakeVisible (*newGesturePanel);
 
-    gesturePanel = std::make_unique<GesturePanel> (hubConfig, *newGesturePanel, neova_dash::ui::FRAMERATE);
+    gesturePanel = std::make_unique<GesturePanel> (hubConfig, *newGesturePanel,
+                                                   getCommandManager(), neova_dash::ui::FRAMERATE);
     addAndMakeVisible (*gesturePanel);
 
     // Top panel properties
@@ -40,27 +41,15 @@ DashBoardInterface::~DashBoardInterface()
 {
     header = nullptr;
     presetSelector = nullptr;
+    gesturePanel = nullptr;
     newGesturePanel = nullptr;
-    //gesturePanel = nullptr;
     uploadButton = nullptr;
 }
 
 //==============================================================================
 void DashBoardInterface::paint (Graphics& g)
 {
-	/*
-    ColourGradient gradFill (neova_dash::colour::dashboardBackground,
-                             getLocalBounds().getCentreX(),
-                             getHeight()/4,
-                             neova_dash::colour::dashboardBackground2,
-                             getLocalBounds().getCentreX(),
-                             getHeight(),
-                             true);
-    gradFill.addColour (0.5, neova_dash::colour::dashboardBackground);
-    g.setGradientFill (gradFill);*/
-
-    g.setColour (neova_dash::colour::dashboardBackground2);
-    g.fillRect (getLocalBounds());
+	g.drawImage (backgroundImage, getLocalBounds().toFloat());
 }
 
 void DashBoardInterface::resized()
@@ -76,8 +65,7 @@ void DashBoardInterface::resized()
 
     header->setBounds (area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL, MARGIN));
 
-    presetSelector->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight())
-                                  .reduced (2*MARGIN));
+    presetSelector->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight()));
     uploadButton->setBounds (area.withSize (area.getWidth()/7, area.getHeight()/2)
                                  .withSizeKeepingCentre (area.getWidth()/5, HEADER_HEIGHT));
 }
@@ -103,7 +91,9 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
 {
     using namespace neova_dash::commands;
     
-    int commandIDs[] = { updateDashInterface,
+    int commandIDs[] = {
+                            updateDashInterface,
+                            updateInterfaceLEDs
     				   };
 
     commands.addArray (commandIDs, numElementsInArray (commandIDs));
@@ -116,7 +106,10 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
     switch (commandID)
     {
         case updateDashInterface:
-            result.setInfo ("Update", "Udpates Interface To Current Hub Configuration", "Interface", 0);
+            result.setInfo ("Update Full Interface", "Udpates Interface To Current Hub Configuration", "Interface", 0);
+            break;
+        case updateInterfaceLEDs:
+            result.setInfo ("Update LEDs", "Udpates Hub LEDs To Current Hub Configuration", "Interface", 0);
             break;
         default:
             break;
@@ -131,9 +124,14 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
     switch (info.commandID)
     {
         case updateDashInterface:
-			repaint();
+            presetSelector->update();
             gesturePanel->update();
 			return true;
+
+        case updateInterfaceLEDs:
+            presetSelector->repaintLEDs();
+            return true;
+
         default:
             return false;
     }

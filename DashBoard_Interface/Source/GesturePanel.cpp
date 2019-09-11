@@ -12,16 +12,19 @@
 #include "GesturePanel.h"
 
 //==============================================================================
-GesturePanel::GesturePanel (HubConfiguration& data, NewGesturePanel& newGest,
+GesturePanel::GesturePanel (HubConfiguration& data, NewGesturePanel& newGest, ApplicationCommandManager& manager,
                             int freqHz)
-                            : hubConfig (data), newGesturePanel (newGest),
+                            : hubConfig (data), newGesturePanel (newGest), commandManager (manager),
                               freq (freqHz)
 {
     setComponentID ("gesturePanel");
     setWantsKeyboardFocus (true);
-    addAndMakeVisible (gestureSettings = new GestureSettingsComponent (int (hubConfig.getGestureData (selectedGesture)
+
+    gestureSettings = std::make_unique<GestureSettingsComponent> (int (hubConfig.getGestureData (selectedGesture)
                                                                                      .type),
-                                                                       hubConfig));
+                                                                  hubConfig);
+    addAndMakeVisible (*gestureSettings);
+
     initialiseGestureSlots();
 
     startTimerHz (freq);
@@ -49,12 +52,8 @@ void GesturePanel::update()
 
     stopTimer();
 
-    /* OLD, doesn't fit changing a preset into account
-    for (int i=0; i<neova_dash::gesture::NUM_GEST; i++)
-    {
-        updateSlotIfNeeded (i);
-    }*/
     initialiseGestureSlots();
+    resized();
 
     if (selectedGesture != -1)
     {
@@ -194,12 +193,10 @@ void GesturePanel::handleLeftClickUp (const MouseEvent& event)
             {
                 if (auto* slotUnderMouse = dynamic_cast<EmptyGestureSlotComponent*> (componentUnderMouse))
                 {
-                    DBG ("Moving gesture " << gestureComponent->id << " to slot " << slotUnderMouse->id);
                     moveGestureToId (gestureComponent->id, slotUnderMouse->id);
                 }
                 else if (auto* gestureComponentUnderMouse = dynamic_cast<GestureComponent*> (componentUnderMouse))
                 {
-                    DBG ("Swapping gestures " << gestureComponent->id << " and " << gestureComponentUnderMouse->id);
                     swapGestures (gestureComponent->id, gestureComponentUnderMouse->id);
                 }
             }
@@ -239,14 +236,19 @@ bool GesturePanel::keyPressed (const KeyPress &key)
 
 void GesturePanel::initialiseGestureSlots()
 {
-    gestureSlots.clear();
-    
+    if (!gestureSlots.isEmpty()) gestureSlots.clear();
+
     for (int i=0; i<neova_dash::gesture::NUM_GEST; i++)
     {
         if (hubConfig.getGestureData (i).type != uint8 (neova_dash::gesture::none))
         {
-            gestureSlots.add (new GestureComponent (hubConfig, i,
+            gestureSlots.add (new GestureComponent (hubConfig, commandManager, i,
                                                     dragMode, draggedGestureComponentId, draggedOverSlotId));
+
+            if (selectedGesture != -1 && i == selectedGesture)
+            {
+                dynamic_cast<GestureComponent*> (gestureSlots.getLast())->setSelected (true);
+            }
         }
         else
         {
@@ -257,6 +259,29 @@ void GesturePanel::initialiseGestureSlots()
 
         addAndMakeVisible (gestureSlots.getLast());
         gestureSlots.getLast()->addMouseListener (this, false);
+    }
+}
+
+void GesturePanel::updateGestureSlots()
+{
+    for (int i=0; i<neova_dash::gesture::NUM_GEST; i++)
+    {
+		gestureSlots[i]->removeMouseListener(this);
+
+        if (hubConfig.getGestureData (i).type != uint8 (neova_dash::gesture::none))
+        {
+            gestureSlots.set (i, new GestureComponent (hubConfig, commandManager, i,
+                                                       dragMode, draggedGestureComponentId, draggedOverSlotId));
+        }
+        else
+        {
+            gestureSlots.set (i, new EmptyGestureSlotComponent (hubConfig, i,
+                                                                dragMode, draggedGestureComponentId,
+                                                                          draggedOverSlotId));
+        }
+
+        addAndMakeVisible (gestureSlots[i]);
+        gestureSlots[i]->addMouseListener (this, false);
     }
 }
 
@@ -304,7 +329,7 @@ void GesturePanel::updateSlotIfNeeded (int slotToCheck)
             addAndMakeVisible (gestureSlots[slotToCheck]);
             gestureSlots[slotToCheck]->addMouseListener (this, false);
             resized();
-            repaint();
+            //repaint();
         }
     }
     // 2nd check, if a gesture was created (slot is empty but should be a gestureComponent)
@@ -313,6 +338,7 @@ void GesturePanel::updateSlotIfNeeded (int slotToCheck)
         if (hubConfig.getGestureData (slotToCheck).type != uint8 (neova_dash::gesture::none))
         {
             gestureSlots.set (slotToCheck, new GestureComponent (hubConfig,
+                                                                 commandManager,
                                                                  slotToCheck,
                                                                  dragMode,
                                                                  draggedGestureComponentId,
@@ -325,11 +351,11 @@ void GesturePanel::updateSlotIfNeeded (int slotToCheck)
 			if (newGesturePanel.getLastSelectedSlot() == slotToCheck)
 			{
 				newGesturePanel.hidePanel(true);
-				selectGestureExclusive(*dynamic_cast<GestureComponent*> (gestureSlots[slotToCheck]));
+				selectGestureExclusive (*dynamic_cast<GestureComponent*> (gestureSlots[slotToCheck]));
 			}
 
             resized();
-            repaint();
+            //repaint();
         }
     }
 }
@@ -342,6 +368,7 @@ void GesturePanel::moveGestureToId (int idToMoveFrom, int idToMoveTo)
     if (mustChangeSelection) unselectCurrentGesture();
 
     hubConfig.moveGestureToId (idToMoveFrom, idToMoveTo);
+    commandManager.invokeDirectly (neova_dash::commands::updateInterfaceLEDs, true);
 	update();
 
     if (mustChangeSelection)
@@ -372,6 +399,7 @@ void GesturePanel::swapGestures (int firstId, int secondId)
                                                                           draggedOverSlotId), true);
 
     hubConfig.swapGestures (firstId, secondId);
+    commandManager.invokeDirectly (neova_dash::commands::updateInterfaceLEDs, true);
     update();
     
     if (mustChangeSelection) selectGestureExclusive (idToSelect);
@@ -402,9 +430,12 @@ void GesturePanel::removeGestureAndGestureComponent (int gestureId)
         unselectCurrentGesture();
         gestureSettings.reset (new GestureSettingsComponent (neova_dash::gesture::NUM_GEST + 1,
                                                              hubConfig));
+        addAndMakeVisible (*gestureSettings);
+        resized();
     }
 
     hubConfig.setDefaultGestureValues (gestureId, neova_dash::gesture::none);
+    commandManager.invokeDirectly (neova_dash::commands::updateInterfaceLEDs, true);
     updateSlotIfNeeded (gestureId);
 
     if (!isTimerRunning()) startTimerHz (freq);
@@ -444,8 +475,9 @@ void GesturePanel::selectGestureExclusive (GestureComponent& gestureComponentToS
     }
 
     gestureSettings.reset (new GestureSettingsComponent (gestureComponentToSelect.id, hubConfig));
-
+    addAndMakeVisible (*gestureSettings);
     selectedGesture = gestureComponentToSelect.id;
+    resized();
 }
 
 void GesturePanel::selectGestureExclusive (const int idToSelect)
@@ -477,6 +509,8 @@ void GesturePanel::unselectCurrentGesture()
         selectedGesture = -1;
         gestureSettings.reset (new GestureSettingsComponent (neova_dash::gesture::NUM_GEST + 1,
 			                                                 hubConfig));
+        addAndMakeVisible (*gestureSettings);
+        resized();
 
         return;
     }

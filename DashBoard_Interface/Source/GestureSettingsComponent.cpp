@@ -97,6 +97,8 @@ void GestureSettingsComponent::resized()
     midiPanel->setBounds (area.removeFromBottom (getHeight()/2 - HEADER_HEIGHT));
     area.removeFromBottom (MARGIN);
     //gestTuner->setBounds (area);
+
+	repaint();
 }
 
 void GestureSettingsComponent::updateDisplay()

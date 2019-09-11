@@ -26,7 +26,7 @@ class GesturePanel    : public Component,
 {
 public:
     //==============================================================================
-    GesturePanel (HubConfiguration& data, NewGesturePanel& newGest,
+    GesturePanel (HubConfiguration& data, NewGesturePanel& newGest, ApplicationCommandManager& manager,
                   int freqHz = 60);
     ~GesturePanel();
 
@@ -49,6 +49,7 @@ public:
 
     //==============================================================================
     void initialiseGestureSlots();
+    void updateGestureSlots();
     void resizeSlotsAndTrimAreaAccordingly (juce::Rectangle<int>& area, int marginX = neova_dash::ui::MARGIN,
                                                                         int marginY = neova_dash::ui::MARGIN);
     void removeGestureAndGestureComponent (int gestureId);
@@ -77,7 +78,7 @@ private:
 
     //==============================================================================
     OwnedArray<Component> gestureSlots;
-    ScopedPointer<GestureSettingsComponent> gestureSettings;
+    std::unique_ptr<GestureSettingsComponent> gestureSettings;
 
     //==============================================================================
     int selectedGesture = -1;
@@ -91,6 +92,7 @@ private:
     //==============================================================================
     HubConfiguration& hubConfig;
     NewGesturePanel& newGesturePanel;
+    ApplicationCommandManager& commandManager;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GesturePanel)

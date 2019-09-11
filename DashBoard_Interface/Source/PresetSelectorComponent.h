@@ -32,6 +32,11 @@ public:
     //==============================================================================
     void buttonClicked (Button* bttn) override;
 
+    //==========================================================================
+    void update();
+    void updateToggles();
+    void repaintLEDs();
+
 private:
     //==============================================================================
     class PresetToggle : public Button
@@ -80,6 +85,10 @@ private:
     
     HubConfiguration& hubConfig;
     ApplicationCommandManager& commandManager;
+
+    //==============================================================================
+    Image hubImage = ImageFileFormat::loadFrom (DashData::DashboardHUBonlycropped_png,
+                                                DashData::DashboardHUBonlycropped_pngSize);
 
     //==============================================================================
     OwnedArray<PresetToggle> toggles;

@@ -143,8 +143,10 @@ namespace gesture
 		}
 	}
 
-	const Colour getHighlightColour (const neova_dash::gesture::GestureType type)
+	const Colour getHighlightColour (const neova_dash::gesture::GestureType type, const bool active)
 	{
+		if (!active) return neova_dash::colour::inactiveGesture;
+
 		switch (type)
 		{
 			case neova_dash::gesture::vibrato:
@@ -167,9 +169,9 @@ namespace gesture
 		}	
 	}
 
-    const Colour getHighlightColour (const int typeInt)
+    const Colour getHighlightColour (const int typeInt, const bool active)
     {
-    	return getHighlightColour (intToGestureType (typeInt));
+    	return getHighlightColour (intToGestureType (typeInt), active);
     }
 
 }; // namespace gesture

@@ -178,8 +178,8 @@ void HubConfiguration::setDefaultConfig()
 {
 	setGestureData (0, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0);
 	setGestureData (0, 1, 1, neova_dash::gesture::pitchBend, 0, 127, 0);
-	setGestureData (0, 2, 1, neova_dash::gesture::tilt, 0, 127, 0);
-	setGestureData (0, 3, 1, neova_dash::gesture::roll, 0, 127, 0);
+	setGestureData (0, 2, 0, neova_dash::gesture::tilt, 0, 127, 0);
+	setGestureData (0, 3, 0, neova_dash::gesture::roll, 0, 127, 0);
 
 	setGestureData (1, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0);
 	setGestureData (1, 1, 1, neova_dash::gesture::tilt, 0, 127, 0);

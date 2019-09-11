@@ -13,11 +13,12 @@
 //==============================================================================
 // Gesture Component
 
-GestureComponent::GestureComponent (HubConfiguration& hubCfg, const int gestNum,
+GestureComponent::GestureComponent (HubConfiguration& hubCfg, ApplicationCommandManager& manager,
+                                                              const int gestNum,
                                                               const bool& dragModeReference,
                                                               const int& draggedGestureReference,
                                                               const int& draggedOverSlotReference)
-    : hubConfig (hubCfg),
+    : hubConfig (hubCfg), commandManager (manager),
       id (gestNum), type (hubCfg.getGestureData (id).type),
       dragMode (dragModeReference),
       draggedGesture (draggedGestureReference),
@@ -49,14 +50,15 @@ void GestureComponent::paint (Graphics& g)
     if (dragMode && draggedGesture != id && draggedOverSlot == id)
     {
         g.setColour (neova_dash::gesture::getHighlightColour
-		                (static_cast <neova_dash::gesture::GestureType>
-							(hubConfig.getGestureData (draggedGesture).type)));
+		                (hubConfig.getGestureData (draggedGesture).type,
+                         hubConfig.getGestureData (draggedGesture).on == 0 ? false : true));
 
         g.drawRoundedRectangle (getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 3.0f);
     }
     else if (selected)
     {
-        g.setColour (neova_dash::gesture::getHighlightColour (static_cast <neova_dash::gesture::GestureType> (type)));
+        g.setColour (neova_dash::gesture::getHighlightColour (type, hubConfig.getGestureData (id).on == 0 ? false
+                                                                                                          : true));
         g.drawRoundedRectangle (getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 1.0f);
     }
 
@@ -160,21 +162,16 @@ void GestureComponent::createButton()
 	using namespace neova_dash;
 
     muteButton->setShape (muteButtonPath, false, true, false);
-    muteButton->setOutline (gesture::getHighlightColour (gesture::intToGestureType (type)), 1.5f);
+    muteButton->setOutline (gesture::getHighlightColour (type,
+                                                         hubConfig.getGestureData (id).on == 0 ? false
+                                                                                               : true),
+                            1.5f);
     muteButton->setToggleState (hubConfig.getGestureData (id).on, dontSendNotification);
     muteButton->setClickingTogglesState (true);
     muteButton->onClick = [this] ()
     {
         hubConfig.setUint8ValueAndUpload (id, HubConfiguration::on, uint8 (muteButton->getToggleState() ? 1 : 0));
-    
-        if (selected)
-        {
-            if (auto* closeButton = dynamic_cast<Button*> (getParentComponent()
-    														  ->findChildWithID ("Close Button")))
-    			closeButton->setToggleState (hubConfig.getGestureData (id).on, dontSendNotification);
-        }
-
-        repaint();
+        commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
     };
 }
 
@@ -271,7 +268,9 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
     if (dragMode && draggedGesture != id && draggedOverSlot == id)
     {
         g.setColour (neova_dash::gesture::getHighlightColour
-                        (neova_dash::gesture::intToGestureType (hubConfig.getGestureData (draggedGesture).type)));
+                        (hubConfig.getGestureData (draggedGesture).type,
+                         hubConfig.getGestureData (draggedGesture).on == 0 ? false
+                                                                           : true));
     }
     else
     {
@@ -280,13 +279,14 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
 
     // Plus Icon
     g.strokePath (plusIcon, {2.0f, PathStrokeType::mitered, PathStrokeType::rounded});
-
     
     // Outline
     if (dragMode && draggedGesture != id && draggedOverSlot == id)
     {
         g.setColour (neova_dash::gesture::getHighlightColour
-                        (neova_dash::gesture::intToGestureType (hubConfig.getGestureData (draggedGesture).type)));
+                        (hubConfig.getGestureData (draggedGesture).type,
+                         hubConfig.getGestureData (draggedGesture).on == 0 ? false
+                                                                           : true));
 		g.drawRoundedRectangle(getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 3.0f);
     }
 

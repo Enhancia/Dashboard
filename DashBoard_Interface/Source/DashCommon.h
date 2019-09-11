@@ -19,12 +19,15 @@ namespace neova_dash
     	// Lists all possible commands with their associated id
     	enum commandIDs
     	{
+            // Backend commands
     		flashHub            = 0x00000001, // Writes Temp Hub Config To Its Memory
     		upgradeHub          = 0x00000002, // Upgrades Hub Firm
     		upgradeRing         = 0x00000003, // Upgrades Ring Firm
-    		
     		uploadConfigToHub   = 0x00000004, // Uploads config to HUB
-    		updateDashInterface = 0x00000005  // Updates Dash interface to match the HUB data 
+
+            // Frontend commands
+    		updateDashInterface = 0x01000001, // Updates Dash interface to match the HUB data
+            updateInterfaceLEDs = 0x01000002  // Updates the Hub lEDs in the Dash interface
     	};
     };
 
@@ -89,8 +92,8 @@ namespace neova_dash
         extern const String getTypeString (const GestureType type, const bool withSpacingAndCase);
         extern const String getTypeString (const int typeInt, const bool withSpacingAndCase);
         extern const String getDescriptionString (const GestureType type);
-        extern const Colour getHighlightColour (const GestureType type);
-        extern const Colour getHighlightColour (const int typeInt);
+        extern const Colour getHighlightColour (const GestureType type, const bool active = true);
+        extern const Colour getHighlightColour (const int typeInt, const bool active = true);
     };
 
     namespace font

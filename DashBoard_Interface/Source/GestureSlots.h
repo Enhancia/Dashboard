@@ -18,7 +18,8 @@ class GestureComponent : public Component
 {
 public:
     //==============================================================================
-    GestureComponent (HubConfiguration& hubCfg, const int gestNum,
+    GestureComponent (HubConfiguration& hubCfg, ApplicationCommandManager& manager,
+                                                const int gestNum,
                                                 const bool& dragModeReference,
                                                 const int& draggedGestureReference,
                                                 const int& draggedOverSlotReference);
@@ -52,6 +53,8 @@ private:
 
     //==============================================================================
     HubConfiguration& hubConfig;
+    ApplicationCommandManager& commandManager;
+
     ScopedPointer<Label> gestureNameLabel;
     ScopedPointer<ShapeButton> muteButton;
     
