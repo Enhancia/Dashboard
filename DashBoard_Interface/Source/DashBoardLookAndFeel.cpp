@@ -24,14 +24,14 @@ void DashBoardLookAndFeel::setColours()
     using namespace neova_dash::colour;
     
     // Label
-	setColour (Label::textColourId, mainText);
-	setColour (Label::backgroundColourId, Colour (0));
-	setColour (Label::outlineColourId, subText);
+	  setColour (Label::textColourId, mainText);
+	  setColour (Label::backgroundColourId, Colour (0));
+	  setColour (Label::outlineColourId, Colour (0));
 
     // Text 
     setColour (TextEditor::outlineColourId, Colour (0));
     setColour (TextEditor::backgroundColourId, Colour (0));
-    setColour (TextEditor::focusedOutlineColourId, mainText.withAlpha (0.5f));
+    setColour (TextEditor::focusedOutlineColourId, Colour (0));
     setColour (TextEditor::highlightColourId, mainText.withAlpha (0.5f));
     setColour (CaretComponent::caretColourId, mainText);
 

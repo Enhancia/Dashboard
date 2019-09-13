@@ -99,9 +99,9 @@ void GestureSettingsComponent::resized()
 
     //muteButton->setBounds (headerArea.removeFromRight (30).withSizeKeepingCentre (18, 18));
 
-    midiPanel->setBounds (area.removeFromBottom (getHeight()/2 - HEADER_HEIGHT));
+    midiPanel->setBounds (area.removeFromBottom (getHeight()/3 - HEADER_HEIGHT));
     area.removeFromBottom (MARGIN);
-    gestTuner->setBounds (area);
+    if (gestTuner != nullptr) gestTuner->setBounds (area);
 
 	repaint();
 }
@@ -112,7 +112,8 @@ void GestureSettingsComponent::updateDisplay()
 
     if (!disabled)
     {
-        if (hubConfig.getGestureData (gestureId).on != 0) gestTuner->updateDisplay();
+        if (hubConfig.getGestureData (gestureId).on != 0
+			&& gestTuner != nullptr) gestTuner->updateDisplay();
         
         //midiPanel->updateDisplay();
     }
@@ -128,6 +129,7 @@ void GestureSettingsComponent::disableIfGestureWasDeleted()
 
 void GestureSettingsComponent::updateComponents()
 {
+	if (gestTuner != nullptr) gestTuner->updateColour();
 }
 
 void GestureSettingsComponent::createTuner()

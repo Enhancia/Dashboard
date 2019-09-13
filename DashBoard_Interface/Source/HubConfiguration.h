@@ -102,6 +102,9 @@ public:
     GestureData& getGestureData (const int gestureNumber, const int presetNumber);
 	GestureData& getGestureData (const int gestureNumber);
 
+    bool isGestureActive (const int gestureNumber, const int presetNumber);
+    bool isGestureActive (const int gestureNumber);
+
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber, const int presetNumber);
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber);
 

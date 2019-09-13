@@ -174,14 +174,27 @@ HubConfiguration::PresetData& HubConfiguration::getPresetData()
 	return getPresetData (selectedPreset);
 }
 
+bool HubConfiguration::isGestureActive (const int gestureNumber, const int presetNumber)
+{
+	return getGestureData (gestureNumber, presetNumber).on != 0;
+}
+
+bool HubConfiguration::isGestureActive (const int gestureNumber)
+{
+	return isGestureActive (gestureNumber, selectedPreset);
+}
+
 void HubConfiguration::setDefaultConfig()
 {
 	setGestureData (0, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0);
+	setGestureParameters (0, 0, 400.0f, 40.0f);
 	setGestureData (0, 1, 1, neova_dash::gesture::pitchBend, 0, 127, 0);
 	setGestureData (0, 2, 0, neova_dash::gesture::tilt, 0, 127, 0);
+	setGestureParameters (0, 2, 0.0f, 50.0f);
 	setGestureData (0, 3, 0, neova_dash::gesture::roll, 0, 127, 0);
 
 	setGestureData (1, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0);
+	setGestureParameters (1, 0, 450.0f, 20.0f);
 	setGestureData (1, 1, 1, neova_dash::gesture::tilt, 0, 127, 0);
 	setGestureData (1, 2, 0, neova_dash::gesture::none, 0, 127, 0);
 	setGestureData (1, 3, 1, neova_dash::gesture::roll, 0, 127, 0);

@@ -14,7 +14,7 @@ VibratoTuner::VibratoTuner (HubConfiguration& config, const float& val,
 	                                                  NormalisableRange<float> gestRange, const int gestureId,
 					                                  const float& vibratoIntensity, float maxIntens,
     				                                  const Range<float> gainMax, const Range<float> threshMax)
-    : Tuner ("", neova_dash::colour::vibrato),
+    : Tuner ("",  neova_dash::gesture::getHighlightColour (gestureId, config.isGestureActive (gestureId))),
       hubConfig (config),
       value (val), gestureRange (gestRange), id (gestureId),
       intensity (vibratoIntensity), maxIntensity (maxIntens),
@@ -45,8 +45,8 @@ VibratoTuner::~VibratoTuner()
 //==============================================================================
 void VibratoTuner::paint (Graphics& g)
 {
-	drawValueCursor (g);
-	drawIntensityCursor (g);
+	//drawValueCursor (g);
+	//drawIntensityCursor (g);
 
 	g.setColour (neova_dash::colour::tunerSliderBackground);
 	g.setFont (Font().withHeight (14.0f));
@@ -112,8 +112,7 @@ void VibratoTuner::updateDisplay()
 void VibratoTuner::updateColour()
 {
 	tunerColour = neova_dash::gesture::getHighlightColour (neova_dash::gesture::vibrato,
-												           hubConfig.getGestureData (id).on == 0 ? false
-																							    : true);
+												           hubConfig.isGestureActive (id));
 }
 
 //==============================================================================
@@ -173,15 +172,13 @@ void VibratoTuner::sliderValueChanged (Slider* sldr)
 {
 	if (sldr == gainSlider)
 	{
-		setGain (sldr->getValue());
 		updateLabelBounds (gainLabel);
-		gainLabel->setText (String (int (getGain())), dontSendNotification);
+		gainLabel->setText (String (int (gainSlider->getValue())), dontSendNotification);
 	}
 	else if (sldr == thresholdSlider)
 	{    
-		setThreshold (sldr->getValue());
 		updateLabelBounds (thresholdLabel);
-		thresholdLabel->setText (String (int (getThreshold())), dontSendNotification);
+		thresholdLabel->setText (String (int (thresholdSlider->getValue())), dontSendNotification);
 		//setThresholdSliderColour();
 	}
 }

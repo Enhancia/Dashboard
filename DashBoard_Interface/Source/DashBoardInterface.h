@@ -50,6 +50,8 @@ private:
     std::unique_ptr<GesturePanel> gesturePanel;
     std::unique_ptr<NewGesturePanel> newGesturePanel;
     std::unique_ptr<UploadButton> uploadButton;
+
+    DashBoardLookAndFeel dashBoardLookAndFeel;
     
     //==============================================================================
     HubConfiguration& hubConfig;

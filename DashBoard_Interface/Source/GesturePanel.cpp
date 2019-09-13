@@ -53,13 +53,14 @@ void GesturePanel::update()
     stopTimer();
 
     initialiseGestureSlots();
-    resized();
 
     if (selectedGesture != -1)
     {
-        gestureSettings->updateComponents();
+        gestureSettings.reset (new GestureSettingsComponent (selectedGesture, hubConfig));
+        addAndMakeVisible (*gestureSettings);
     }
 
+    resized();
     startTimerHz (freq);
 }
 

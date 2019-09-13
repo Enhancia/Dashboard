@@ -11,6 +11,8 @@
 //==============================================================================
 DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (data)
 {
+    setLookAndFeel (&dashBoardLookAndFeel);
+
     // Creates Components
     header = std::make_unique<HeaderComponent>();
     addAndMakeVisible (*header);

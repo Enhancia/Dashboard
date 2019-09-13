@@ -51,14 +51,13 @@ void GestureComponent::paint (Graphics& g)
     {
         g.setColour (neova_dash::gesture::getHighlightColour
 		                (hubConfig.getGestureData (draggedGesture).type,
-                         hubConfig.getGestureData (draggedGesture).on == 0 ? false : true));
+                         hubConfig.isGestureActive (id)));
 
         g.drawRoundedRectangle (getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 3.0f);
     }
     else if (selected)
     {
-        g.setColour (neova_dash::gesture::getHighlightColour (type, hubConfig.getGestureData (id).on == 0 ? false
-                                                                                                          : true));
+        g.setColour (neova_dash::gesture::getHighlightColour (type, hubConfig.isGestureActive (id)));
         g.drawRoundedRectangle (getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 1.0f);
     }
 
@@ -162,11 +161,9 @@ void GestureComponent::createButton()
 	using namespace neova_dash;
 
     muteButton->setShape (muteButtonPath, false, true, false);
-    muteButton->setOutline (gesture::getHighlightColour (type,
-                                                         hubConfig.getGestureData (id).on == 0 ? false
-                                                                                               : true),
+    muteButton->setOutline (gesture::getHighlightColour (type, hubConfig.isGestureActive (id)),
                             1.5f);
-    muteButton->setToggleState (hubConfig.getGestureData (id).on, dontSendNotification);
+    muteButton->setToggleState (hubConfig.isGestureActive (id), dontSendNotification);
     muteButton->setClickingTogglesState (true);
     muteButton->onClick = [this] ()
     {
@@ -269,8 +266,7 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
     {
         g.setColour (neova_dash::gesture::getHighlightColour
                         (hubConfig.getGestureData (draggedGesture).type,
-                         hubConfig.getGestureData (draggedGesture).on == 0 ? false
-                                                                           : true));
+                         hubConfig.isGestureActive (id)));
     }
     else
     {
@@ -285,8 +281,7 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
     {
         g.setColour (neova_dash::gesture::getHighlightColour
                         (hubConfig.getGestureData (draggedGesture).type,
-                         hubConfig.getGestureData (draggedGesture).on == 0 ? false
-                                                                           : true));
+                         hubConfig.isGestureActive (id)));
 		g.drawRoundedRectangle(getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 3.0f);
     }
 
