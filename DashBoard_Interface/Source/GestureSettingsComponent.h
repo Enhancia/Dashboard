@@ -13,9 +13,10 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DashCommon.h"
 #include "HubConfiguration.h"
+#include "Tuner.h"
+#include "VibratoTuner.h"
 
 class GestureSettingsComponent : public Component
-                                //private Button::Listener
 {
 public:
     //==============================================================================
@@ -27,14 +28,8 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
-    /*
-    //==============================================================================
-    //callbacks
-    void buttonClicked (Button*) override;
-    
     //==============================================================================
     Tuner& getTuner();
-    */
     void updateDisplay();
     void updateComponents();
     
@@ -44,25 +39,22 @@ private:
     //==============================================================================
     void paintBackground (Graphics&);
     
-    /*
     //==============================================================================
     void createTuner();
     void createToggles();
-    void createPanels();
-    void showAppropriatePanel();
 	void disableIfGestureWasDeleted();
     
     //==============================================================================
     bool disabled = false;
-	*/
+
     //==============================================================================
     HubConfiguration& hubConfig;
     const int HEADER_HEIGHT = 30;
-	/*
-    ScopedPointer<Tuner> gestTuner;
-    ScopedPointer<PlumeShapeButton> muteButton;
-    */
-    ScopedPointer<Component> midiPanel;
+	
+    std::unique_ptr<Tuner> gestTuner;
+    //ScopedPointer<PlumeShapeButton> muteButton;
+
+    std::unique_ptr<Component> midiPanel;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GestureSettingsComponent)

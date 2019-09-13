@@ -11,7 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-//#include "DashBoardLookAndFeel.h"
+#include "DashBoardLookAndFeel.h"
 #include "DashCommon.h"
 #include "HubConfiguration.h"
 
@@ -34,11 +34,12 @@ public:
     
     //==============================================================================
 	virtual void updateDisplay() {}
-	virtual void update() = 0;
+	virtual void updateComponents() = 0;
 
     //==============================================================================
     Colour getColour() { return tunerColour; }
     virtual void setColour (const Colour newColour) { tunerColour = newColour; }
+    virtual void updateColour() {}
 
 protected:
     Colour tunerColour;

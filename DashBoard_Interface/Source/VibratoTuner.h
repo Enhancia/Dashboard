@@ -21,14 +21,15 @@ class VibratoTuner:    public Tuner,
 {
 public:
     //==============================================================================
-    VibratoTuner (HubConfiguration& config, cosnt int gestureId);
+    VibratoTuner (HubConfiguration& config, const int gestureId);
     ~VibratoTuner();
     
     //==============================================================================
     void paint (Graphics& g) override;
     void resized() override;
-    void updateComponents() override;
-    void updateDisplay() override;
+    void updateComponents();
+    void updateDisplay();
+    void updateColour() override;
     
     //==============================================================================
     void labelTextChanged (Label* lbl) override;
@@ -45,10 +46,10 @@ public:
     
 private:
     //==============================================================================
-	VibratoTuner (const float& val, NormalisableRange<float> gestRange, const int gestureId,
-					                const float& vibratoIntensity, float maxIntens,
-    				                RangedAudioParameter& gain, const Range<float> gainMax,
-    				                RangedAudioParameter& thresh, const Range<float> threshMax);
+	VibratoTuner (HubConfiguration& config, const float& val,
+	                                        NormalisableRange<float> gestRange, const int gestureId,
+					                        const float& vibratoIntensity, float maxIntens,
+    				                        const Range<float> gainMax, const Range<float> threshMax);
 
     //==============================================================================
     void createSliders();
@@ -64,7 +65,6 @@ private:
     //==============================================================================
     void setGain (float value);
     void setThreshold (float value);
-    float& getIntensityReference();
 
     float getGain();
     float getThreshold();

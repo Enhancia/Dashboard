@@ -10,22 +10,24 @@
 
 #include "VibratoTuner.h"
 
-VibratoTuner::VibratoTuner(const float& val, NormalisableRange<float> gestRange, const int gestureId,
-					                         const float& vibratoIntensity, float maxIntens,
-    				                         const Range<float> gainMax, const Range<float> threshMax);
-    : Tuner ("", getPlumeColour (vibratoHighlight)),
+VibratoTuner::VibratoTuner (HubConfiguration& config, const float& val,
+	                                                  NormalisableRange<float> gestRange, const int gestureId,
+					                                  const float& vibratoIntensity, float maxIntens,
+    				                                  const Range<float> gainMax, const Range<float> threshMax)
+    : Tuner ("", neova_dash::colour::vibrato),
+      hubConfig (config),
       value (val), gestureRange (gestRange), id (gestureId),
       intensity (vibratoIntensity), maxIntensity (maxIntens),
-      gain (vibGain), parameterMaxGain (gainMax),
-      threshold (thresh), parameterMaxThreshold (threshMax)
+      parameterMaxGain (gainMax), parameterMaxThreshold (threshMax)
 {
     createSliders();
     createLabels();
 }
 
 VibratoTuner::VibratoTuner (HubConfiguration& config, const int gestureId)
-    : VibratoTuner (config.data[0], NormalisableRange<float> (-180.0f, 180.0f), gestureId
-    				config.data[1], 1000,
+    : VibratoTuner (config,
+		            config.data[0], NormalisableRange<float> (-180.0f, 180.0f), gestureId,
+    				config.data[1], 1000.0f,
     	            Range<float> (0.0f, neova_dash::ui::VIBRATO_DISPLAY_MAX),
     	            Range<float> (0.0f, neova_dash::ui::VIBRATO_THRESH_DISPLAY_MAX))
 {
@@ -46,7 +48,7 @@ void VibratoTuner::paint (Graphics& g)
 	drawValueCursor (g);
 	drawIntensityCursor (g);
 
-	g.setColour (neova_dash::colour::tunerSliderBackground));
+	g.setColour (neova_dash::colour::tunerSliderBackground);
 	g.setFont (Font().withHeight (14.0f));
 	g.drawText ("THRESHOLD", thresholdSlider->getBounds().withSizeKeepingCentre (100, 50)
 														 .withY (thresholdSlider->getBounds().getBottom()),
@@ -105,6 +107,13 @@ void VibratoTuner::updateDisplay()
 	{
 		repaint();
 	}
+}
+
+void VibratoTuner::updateColour()
+{
+	tunerColour = neova_dash::gesture::getHighlightColour (neova_dash::gesture::vibrato,
+												           hubConfig.getGestureData (id).on == 0 ? false
+																							    : true);
 }
 
 //==============================================================================
@@ -214,12 +223,12 @@ void VibratoTuner::mouseUp (const MouseEvent& e)
 	{
 		if (e.eventComponent == gainSlider)
 		{
-			gain.endChangeGesture();
+			setGain (float (gainSlider->getValue()));
 			gainLabel->setVisible (false);
 		}
 		else if (e.eventComponent == thresholdSlider)
 		{
-			threshold.endChangeGesture();
+			setThreshold (float (thresholdSlider->getValue()));
 			thresholdLabel->setVisible (false);
 		}
 	}
@@ -256,7 +265,7 @@ void VibratoTuner::createSliders()
     //gainSlider->setRotaryParameters (MathConstants<float>::pi*5/3, MathConstants<float>::pi*7/3, true);
     gainSlider->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
     gainSlider->setColour (Slider::rotarySliderFillColourId, tunerColour);
-    gainSlider->setColour (Slider::rotarySliderOutlineColourId, getPlumeColour (tunerSliderBackground));
+    gainSlider->setColour (Slider::rotarySliderOutlineColourId, neova_dash::colour::tunerSliderBackground);
     gainSlider->setRange (double (parameterMaxGain.getStart()), double (parameterMaxGain.getEnd()), 1.0);
     gainSlider->setValue (double (getGain()));
     gainSlider->addListener (this);
@@ -265,7 +274,7 @@ void VibratoTuner::createSliders()
     // ThreshSliderParameters
 	thresholdSlider->setSliderStyle(Slider::LinearVertical);
     thresholdSlider->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
-    thresholdSlider->setColour (Slider::backgroundColourId, getPlumeColour (tunerSliderBackground));
+    thresholdSlider->setColour (Slider::backgroundColourId, neova_dash::colour::tunerSliderBackground);
     thresholdSlider->setColour (Slider::trackColourId, tunerColour);
     //setThresholdSliderColour();
     thresholdSlider->setRange (double (parameterMaxThreshold.getStart()),
@@ -332,22 +341,22 @@ void VibratoTuner::updateLabelBounds (Label* labelToUpdate)
 
 void VibratoTuner::setGain (float value)
 {
-	hubConfiguration.setFloatValueAndUpload (id, HubConfiguration::gestureParam0, value);
+	hubConfig.setFloatValueAndUpload (id, HubConfiguration::gestureParam0, value);
 }
 
 void VibratoTuner::setThreshold (float value)
 {
-	hubConfiguration.setFloatValueAndUpload (id, HubConfiguration::gestureParam1, value);
+	hubConfig.setFloatValueAndUpload (id, HubConfiguration::gestureParam1, value);
 }
 
 float VibratoTuner::getGain()
 {
-    return gain.convertFrom0to1 (gain.getValue());
+    return hubConfig.getGestureData (id).gestureParam0;
 }
 
 float VibratoTuner::getThreshold()
 {
-    return threshold.convertFrom0to1 (threshold.getValue());
+    return hubConfig.getGestureData (id).gestureParam1;
 }
 
 void VibratoTuner::drawValueCursor (Graphics& g)
@@ -361,7 +370,7 @@ void VibratoTuner::drawValueCursor (Graphics& g)
 	Point<int> cursorPoint = {gainSlider->getBounds().getCentreX() + offset,
 							  gainSlider->getBounds().getCentreY()};
 
-    g.setColour ((intensity < getThreshold()) ? getPlumeColour (tunerSliderBackground) : tunerColour);
+    g.setColour ((intensity < getThreshold()) ? neova_dash::colour::tunerSliderBackground : tunerColour);
     g.fillEllipse (juce::Rectangle<float> (5.0f, 5.0f).withCentre (cursorPoint.toFloat()));
 }
 
@@ -379,14 +388,14 @@ void VibratoTuner::drawIntensityCursor (Graphics& g)
                             {cursorPoint.x + 3.0f, cursorPoint.y       },
                             {cursorPoint.x - 3.0f, cursorPoint.y + 3.0f});
 
-    g.setColour ((intensity < getThreshold()) ? getPlumeColour (tunerSliderBackground) : tunerColour);
+    g.setColour ((intensity < getThreshold()) ? neova_dash::colour::tunerSliderBackground : tunerColour);
     g.fillPath (cursorPath);
 }
 
 void VibratoTuner::setThresholdSliderColour()
 {
 	thresholdSlider->setColour (Slider::trackColourId,
-							    (intensity < getThreshold()) ? getPlumeColour (tunerSliderBackground)
+							    (intensity < getThreshold()) ? neova_dash::colour::tunerSliderBackground
 			                       							 : tunerColour);
 }
 

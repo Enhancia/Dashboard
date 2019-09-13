@@ -13,12 +13,16 @@
 GestureSettingsComponent::GestureSettingsComponent (const int gestId, HubConfiguration& config)
 	: gestureId (gestId), hubConfig (config) 
 {
-	addAndMakeVisible (midiPanel = new Component ("Midi Panel"));
+	createTuner();
+	createToggles();
+	midiPanel = std::make_unique<Component>("Midi Panel");
+	addAndMakeVisible (*midiPanel);
+
 }
 
 GestureSettingsComponent::~GestureSettingsComponent()
 {
-	midiPanel = nullptr;
+	//midiPanel = nullptr;
 }
 
 void GestureSettingsComponent::paint (Graphics& g)
@@ -97,15 +101,96 @@ void GestureSettingsComponent::resized()
 
     midiPanel->setBounds (area.removeFromBottom (getHeight()/2 - HEADER_HEIGHT));
     area.removeFromBottom (MARGIN);
-    //gestTuner->setBounds (area);
+    gestTuner->setBounds (area);
 
 	repaint();
 }
 
 void GestureSettingsComponent::updateDisplay()
 {
+    if (!disabled) disableIfGestureWasDeleted();
+
+    if (!disabled)
+    {
+        if (hubConfig.getGestureData (gestureId).on != 0) gestTuner->updateDisplay();
+        
+        //midiPanel->updateDisplay();
+    }
+}
+
+void GestureSettingsComponent::disableIfGestureWasDeleted()
+{
+    if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::none))
+    {
+        disabled = true;
+    }
 }
 
 void GestureSettingsComponent::updateComponents()
 {
+}
+
+void GestureSettingsComponent::createTuner()
+{
+	if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::vibrato))
+    {
+        gestTuner = std::make_unique <VibratoTuner> (hubConfig, gestureId);
+        addAndMakeVisible (*gestTuner);
+    }
+    /*
+    else if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::pitchBend))
+    {
+        gestTuner = std::make_unique <PitchBendTuner> (hubConfig, gestureId);
+        addAndMakeVisible (*gestTuner);
+    }
+    
+    else if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::tilt))
+    {
+        gestTuner = std::make_unique <TiltTuner> (hubConfig, gestureId);
+        addAndMakeVisible (*gestTuner);
+    }
+    /*  Un-comment when the wave gesture is implemented
+    else if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::wave))
+    {
+        gestTuner = std::make_unique <WaveTuner> (hubConfig, gestureId);
+        addAndMakeVisible (*gestTuner);
+    }
+    */
+    /*
+    else if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::roll))
+    {
+        gestTuner = std::make_unique <RollTuner> (hubConfig, gestureId);
+        addAndMakeVisible (*gestTuner);
+    }
+    */
+    else
+    {
+        DBG ("Unknown Gesture type. No tuner was created.");
+        return;
+    }
+
+    gestTuner->updateColour();
+}
+
+void GestureSettingsComponent::createToggles()
+{
+	/*
+	addAndMakeVisible (muteButton = new PlumeShapeButton ("Mute Button",
+                                                          getPlumeColour (plumeBackground),
+                                                          getPlumeColour (mutedHighlight),
+                                                          Gesture::getHighlightColour (gesture.type)));
+
+    muteButton->setShape (PLUME::path::createPath (PLUME::path::onOff), false, true, false);
+    muteButton->setToggleState (gesture.isActive(), dontSendNotification);
+    muteButton->setClickingTogglesState (true);
+    muteButton->onClick = [this] ()
+    {
+        gesture.setActive (muteButton->getToggleState());
+        closeButton.setToggleState (gesture.isActive(), dontSendNotification);
+    };*/
+}
+
+Tuner& GestureSettingsComponent::getTuner()
+{
+	return *gestTuner;
 }
