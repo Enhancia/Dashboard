@@ -10,6 +10,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DashCommon.h"
+#include "DashBoardLookAndFeel.h"
 
 #include "GesturePanel.h"
 #include "NewGesturePanel.h"

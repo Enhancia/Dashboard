@@ -107,6 +107,8 @@ public:
 
     //const String getHubFirm();
     //const String getRingFirm();
+    
+    Array<float> data {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
 private:
     //==============================================================================
@@ -133,7 +135,7 @@ private:
 
     //==============================================================================
 	ApplicationCommandManager& commandManager = getCommandManager();
-	int selectedPreset = -1;
+	int selectedPreset = 0;
     
 	ConfigData config;
 

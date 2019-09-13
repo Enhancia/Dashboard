@@ -40,6 +40,22 @@ namespace neova_dash
         const int DASHBOARD_HEIGHT = 1100*3/4;
         const int HEADER_HEIGHT    = 55;
 
+        // Gesture tuner display ranges
+        const float VIBRATO_DISPLAY_MAX  = 500.0f;
+        const float VIBRATO_THRESH_DISPLAY_MAX = 500.0f;
+    
+        const float PITCHBEND_DISPLAY_MIN = -90.0f;
+        const float PITCHBEND_DISPLAY_MAX =  90.0f;
+    
+        const float TILT_DISPLAY_MIN = -90.0f;
+        const float TILT_DISPLAY_MAX =  90.0f;
+    
+        const float ROLL_DISPLAY_MIN = -90.0f;
+        const float ROLL_DISPLAY_MAX =  90.0f;
+    
+        const float WAVE_DISPLAY_MIN = -90.0f;
+        const float WAVE_DISPLAY_MAX =  90.0f;
+
         const int FRAMERATE = 60; // Display frequency in Hz
 
         extern void paintTiledPath (Graphics&, Path&, juce::Rectangle<float>,
@@ -63,6 +79,10 @@ namespace neova_dash
         const Colour gestureBackground2     (0xff2c2c2c);
         const Colour mainText               (0xfff0f0f0);
         const Colour subText                (0x80f0f0f0);
+
+        const Colour tunerSliderThumb       (0xffffffff);
+        const Colour tunerSliderBackground  (0xff4e4e4e);
+        const Colour midiSliderBackground   (0xff434343);
 
         const Colour inactiveGesture        (0xff808080);
         const Colour vibrato                (0xffec6565);

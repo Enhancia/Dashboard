@@ -54,21 +54,22 @@ void GestureSettingsComponent::paintBackground (Graphics& g)
     using namespace neova_dash::ui;
     auto area = getLocalBounds().withBottom (midiPanel->getBottom());
 
-    // MidiMap Background
-    g.setColour (neova_dash::colour::gestureBackground2);
-    g.fillRoundedRectangle (area.withTop (midiPanel->getY()).toFloat(), 10.0f);
-
     // Tuner backGround
     g.setColour (neova_dash::colour::gestureBackground);
-    g.fillRoundedRectangle (area.withBottom (midiPanel->getY() + HEADER_HEIGHT)
-                                .toFloat(),
-                            10.0f);
+    g.fillRoundedRectangle (area.toFloat(), 10.0f);
+
+    // MidiMap Background
+    g.saveState();
+    g.reduceClipRegion (0, midiPanel->getY(), getWidth(), getLocalBounds().getBottom());
+    g.setColour (neova_dash::colour::gestureBackground2);
+    g.fillRoundedRectangle (area.toFloat(), 10.0f);
+    g.restoreState();
 
     Path tile;
     tile.addEllipse (0, 0, 2, 2);
 
     neova_dash::ui::paintTiledPath (g, tile,
-                                    area.withBottom (midiPanel->getY() + HEADER_HEIGHT)
+                                    area.withBottom (midiPanel->getY())
                                     .toFloat(),
                                     15.0f, 15.0f, neova_dash::colour::gestureBackground2, Colour (0), 0.0f);
 

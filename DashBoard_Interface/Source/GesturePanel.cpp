@@ -307,7 +307,7 @@ void GesturePanel::resizeSlotsAndTrimAreaAccordingly (juce::Rectangle<int>& area
     {
         gestureSlots[i]->setBounds (i < numRows ? column1.removeFromTop (slotHeight)
 														 .reduced (marginX, marginY)
-                                                : column2.removeFromTop (slotHeight)
+                                                : column2.removeFromBottom (slotHeight)
 														 .reduced (marginX, marginY));
     }
 }
@@ -527,7 +527,6 @@ void GesturePanel::createMenuForGestureId (int id)
 {
     PopupMenu gestureMenu;
 
-    //gestureMenu.addItem (1, "Rename", true);
     gestureMenu.addItem (1, "Duplicate", true);
     gestureMenu.addItem (2, "Delete", true);
     

@@ -27,6 +27,8 @@ PresetSelectorComponent::PresetSelectorComponent (HubConfiguration& config, Appl
 		leds.add (new GestureLED (i, hubConfig));
 		addAndMakeVisible (leds.getLast());
 	}
+
+	updateToggles();
 }
 
 PresetSelectorComponent::~PresetSelectorComponent()
@@ -81,10 +83,10 @@ void PresetSelectorComponent::resized()
 
 		if (column == 0)                       columnArea.removeFromRight (columnXMargin);
 		else if (column == toggles.size() - 1) columnArea.removeFromLeft (columnXMargin);
-		else                                   columnArea.reduce (columnXMargin*2/3, 0);
+		else                                   columnArea.reduce (columnXMargin*2/3 -2, 0);
 
-		if (column == 1 || column == 2) columnArea.translate (0, 22);
-		if (column == 2 || column == 3) columnArea.translate (4, 0);
+		if (column == 1 || column == 2) columnArea.translate (0, 23);
+		if (column == 2 || column == 3) columnArea.translate (3, 0);
 
 		toggles[column]->setBounds (columnArea);
 		leds[column]->setBounds (columnArea.withHeight (20).translated (0, -23));
@@ -153,21 +155,25 @@ void PresetSelectorComponent::PresetToggle::paintButton (Graphics& g, bool shoul
 								   				  jmin (getWidth(), getHeight())/2 })
 								   .reduced (1);
 
-	/*
-	//Shadow Draw
-	g.setColour (Colours::black.withAlpha (0.2f));
-	g.drawEllipse (ellipseArea.toFloat()
-							  .withTrimmedRight (1.5f)
-							  .withTrimmedBottom (1.5f),
-				   1.5f);
-	*/
+	ColourGradient higlightFill (ColourGradient (neova_dash::colour::subText.withAlpha (0.2f),
+												 ellipseArea.getCentre().toFloat(),
+												 Colour (0),
+												 {float (ellipseArea.getCentreX()), 0.0f},
+												 true));
+	higlightFill.addColour (0.4f, neova_dash::colour::subText.withAlpha (0.15f));
+	higlightFill.addColour (0.8f, Colour (0));
 
 	// Button Draw
-	g.setColour (neova_dash::colour::mainText.withAlpha (getToggleState() ? 0.6f
-																		  : shouldDrawButtonAsHighlighted ? 0.3f
-																										  : 0.0f));
-	g.drawEllipse (ellipseArea.toFloat(), 2.0f);
-
+	if (getToggleState())
+	{
+		g.setColour (neova_dash::colour::mainText.withAlpha (0.6f));
+		g.drawEllipse (ellipseArea.toFloat(), 2.0f);
+	}
+	else if (shouldDrawButtonAsHighlighted)
+	{
+		g.setGradientFill (higlightFill);
+		g.fillEllipse (ellipseArea.toFloat());
+	}
 }
 
 //==============================================================================
