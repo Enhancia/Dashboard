@@ -43,6 +43,7 @@ public:
     // Callbacks
     void timerCallback() override;
 
+    void mouseDown (const MouseEvent &event) override;
     void mouseUp (const MouseEvent &event) override;
     void mouseDrag (const MouseEvent &event) override;
     bool keyPressed (const KeyPress &key) override;

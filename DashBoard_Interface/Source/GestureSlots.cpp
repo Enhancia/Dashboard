@@ -51,7 +51,7 @@ void GestureComponent::paint (Graphics& g)
     {
         g.setColour (neova_dash::gesture::getHighlightColour
 		                (hubConfig.getGestureData (draggedGesture).type,
-                         hubConfig.isGestureActive (id)));
+                         hubConfig.isGestureActive (draggedGesture)));
 
         g.drawRoundedRectangle (getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 3.0f);
     }
@@ -134,10 +134,12 @@ void GestureComponent::startNameEntry()
 
 void GestureComponent::createLabel()
 {
-    addAndMakeVisible (gestureNameLabel = new Label ("gestureNameLabel",
-		                                             neova_dash::gesture::getTypeString
-													     (neova_dash::gesture::intToGestureType(type),
-														  true).toUpperCase()));
+	gestureNameLabel = std::make_unique<Label> ("gestureNameLabel",
+                                                neova_dash::gesture::getTypeString
+                                                   (neova_dash::gesture::intToGestureType(type),
+                                                    true).toUpperCase());
+
+    addAndMakeVisible (*gestureNameLabel);
 
     gestureNameLabel->setEditable (false, false, false);
     gestureNameLabel->setColour (Label::backgroundColourId, Colour (0x00000000));
@@ -149,25 +151,23 @@ void GestureComponent::createLabel()
 
 void GestureComponent::createButton()
 {
-    addAndMakeVisible (muteButton = new ShapeButton ("Mute Button",
-                                                     Colour (0),
-                                                     Colour (0),
-                                                     Colour (0)));
-
-    // TO DELETE
-    Path muteButtonPath;
-    muteButtonPath.addRectangle (Rectangle<float> (10.0f, 10.0f));
+    muteButton = std::make_unique<DashShapeButton> ("Mute Button",
+                                                    neova_dash::colour::dashboardBackground,
+                                                    neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (id)
+                                                                                                      .type),
+                                                    neova_dash::colour::inactiveGesture);
+    addAndMakeVisible (*muteButton);
 
 	using namespace neova_dash;
 
-    muteButton->setShape (muteButtonPath, false, true, false);
+    muteButton->setShape (path::createPath (path::onOff), false, true, false);
     muteButton->setOutline (gesture::getHighlightColour (type, hubConfig.isGestureActive (id)),
                             1.5f);
-    muteButton->setToggleState (hubConfig.isGestureActive (id), dontSendNotification);
+    muteButton->setToggleState (!hubConfig.isGestureActive (id), dontSendNotification);
     muteButton->setClickingTogglesState (true);
     muteButton->onClick = [this] ()
     {
-        hubConfig.setUint8ValueAndUpload (id, HubConfiguration::on, uint8 (muteButton->getToggleState() ? 1 : 0));
+        hubConfig.setUint8Value (id, HubConfiguration::on, uint8 (muteButton->getToggleState() ? 0 : 1));
         commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
     };
 }

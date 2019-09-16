@@ -46,6 +46,8 @@ DashBoardInterface::~DashBoardInterface()
     gesturePanel = nullptr;
     newGesturePanel = nullptr;
     uploadButton = nullptr;
+
+	setLookAndFeel (nullptr);
 }
 
 //==============================================================================

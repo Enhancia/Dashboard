@@ -22,7 +22,7 @@ GesturePanel::GesturePanel (HubConfiguration& data, NewGesturePanel& newGest, Ap
 
     gestureSettings = std::make_unique<GestureSettingsComponent> (int (hubConfig.getGestureData (selectedGesture)
                                                                                      .type),
-                                                                  hubConfig);
+                                                                  hubConfig, commandManager);
     addAndMakeVisible (*gestureSettings);
 
     initialiseGestureSlots();
@@ -56,7 +56,7 @@ void GesturePanel::update()
 
     if (selectedGesture != -1)
     {
-        gestureSettings.reset (new GestureSettingsComponent (selectedGesture, hubConfig));
+        gestureSettings.reset (new GestureSettingsComponent (selectedGesture, hubConfig, commandManager));
         addAndMakeVisible (*gestureSettings);
     }
 
@@ -65,7 +65,7 @@ void GesturePanel::update()
 }
 
 //==============================================================================
-void GesturePanel::paint (Graphics& g)
+void GesturePanel::paint (Graphics&)
 {
 }
 
@@ -99,6 +99,17 @@ void GesturePanel::timerCallback()
     if (gestureSettings != nullptr)
     {
         gestureSettings->updateDisplay();
+    }
+}
+
+void GesturePanel::mouseDown (const MouseEvent &event)
+{
+    if (auto* gestureComponent = dynamic_cast<GestureComponent*> (event.eventComponent))
+    {
+        if (!gestureComponent->isSelected())
+        {
+            selectGestureExclusive (*gestureComponent);
+        }
     }
 }
 
@@ -180,6 +191,7 @@ void GesturePanel::handleLeftClickUp (const MouseEvent& event)
 {
     if (auto* gestureComponent = dynamic_cast<GestureComponent*> (event.eventComponent))
     {
+        /*
         // Mouse didn't leave the component it clicked in the first place
         if (getComponentAt (event.getEventRelativeTo (this).getPosition()) == event.eventComponent)
         {
@@ -187,8 +199,9 @@ void GesturePanel::handleLeftClickUp (const MouseEvent& event)
             {
                 selectGestureExclusive (*gestureComponent);
             }
+            }
         }
-        else // Mouse was dragged to another component
+        else // Mouse was dragged to another component*/
         {
             if (Component* componentUnderMouse = getComponentAt (event.getEventRelativeTo (this).getPosition()))
             {
@@ -430,7 +443,7 @@ void GesturePanel::removeGestureAndGestureComponent (int gestureId)
     {
         unselectCurrentGesture();
         gestureSettings.reset (new GestureSettingsComponent (neova_dash::gesture::NUM_GEST + 1,
-                                                             hubConfig));
+                                                             hubConfig, commandManager));
         addAndMakeVisible (*gestureSettings);
         resized();
     }
@@ -475,7 +488,8 @@ void GesturePanel::selectGestureExclusive (GestureComponent& gestureComponentToS
         }
     }
 
-    gestureSettings.reset (new GestureSettingsComponent (gestureComponentToSelect.id, hubConfig));
+    gestureSettings.reset (new GestureSettingsComponent (gestureComponentToSelect.id, hubConfig,
+			                                             commandManager));
     addAndMakeVisible (*gestureSettings);
     selectedGesture = gestureComponentToSelect.id;
     resized();
@@ -509,7 +523,7 @@ void GesturePanel::unselectCurrentGesture()
 
         selectedGesture = -1;
         gestureSettings.reset (new GestureSettingsComponent (neova_dash::gesture::NUM_GEST + 1,
-			                                                 hubConfig));
+			                                                 hubConfig, commandManager));
         addAndMakeVisible (*gestureSettings);
         resized();
 

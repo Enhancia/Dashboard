@@ -14,7 +14,9 @@
 OneRangeTuner::OneRangeTuner (HubConfiguration& config, const int gestureId,
 							  const float& val, NormalisableRange<float> gestRange,
                    			  const Range<float> paramMax, const String unit, TunerStyle style)
-    : Tuner (unit, neova_dash::gesture::getHighlightColour (gestureId, config.isGestureActive (gestureId))),
+
+    : Tuner (unit, neova_dash::gesture::getHighlightColour (config.getGestureData (gestureId).type,
+    														config.isGestureActive (gestureId))),
       hubConfig (config), id (gestureId),
       value (val), gestureRange (gestRange),
       parameterMax (paramMax), tunerStyle (style)
@@ -28,19 +30,19 @@ OneRangeTuner::OneRangeTuner (HubConfiguration& config, const int gestureId,
 
 OneRangeTuner::~OneRangeTuner()
 {
-    setLookAndFeel (nullptr);
-
     lowSlider = nullptr;
     highSlider = nullptr;
     rangeLabelMin = nullptr;
     rangeLabelMax = nullptr;
+
+    setLookAndFeel (nullptr);
 }
     
 //==============================================================================
 void OneRangeTuner::paint (Graphics& g)
 {
     drawTunerSliderBackground (g);
-    drawValueCursor (g);
+    //drawValueCursor (g);
 }
 
 void OneRangeTuner::resized()
@@ -101,30 +103,28 @@ void OneRangeTuner::resizeButtons()
     
 void OneRangeTuner::updateComponents()
 {
-    if (getRangeHigh() < getRangeLow())
+    // Sets slider value
+    if (lowSlider->getThumbBeingDragged() == -1)
     {
-        // Sets slider value
-        if (lowSlider->getThumbBeingDragged() == -1)
-        {
-            lowSlider->setValue (double (getRangeLow()), dontSendNotification);
-        }
-
-        if (highSlider->getThumbBeingDragged() == -1)
-        {
-            highSlider->setValue (double (getRangeHigh()), dontSendNotification);
-        }
-        
-        // Sets label text
-        if (!(rangeLabelMin->isBeingEdited()))
-        {
-            rangeLabelMin->setText (String (int (getRangeLow())) + valueUnit, dontSendNotification);
-        }
-          
-        if (!(rangeLabelMax->isBeingEdited()))
-        {
-            rangeLabelMax->setText (String (int (getRangeHigh())) + valueUnit, dontSendNotification);
-        }
+        lowSlider->setValue (double (getRangeLow()), dontSendNotification);
     }
+
+    if (highSlider->getThumbBeingDragged() == -1)
+    {
+        highSlider->setValue (double (getRangeHigh()), dontSendNotification);
+    }
+    
+    // Sets label text
+    if (!(rangeLabelMin->isBeingEdited()))
+    {
+        rangeLabelMin->setText (String (int (getRangeLow())) + valueUnit, dontSendNotification);
+    }
+      
+    if (!(rangeLabelMax->isBeingEdited()))
+    {
+        rangeLabelMax->setText (String (int (getRangeHigh())) + valueUnit, dontSendNotification);
+    }
+    
 }
 
 void OneRangeTuner::updateDisplay()
@@ -154,6 +154,12 @@ void OneRangeTuner::setColour (const Colour newColour)
 
     repaint();
 }
+
+void OneRangeTuner::updateColour()
+{
+	setColour (neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (id).type,
+    												    hubConfig.isGestureActive (id)));
+}
     
 void OneRangeTuner::setStyle (TunerStyle newStyle)
 {
@@ -163,17 +169,17 @@ void OneRangeTuner::setStyle (TunerStyle newStyle)
     {
         case wave:
             setAngles (0.0f, MathConstants<float>::pi);
-            tunerColour = neova_dash::colour::wave;
+            //tunerColour = neova_dash::colour::wave;
             break;
 
         case tilt:
             setAngles (MathConstants<float>::pi*16/10, MathConstants<float>::twoPi);
-            tunerColour = neova_dash::colour::tilt;
+            //tunerColour = neova_dash::colour::tilt;
             break;
 
         case roll:
             setAngles (MathConstants<float>::pi*5/3, MathConstants<float>::pi*7/3);
-            tunerColour = neova_dash::colour::roll;
+            //tunerColour = neova_dash::colour::roll;
             break;
     }
 }
@@ -211,8 +217,8 @@ void OneRangeTuner::labelTextChanged (Label* lbl)
     {
         if ( val > getRangeHigh()) val = getRangeHigh();
             
-        lowSlider->setValue (getRangeLow(), sendNotification);
-    	setRangeLow (float (lowSlider->getValue()));
+        lowSlider->setValue (val, sendNotification);
+    	setRangeLow (float (lowSlider->getValue()), false);
     	setRangeHigh (float (highSlider->getValue()));
         updateLabelBounds (rangeLabelMin);
         lbl->setText (String (int (getRangeLow())) + valueUnit, dontSendNotification);
@@ -222,8 +228,8 @@ void OneRangeTuner::labelTextChanged (Label* lbl)
     {
         if ( val < getRangeLow()) val = getRangeLow();
             
-        highSlider->setValue (getRangeHigh(), sendNotification);
-    	setRangeLow (float (lowSlider->getValue()));
+        highSlider->setValue (val, sendNotification);
+    	setRangeLow (float (lowSlider->getValue()), false);
     	setRangeHigh (float (highSlider->getValue()));
         updateLabelBounds (rangeLabelMax);
         lbl->setText (String (int (getRangeHigh())) + valueUnit, dontSendNotification);
@@ -243,12 +249,12 @@ void OneRangeTuner::sliderValueChanged (Slider* sldr)
     {
         // min value changed by user
         updateLabelBounds (rangeLabelMin);
-        rangeLabelMin->setText (String (int (getRangeLow())) + valueUnit, dontSendNotification);
+        rangeLabelMin->setText (String (int (sldr->getValue())) + valueUnit, dontSendNotification);
         
         // in case the other thumb is dragged along..
-        if (highSlider->getThumbBeingDragged() == -1 && getRangeLow() > getRangeHigh())
+        if (highSlider->getThumbBeingDragged() == -1 && lowSlider->getValue() > highSlider->getValue())
         {
-            highSlider->setValue (double (getRangeLow()), dontSendNotification);
+            highSlider->setValue (sldr->getValue(), dontSendNotification);
             updateLabelBounds (rangeLabelMax);
             rangeLabelMax->setText (String (float (sldr->getValue())) + valueUnit, dontSendNotification);
         }
@@ -258,12 +264,12 @@ void OneRangeTuner::sliderValueChanged (Slider* sldr)
     else if (sldr == highSlider)
     {
         updateLabelBounds (rangeLabelMax);
-        rangeLabelMax->setText (String (int (getRangeHigh())) + valueUnit, dontSendNotification);
+        rangeLabelMax->setText (String (int (sldr->getValue())) + valueUnit, dontSendNotification);
         
         // in case the other thumb is dragged along..
-        if (lowSlider->getThumbBeingDragged() == -1 && getRangeLow() > getRangeHigh())
+        if (lowSlider->getThumbBeingDragged() == -1 && lowSlider->getValue() > highSlider->getValue())
         {
-            lowSlider->setValue (double (getRangeLow()), dontSendNotification);
+            lowSlider->setValue (sldr->getValue(), dontSendNotification);
             updateLabelBounds (rangeLabelMin);
             rangeLabelMin->setText (String (float (sldr->getValue())) + valueUnit, dontSendNotification);
         }
@@ -399,7 +405,7 @@ void OneRangeTuner::mouseUp (const MouseEvent& e)
 
     if (objectBeingDragged != none)
     {
-    	setRangeLow (float (lowSlider->getValue()));
+    	setRangeLow (float (lowSlider->getValue()), false);
     	setRangeHigh (float (highSlider->getValue()));
         rangeLabelMin->setVisible (false);
         rangeLabelMax->setVisible (false);
@@ -487,14 +493,14 @@ void OneRangeTuner::createButtons()
     setButtonSettings (*maxAngleButton);
 }
     
-void OneRangeTuner::setRangeLow (float val)
+void OneRangeTuner::setRangeLow (float val, bool uploadToHub)
 {
-	hubConfig.setFloatValueAndUpload (id, HubConfiguration::gestureParam0, value);
+	hubConfig.setFloatValue (id, HubConfiguration::gestureParam0, val, uploadToHub);
 }
     
-void OneRangeTuner::setRangeHigh (float val)
+void OneRangeTuner::setRangeHigh (float val, bool uploadToHub)
 {
-	hubConfig.setFloatValueAndUpload (id, HubConfiguration::gestureParam1, value);
+	hubConfig.setFloatValue (id, HubConfiguration::gestureParam1, val, uploadToHub);
 }
     
 float OneRangeTuner::getRangeLow()

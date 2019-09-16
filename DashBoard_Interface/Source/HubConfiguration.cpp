@@ -18,14 +18,19 @@ HubConfiguration::~HubConfiguration()
 {
 }
 
-void HubConfiguration::setMidiChannelAndUpload (const uint8 newMidiChannel)
+void HubConfiguration::setMidiChannel (const uint8 newMidiChannel, bool uploadToHub)
 {
 	config.midiChannel = newMidiChannel;
 
-	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+	if (uploadToHub)
+	{
+		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+	}
 }
 
-void HubConfiguration::setUint8ValueAndUpload (const int gestureNumber, const uint8DataId dataId, const uint8 newUint8Value)
+void HubConfiguration::setUint8Value (const int gestureNumber, const uint8DataId dataId,
+													           const uint8 newUint8Value,
+													           bool uploadToHub)
 {
 	GestureData& gesture = getGestureData (gestureNumber);
 	uint8* valToUpdatePtr;
@@ -37,16 +42,22 @@ void HubConfiguration::setUint8ValueAndUpload (const int gestureNumber, const ui
 		case midiLow:  valToUpdatePtr = &gesture.midiLow;  break;
 		case midiHigh: valToUpdatePtr = &gesture.midiHigh; break;
 		case cc:       valToUpdatePtr = &gesture.cc;       break;
+		case midiType: valToUpdatePtr = &gesture.midiType; break;
 
 		default: return;
 	}
 
 	*valToUpdatePtr = newUint8Value;
 
-	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+	if (uploadToHub)
+	{
+		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+	}
 }
 
-void HubConfiguration::setFloatValueAndUpload (const int gestureNumber, const floatDataId dataId, const float newFloatValue)
+void HubConfiguration::setFloatValue (const int gestureNumber, const floatDataId dataId,
+													           const float newFloatValue,
+													           bool uploadToHub)
 {
 	GestureData& gesture = getGestureData (gestureNumber);
 	float* valToUpdatePtr;
@@ -65,7 +76,10 @@ void HubConfiguration::setFloatValueAndUpload (const int gestureNumber, const fl
 
 	*valToUpdatePtr = newFloatValue;
 
-	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+	if (uploadToHub)
+	{
+		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+	}
 }
 
 void HubConfiguration::setDefaultGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType type,
@@ -73,7 +87,7 @@ void HubConfiguration::setDefaultGestureValues (const int gestureNumber, const n
 {
 	using namespace neova_dash::gesture;
 
-	setGestureData (presetNumber, gestureNumber, 1, uint8 (type), 0, 127, 0);
+	setGestureData (presetNumber, gestureNumber, 1, uint8 (type), 0, 127, 0, 1);
 
 	switch (type)
 	{
@@ -186,28 +200,35 @@ bool HubConfiguration::isGestureActive (const int gestureNumber)
 
 void HubConfiguration::setDefaultConfig()
 {
-	setGestureData (0, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0);
+	setGestureData       (0, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0, 1);
 	setGestureParameters (0, 0, 400.0f, 40.0f);
-	setGestureData (0, 1, 1, neova_dash::gesture::pitchBend, 0, 127, 0);
-	setGestureData (0, 2, 0, neova_dash::gesture::tilt, 0, 127, 0);
+	setGestureData       (0, 1, 1, neova_dash::gesture::pitchBend, 0, 127, 0, 1);
+	setGestureParameters (0, 1, -50.0f, -20.0f, 30.0f, 60.0f);
+	setGestureData       (0, 2, 0, neova_dash::gesture::tilt, 0, 127, 0, 1);
 	setGestureParameters (0, 2, 0.0f, 50.0f);
-	setGestureData (0, 3, 0, neova_dash::gesture::roll, 0, 127, 0);
+	setGestureData       (0, 3, 0, neova_dash::gesture::roll, 0, 127, 0, 1);
+	setGestureParameters (0, 3, -30.0f, 30.0f);
 
-	setGestureData (1, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0);
+	setGestureData       (1, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0, 1);
 	setGestureParameters (1, 0, 450.0f, 20.0f);
-	setGestureData (1, 1, 1, neova_dash::gesture::tilt, 0, 127, 0);
-	setGestureData (1, 2, 0, neova_dash::gesture::none, 0, 127, 0);
-	setGestureData (1, 3, 1, neova_dash::gesture::roll, 0, 127, 0);
+	setGestureData       (1, 1, 1, neova_dash::gesture::tilt, 0, 127, 0, 1);
+	setGestureParameters (1, 1, 0.0f, 80.0f);
+	setGestureData       (1, 2, 0, neova_dash::gesture::none, 0, 127, 0, 1);
+	setGestureData       (1, 3, 1, neova_dash::gesture::roll, 0, 127, 0, 1);
+	setGestureParameters (1, 3, -50.0f, 20.0f);
 
-	setGestureData (2, 0, 0, neova_dash::gesture::none, 0, 127, 0);
-	setGestureData (2, 1, 0, neova_dash::gesture::none, 0, 127, 0);
-	setGestureData (2, 2, 1, neova_dash::gesture::roll, 0, 127, 0);
-	setGestureData (2, 3, 1, neova_dash::gesture::wave, 0, 127, 0);
+	setGestureData       (2, 0, 0, neova_dash::gesture::none, 0, 127, 0, 1);
+	setGestureData       (2, 1, 0, neova_dash::gesture::none, 0, 127, 0, 1);
+	setGestureData       (2, 2, 1, neova_dash::gesture::roll, 0, 127, 0, 1);
+	setGestureParameters (2, 2, -10.0f, 90.0f);
+	setGestureData       (2, 3, 1, neova_dash::gesture::wave, 0, 127, 0, 1);
+	setGestureParameters (2, 3, -50.0f, 20.0f);
 
-	setGestureData (3, 0, 0, neova_dash::gesture::none, 0, 127, 0);
-	setGestureData (3, 1, 0, neova_dash::gesture::none, 0, 127, 0);
-	setGestureData (3, 2, 1, neova_dash::gesture::tilt, 0, 127, 0);
-	setGestureData (3, 3, 0, neova_dash::gesture::none, 0, 127, 0);
+	setGestureData       (3, 0, 0, neova_dash::gesture::none, 0, 127, 0, 1);
+	setGestureData       (3, 1, 0, neova_dash::gesture::none, 0, 127, 0, 1);
+	setGestureData       (3, 2, 1, neova_dash::gesture::tilt, 0, 127, 0, 1);
+	setGestureParameters (3, 2, -10.0f, -5.0f);
+	setGestureData       (3, 3, 0, neova_dash::gesture::none, 0, 127, 0, 1);
 
 	//commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
 }
@@ -218,6 +239,7 @@ void HubConfiguration::setGestureData (int presetNum, int gestureNum,
                                    				      uint8 newMidiLow,
                                    				      uint8 newMidiHigh,
                                    				      uint8 newCc,
+                                        			  uint8 newMidiType,
                                    				      bool uploadToHub)
 {
 	GestureData& gesture = getGestureData (gestureNum, presetNum);
@@ -227,6 +249,9 @@ void HubConfiguration::setGestureData (int presetNum, int gestureNum,
 	gesture.midiLow  = newMidiLow;
 	gesture.midiHigh = newMidiHigh;
 	gesture.cc       = newCc;
+	gesture.midiType = ( newType == neova_dash::gesture::vibrato ||
+						 newType == neova_dash::gesture::pitchBend ) ? neova_dash::gesture::pitchMidi
+																	 : newMidiType;
 
 	if (uploadToHub) commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
 }

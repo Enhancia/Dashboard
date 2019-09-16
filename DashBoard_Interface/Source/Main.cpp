@@ -62,7 +62,7 @@ public:
         MainWindow (String name , HubConfiguration& data)
             : DocumentWindow (name, Desktop::getInstance().getDefaultLookAndFeel()
                                                           .findColour (ResizableWindow::backgroundColourId),
-                                    DocumentWindow::allButtons)
+                                    DocumentWindow::minimiseButton + DocumentWindow::closeButton)
         {
             setUsingNativeTitleBar (true);
             setContentOwned (new DashBoardInterface (data), true);

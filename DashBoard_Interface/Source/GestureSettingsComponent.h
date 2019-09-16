@@ -13,14 +13,15 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DashCommon.h"
 #include "HubConfiguration.h"
-#include "Tuner.h"
-#include "VibratoTuner.h"
+#include "GesturesTuner.h"
+#include "MidiPanel.h"
+#include "DashShapeButton.h"
 
 class GestureSettingsComponent : public Component
 {
 public:
     //==============================================================================
-    GestureSettingsComponent (const int gestureId, HubConfiguration& config);
+    GestureSettingsComponent (const int gestureId, HubConfiguration& config, ApplicationCommandManager& manager);
     ~GestureSettingsComponent();
     
     //==============================================================================
@@ -42,6 +43,7 @@ private:
     //==============================================================================
     void createTuner();
     void createToggles();
+    void createMidiPanel();
 	void disableIfGestureWasDeleted();
     
     //==============================================================================
@@ -52,9 +54,9 @@ private:
     const int HEADER_HEIGHT = 30;
 	
     std::unique_ptr<Tuner> gestTuner;
-    //ScopedPointer<PlumeShapeButton> muteButton;
-
-    std::unique_ptr<Component> midiPanel;
+    std::unique_ptr<DashShapeButton> muteButton;
+    std::unique_ptr<MidiPanel> midiPanel;
+    ApplicationCommandManager& commandManager;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GestureSettingsComponent)

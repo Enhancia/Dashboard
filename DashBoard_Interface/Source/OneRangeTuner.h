@@ -51,6 +51,7 @@ public:
     void updateDisplay() override;
 
     void setColour (const Colour newColour) override;
+    void updateColour() override;
     
     //==============================================================================
     void labelTextChanged (Label* lbl) override;
@@ -80,8 +81,8 @@ private:
     void resizeButtons();
     
     //==============================================================================
-    void setRangeLow (float value);
-    void setRangeHigh (float value);
+    void setRangeLow (float value, bool uploadToHub = true);
+    void setRangeHigh (float value, bool uploadToHub = true);
     
     float getRangeLow();
     float getRangeHigh();

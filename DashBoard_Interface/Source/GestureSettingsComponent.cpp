@@ -10,19 +10,18 @@
 
 #include "GestureSettingsComponent.h"
 
-GestureSettingsComponent::GestureSettingsComponent (const int gestId, HubConfiguration& config)
-	: gestureId (gestId), hubConfig (config) 
+GestureSettingsComponent::GestureSettingsComponent (const int gestId, HubConfiguration& config, ApplicationCommandManager& manager)
+	: gestureId (gestId), hubConfig (config), commandManager (manager)
 {
 	createTuner();
 	createToggles();
-	midiPanel = std::make_unique<Component>("Midi Panel");
-	addAndMakeVisible (*midiPanel);
-
+    createMidiPanel();
 }
 
 GestureSettingsComponent::~GestureSettingsComponent()
 {
-	//midiPanel = nullptr;
+    gestTuner = nullptr;
+	midiPanel = nullptr;
 }
 
 void GestureSettingsComponent::paint (Graphics& g)
@@ -95,11 +94,10 @@ void GestureSettingsComponent::resized()
 
     auto area = getLocalBounds();
     auto headerArea = area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL);
-    headerArea.removeFromRight (25);
 
-    //muteButton->setBounds (headerArea.removeFromRight (30).withSizeKeepingCentre (18, 18));
+    muteButton->setBounds (headerArea.removeFromRight (30).withSizeKeepingCentre (18, 18));
 
-    midiPanel->setBounds (area.removeFromBottom (getHeight()/3 - HEADER_HEIGHT));
+    midiPanel->setBounds (area.removeFromBottom (getHeight()/3));
     area.removeFromBottom (MARGIN);
     if (gestTuner != nullptr) gestTuner->setBounds (area);
 
@@ -113,7 +111,10 @@ void GestureSettingsComponent::updateDisplay()
     if (!disabled)
     {
         if (hubConfig.getGestureData (gestureId).on != 0
-			&& gestTuner != nullptr) gestTuner->updateDisplay();
+			&& gestTuner != nullptr)
+        {
+            //gestTuner->updateDisplay();
+        }
         
         //midiPanel->updateDisplay();
     }
@@ -139,7 +140,6 @@ void GestureSettingsComponent::createTuner()
         gestTuner = std::make_unique <VibratoTuner> (hubConfig, gestureId);
         addAndMakeVisible (*gestTuner);
     }
-    /*
     else if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::pitchBend))
     {
         gestTuner = std::make_unique <PitchBendTuner> (hubConfig, gestureId);
@@ -158,13 +158,11 @@ void GestureSettingsComponent::createTuner()
         addAndMakeVisible (*gestTuner);
     }
     */
-    /*
     else if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::roll))
     {
         gestTuner = std::make_unique <RollTuner> (hubConfig, gestureId);
         addAndMakeVisible (*gestTuner);
     }
-    */
     else
     {
         DBG ("Unknown Gesture type. No tuner was created.");
@@ -176,20 +174,30 @@ void GestureSettingsComponent::createTuner()
 
 void GestureSettingsComponent::createToggles()
 {
-	/*
-	addAndMakeVisible (muteButton = new PlumeShapeButton ("Mute Button",
-                                                          getPlumeColour (plumeBackground),
-                                                          getPlumeColour (mutedHighlight),
-                                                          Gesture::getHighlightColour (gesture.type)));
+    muteButton = std::make_unique<DashShapeButton> ("Mute Button",
+                                                    neova_dash::colour::dashboardBackground,
+                                                    neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (gestureId)
+                                                                                                      .type),
+                                                    neova_dash::colour::inactiveGesture);
+    addAndMakeVisible (*muteButton);
 
-    muteButton->setShape (PLUME::path::createPath (PLUME::path::onOff), false, true, false);
-    muteButton->setToggleState (gesture.isActive(), dontSendNotification);
+    muteButton->setShape (neova_dash::path::createPath (neova_dash::path::onOff), false, true, false);
+    muteButton->setToggleState (!hubConfig.isGestureActive (gestureId), dontSendNotification);
     muteButton->setClickingTogglesState (true);
     muteButton->onClick = [this] ()
     {
-        gesture.setActive (muteButton->getToggleState());
-        closeButton.setToggleState (gesture.isActive(), dontSendNotification);
-    };*/
+        if (hubConfig.getGestureData (gestureId).type != uint8 (neova_dash::gesture::none))
+        {
+            hubConfig.setUint8Value (gestureId, HubConfiguration::on, uint8 (muteButton->getToggleState() ? 0 : 1));
+            commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
+        }
+    };
+}
+
+void GestureSettingsComponent::createMidiPanel()
+{
+    midiPanel = std::make_unique<MidiPanel> (hubConfig, gestureId);
+    addAndMakeVisible (*midiPanel);
 }
 
 Tuner& GestureSettingsComponent::getTuner()

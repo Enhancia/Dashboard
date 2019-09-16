@@ -29,6 +29,8 @@ public:
     	uint8 midiLow = 0;
     	uint8 midiHigh = 127;
     	uint8 cc = 0;
+        uint8 midiType = (type == neova_dash::gesture::vibrato || type == neova_dash::gesture::pitchBend)
+                              ? neova_dash::gesture::pitchMidi : neova_dash::gesture::ccMidi;
 
         float gestureParam0 = 0.0f;
         float gestureParam1 = 0.0f;
@@ -63,7 +65,8 @@ public:
     	type,
     	midiLow,
     	midiHigh,
-    	cc
+    	cc,
+        midiType
     };
 
     enum floatDataId
@@ -81,9 +84,15 @@ public:
 	~HubConfiguration();
 
     //==============================================================================
-    void setMidiChannelAndUpload (const uint8 newMidiChannel);
-    void setUint8ValueAndUpload (const int gestureNumber, const uint8DataId dataId, const uint8 newUint8Value);
-    void setFloatValueAndUpload (const int gestureNumber, const floatDataId dataId, const float newFloatValue);
+    void setMidiChannel (const uint8 newMidiChannel, bool uploadToHub = true);
+
+    void setUint8Value (const int gestureNumber, const uint8DataId dataId,
+                                                 const uint8 newUint8Value,
+                                                 bool uploadToHub = true);
+
+    void setFloatValue (const int gestureNumber, const floatDataId dataId,
+                                                 const float newFloatValue,
+                                                 bool uploadToHub = true);
 
     void setDefaultGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType, const int presetNumber);
     void setDefaultGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType);
@@ -123,6 +132,7 @@ private:
                                         uint8 newMidiLow,
                                         uint8 newMidiHigh,
                                         uint8 newCc,
+                                        uint8 newMidiType,
                                         bool uploadToHub = false);
 
     void setGestureParameters (int presetNum, int gestureNum, float value0,

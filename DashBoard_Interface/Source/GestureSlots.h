@@ -13,6 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DashCommon.h"
 #include "HubConfiguration.h"
+#include "DashShapeButton.h"
 
 class GestureComponent : public Component
 {
@@ -55,8 +56,8 @@ private:
     HubConfiguration& hubConfig;
     ApplicationCommandManager& commandManager;
 
-    ScopedPointer<Label> gestureNameLabel;
-    ScopedPointer<ShapeButton> muteButton;
+    std::unique_ptr<Label> gestureNameLabel;
+    std::unique_ptr<DashShapeButton> muteButton;
     
     bool on = bool (hubConfig.getGestureData (id).on);
     bool selected = false, highlighted = false, solo = false;

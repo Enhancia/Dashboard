@@ -111,8 +111,8 @@ void VibratoTuner::updateDisplay()
 
 void VibratoTuner::updateColour()
 {
-	tunerColour = neova_dash::gesture::getHighlightColour (neova_dash::gesture::vibrato,
-												           hubConfig.isGestureActive (id));
+	setColour (neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (id).type,
+    												    hubConfig.isGestureActive (id)));
 }
 
 //==============================================================================
@@ -336,14 +336,14 @@ void VibratoTuner::updateLabelBounds (Label* labelToUpdate)
 	}
 }
 
-void VibratoTuner::setGain (float value)
+void VibratoTuner::setGain (float val)
 {
-	hubConfig.setFloatValueAndUpload (id, HubConfiguration::gestureParam0, value);
+	hubConfig.setFloatValue (id, HubConfiguration::gestureParam0, val);
 }
 
-void VibratoTuner::setThreshold (float value)
+void VibratoTuner::setThreshold (float val)
 {
-	hubConfig.setFloatValueAndUpload (id, HubConfiguration::gestureParam1, value);
+	hubConfig.setFloatValue (id, HubConfiguration::gestureParam1, val);
 }
 
 float VibratoTuner::getGain()
