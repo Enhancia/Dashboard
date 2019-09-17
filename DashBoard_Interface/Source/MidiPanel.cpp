@@ -108,8 +108,8 @@ void MidiPanel::comboBoxChanged (ComboBox* box)
 
         hubConfig.setUint8Value (id, HubConfiguration::midiType, midiTypeBox->getSelectedId());
 
-        if (auto* parentComp = getParentComponent())
-        	parentComp->repaint();
+        if (auto* gestPanel = getParentComponent()->getParentComponent())
+            gestPanel->repaint();
     }
 }
 
@@ -136,10 +136,7 @@ void MidiPanel::createComboBox()
     midiTypeBox->addItem ("Pitch", neova_dash::gesture::pitchMidi);
     midiTypeBox->addItem ("CC", neova_dash::gesture::ccMidi);
     //midiTypeBox->addItem ("AfterTouch", neova_dash::gesture::afterTouchMidi);
-    midiTypeBox->setSelectedId ((   hubConfig.getGestureData (id).type == neova_dash::gesture::vibrato
-    							 || hubConfig.getGestureData (id).type == neova_dash::gesture::pitchBend)
-    							     ? neova_dash::gesture::pitchMidi : neova_dash::gesture::ccMidi,
-    							dontSendNotification);
+    midiTypeBox->setSelectedId (int (hubConfig.getGestureData (id).midiType), dontSendNotification);
     
     // ComboBox look
     midiTypeBox->setJustificationType (Justification::centred);

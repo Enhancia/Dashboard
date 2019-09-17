@@ -200,35 +200,35 @@ bool HubConfiguration::isGestureActive (const int gestureNumber)
 
 void HubConfiguration::setDefaultConfig()
 {
-	setGestureData       (0, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0, 1);
+	setGestureData       (0, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0, 2);
 	setGestureParameters (0, 0, 400.0f, 40.0f);
-	setGestureData       (0, 1, 1, neova_dash::gesture::pitchBend, 0, 127, 0, 1);
+	setGestureData       (0, 1, 1, neova_dash::gesture::pitchBend, 0, 127, 0, 2);
 	setGestureParameters (0, 1, -50.0f, -20.0f, 30.0f, 60.0f);
-	setGestureData       (0, 2, 0, neova_dash::gesture::tilt, 0, 127, 0, 1);
+	setGestureData       (0, 2, 0, neova_dash::gesture::tilt, 0, 127, 0, 2);
 	setGestureParameters (0, 2, 0.0f, 50.0f);
-	setGestureData       (0, 3, 0, neova_dash::gesture::roll, 0, 127, 0, 1);
+	setGestureData       (0, 3, 0, neova_dash::gesture::roll, 0, 127, 0, 2);
 	setGestureParameters (0, 3, -30.0f, 30.0f);
 
-	setGestureData       (1, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0, 1);
+	setGestureData       (1, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0, 2);
 	setGestureParameters (1, 0, 450.0f, 20.0f);
-	setGestureData       (1, 1, 1, neova_dash::gesture::tilt, 0, 127, 0, 1);
+	setGestureData       (1, 1, 1, neova_dash::gesture::tilt, 0, 127, 0, 2);
 	setGestureParameters (1, 1, 0.0f, 80.0f);
-	setGestureData       (1, 2, 0, neova_dash::gesture::none, 0, 127, 0, 1);
-	setGestureData       (1, 3, 1, neova_dash::gesture::roll, 0, 127, 0, 1);
+	setGestureData       (1, 2, 0, neova_dash::gesture::none, 0, 127, 0, 2);
+	setGestureData       (1, 3, 1, neova_dash::gesture::roll, 0, 127, 0, 2);
 	setGestureParameters (1, 3, -50.0f, 20.0f);
 
-	setGestureData       (2, 0, 0, neova_dash::gesture::none, 0, 127, 0, 1);
-	setGestureData       (2, 1, 0, neova_dash::gesture::none, 0, 127, 0, 1);
-	setGestureData       (2, 2, 1, neova_dash::gesture::roll, 0, 127, 0, 1);
+	setGestureData       (2, 0, 0, neova_dash::gesture::none, 0, 127, 0, 2);
+	setGestureData       (2, 1, 0, neova_dash::gesture::none, 0, 127, 0, 2);
+	setGestureData       (2, 2, 1, neova_dash::gesture::roll, 0, 127, 0, 2);
 	setGestureParameters (2, 2, -10.0f, 90.0f);
-	setGestureData       (2, 3, 1, neova_dash::gesture::wave, 0, 127, 0, 1);
+	setGestureData       (2, 3, 1, neova_dash::gesture::wave, 0, 127, 0, 2);
 	setGestureParameters (2, 3, -50.0f, 20.0f);
 
-	setGestureData       (3, 0, 0, neova_dash::gesture::none, 0, 127, 0, 1);
-	setGestureData       (3, 1, 0, neova_dash::gesture::none, 0, 127, 0, 1);
-	setGestureData       (3, 2, 1, neova_dash::gesture::tilt, 0, 127, 0, 1);
+	setGestureData       (3, 0, 0, neova_dash::gesture::none, 0, 127, 0, 2);
+	setGestureData       (3, 1, 0, neova_dash::gesture::none, 0, 127, 0, 2);
+	setGestureData       (3, 2, 1, neova_dash::gesture::tilt, 0, 127, 0, 2);
 	setGestureParameters (3, 2, -10.0f, -5.0f);
-	setGestureData       (3, 3, 0, neova_dash::gesture::none, 0, 127, 0, 1);
+	setGestureData       (3, 3, 0, neova_dash::gesture::none, 0, 127, 0, 2);
 
 	//commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
 }
@@ -304,6 +304,8 @@ void HubConfiguration::duplicateGesture (const int idToDuplicateFrom, const bool
     if (isIdAvailable (idToDuplicateFrom) || idToDuplicateTo == -1) return;
 
 	getGestureData (idToDuplicateTo) = getGestureData (idToDuplicateFrom);
+
+    commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
 }
 
 void HubConfiguration::swapGestures (const int firstId, const int secondId)
@@ -319,6 +321,8 @@ void HubConfiguration::swapGestures (const int firstId, const int secondId)
 
     // Copies second gesture to first Id
     getGestureData (firstId) = secondGestureCopy;
+
+    commandManager.invokeDirectly (neova_dash::commands::updateInterfaceLEDs, true);
 }
 
 int HubConfiguration::findClosestIdToDuplicate (int idToDuplicateFrom, bool prioritizeHigherId)
@@ -346,6 +350,16 @@ int HubConfiguration::findClosestIdToDuplicate (int idToDuplicateFrom, bool prio
     }
 
     return lowerAvailableId;
+}
+
+bool HubConfiguration::canDuplicate()
+{
+	for (int slot = 0; slot < neova_dash::gesture::NUM_GEST; slot++)
+	{
+		if (isIdAvailable (slot)) return true;
+	}
+
+	return false;
 }
 
 bool HubConfiguration::isIdAvailable (const int idToCheck)

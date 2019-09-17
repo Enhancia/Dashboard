@@ -70,10 +70,12 @@ void GestureComponent::paint (Graphics& g)
     g.setFont (Font().withHeight (12.0f));
     g.setColour (neova_dash::colour::subText);
     
-    g.drawText ((   hubConfig.getGestureData (id).type == neova_dash::gesture::pitchBend
-                 || hubConfig.getGestureData (id).type == neova_dash::gesture::vibrato)
-                    ?  "Pitch MIDI" : "CC " + String (hubConfig.getGestureData (id).cc) + " MIDI",
-                    
+    g.drawText (hubConfig.getGestureData (id).midiType == neova_dash::gesture::pitchMidi
+                    ? "Pitch MIDI"
+                    : hubConfig.getGestureData (id).midiType == neova_dash::gesture::ccMidi
+                        ? "CC " + String (hubConfig.getGestureData (id).cc) + " MIDI"
+                        : hubConfig.getGestureData (id).midiType == neova_dash::gesture::afterTouchMidi
+                            ? "Aftertouch Midi" : "Unknown MIDI",
                 stateArea, Justification::centred, true);
     
     // Gesture Image

@@ -15,7 +15,7 @@
 #include "GesturePanel.h"
 #include "NewGesturePanel.h"
 #include "HeaderComponent.h"
-#include "PresetSelectorComponent.h"
+#include "HubComponent.h"
 #include "UploadButton.h"
 
 ApplicationCommandManager& getCommandManager();
@@ -35,6 +35,7 @@ public:
 
     //==============================================================================
     void mouseDown (const MouseEvent&);
+    void modifierKeysChanged (const ModifierKeys&);
 
     //==============================================================================
     ApplicationCommandTarget* getNextCommandTarget() override;
@@ -46,7 +47,7 @@ public:
 private:
     //==============================================================================
     std::unique_ptr<HeaderComponent> header;
-    std::unique_ptr<PresetSelectorComponent> presetSelector;
+    std::unique_ptr<HubComponent> hubComponent;
     std::unique_ptr<GesturePanel> gesturePanel;
     std::unique_ptr<NewGesturePanel> newGesturePanel;
     std::unique_ptr<UploadButton> uploadButton;
@@ -55,6 +56,7 @@ private:
     
     //==============================================================================
     HubConfiguration& hubConfig;
+    bool commandKeyDown = ModifierKeys::currentModifiers.isCommandDown();
 
     //==============================================================================
     Image backgroundImage = ImageFileFormat::loadFrom (DashData::HUBBG_png, DashData::HUBBG_pngSize);

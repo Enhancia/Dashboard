@@ -99,6 +99,7 @@ public:
 
     void moveGestureToId (const int idToMoveFrom, const int idToMoveTo);
     void duplicateGesture (const int idToDuplicateFrom, const bool prioritizeHigherId = true);
+    bool canDuplicate();
     void swapGestures (const int id1, const int id2);
     
     //==============================================================================

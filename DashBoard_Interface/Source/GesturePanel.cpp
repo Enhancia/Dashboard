@@ -413,7 +413,6 @@ void GesturePanel::swapGestures (int firstId, int secondId)
                                                                           draggedOverSlotId), true);
 
     hubConfig.swapGestures (firstId, secondId);
-    commandManager.invokeDirectly (neova_dash::commands::updateInterfaceLEDs, true);
     update();
     
     if (mustChangeSelection) selectGestureExclusive (idToSelect);
@@ -542,7 +541,7 @@ void GesturePanel::createMenuForGestureId (int id)
 {
     PopupMenu gestureMenu;
 
-    gestureMenu.addItem (1, "Duplicate", true);
+    gestureMenu.addItem (1, "Duplicate", hubConfig.canDuplicate());
     gestureMenu.addItem (2, "Delete", true);
     
     handleMenuResult (id,

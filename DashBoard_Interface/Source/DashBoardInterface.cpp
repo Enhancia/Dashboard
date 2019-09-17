@@ -17,8 +17,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     header = std::make_unique<HeaderComponent>();
     addAndMakeVisible (*header);
 
-    presetSelector = std::make_unique<PresetSelectorComponent> (hubConfig, getCommandManager());
-    addAndMakeVisible (*presetSelector);
+    hubComponent = std::make_unique<HubComponent> (hubConfig, getCommandManager());
+    addAndMakeVisible (*hubComponent);
 	
     uploadButton = std::make_unique<UploadButton> (getCommandManager());
     addAndMakeVisible (*uploadButton);
@@ -42,7 +42,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
 DashBoardInterface::~DashBoardInterface()
 {
     header = nullptr;
-    presetSelector = nullptr;
+    hubComponent = nullptr;
     gesturePanel = nullptr;
     newGesturePanel = nullptr;
     uploadButton = nullptr;
@@ -69,7 +69,7 @@ void DashBoardInterface::resized()
 
     header->setBounds (area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL, MARGIN));
 
-    presetSelector->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight()));
+    hubComponent->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight()));
     uploadButton->setBounds (area.withSize (area.getWidth()/7, area.getHeight()/2)
                                  .withSizeKeepingCentre (area.getWidth()/5, HEADER_HEIGHT));
 }
@@ -83,6 +83,21 @@ void DashBoardInterface::mouseDown (const MouseEvent& event)
 	else if (event.mods.isRightButtonDown())
 	{
 	}
+}
+void DashBoardInterface::modifierKeysChanged (const ModifierKeys& modifiers)
+{
+    if (modifiers.isCommandDown() && !commandKeyDown
+                                  && hubComponent->getCurrentMode() != HubComponent::presetSelection)
+    {
+        hubComponent->switchHubMode();
+    }
+    else if (!modifiers.isCommandDown() && commandKeyDown
+                                        && hubComponent->getCurrentMode() == HubComponent::presetSelection)
+    {
+        hubComponent->switchHubMode();
+    }
+
+    commandKeyDown = modifiers.isCommandDown();
 }
 
 //==============================================================================
@@ -128,12 +143,12 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
     switch (info.commandID)
     {
         case updateDashInterface:
-            presetSelector->update();
+            hubComponent->update();
             gesturePanel->update();
 			return true;
 
         case updateInterfaceLEDs:
-            presetSelector->repaintLEDs();
+            hubComponent->repaintLEDs();
             return true;
 
         default:

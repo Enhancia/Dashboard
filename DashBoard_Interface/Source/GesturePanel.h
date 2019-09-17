@@ -82,7 +82,7 @@ private:
     std::unique_ptr<GestureSettingsComponent> gestureSettings;
 
     //==============================================================================
-    int selectedGesture = -1;
+    int selectedGesture = 0;
     int freq;
 
     //==============================================================================
