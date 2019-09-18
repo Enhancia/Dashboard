@@ -30,10 +30,13 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
                                                    getCommandManager(), neova_dash::ui::FRAMERATE);
     addAndMakeVisible (*gesturePanel);
 
+    presetSelector = std::make_unique<PresetSelectorComponent> (hubConfig, getCommandManager());
+    addAndMakeVisible (*presetSelector);
+    presetSelector->addMouseListener (this, true);
+
     // Top panel properties
     newGesturePanel->hidePanel();
     newGesturePanel->setAlwaysOnTop (true);
-
 
     // Sets settings
     setSize (neova_dash::ui::DASHBOARD_WIDTH, neova_dash::ui::DASHBOARD_HEIGHT);
@@ -62,14 +65,16 @@ void DashBoardInterface::resized()
 
     auto area = getLocalBounds();
 
-	auto gPanelArea = area.removeFromBottom(area.getHeight() / 2);
+	auto gPanelArea = area.removeFromBottom (area.getHeight() / 2 - 5);
 
     gesturePanel->setBounds (gPanelArea.reduced (0, MARGIN));
     newGesturePanel->setBounds (gPanelArea.reduced (0, MARGIN));
 
     header->setBounds (area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL, MARGIN));
 
-    hubComponent->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight()));
+    presetSelector->setBounds (area.removeFromBottom (10).withSizeKeepingCentre (160, 30));
+    hubComponent->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight())
+                                 .translated (0, -10));
     uploadButton->setBounds (area.withSize (area.getWidth()/7, area.getHeight()/2)
                                  .withSizeKeepingCentre (area.getWidth()/5, HEADER_HEIGHT));
 }
@@ -84,6 +89,28 @@ void DashBoardInterface::mouseDown (const MouseEvent& event)
 	{
 	}
 }
+
+void DashBoardInterface::mouseEnter (const MouseEvent& event)
+{
+    if ((event.eventComponent == presetSelector.get() ||
+         event.eventComponent->getParentComponent() == presetSelector.get())
+        && hubComponent->getCurrentMode() == HubComponent::gestureMute)
+    {
+        hubComponent->switchHubMode();
+    }
+}
+
+void DashBoardInterface::mouseExit (const MouseEvent& event)
+{
+    if ((event.eventComponent == presetSelector.get() ||
+         event.eventComponent->getParentComponent() == presetSelector.get())
+        && hubComponent->getCurrentMode() == HubComponent::presetSelection
+        && !commandKeyDown)
+    {
+        hubComponent->switchHubMode();
+    }
+}
+
 void DashBoardInterface::modifierKeysChanged (const ModifierKeys& modifiers)
 {
     if (modifiers.isCommandDown() && !commandKeyDown
@@ -92,7 +119,8 @@ void DashBoardInterface::modifierKeysChanged (const ModifierKeys& modifiers)
         hubComponent->switchHubMode();
     }
     else if (!modifiers.isCommandDown() && commandKeyDown
-                                        && hubComponent->getCurrentMode() == HubComponent::presetSelection)
+                                        && hubComponent->getCurrentMode() == HubComponent::presetSelection
+                                        && !presetSelector->isMouseOver())
     {
         hubComponent->switchHubMode();
     }
@@ -145,6 +173,7 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
         case updateDashInterface:
             hubComponent->update();
             gesturePanel->update();
+            presetSelector->update();
 			return true;
 
         case updateInterfaceLEDs:

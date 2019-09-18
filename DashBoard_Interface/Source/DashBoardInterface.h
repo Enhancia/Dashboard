@@ -17,6 +17,7 @@
 #include "HeaderComponent.h"
 #include "HubComponent.h"
 #include "UploadButton.h"
+#include "PresetSelectorComponent.h"
 
 ApplicationCommandManager& getCommandManager();
 
@@ -34,6 +35,8 @@ public:
     void resized() override;
 
     //==============================================================================
+    void mouseEnter (const MouseEvent&);
+    void mouseExit (const MouseEvent&);
     void mouseDown (const MouseEvent&);
     void modifierKeysChanged (const ModifierKeys&);
 
@@ -51,6 +54,7 @@ private:
     std::unique_ptr<GesturePanel> gesturePanel;
     std::unique_ptr<NewGesturePanel> newGesturePanel;
     std::unique_ptr<UploadButton> uploadButton;
+    std::unique_ptr<PresetSelectorComponent> presetSelector;
 
     DashBoardLookAndFeel dashBoardLookAndFeel;
     

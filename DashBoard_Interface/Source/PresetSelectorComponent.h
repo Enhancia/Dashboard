@@ -11,15 +11,20 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "HubConfiguration.h"
+#include "DashCommon.h"
+#include "DashShapeButton.h"
+#include "DashBoardLookAndFeel.h"
 
 //==============================================================================
 /*
 */
-class PresetSelectorComponent    : public Component
+class PresetSelectorComponent    : public Component,
+                                   private Button::Listener
 {
 public:
     //==============================================================================
-    PresetSelectorComponent (HubConfiguration& config);
+    PresetSelectorComponent (HubConfiguration& config, ApplicationCommandManager& manager);
     ~PresetSelectorComponent();
 
     //==============================================================================
@@ -27,14 +32,21 @@ public:
     void resized() override;
 
     //==============================================================================
-    void mouseEnter (const MouseEvent &event) override;
-    void mouseExit (const MouseEvent &event) override;
-    void mouseUp (const MouseEvent &event) override;
+    void buttonClicked (Button* bttn) override;
+
+    //==============================================================================
+    void update();
 
 private:
     //==============================================================================
+    void createButtons();
+
+    //==============================================================================
     HubConfiguration& hubConfig;
-    Path arrowLeft, arrowRight;
+    ApplicationCommandManager& commandManager;
+
+    std::unique_ptr<DashShapeButton> leftArrowButton;
+    std::unique_ptr<DashShapeButton> rightArrowButton;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetSelectorComponent)
