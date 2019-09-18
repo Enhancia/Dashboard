@@ -67,11 +67,11 @@ public:
     };
 
     void setPaintMode (const PaintMode newPaintMode);
-
-
+    void setStrokeThickness (const float newThickness);
 
 private:
 	Colour backgroundFill;
+	float strokeThickness = 1.0f;
 	
 	PaintMode paintMode = stroke;
 	Colour pathStrokeOffNormal, pathStrokeOffOver, pathStrokeOffDown;

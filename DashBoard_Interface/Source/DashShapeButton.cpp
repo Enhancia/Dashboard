@@ -75,15 +75,15 @@ void DashShapeButton::paintButton (Graphics& g, bool shouldDrawButtonAsHighlight
 	{
 		if (shouldDrawButtonAsHighlighted) setOutline (getToggleState() ? pathStrokeOnOver
 																		: pathStrokeOffOver,
-													   1.0f);
+													   strokeThickness);
 
 		else if (shouldDrawButtonAsDown)   setOutline (getToggleState() ? pathStrokeOnDown
 																		: pathStrokeOffDown,
-													   1.0f);
+													   strokeThickness);
 
 		else                               setOutline (getToggleState() ? pathStrokeOnNormal
 																		: pathStrokeOffNormal,
-													   1.0f);
+													   strokeThickness);
 	}
 
 	// Draws Regular Shape Button on top
@@ -196,4 +196,13 @@ void DashShapeButton::setPaintMode (const PaintMode newPaintMode)
 		default:
 			break;
 	}
+}
+
+
+void DashShapeButton::setStrokeThickness (const float newThickness)
+{
+	if (newThickness < 0.0f) return;
+
+	strokeThickness = newThickness;
+	repaint();
 }

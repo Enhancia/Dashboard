@@ -14,6 +14,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DashCommon.h"
 #include "HubConfiguration.h"
+#include "DashShapeButton.h"
 
 //==============================================================================
 /*
@@ -96,7 +97,7 @@ private:
     ApplicationCommandManager& commandManager;
     
     //==============================================================================
-    ScopedPointer<ShapeButton> closeButton;
+    ScopedPointer<DashShapeButton> closeButton;
     ScopedPointer<TextEditor> descriptionTextEditor;
     OwnedArray<GestureTypeSelector> gestureSelectors;
 

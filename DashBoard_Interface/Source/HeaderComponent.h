@@ -12,21 +12,26 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DashCommon.h"
+#include "OptionsPanel.h"
 
 //==============================================================================
 /*
 */
 
-class HeaderComponent    : public Component
+class HeaderComponent    : public Component,
+						   private Button::Listener
 {
 public:
     //==============================================================================
-    HeaderComponent();
+    HeaderComponent (OptionsPanel& options);
     ~HeaderComponent();
 
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
+
+    //==============================================================================
+    void buttonClicked (Button* bttn) override;
 
 private:
 	class BatteryComponent : public Component
@@ -48,8 +53,13 @@ private:
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BatteryComponent)
 	};
 
+	//==============================================================================
+	void createButton();
+	
     //==============================================================================
     std::unique_ptr<BatteryComponent> batteryComponent;
+    std::unique_ptr<DashShapeButton> optionsButton;
+    OptionsPanel& optionsPanel;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HeaderComponent)

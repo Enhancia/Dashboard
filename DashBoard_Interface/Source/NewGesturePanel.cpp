@@ -30,18 +30,17 @@ void NewGesturePanel::paint (Graphics& g)
 {
     using namespace neova_dash::ui;
 
-    /*
     // transparent area
     auto gradTransp = ColourGradient::vertical (Colour (0x00000000),
-                                                0.0f, 
+                                                float (getX()), 
                                                 Colour (0x00000000),
-                                                float(getHeight()));
-    gradTransp.addColour (0.05, neova_dash::colour::topPanelTransparentArea);
-    gradTransp.addColour (0.95, neova_dash::colour::topPanelTransparentArea);
+                                                float(getLocalBounds().getBottom()));
+    gradTransp.addColour (0.05f, neova_dash::colour::topPanelTransparentArea);
+    gradTransp.addColour (0.95f, neova_dash::colour::topPanelTransparentArea);
 
     g.setGradientFill (gradTransp);
-    */
-    g.setColour (Colours::black); // TO DELETE
+    
+    //g.setColour (Colours::black); // TO DELETE
     g.fillRect (getLocalBounds());
     
     // panel area
@@ -77,8 +76,8 @@ void NewGesturePanel::resized()
     // Panel Area
     panelArea = getLocalBounds().reduced (getWidth()/4, getHeight()/6);
 
-    closeButton->setBounds (juce::Rectangle<int> (15, 15).withX (panelArea.getRight() - MARGIN - 15)
-                                                         .withY (panelArea.getY() + MARGIN)
+    closeButton->setBounds (juce::Rectangle<int> (25, 25).withRightX (panelArea.getRight() - MARGIN_SMALL)
+                                                         .withY (panelArea.getY() + MARGIN_SMALL)
                                                          .reduced (3));
 
 	  auto area = panelArea.reduced (2*MARGIN);
@@ -88,7 +87,7 @@ void NewGesturePanel::resized()
 
     descriptionTextEditor->setBounds (area.reduced (2*MARGIN, MARGIN));
     if (area.getHeight() > 80)
-    	descriptionTextEditor->setBounds (area.withSizeKeepingCentre (area.reduced (2*MARGIN, MARGIN).getWidth(),
+    descriptionTextEditor->setBounds (area.withSizeKeepingCentre (area.reduced (2*MARGIN, MARGIN).getWidth(),
     																  80));
 }
 
@@ -125,6 +124,13 @@ void NewGesturePanel::mouseUp (const MouseEvent &event)
     		createNewGesture();
     		gestureSelector->setHighlighted (false);
   	}
+    else
+    {
+        if (!panelArea.contains (event.getPosition()))
+        {
+            hidePanel (true);
+        }
+    }
 }
 void NewGesturePanel::buttonClicked (Button* bttn)
 {
@@ -154,15 +160,15 @@ void NewGesturePanel::showPanelForGestureID (const int gestureID)
 {
   	if (gestureID < 0 || gestureID >= neova_dash::gesture::NUM_GEST)
   	{
-  		// Plume tries to create a gesture for an id that can't exist
-  		jassertfalse;
-  		return;
+    		// Plume tries to create a gesture for an id that can't exist
+    		jassertfalse;
+    		return;
   	}
   	else if (hubConfig.getGestureData (gestureID).type != int (neova_dash::gesture::none))
   	{
-  		// Plume tries to create a gesture for an id that already has a gesture!!
-  		jassertfalse;
-  		return;
+    		// Plume tries to create a gesture for an id that already has a gesture!!
+    		jassertfalse;
+    		return;
   	}
 
     selectedGestureSlot = gestureID;
@@ -205,9 +211,8 @@ void NewGesturePanel::unselectGestureType()
 //==============================================================================
 void NewGesturePanel::createCloseButton()
 {
-    addAndMakeVisible (closeButton = new ShapeButton ("Close Settings Button", Colour(0x00000000),
-                                                                               Colour(0x00000000),
-                                                                               Colour(0x00000000)));
+    addAndMakeVisible (closeButton = new DashShapeButton ("Close Settings Button", Colour(0),
+                                                                                   neova_dash::colour::mainText));
 
     Path p;
     p.startNewSubPath (0, 0);
@@ -216,7 +221,6 @@ void NewGesturePanel::createCloseButton()
     p.lineTo (3*neova_dash::ui::MARGIN, 0);
 
     closeButton->setShape (p, false, true, false);
-    closeButton->setOutline (Colour (0xffffffff), 1.0f);
     closeButton->addMouseListener (this, false);
     closeButton->addListener (this);
 }
@@ -242,10 +246,10 @@ void NewGesturePanel::resizeGestureSelectorButtons (juce::Rectangle<int> buttons
 
   	for (int i=0; i < N; i++)
   	{
-  		if (i == (int) neova_dash::gesture::wave) continue; // TODO WAVE remove when wave is implemented
+    		if (i == (int) neova_dash::gesture::wave) continue; // TODO WAVE remove when wave is implemented
 
-  		gestureSelectors[i]->setBounds (buttonsArea.removeFromLeft (selectorWidth));
-  		buttonsArea.removeFromLeft (MARGIN);
+    		gestureSelectors[i]->setBounds (buttonsArea.removeFromLeft (selectorWidth));
+    		buttonsArea.removeFromLeft (MARGIN);
   	}
 }
 
@@ -278,19 +282,19 @@ void NewGesturePanel::GestureTypeSelector::paint (Graphics& g)
 {
   	if (highlighted)
   	{
-  		// Fill
-  		g.setColour (neova_dash::gesture::getHighlightColour (gestureType).withAlpha (0.15f));
-  		g.fillRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f);
+    		// Fill
+    		g.setColour (neova_dash::gesture::getHighlightColour (gestureType).withAlpha (0.15f));
+    		g.fillRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f);
 
   /*
-  		// Outline
-  		g.setColour (Gesture::getHighlightColour (gestureType));
-  		g.drawRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f, 1.0f);*/
+    		// Outline
+    		g.setColour (Gesture::getHighlightColour (gestureType));
+    		g.drawRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f, 1.0f);*/
   	}
   	else
   	{
-  		g.setColour (neova_dash::colour::gestureBackground);
-  		g.fillRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f);
+    		g.setColour (neova_dash::colour::gestureBackground);
+    		g.fillRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f);
   	}
 
   	g.setColour (neova_dash::colour::mainText);
@@ -315,8 +319,8 @@ void NewGesturePanel::GestureTypeSelector::setHighlighted (bool shouldBeHighligh
 {
   	if (shouldBeHighlighted != highlighted)
   	{
-  		highlighted = shouldBeHighlighted;
-  		repaint();
+    		highlighted = shouldBeHighlighted;
+    		repaint();
   	}
 }
 
@@ -326,8 +330,8 @@ void NewGesturePanel::GestureTypeSelector::drawGesturePath (Graphics& g, juce::R
 
     g.setColour (Colour (0xfff3f3f3));
 
-	g.drawText (getTypeString(intToGestureType(gestureType), true), getLocalBounds(),
-		        Justification::centred, true);
+	 g.drawText (getTypeString(intToGestureType(gestureType), true), getLocalBounds(),
+		           Justification::centred, true);
     /*
     // Icon Fill
     Path iconFill;

@@ -12,10 +12,12 @@
 #include "HeaderComponent.h"
 
 //==============================================================================
-HeaderComponent::HeaderComponent()
+HeaderComponent::HeaderComponent (OptionsPanel& options) : optionsPanel (options)
 {
     batteryComponent = std::make_unique<BatteryComponent>();
     addAndMakeVisible (*batteryComponent);
+
+    createButton();
 }
 
 HeaderComponent::~HeaderComponent()
@@ -42,7 +44,31 @@ void HeaderComponent::resized()
 {
 	auto area = getLocalBounds().reduced (neova_dash::ui::MARGIN, 0);
 
-	batteryComponent->setBounds (area.withLeft (area.getWidth()*8/9));
+	batteryComponent->setBounds (area.removeFromRight (area.getWidth()/9));
+    optionsButton->setBounds (area.removeFromLeft (40));
+}
+
+void HeaderComponent::buttonClicked (Button* bttn)
+{
+    if (bttn == optionsButton.get())
+    {
+        optionsPanel.setVisible (true);
+    }
+}
+
+void HeaderComponent::createButton()
+{
+    // Close button
+    optionsButton = std::make_unique <DashShapeButton> ("Open Options Button",
+                                                       Colour(0),
+                                                       neova_dash::colour::mainText);
+    addAndMakeVisible (*optionsButton);
+
+    optionsButton->setShape (neova_dash::path::createPath (neova_dash::path::options),
+                            false, true, false);
+    optionsButton->setPaintMode (DashShapeButton::fillAndStroke);
+    optionsButton->setStrokeThickness (1.8f);
+    optionsButton->addListener (this);
 }
 
 void HeaderComponent::BatteryComponent::paint (Graphics& g)

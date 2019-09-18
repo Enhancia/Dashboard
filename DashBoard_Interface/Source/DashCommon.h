@@ -70,11 +70,11 @@ namespace neova_dash
         const Colour dashboardBackground    (0xff2f2f2f);
         const Colour dashboardBackground2   (0xff2b2b2b);
         const Colour topPanelBackground     (0xff2b2b2b);
-        const Colour topPanelTransparentArea(0xff2b2b2b);
+        const Colour topPanelTransparentArea(0xc0000005);
         const Colour headerBackground       (0xff464646);
         const Colour uploadButtonBackground (0xff565656);
         const Colour emptySlotOutline       (0xff808080);
-        const Colour emptySlotBackground    (0x40808080);
+        const Colour emptySlotBackground    (0x10808080);
         const Colour gestureHeader          (0xff636363);
         const Colour gestureBackground      (0xff353535);
         const Colour gestureBackground2     (0xff2c2c2c);

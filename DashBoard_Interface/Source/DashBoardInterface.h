@@ -55,6 +55,7 @@ private:
     std::unique_ptr<NewGesturePanel> newGesturePanel;
     std::unique_ptr<UploadButton> uploadButton;
     std::unique_ptr<PresetSelectorComponent> presetSelector;
+    std::unique_ptr<OptionsPanel> optionsPanel;
 
     DashBoardLookAndFeel dashBoardLookAndFeel;
     

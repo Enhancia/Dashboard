@@ -14,7 +14,10 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     setLookAndFeel (&dashBoardLookAndFeel);
 
     // Creates Components
-    header = std::make_unique<HeaderComponent>();
+    optionsPanel = std::make_unique<OptionsPanel> (hubConfig, getCommandManager());
+    addAndMakeVisible (*optionsPanel);
+
+    header = std::make_unique<HeaderComponent> (*optionsPanel);
     addAndMakeVisible (*header);
 
     hubComponent = std::make_unique<HubComponent> (hubConfig, getCommandManager());
@@ -37,6 +40,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     // Top panel properties
     newGesturePanel->hidePanel();
     newGesturePanel->setAlwaysOnTop (true);
+    optionsPanel->setVisible (false);
+    optionsPanel->setAlwaysOnTop (true);
 
     // Sets settings
     setSize (neova_dash::ui::DASHBOARD_WIDTH, neova_dash::ui::DASHBOARD_HEIGHT);
@@ -64,6 +69,7 @@ void DashBoardInterface::resized()
     using namespace neova_dash::ui;
 
     auto area = getLocalBounds();
+    optionsPanel->setBounds (area);
 
 	auto gPanelArea = area.removeFromBottom (area.getHeight() / 2 - 5);
 
@@ -120,7 +126,9 @@ void DashBoardInterface::modifierKeysChanged (const ModifierKeys& modifiers)
     }
     else if (!modifiers.isCommandDown() && commandKeyDown
                                         && hubComponent->getCurrentMode() == HubComponent::presetSelection
-                                        && !presetSelector->isMouseOver())
+                                        && !presetSelector->isMouseOver()
+                                        && !presetSelector->getChildComponent (0)->isMouseOver()
+                                        && !presetSelector->getChildComponent (1)->isMouseOver())
     {
         hubComponent->switchHubMode();
     }
