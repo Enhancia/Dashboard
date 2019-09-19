@@ -53,13 +53,16 @@ void OptionsPanel::paint (Graphics& g)
 
     g.setGradientFill (gradOut);
     g.drawRoundedRectangle (optionsArea.toFloat(), 10.0f, 1.0f);
+
+    paintProductInformations (g, optionsArea.withTrimmedBottom (optionsArea.getHeight()*2/3)
+    										.reduced (neova_dash::ui::MARGIN));
 }
 
 void OptionsPanel::resized()
 {
     using namespace neova_dash::ui;
     
-    optionsArea = getBounds().reduced (getWidth()/5, getHeight()/8);
+    optionsArea = getBounds().reduced (getWidth()/5, getHeight()/6);
 
   #if JUCE_WINDOWS
     closeButton->setBounds (juce::Rectangle<int> (25, 25).withRightX (optionsArea.getRight() - MARGIN_SMALL)
@@ -108,4 +111,34 @@ void OptionsPanel::createButton()
 
     closeButton->setShape (p, false, true, false);
 	closeButton->addListener (this);
+}
+
+void OptionsPanel::paintProductInformations (Graphics& g, Rectangle<int> area)
+{
+	using namespace neova_dash::ui;
+
+	g.drawImage (logoImage, area.removeFromLeft (area.getWidth()/2)
+								.reduced (MARGIN*6, MARGIN*3)
+								.toFloat(),
+						    RectanglePlacement::centred);
+
+	// Dash Text
+	auto dashTextArea = area.removeFromTop (area.getHeight()/2).reduced (MARGIN*2);
+
+	g.setColour (neova_dash::colour::mainText);
+	g.setFont (Font().boldened().withHeight (25));
+	g.drawText ("Neova DashBoard", dashTextArea.removeFromTop (dashTextArea.getHeight()/2),
+								   Justification::centredLeft);
+
+	g.setColour (neova_dash::colour::subText);
+	g.setFont (Font().withHeight (13));
+	g.drawText (String ("v " + JUCEApplication::getInstance()->getApplicationVersion()),
+		        dashTextArea, Justification::centredLeft);
+
+	//Enhancia Text
+	g.setColour (neova_dash::colour::mainText);
+	g.setFont (Font().withHeight (20));
+	g.drawText (String ("Enhancia " + String (CharPointer_UTF8 ("\xe2\x84\xa2"))), area.reduced (MARGIN*2),
+							   Justification::centredLeft);
+
 }
