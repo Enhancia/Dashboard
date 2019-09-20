@@ -24,7 +24,7 @@ PresetSelectorComponent::~PresetSelectorComponent()
 void PresetSelectorComponent::paint (Graphics& g)
 {
     g.setColour (neova_dash::colour::mainText);
-    g.setFont (Font().withHeight (14.0f));
+    g.setFont (neova_dash::font::dashFont.withHeight (14.0f));
 
     g.drawText (String ("Slot " + String (hubConfig.getSelectedPreset() + 1)),
     			getLocalBounds().withSizeKeepingCentre (getWidth()/2, getHeight()),

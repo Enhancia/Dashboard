@@ -67,7 +67,7 @@ void GestureComponent::paint (Graphics& g)
     auto stateArea = area.removeFromBottom (25)
                          .reduced (neova_dash::ui::MARGIN*3, neova_dash::ui::MARGIN_SMALL);
 
-    g.setFont (Font().withHeight (12.0f));
+    g.setFont (neova_dash::font::dashFont.withHeight (12.0f));
     g.setColour (neova_dash::colour::subText);
     
     g.drawText (hubConfig.getGestureData (id).midiType == neova_dash::gesture::pitchMidi
@@ -146,7 +146,7 @@ void GestureComponent::createLabel()
     gestureNameLabel->setEditable (false, false, false);
     gestureNameLabel->setColour (Label::backgroundColourId, Colour (0x00000000));
     gestureNameLabel->setColour (Label::textColourId, neova_dash::colour::mainText);
-    gestureNameLabel->setFont (Font().withHeight (15.0f));
+    gestureNameLabel->setFont (neova_dash::font::dashFont.withHeight (15.0f));
     gestureNameLabel->setJustificationType (Justification::centred);
     gestureNameLabel->setInterceptsMouseClicks (false, false);
 }

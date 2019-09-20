@@ -49,7 +49,7 @@ void VibratoTuner::paint (Graphics& g)
 	//drawIntensityCursor (g);
 
 	g.setColour (neova_dash::colour::tunerSliderBackground);
-	g.setFont (Font().withHeight (14.0f));
+	g.setFont (neova_dash::font::dashFont.withHeight (14.0f));
 	g.drawText ("THRESHOLD", thresholdSlider->getBounds().withSizeKeepingCentre (100, 50)
 														 .withY (thresholdSlider->getBounds().getBottom()),
 							 Justification::centredTop);
@@ -291,7 +291,7 @@ void VibratoTuner::createLabels()
     auto setLabelSettings = [this] (Label& label)
     {
         label.setEditable (false, false, false);
-        label.setFont (Font().withHeight (13.0f));
+        label.setFont (neova_dash::font::dashFont.withHeight (13.0f));
         label.setJustificationType (Justification::centred);
         label.setColour (Label::textColourId, tunerColour);
         label.setColour (Label::textWhenEditingColourId, tunerColour);

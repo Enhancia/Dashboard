@@ -74,7 +74,7 @@ void DashBoardInterface::resized()
 	auto gPanelArea = area.removeFromBottom (area.getHeight() / 2 - 5);
 
     gesturePanel->setBounds (gPanelArea.reduced (0, MARGIN));
-    newGesturePanel->setBounds (gPanelArea.reduced (0, MARGIN));
+    newGesturePanel->setBounds (gPanelArea);
 
     header->setBounds (area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL, MARGIN));
 

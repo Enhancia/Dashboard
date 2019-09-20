@@ -38,14 +38,14 @@ void GestureSettingsComponent::paint (Graphics& g)
 
     //Advanced Settings text
     g.setColour (neova_dash::colour::subText);
-    g.setFont (Font().withHeight (10.0f));
+    g.setFont (neova_dash::font::dashFont.withHeight (10.0f));
     g.drawText ("ADVANCED PANEL",
                 headerArea.removeFromLeft (getWidth()/3).reduced (MARGIN, MARGIN_SMALL),
                 Justification::bottomLeft, false);
 
     // Gesture Name text
     g.setColour (neova_dash::colour::mainText);                    
-    g.setFont (Font().boldened().withHeight (15.0f));
+    g.setFont (neova_dash::font::dashFont.boldened().withHeight (15.0f));
     g.drawText (neova_dash::gesture::getTypeString (hubConfig.getGestureData (gestureId)
 		                                                     .type, true).toUpperCase(),
                 headerArea.removeFromLeft (getWidth()/3).reduced (MARGIN, 0),

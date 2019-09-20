@@ -35,8 +35,9 @@ public:
 
 private:
     //==============================================================================
-    void createButton();
-    void paintProductInformations (Graphics& g, Rectangle<int> areaToPaint);
+    void createButtons();
+    void paintProductInformations (Graphics& g, Rectangle<int> area);
+    void paintFirmUpdateArea (Graphics& g, Rectangle<int> area);
 
     //==============================================================================
     juce::Rectangle<int> optionsArea;
@@ -47,6 +48,7 @@ private:
     //==============================================================================
     HubConfiguration& hubConfig;
     ApplicationCommandManager& commandManager;
+    std::unique_ptr<TextButton> updateFirmwareButton;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OptionsPanel)

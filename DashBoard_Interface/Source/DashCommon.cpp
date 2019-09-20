@@ -178,7 +178,20 @@ namespace gesture
 
 namespace font
 {
-	//const Font dashFont = Font();
-}; // namespace font
+	const Font getDashFont (DashFontId type = regular)
+    {
+        if (type == regular)
+            return Font (Typeface::createSystemTypefaceFor (Font (Font::getDefaultSansSerifFontName(),
+            												12.0f, 0)));
+        else if (type == enhancia)
+            return Font (Typeface::createSystemTypefaceFor (DashData::NOOADemiSerifDEMO_ttf,
+                                                            DashData::NOOADemiSerifDEMO_ttfSize));
+          
+        return Font();
+    }
+        
+    const Font dashFont = getDashFont();
+    const Font enhanciaFont = getDashFont (enhancia);
 
+}; // namespace font
 }; // namespace neova_dash

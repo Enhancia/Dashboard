@@ -143,6 +143,13 @@ namespace neova_dash
 
     namespace font
     {
-        //static const Font dashFont;
+        enum DashFontId
+        {
+            regular =0,
+            enhancia
+        };
+        
+        extern const Font dashFont;
+        extern const Font enhanciaFont;
     };
 };

@@ -33,10 +33,10 @@ void HeaderComponent::paint (Graphics& g)
 	auto area = getLocalBounds().reduced (0, neova_dash::ui::MARGIN_SMALL);
     g.setColour (neova_dash::colour::mainText);
 
-    g.setFont (Font().withHeight (17.0f).boldened().withExtraKerningFactor (0.1f));
+    g.setFont (neova_dash::font::dashFont.withHeight (17.0f).boldened().withExtraKerningFactor (0.1f));
     g.drawText ("Neova", area, Justification::centredTop, false);
 
-	g.setFont(Font().withHeight (10.0f));
+	g.setFont(neova_dash::font::dashFont.withHeight (10.0f));
 	g.drawText("DASHBOARD", area, Justification::centredBottom, false);
 }
 
@@ -77,7 +77,7 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
 
 	auto area = getLocalBounds().reduced(neova_dash::ui::MARGIN);
 
-    g.setFont (Font().withHeight (11.0f));
+    g.setFont (neova_dash::font::dashFont.withHeight (11.0f));
     g.drawText ("Ring Battery", getLocalBounds().withWidth (getWidth()*2/3), Justification::centred, true);
 
     auto batteryArea = area.withLeft (getWidth()*2/3)

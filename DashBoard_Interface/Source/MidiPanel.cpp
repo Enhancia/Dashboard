@@ -37,7 +37,7 @@ void MidiPanel::paint (Graphics& g)
     area.removeFromRight (getWidth()*2/3);
 
     g.setColour (neova_dash::colour::subText);
-    g.setFont (Font().withHeight (13.0f));
+    g.setFont (neova_dash::font::dashFont.withHeight (13.0f));
 
     g.drawText ("MIDI Type:",
                 area.removeFromTop (area.getHeight()/2),
@@ -161,7 +161,7 @@ void MidiPanel::createLabels()
     // CC label
     addAndMakeVisible (ccLabel = new Label ("CC Label", TRANS (String(hubConfig.getGestureData (id).cc))));
     ccLabel->setEditable ((midiTypeBox->getSelectedId() == 1), false, false);
-    ccLabel->setFont (Font().withHeight (13.0f));
+    ccLabel->setFont (neova_dash::font::dashFont.withHeight (13.0f));
     ccLabel->setJustificationType (Justification::centred);
 
     ccLabel->setColour (Label::backgroundColourId , Colour (0));
@@ -503,7 +503,7 @@ void MidiRangeTuner::createLabels()
     {
         label.setEditable (true, false, false);
         label.setSize (30, 30);
-        label.setFont (Font().withHeight (11.0f));
+        label.setFont (neova_dash::font::dashFont.withHeight (11.0f));
         label.setColour (Label::textColourId, highlightColour);
         label.setColour (Label::backgroundColourId, Colour (0x00000000));
         label.setColour (Label::textWhenEditingColourId, highlightColour);

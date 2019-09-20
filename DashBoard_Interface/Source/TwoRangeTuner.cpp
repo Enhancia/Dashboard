@@ -595,7 +595,7 @@ void TwoRangeTuner::createLabels()
     auto setLabelSettings = [this] (Label& label)
     {
         label.setEditable (true, false, false);
-        label.setFont (Font().withHeight (13.0f));
+        label.setFont (neova_dash::font::dashFont.withHeight (13.0f));
         label.setJustificationType (Justification::centred);
         label.setColour (Label::textColourId, tunerColour);
         label.setColour (Label::textWhenEditingColourId, tunerColour);

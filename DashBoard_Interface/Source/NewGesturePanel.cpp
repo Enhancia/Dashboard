@@ -33,10 +33,9 @@ void NewGesturePanel::paint (Graphics& g)
     // transparent area
     auto gradTransp = ColourGradient::vertical (Colour (0x00000000),
                                                 float (getX()), 
-                                                Colour (0x00000000),
+                                                Colour (neova_dash::colour::topPanelTransparentArea),
                                                 float(getLocalBounds().getBottom()));
     gradTransp.addColour (0.05f, neova_dash::colour::topPanelTransparentArea);
-    gradTransp.addColour (0.95f, neova_dash::colour::topPanelTransparentArea);
 
     g.setGradientFill (gradTransp);
     
@@ -106,11 +105,11 @@ void NewGesturePanel::mouseEnter (const MouseEvent &event)
     		descriptionTextEditor->setText ("", false);
 
     		// Gesture Type
-    		descriptionTextEditor->setFont (Font().withHeight (15.0f).boldened());
+    		descriptionTextEditor->setFont (neova_dash::font::dashFont.withHeight (15.0f).boldened());
     		descriptionTextEditor->insertTextAtCaret (getTypeString (intToGestureType (gestureSelector->gestureType), true)
     												  	                  + " :\n");
     		// Gesture Description
-    		descriptionTextEditor->setFont (Font().withHeight (14.0f));
+    		descriptionTextEditor->setFont (neova_dash::font::dashFont.withHeight (14.0f));
     		descriptionTextEditor->insertTextAtCaret (getDescriptionString (intToGestureType (gestureSelector->gestureType)));
     	
     		descriptionTextEditor->setCaretPosition (0);
@@ -263,7 +262,7 @@ void NewGesturePanel::createAndAddTextEditor()
     descriptionTextEditor->setPopupMenuEnabled (false);
     descriptionTextEditor->applyColourToAllText (neova_dash::colour::mainText, true);
     descriptionTextEditor->setJustification (Justification::centred);
-    descriptionTextEditor->setFont (Font().withHeight (13.0f));
+    descriptionTextEditor->setFont (neova_dash::font::dashFont.withHeight (13.0f));
     descriptionTextEditor->setMouseCursor (MouseCursor (MouseCursor::NormalCursor));
     descriptionTextEditor->setInterceptsMouseClicks (false, false);
 }

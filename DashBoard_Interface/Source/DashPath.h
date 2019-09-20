@@ -19,7 +19,9 @@ namespace neova_dash
     		enum PathId
     		{
     			options = 0,
-    			onOff
+    			onOff,
+                enhanciaLogo,
+                upload
     		};
 
         extern const Path createPath (PathId pathToCreate);

@@ -58,12 +58,12 @@ void DashBoardLookAndFeel::setColours()
 
 Font DashBoardLookAndFeel::getTextButtonFont (TextButton&, int buttonHeight)
 {
-    return Font().withHeight ((buttonHeight * 6.0f) / 10.0f);
+    return neova_dash::font::dashFont.withHeight ((buttonHeight * 6.0f) / 10.0f);
 }
 
 Font DashBoardLookAndFeel::getComboBoxFont (ComboBox& cb)
 {
-	return Font().withHeight (jmax (11.0f, jmin (14.0f, (cb.getHeight() * 6.0f) / 10.0f)));
+	return neova_dash::font::dashFont.withHeight (jmax (11.0f, jmin (14.0f, (cb.getHeight() * 6.0f) / 10.0f)));
 }
 
 void DashBoardLookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int width, int height, float sliderPos,
