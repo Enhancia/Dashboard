@@ -44,7 +44,14 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     optionsPanel->setAlwaysOnTop (true);
 
     // Sets settings
-    setSize (neova_dash::ui::DASHBOARD_WIDTH, neova_dash::ui::DASHBOARD_HEIGHT);
+    int dashboardWidth  = Desktop::getInstance().getDisplays()
+                                                 .getMainDisplay()
+                                                 .userArea
+                                                 .getWidth()
+                                                 *3/4;
+
+    setSize (dashboardWidth,
+             dashboardWidth*6/7);
 }
 
 DashBoardInterface::~DashBoardInterface()
@@ -145,7 +152,7 @@ ApplicationCommandTarget* DashBoardInterface::getNextCommandTarget()
 void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
 {
     using namespace neova_dash::commands;
-    
+
     commands.addArray ({
                             updateDashInterface,
                             updateInterfaceLEDs

@@ -167,7 +167,7 @@ void OptionsPanel::paintProductInformations (Graphics& g, Rectangle<int> area)
   	auto dashTextArea = area.reduced (MARGIN*2, area.getHeight()/4);
 
   	g.setColour (neova_dash::colour::mainText);
-  	g.setFont (neova_dash::font::dashFont.withHeight (25));
+  	g.setFont (neova_dash::font::dashFont.withHeight (20));
   	g.drawText ("Neova DASHBOARD", dashTextArea.removeFromTop (dashTextArea.getHeight()/2),
   								   Justification::bottomLeft);
 

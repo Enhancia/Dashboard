@@ -56,10 +56,11 @@ void HubComponent::paint (Graphics& g)
 void HubComponent::resized()
 {
 	using namespace neova_dash::ui;
-	auto area = getLocalBounds().reduced (48, 62)
-								.withTop (242)
+	/*
+	auto area = getLocalBounds().reduced (47, 62)
+								.withTop (238)
 								.translated (-1, 0);
-
+	
 	const int columnWidth = area.getWidth() / neova_dash::gesture::NUM_GEST;
 
 	for (int column = 0; column < neova_dash::gesture::NUM_GEST; column++)
@@ -71,15 +72,29 @@ void HubComponent::resized()
 		else if (column == neova_dash::gesture::NUM_GEST - 1) columnArea.removeFromLeft (columnXMargin);
 		else                                   columnArea.reduce (columnXMargin*2/3 -2, 0);
 
-		if (column == 1 || column == 2) columnArea.translate (0, 23);
+		if (column == 1 || column == 2) columnArea.translate (0, 22);
 		if (column == 2 || column == 3) columnArea.translate (3, 0);
 
 		buttons[column]->setBounds (columnArea);
 		leds[column]->setBounds (columnArea.withHeight (20).translated (0, -23));
-	}
+	}*/
 	
-	buttons[CTRL_ID]->setBounds (Rectangle<int> (30, 30).withCentre (getLocalBounds().getTopRight()
-																					 .translated (-77, 81)));
+	int hubSize = jmin (getHeight(), getWidth());
+	auto buttonArea = Rectangle<int> (hubSize*15/100, hubSize*15/100);
+
+	buttons[0]->setBounds (buttonArea.withCentre ({hubSize*212/1000, hubSize*75/100}));
+	buttons[1]->setBounds (buttonArea.withCentre ({hubSize*398/1000, hubSize*817/1000}));
+	buttons[2]->setBounds (buttonArea.withCentre ({hubSize*597/1000, hubSize*817/1000}));
+	buttons[3]->setBounds (buttonArea.withCentre ({hubSize*785/1000, hubSize*75/100}));
+
+	for (int i=0; i<neova_dash::gesture::NUM_GEST; i++)
+	{
+		leds[i]->setBounds (buttons[i]->getBounds().withHeight (20).translated (0, -hubSize*7/100));
+	}
+
+	buttons[CTRL_ID]->setBounds (Rectangle<int> (hubSize*86/1000,
+												 hubSize*86/1000)
+									.withCentre ({hubSize*788/1000, hubSize*227/1000}));
 }
 
 void HubComponent::update()

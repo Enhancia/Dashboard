@@ -37,8 +37,6 @@ namespace neova_dash
         // UI display constant sizes, in px
         const int MARGIN           = 8;
         const int MARGIN_SMALL     = 3;
-        const int DASHBOARD_WIDTH  = 1266*3/4;
-        const int DASHBOARD_HEIGHT = 1100*3/4;
         const int HEADER_HEIGHT    = 55;
 
         // Gesture tuner display ranges
