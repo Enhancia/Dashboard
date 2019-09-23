@@ -561,6 +561,7 @@ void GesturePanel::handleMenuResult (int gestureId, const int menuResult)
         case 1: // Duplicate
             hubConfig.duplicateGesture (gestureId);
             update();
+            commandManager.invokeDirectly (neova_dash::commands::updateInterfaceLEDs, true);
             selectGestureExclusive (gestureId);
             break;
 

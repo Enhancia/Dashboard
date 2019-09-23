@@ -170,6 +170,12 @@ void NewGesturePanel::showPanelForGestureID (const int gestureID)
     		return;
   	}
 
+    if (isVisible())
+    {
+        unselectGestureType();
+        descriptionTextEditor->setText ("");
+    }
+
     selectedGestureSlot = gestureID;
 
     setVisible (true);

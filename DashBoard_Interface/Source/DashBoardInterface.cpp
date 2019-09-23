@@ -20,8 +20,6 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     header = std::make_unique<HeaderComponent> (*optionsPanel);
     addAndMakeVisible (*header);
 
-    hubComponent = std::make_unique<HubComponent> (hubConfig, getCommandManager());
-    addAndMakeVisible (*hubComponent);
 	
     uploadButton = std::make_unique<UploadButton> (getCommandManager());
     addAndMakeVisible (*uploadButton);
@@ -32,6 +30,9 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     gesturePanel = std::make_unique<GesturePanel> (hubConfig, *newGesturePanel,
                                                    getCommandManager(), neova_dash::ui::FRAMERATE);
     addAndMakeVisible (*gesturePanel);
+
+    hubComponent = std::make_unique<HubComponent> (hubConfig, *newGesturePanel, getCommandManager());
+    addAndMakeVisible (*hubComponent);
 
     presetSelector = std::make_unique<PresetSelectorComponent> (hubConfig, getCommandManager());
     addAndMakeVisible (*presetSelector);
@@ -44,14 +45,15 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     optionsPanel->setAlwaysOnTop (true);
 
     // Sets settings
-    int dashboardWidth  = Desktop::getInstance().getDisplays()
-                                                 .getMainDisplay()
-                                                 .userArea
-                                                 .getWidth()
-                                                 *3/4;
+    Rectangle<int> screenArea  = Desktop::getInstance().getDisplays()
+                                                       .getMainDisplay()
+                                                       .userArea;
 
-    setSize (dashboardWidth,
-             dashboardWidth*6/7);
+    int dashWidth = jmin (screenArea.getHeight()*63/60, // screenH * 9/10 * AspectRatio^-1 (= 7/6)
+                          screenArea.getWidth()*3/4);
+
+    setSize (dashWidth,
+             dashWidth*6/7);
 }
 
 DashBoardInterface::~DashBoardInterface()

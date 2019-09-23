@@ -14,8 +14,8 @@
 //==============================================================================
 // HubComponent
 
-HubComponent::HubComponent (HubConfiguration& config, ApplicationCommandManager& manager)
-    : hubConfig (config), commandManager (manager)
+HubComponent::HubComponent (HubConfiguration& config, NewGesturePanel& newGest, ApplicationCommandManager& manager)
+    : hubConfig (config), commandManager (manager), newGesturePanel (newGest)
 {
 	currentPreset = hubConfig.getSelectedPreset();
 
@@ -150,13 +150,34 @@ void HubComponent::handleHubButtonClick (const int buttonId)
 
 			commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
 		}
-		else if (mode == gestureMute && hubConfig.getGestureData (buttonId).type != neova_dash::gesture::none)
+		else if (mode == gestureMute)
 		{
-			hubConfig.setUint8Value (buttonId,
-									 HubConfiguration::on,
-									 (hubConfig.getGestureData (buttonId).on == 0) ? 1 : 0);
-			
-			commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
+			if (hubConfig.getGestureData (buttonId).type != neova_dash::gesture::none)
+			{
+				hubConfig.setUint8Value (buttonId,
+										 HubConfiguration::on,
+										 (hubConfig.getGestureData (buttonId).on == 0) ? 1 : 0);
+				
+				commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
+			}
+			else
+			{
+				if (!newGesturePanel.isVisible())
+				{
+					newGesturePanel.showPanelForGestureID (buttonId);
+				}
+				else 
+				{
+					if (newGesturePanel.getLastSelectedSlot() == buttonId)
+					{
+						newGesturePanel.hidePanel();
+					}
+					else
+					{ 
+						newGesturePanel.showPanelForGestureID (buttonId);
+					}
+				}
+			}
 		}
 	}
 }

@@ -13,6 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DashCommon.h"
 #include "HubConfiguration.h"
+#include "NewGesturePanel.h"
 
 //==============================================================================
 /*
@@ -28,7 +29,7 @@ public:
     };
 
     //==============================================================================
-    HubComponent (HubConfiguration& data, ApplicationCommandManager& manager);
+    HubComponent (HubConfiguration& data, NewGesturePanel& newGest, ApplicationCommandManager& manager);
     ~HubComponent();
 
     //==============================================================================
@@ -95,6 +96,7 @@ private:
     
     HubConfiguration& hubConfig;
     ApplicationCommandManager& commandManager;
+    NewGesturePanel& newGesturePanel;
 
     //==============================================================================
     Image hubImage = ImageFileFormat::loadFrom (DashData::DashboardHUBonlycropped_png,
