@@ -146,12 +146,10 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
 {
     using namespace neova_dash::commands;
     
-    int commandIDs[] = {
+    commands.addArray ({
                             updateDashInterface,
                             updateInterfaceLEDs
-    				   };
-
-    commands.addArray (commandIDs, numElementsInArray (commandIDs));
+                       });
 }
 
 void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)

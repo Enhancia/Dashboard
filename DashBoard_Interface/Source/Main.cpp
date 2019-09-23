@@ -87,13 +87,12 @@ public:
     {
         using namespace neova_dash::commands;
 
-        int commandIDs[] = {  flashHub,
+        commands.addArray ({  
+                              flashHub,
                               upgradeHub,
                               upgradeRing,
                               uploadConfigToHub
-                            };
-
-        commands.addArray (commandIDs, numElementsInArray (commandIDs));
+                           });
     }
 
     void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override
