@@ -109,17 +109,22 @@ public:
     PresetData& getPresetData (const int presetNumber);
     PresetData& getPresetData();
 
+    //==============================================================================
     GestureData& getGestureData (const int gestureNumber, const int presetNumber);
 	GestureData& getGestureData (const int gestureNumber);
 
     bool isGestureActive (const int gestureNumber, const int presetNumber);
     bool isGestureActive (const int gestureNumber);
 
+    void setSelectedGesture (const int gestureToSelect);
+    const int getSelectedGesture();
+
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber, const int presetNumber);
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber);
 
     //const String getHubFirm();
     //const String getRingFirm();
+
     
     Array<float> data {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
@@ -146,10 +151,12 @@ private:
 
     int findClosestIdToDuplicate (int idToDuplicateFrom, bool prioritizeHigherId);
     bool isIdAvailable (const int idToCheck);
+    void selectFirstExistingGesture();
 
     //==============================================================================
 	ApplicationCommandManager& commandManager = getCommandManager();
 	int selectedPreset = 0;
+    int selectedGesture = -1;
     
 	ConfigData config;
 

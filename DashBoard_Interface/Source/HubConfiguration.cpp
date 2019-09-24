@@ -124,6 +124,8 @@ void HubConfiguration::setPreset (const int gestureNumberToSelect)
 	if (gestureNumberToSelect < 0 || gestureNumberToSelect > 4 || gestureNumberToSelect == selectedPreset) return;
 
 	selectedPreset = gestureNumberToSelect;
+	selectFirstExistingGesture();
+	
 	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);	
 }
 
@@ -153,17 +155,10 @@ HubConfiguration::GestureData& HubConfiguration::getGestureData (const int gestu
 
 	switch (gestureNumber)
 	{
-		case (1):
-			return preset->gestureData1;
-
-		case (2):
-			return preset->gestureData2;
-		
-		case (3):
-			return preset->gestureData3;
-		
-		default:
-			return preset->gestureData0;
+		case (1): return preset->gestureData1;
+		case (2): return preset->gestureData2;
+		case (3): return preset->gestureData3;
+		default:  return preset->gestureData0;
 	}
 }
 
@@ -196,6 +191,19 @@ bool HubConfiguration::isGestureActive (const int gestureNumber, const int prese
 bool HubConfiguration::isGestureActive (const int gestureNumber)
 {
 	return isGestureActive (gestureNumber, selectedPreset);
+}
+
+void HubConfiguration::setSelectedGesture (const int gestureToSelect)
+{
+	if (gestureToSelect < -1 || gestureToSelect > neova_dash::gesture::NUM_GEST
+							 || gestureToSelect == selectedGesture) return;
+
+	selectedGesture = gestureToSelect;
+}
+
+const int HubConfiguration::getSelectedGesture()
+{
+	return selectedGesture;
 }
 
 void HubConfiguration::setDefaultConfig()
@@ -367,4 +375,19 @@ bool HubConfiguration::isIdAvailable (const int idToCheck)
 	if (idToCheck < 0 || idToCheck >= neova_dash::gesture::NUM_GEST) return false;
 
 	return (getGestureData (idToCheck).type == neova_dash::gesture::none);
+}
+
+
+void HubConfiguration::selectFirstExistingGesture()
+{
+	selectedGesture = -1;
+
+    for (int slot = 0; slot < neova_dash::gesture::NUM_GEST; slot++)
+    {
+        if (getGestureData (slot).type != neova_dash::gesture::none)
+        {
+            selectedGesture = slot;
+            return;
+        }
+    }
 }

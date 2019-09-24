@@ -22,7 +22,8 @@ GesturePanel::GesturePanel (HubConfiguration& data, NewGesturePanel& newGest, Ap
     setComponentID ("gesturePanel");
     setWantsKeyboardFocus (true);
 
-    gestureSettings = std::make_unique<GestureSettingsComponent> (int (hubConfig.getGestureData (selectedGesture)
+    gestureSettings = std::make_unique<GestureSettingsComponent> (int (hubConfig.getGestureData
+                                                                    (hubConfig.getSelectedGesture())
                                                                                      .type),
                                                                   hubConfig, commandManager);
     addAndMakeVisible (*gestureSettings);
@@ -57,20 +58,7 @@ void GesturePanel::update()
     stopTimer();
     initialiseGestureSlots();
 
-    // selects the first created gesture in the preset, or none
-    if (hubConfig.getGestureData (selectedGesture).type == neova_dash::gesture::none)
-        selectedGesture = -1;
-
-    for (int slot = 0; slot < neova_dash::gesture::NUM_GEST; slot++)
-    {
-        if (hubConfig.getGestureData (slot).type != neova_dash::gesture::none)
-        {
-            selectGestureExclusive (slot);
-            break;
-        }
-    }
-
-    gestureSettings.reset (new GestureSettingsComponent (selectedGesture, hubConfig, commandManager));
+    gestureSettings.reset (new GestureSettingsComponent (hubConfig.getSelectedGesture(), hubConfig, commandManager));
     addAndMakeVisible (*gestureSettings);
     
     resized();
@@ -246,16 +234,16 @@ bool GesturePanel::keyPressed (const KeyPress &key)
     {
         if (key.getKeyCode() == KeyPress::deleteKey || key.getKeyCode() == KeyPress::backspaceKey)
         {
-            removeGestureAndGestureComponent (selectedGesture);
+            removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
         }
-
+        /*
         else if (key.getTextCharacter() == 'r')
         {
 			if (key.getModifiers().isAltDown())
 			{
-				renameGestureInSlot (selectedGesture);
+				renameGestureInSlot (hubConfig.getSelectedGesture());
 			}
-        }
+        }*/
     }
 
 	return false;
@@ -272,7 +260,7 @@ void GesturePanel::initialiseGestureSlots()
             gestureSlots.add (new GestureComponent (hubConfig, commandManager, i,
                                                     dragMode, draggedGestureComponentId, draggedOverSlotId));
 
-            if (selectedGesture != -1 && i == selectedGesture)
+            if (hubConfig.getSelectedGesture() != -1 && i == hubConfig.getSelectedGesture())
             {
                 dynamic_cast<GestureComponent*> (gestureSlots.getLast())->setSelected (true);
             }
@@ -390,7 +378,7 @@ void GesturePanel::updateSlotIfNeeded (int slotToCheck)
 
 void GesturePanel::moveGestureToId (int idToMoveFrom, int idToMoveTo)
 {
-    bool mustChangeSelection = (selectedGesture == idToMoveFrom);
+    bool mustChangeSelection = (hubConfig.getSelectedGesture() == idToMoveFrom);
     
     if (mustChangeSelection) unselectCurrentGesture();
 
@@ -406,12 +394,13 @@ void GesturePanel::moveGestureToId (int idToMoveFrom, int idToMoveTo)
 
 void GesturePanel::swapGestures (int firstId, int secondId)
 {
-    bool mustChangeSelection = (selectedGesture == firstId || selectedGesture == secondId);
+    bool mustChangeSelection = (hubConfig.getSelectedGesture() == firstId
+                                || hubConfig.getSelectedGesture() == secondId);
     int idToSelect;
 
     if (mustChangeSelection)
     {
-        idToSelect = (selectedGesture == firstId ? secondId : firstId);
+        idToSelect = (hubConfig.getSelectedGesture() == firstId ? secondId : firstId);
         unselectCurrentGesture();
     }
 
@@ -451,7 +440,7 @@ void GesturePanel::removeGestureAndGestureComponent (int gestureId)
     if (gestureId < 0 || gestureId > neova_dash::gesture::NUM_GEST) return;
     stopTimer();
 
-    if (gestureId == selectedGesture)
+    if (gestureId == hubConfig.getSelectedGesture())
     {
         unselectCurrentGesture();
         gestureSettings.reset (new GestureSettingsComponent (neova_dash::gesture::NUM_GEST + 1,
@@ -469,7 +458,7 @@ void GesturePanel::removeGestureAndGestureComponent (int gestureId)
 
 bool GesturePanel::hasSelectedGesture()
 {
-    return selectedGesture != -1;
+    return hubConfig.getSelectedGesture() != -1;
 }
 
 void GesturePanel::switchGestureSelectionState (GestureComponent& gestureComponentToSwitch)
@@ -477,7 +466,7 @@ void GesturePanel::switchGestureSelectionState (GestureComponent& gestureCompone
     if (gestureComponentToSwitch.isSelected())
     {
         gestureComponentToSwitch.setSelected (false);
-        selectedGesture = -1;
+        hubConfig.setSelectedGesture (-1);
     }
     else
     {
@@ -503,7 +492,7 @@ void GesturePanel::selectGestureExclusive (GestureComponent& gestureComponentToS
     gestureSettings.reset (new GestureSettingsComponent (gestureComponentToSelect.id, hubConfig,
 			                                             commandManager));
     addAndMakeVisible (*gestureSettings);
-    selectedGesture = gestureComponentToSelect.id;
+    hubConfig.setSelectedGesture (gestureComponentToSelect.id);
     resized();
 }
 
@@ -520,9 +509,9 @@ void GesturePanel::selectGestureExclusive (const int idToSelect)
 void GesturePanel::unselectCurrentGesture()
 {
 	// Can't unselect if nothing is selected..
-	if (selectedGesture == -1) return;
+	if (hubConfig.getSelectedGesture() == -1) return;
 
-    if (auto* gestureComponentToUnselect = dynamic_cast<GestureComponent*> (gestureSlots[selectedGesture]))
+    if (auto* gestureComponentToUnselect = dynamic_cast<GestureComponent*> (gestureSlots[hubConfig.getSelectedGesture()]))
     {
         if (!gestureComponentToUnselect->isSelected())
         {
@@ -533,7 +522,7 @@ void GesturePanel::unselectCurrentGesture()
 
         gestureComponentToUnselect->setSelected (false);
 
-        selectedGesture = -1;
+        hubConfig.setSelectedGesture (-1);
         gestureSettings.reset (new GestureSettingsComponent (neova_dash::gesture::NUM_GEST + 1,
 			                                                 hubConfig, commandManager));
         addAndMakeVisible (*gestureSettings);

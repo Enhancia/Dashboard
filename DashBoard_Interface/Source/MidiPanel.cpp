@@ -208,6 +208,9 @@ void MidiRangeTuner::resized()
 
     lowSlider->setMouseDragSensitivity (getWidth());
     highSlider->setMouseDragSensitivity (getWidth());
+
+    setLabelBounds (*rangeLabelMin);
+    setLabelBounds (*rangeLabelMax);
 }
 
 void MidiRangeTuner::labelTextChanged (Label* lbl)
