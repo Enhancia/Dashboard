@@ -37,7 +37,7 @@ public:
     //==============================================================================
     void mouseEnter (const MouseEvent&);
     void mouseExit (const MouseEvent&);
-    void mouseDown (const MouseEvent&);
+    void mouseUp (const MouseEvent&);
     void modifierKeysChanged (const ModifierKeys&);
 
     //==============================================================================

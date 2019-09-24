@@ -17,6 +17,8 @@ GesturePanel::GesturePanel (HubConfiguration& data, NewGesturePanel& newGest, Ap
                             : hubConfig (data), newGesturePanel (newGest), commandManager (manager),
                               freq (freqHz)
 {
+    TRACE_IN;
+
     setComponentID ("gesturePanel");
     setWantsKeyboardFocus (true);
 
@@ -32,6 +34,8 @@ GesturePanel::GesturePanel (HubConfiguration& data, NewGesturePanel& newGest, Ap
 
 GesturePanel::~GesturePanel()
 {
+    TRACE_IN;
+
     stopTimer();
     unselectCurrentGesture();
     newGesturePanel.hidePanel (true);
@@ -51,15 +55,24 @@ void GesturePanel::update()
     }
 
     stopTimer();
-
     initialiseGestureSlots();
 
-    if (selectedGesture != -1)
+    // selects the first created gesture in the preset, or none
+    if (hubConfig.getGestureData (selectedGesture).type == neova_dash::gesture::none)
+        selectedGesture = -1;
+
+    for (int slot = 0; slot < neova_dash::gesture::NUM_GEST; slot++)
     {
-        gestureSettings.reset (new GestureSettingsComponent (selectedGesture, hubConfig, commandManager));
-        addAndMakeVisible (*gestureSettings);
+        if (hubConfig.getGestureData (slot).type != neova_dash::gesture::none)
+        {
+            selectGestureExclusive (slot);
+            break;
+        }
     }
 
+    gestureSettings.reset (new GestureSettingsComponent (selectedGesture, hubConfig, commandManager));
+    addAndMakeVisible (*gestureSettings);
+    
     resized();
     startTimerHz (freq);
 }

@@ -17,6 +17,8 @@
 HubComponent::HubComponent (HubConfiguration& config, NewGesturePanel& newGest, ApplicationCommandManager& manager)
     : hubConfig (config), commandManager (manager), newGesturePanel (newGest)
 {
+	TRACE_IN;
+
 	currentPreset = hubConfig.getSelectedPreset();
 
 	// Creates Bottom Buttons And Lights
@@ -38,6 +40,8 @@ HubComponent::HubComponent (HubConfiguration& config, NewGesturePanel& newGest, 
 
 HubComponent::~HubComponent()
 {
+	TRACE_IN;
+
 	for (int i =0; i < buttons.size(); i++)
 	{
 		buttons[i]->removeListener (this);
@@ -112,7 +116,12 @@ void HubComponent::repaintLEDs()
 
 void HubComponent::switchHubMode()
 {
-	if 		(mode == presetSelection) mode = gestureMute;
+	if (mode == presetSelection)
+	{
+		mode = gestureMute;
+		if (ctrlButtonDown) ctrlButtonDown = false;
+	}
+
 	else if (mode == gestureMute) mode = presetSelection;
 
 	repaintLEDs();
@@ -121,6 +130,17 @@ void HubComponent::switchHubMode()
 HubComponent::HubMode HubComponent::getCurrentMode()
 {
 	return mode;
+}
+
+
+bool HubComponent::getControlButtonDown()
+{
+	return ctrlButtonDown;
+}
+
+void HubComponent::setControlButtonDown (const bool shouldBeDown)
+{
+	ctrlButtonDown = shouldBeDown;
 }
 
 void HubComponent::buttonClicked (Button* bttn)
@@ -135,6 +155,7 @@ void HubComponent::handleHubButtonClick (const int buttonId)
 {
 	if (buttonId == CTRL_ID) // Control button
 	{
+		ctrlButtonDown = !ctrlButtonDown;
 		switchHubMode();
 	}
 

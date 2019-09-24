@@ -14,6 +14,8 @@
 //==============================================================================
 HeaderComponent::HeaderComponent (OptionsPanel& options) : optionsPanel (options)
 {
+    TRACE_IN;
+    
     batteryComponent = std::make_unique<BatteryComponent>();
     addAndMakeVisible (*batteryComponent);
 
@@ -22,6 +24,8 @@ HeaderComponent::HeaderComponent (OptionsPanel& options) : optionsPanel (options
 
 HeaderComponent::~HeaderComponent()
 {
+    TRACE_IN;
+
 	batteryComponent = nullptr;
 }
 

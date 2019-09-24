@@ -19,13 +19,26 @@ public:
     //==============================================================================
     Neova_DashBoard_Interface() {}
 
-    const String getApplicationName() override       { return "Plume Dash Board [Interface]"; }
+    const String getApplicationName() override       { return "Neova Dash Board [Interface]"; }
     const String getApplicationVersion() override    { return ProjectInfo::versionString; }
     bool moreThanOneInstanceAllowed() override       { return false; }
 
     //==============================================================================
     void initialise (const String& commandLine) override
     {
+        dashboardLogger = FileLogger::createDefaultAppLogger ("Enhancia/NeovaDashboard/Logs/",
+                                                              "neovaDashLog.txt",
+                                                              "Neova Dashboard Log | OS :"
+                                                            #if JUCE_MAC
+                                                              " MAC "
+                                                            #elif JUCE_WINDOWS
+                                                              " Windows "
+                                                            #endif
+                                                              "| Neova Dashboard v" + getApplicationVersion()
+                                                                                    + " \n");
+    
+        Logger::setCurrentLogger (dashboardLogger);
+
         mainWindow.reset (new MainWindow (getApplicationName(), hubConfig));
 
         commandManager.registerAllCommandsForTarget (this);
@@ -43,6 +56,9 @@ public:
     void shutdown() override
     {
         mainWindow = nullptr;
+
+        Logger::setCurrentLogger (nullptr);
+        dashboardLogger = nullptr;
     }
 
     //==============================================================================
@@ -123,7 +139,7 @@ public:
     bool perform (const InvocationInfo& info) override
     {
         using namespace neova_dash::commands;
-        DBG ("Back performs : " << commandManager.getNameOfCommand (info.commandID));
+        Logger::writeToLog ("Back performs : " + String (commandManager.getNameOfCommand (info.commandID)));
 
         switch (info.commandID)
         {
@@ -150,6 +166,8 @@ public:
 private:
     std::unique_ptr<MainWindow> mainWindow;
     HubConfiguration hubConfig;
+
+    ScopedPointer<FileLogger> dashboardLogger;
 };
 
 //==============================================================================

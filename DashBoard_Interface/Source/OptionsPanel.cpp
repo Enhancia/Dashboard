@@ -14,11 +14,15 @@
 OptionsPanel::OptionsPanel (HubConfiguration& config, ApplicationCommandManager& manager)
     : hubConfig (config), commandManager (manager)
 {
+    TRACE_IN;
+
     createButtons();
 }
 
 OptionsPanel::~OptionsPanel()
 {
+    TRACE_IN;
+
     closeButton = nullptr;
 }
 

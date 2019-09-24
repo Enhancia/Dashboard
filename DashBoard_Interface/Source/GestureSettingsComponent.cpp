@@ -13,6 +13,8 @@
 GestureSettingsComponent::GestureSettingsComponent (const int gestId, HubConfiguration& config, ApplicationCommandManager& manager)
 	: gestureId (gestId), hubConfig (config), commandManager (manager)
 {
+    TRACE_IN;
+
 	createTuner();
 	createToggles();
     createMidiPanel();
@@ -20,6 +22,8 @@ GestureSettingsComponent::GestureSettingsComponent (const int gestId, HubConfigu
 
 GestureSettingsComponent::~GestureSettingsComponent()
 {
+    TRACE_IN;
+
     gestTuner = nullptr;
 	midiPanel = nullptr;
 }

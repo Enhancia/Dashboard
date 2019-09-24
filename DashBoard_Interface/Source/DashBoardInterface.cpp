@@ -11,6 +11,8 @@
 //==============================================================================
 DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (data)
 {
+    TRACE_IN;
+
     setLookAndFeel (&dashBoardLookAndFeel);
 
     // Creates Components
@@ -19,7 +21,6 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
 
     header = std::make_unique<HeaderComponent> (*optionsPanel);
     addAndMakeVisible (*header);
-
 	
     uploadButton = std::make_unique<UploadButton> (getCommandManager());
     addAndMakeVisible (*uploadButton);
@@ -58,6 +59,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
 
 DashBoardInterface::~DashBoardInterface()
 {
+    TRACE_IN;
+
     header = nullptr;
     hubComponent = nullptr;
     gesturePanel = nullptr;
@@ -95,14 +98,13 @@ void DashBoardInterface::resized()
 }
 
 //==============================================================================
-void DashBoardInterface::mouseDown (const MouseEvent& event)
+void DashBoardInterface::mouseUp (const MouseEvent& event)
 {
-	if (event.mods.isLeftButtonDown())
-	{
-	}
-	else if (event.mods.isRightButtonDown())
-	{
-	}
+	if (hubComponent->getControlButtonDown()
+        && event.eventComponent->getParentComponent() == presetSelector.get())
+    {
+        hubComponent->setControlButtonDown (false);
+    }
 }
 
 void DashBoardInterface::mouseEnter (const MouseEvent& event)
@@ -120,7 +122,7 @@ void DashBoardInterface::mouseExit (const MouseEvent& event)
     if ((event.eventComponent == presetSelector.get() ||
          event.eventComponent->getParentComponent() == presetSelector.get())
         && hubComponent->getCurrentMode() == HubComponent::presetSelection
-        && !commandKeyDown)
+        && !commandKeyDown && !hubComponent->getControlButtonDown())
     {
         hubComponent->switchHubMode();
     }
@@ -180,8 +182,10 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
 
 bool DashBoardInterface::perform (const InvocationInfo& info)
 {
+    TRACE_IN;
+
     using namespace neova_dash::commands;
-    DBG ("Front performs : " << getCommandManager().getNameOfCommand (info.commandID));
+    Logger::writeToLog ("Front performs : " + String (getCommandManager().getNameOfCommand (info.commandID)));
 
     switch (info.commandID)
     {

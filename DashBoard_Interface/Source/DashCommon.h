@@ -13,6 +13,10 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DashPath.h"
 
+// Preprocessor expressions
+#define TRACE_IN  Logger::writeToLog ("[+] Entering: " + String(__FUNCTION__) + "\n")
+#define TRACE_OUT Logger::writeToLog ("[-]  Leaving: " + String(__FUNCTION__) + "\n")
+
 namespace neova_dash
 {
     namespace commands

@@ -13,10 +13,12 @@
 
 UploadButton::UploadButton (ApplicationCommandManager& cm) : Button ("Upload Button"), commandManager (cm)
 {
+	TRACE_IN;
 }
 
 UploadButton::~UploadButton()
 {
+	TRACE_IN;
 }
 
 void UploadButton::resized()

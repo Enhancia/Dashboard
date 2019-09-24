@@ -45,6 +45,8 @@ public:
     void repaintLEDs();
     void switchHubMode();
     HubMode getCurrentMode();
+    bool getControlButtonDown();
+    void setControlButtonDown (const bool shouldBeDown);
 
 private:
     //==============================================================================
@@ -93,6 +95,7 @@ private:
     //==============================================================================
     int currentPreset = 0;
     HubMode mode = gestureMute;
+    bool ctrlButtonDown = false;
     
     HubConfiguration& hubConfig;
     ApplicationCommandManager& commandManager;

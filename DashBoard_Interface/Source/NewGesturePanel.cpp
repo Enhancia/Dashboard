@@ -13,6 +13,8 @@
 NewGesturePanel::NewGesturePanel (HubConfiguration& config, ApplicationCommandManager& manager)
     : hubConfig (config), commandManager (manager)
 {
+    TRACE_IN;
+
   	createCloseButton();
   	createGestureSelectorButtons();
   	createAndAddTextEditor();
@@ -20,6 +22,8 @@ NewGesturePanel::NewGesturePanel (HubConfiguration& config, ApplicationCommandMa
 
 NewGesturePanel::~NewGesturePanel()
 {
+    TRACE_IN;
+
     closeButton = nullptr;
 	  descriptionTextEditor = nullptr;
 }
