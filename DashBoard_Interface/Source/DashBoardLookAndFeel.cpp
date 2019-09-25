@@ -54,6 +54,11 @@ void DashBoardLookAndFeel::setColours()
   	setColour (PopupMenu::textColourId, mainText);
   	setColour (PopupMenu::highlightedBackgroundColourId, subText);
   	setColour (PopupMenu::highlightedTextColourId, mainText);
+
+    // Alert Window
+    setColour (AlertWindow::backgroundColourId, dashboardBackground.withAlpha (0.85f));
+    setColour (AlertWindow::textColourId, mainText);
+    setColour (AlertWindow::outlineColourId, mainText.withAlpha (0.4f));
 }
 
 Font DashBoardLookAndFeel::getTextButtonFont (TextButton&, int buttonHeight)

@@ -55,6 +55,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
 
     setSize (dashWidth,
              dashWidth*6/7);
+
+    header->addMouseListener (this, false); // TO DELETE
 }
 
 DashBoardInterface::~DashBoardInterface()
@@ -104,6 +106,10 @@ void DashBoardInterface::mouseUp (const MouseEvent& event)
         && event.eventComponent->getParentComponent() == presetSelector.get())
     {
         hubComponent->setControlButtonDown (false);
+    }
+    else if (event.eventComponent == header.get()) // TO DELETE
+    {
+        createAndShowAlertPanel ("Teste", "Ouah c 1 test 2 ouf");
     }
 }
 
@@ -202,4 +208,31 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
         default:
             return false;
     }
+}
+
+void DashBoardInterface::createAndShowAlertPanel (const String& title, const String& message,
+                                                   const String& buttonText)
+{
+    alertPanel.reset (new DashAlertPanel (title, message));
+    addAndMakeVisible (*alertPanel);
+    alertPanel->setVisible (true);
+    alertPanel->setAlwaysOnTop (true);
+    alertPanel->setLookAndFeel (&dashBoardLookAndFeel);
+    alertPanel->setBounds (getLocalBounds());
+
+    //if (!buttonText.isEmpty()) alertPanel->addButton (buttonText, 0, KeyPress (KeyPress::escapeKey));
+
+    //alertPanel->setOpaque (false);
+    alertPanel->enterModalState (true, ModalCallbackFunction::forComponent (alertPanelCallback, this), false);
+}
+
+void DashBoardInterface::closePendingAlertPanel()
+{
+    if (alertPanel->isCurrentlyModal()) alertPanel->exitModalState (0);
+    alertPanel.reset (nullptr);
+}
+
+void DashBoardInterface::alertPanelCallback (int modalResult, DashBoardInterface* interface)
+{
+    interface->closePendingAlertPanel();
 }
