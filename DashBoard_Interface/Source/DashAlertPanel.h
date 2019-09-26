@@ -16,7 +16,8 @@
 //==============================================================================
 /*
 */
-class DashAlertPanel    : public Component
+class DashAlertPanel    : public Component,
+                          private Button::Listener
 {
 public:
     //==============================================================================
@@ -28,6 +29,9 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
+    //==============================================================================
+    void buttonClicked (Button* bttn) override;
+
 private:
     //==============================================================================
     void createAndAddTextEditor (const String& textToSet);
@@ -36,10 +40,12 @@ private:
 
     //==============================================================================
     Rectangle<int> panelArea;
+    bool showButton = false;
 
     //==============================================================================
     std::unique_ptr<Label> bodyText;
     std::unique_ptr<Label> titleLabel;
+    std::unique_ptr<TextButton> closeButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DashAlertPanel)
 };

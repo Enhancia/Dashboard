@@ -51,9 +51,25 @@ void DashAlertPanel::resized()
 
     titleLabel->setBounds (area.removeFromTop (area.getHeight()/5));
 
-    //if (closeButton != nullptr) closeButton->setBounds (area.removeFromBottom (area.getHeight()/5);
+    if (showButton)
+    {
+        int buttonHeight = area.getHeight()/5;
+
+        closeButton->setBounds (area.removeFromBottom (buttonHeight)
+                                    .withSizeKeepingCentre
+                                        (closeButton->getBestWidthForHeight (buttonHeight),
+                                         buttonHeight));
+    }
 
     bodyText->setBounds (area.reduced (neova_dash::ui::MARGIN));
+}
+
+void DashAlertPanel::buttonClicked (Button* bttn)
+{
+    if (bttn == closeButton.get())
+    {
+        exitModalState (0);
+    }
 }
 
 void DashAlertPanel::createAndAddLabel (const String& textToSet)
@@ -74,4 +90,11 @@ void DashAlertPanel::createAndAddTextEditor (const String& textToSet)
 
 void DashAlertPanel::createAndAddCloseButton (const String& buttonText)
 {
+    if (!buttonText.isEmpty()) showButton = true;
+
+    closeButton.reset (new TextButton ("Close Button"));
+    addAndMakeVisible (*closeButton);
+
+    closeButton->setButtonText (buttonText);
+    closeButton->addListener (this);
 }
