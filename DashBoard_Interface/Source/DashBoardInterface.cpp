@@ -203,3 +203,31 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             return false;
     }
 }
+
+void DashBoardInterface::createAndShowAlertPanel (const String& title, const String& message,
+                                                   const String& buttonText)
+{
+    alertPanel.reset (new DashAlertPanel (title, message, buttonText));
+    addAndMakeVisible (*alertPanel);
+
+    alertPanel->setVisible (true);
+    alertPanel->setAlwaysOnTop (true);
+    alertPanel->setLookAndFeel (&dashBoardLookAndFeel);
+    alertPanel->setBounds (getLocalBounds());
+
+    //if (!buttonText.isEmpty()) alertPanel->addButton (buttonText, 0, KeyPress (KeyPress::escapeKey));
+
+    //alertPanel->setOpaque (false);
+    alertPanel->enterModalState (true, ModalCallbackFunction::forComponent (alertPanelCallback, this), false);
+}
+
+void DashBoardInterface::closePendingAlertPanel()
+{
+    if (alertPanel->isCurrentlyModal()) alertPanel->exitModalState (0);
+    alertPanel.reset (nullptr);
+}
+
+void DashBoardInterface::alertPanelCallback (int modalResult, DashBoardInterface* interface)
+{
+    interface->closePendingAlertPanel();
+}

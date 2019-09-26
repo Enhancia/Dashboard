@@ -32,6 +32,9 @@ public:
 
     //==============================================================================
     void buttonClicked (Button* bttn) override;
+    
+    //==============================================================================
+    void mouseUp (const MouseEvent&) override;
 
 private:
 	class BatteryComponent : public Component

@@ -39,22 +39,17 @@ public:
     
         Logger::setCurrentLogger (dashboardLogger);
 
-        mainWindow.reset (new MainWindow (getApplicationName(), hubConfig));
+        interface.reset (new DashBoardInterface (hubConfig));
+        mainWindow.reset (new MainWindow (getApplicationName(), interface.get()));
 
         commandManager.registerAllCommandsForTarget (this);
         commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
                                                         (mainWindow->getContentComponent()));
-
-		for (int i = neova_dash::commands::flashHub; i <= commandManager.getNumCommands(); i++)
-		{
-            String s = commandManager.getNameOfCommand (i);
-
-			if (!s.isEmpty()) DBG (i << " " << s);
-		}
     }
 
     void shutdown() override
     {
+        interface = nullptr;
         mainWindow = nullptr;
 
         Logger::setCurrentLogger (nullptr);
@@ -75,13 +70,13 @@ public:
     class MainWindow    : public DocumentWindow
     {
     public:
-        MainWindow (String name , HubConfiguration& data)
+        MainWindow (String name , DashBoardInterface* dashInterface)
             : DocumentWindow (name, Desktop::getInstance().getDefaultLookAndFeel()
                                                           .findColour (ResizableWindow::backgroundColourId),
                                     DocumentWindow::minimiseButton + DocumentWindow::closeButton)
         {
             setUsingNativeTitleBar (true);
-            setContentOwned (new DashBoardInterface (data), true);
+            setContentOwned (dashInterface, true);
             
             setResizable (false, false);
             centreWithSize (getWidth(), getHeight());
@@ -162,6 +157,7 @@ public:
 
     //==============================================================================
     ApplicationCommandManager commandManager;
+    std::unique_ptr<DashBoardInterface> interface;
 
 private:
     std::unique_ptr<MainWindow> mainWindow;

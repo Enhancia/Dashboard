@@ -60,6 +60,33 @@ void HeaderComponent::buttonClicked (Button* bttn)
     }
 }
 
+void HeaderComponent::mouseUp (const MouseEvent& e)
+{
+    /*
+    if (e.eventComponent == batteryComponent.get())
+    {
+        ScopedPointer<AlertWindow> beulAlert = new AlertWindow ("Beul Window",
+                                                                "Ceci est une fenetre concue pour que Beul "
+                                                                "puisse dire des conneries dans mon interface",
+                                                                AlertWindow::NoIcon,
+                                                                getParentComponent());
+        beulAlert->addButton ("Oui", 0, KeyPress (KeyPress::escapeKey));
+        beulAlert->setOpaque (false);
+        beulAlert->setLookAndFeel (&getLookAndFeel());
+        beulAlert->runModalLoop();
+
+        
+        //AlertWindow::showMessageBox (AlertWindow::NoIcon,
+        //                                  "Beul Window",
+        //                                  "Ceci est une fenetre concue pour que Beul "
+        //                                  "puisse dire des conneries dans mon interface",
+        //                                  "Jambon",
+        //                                  getParentComponent());
+
+
+    }*/
+}
+
 void HeaderComponent::createButton()
 {
     // Close button

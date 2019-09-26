@@ -18,6 +18,7 @@
 #include "HubComponent.h"
 #include "UploadButton.h"
 #include "PresetSelectorComponent.h"
+#include "DashAlertPanel.h"
 
 ApplicationCommandManager& getCommandManager();
 
@@ -46,8 +47,15 @@ public:
     void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override;
     bool perform (const InvocationInfo& info) override;
 
+    //==============================================================================
+    void createAndShowAlertPanel (const String& title, const String& message,
+                                                        const String& buttonText = String());
+    void closePendingAlertPanel();
 
 private:
+    //==============================================================================
+    static void alertPanelCallback (int modalResult, DashBoardInterface* interface);
+
     //==============================================================================
     std::unique_ptr<HeaderComponent> header;
     std::unique_ptr<HubComponent> hubComponent;
@@ -56,6 +64,7 @@ private:
     std::unique_ptr<UploadButton> uploadButton;
     std::unique_ptr<PresetSelectorComponent> presetSelector;
     std::unique_ptr<OptionsPanel> optionsPanel;
+    std::unique_ptr<DashAlertPanel> alertPanel;
 
     DashBoardLookAndFeel dashBoardLookAndFeel;
     
