@@ -148,10 +148,14 @@ namespace neova_dash
         enum DashFontId
         {
             regular =0,
-            enhancia
+            bold,
+            light,
+            enhanciaLogo
         };
         
         extern const Font dashFont;
+        extern const Font dashFontBold;
+        extern const Font dashFontLight;
         extern const Font enhanciaFont;
     };
 };

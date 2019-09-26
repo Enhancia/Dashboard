@@ -180,18 +180,28 @@ namespace font
 {
 	const Font getDashFont (DashFontId type = regular)
     {
+        // Halis Grotesque
         if (type == regular)
-            return Font (Typeface::createSystemTypefaceFor (Font (Font::getDefaultSansSerifFontName(),
-            												12.0f, 0)));
-        else if (type == enhancia)
+            return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRRegular_otf,
+                                                            DashData::Ahmet_Altun__HalisGRRegular_otfSize));
+        else if (type == bold)
+            return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRBold_otf,
+                                                            DashData::Ahmet_Altun__HalisGRBold_otfSize));
+        else if (type == light)
+            return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRLight_otf,
+                                                            DashData::Ahmet_Altun__HalisGRLight_otfSize));
+        // Enhancia logo (capital only)
+        else if (type == enhanciaLogo)
             return Font (Typeface::createSystemTypefaceFor (DashData::NOOADemiSerifDEMO_ttf,
                                                             DashData::NOOADemiSerifDEMO_ttfSize));
           
         return Font();
     }
-        
-    const Font dashFont = getDashFont();
-    const Font enhanciaFont = getDashFont (enhancia);
+
+    const Font dashFont      = getDashFont();
+    const Font dashFontBold  = getDashFont (bold);
+    const Font dashFontLight = getDashFont (light);
+    const Font enhanciaFont  = getDashFont (enhanciaLogo);
 
 }; // namespace font
 }; // namespace neova_dash

@@ -48,8 +48,8 @@ void VibratoTuner::paint (Graphics& g)
 	//drawValueCursor (g);
 	//drawIntensityCursor (g);
 
-	g.setColour (neova_dash::colour::tunerSliderBackground);
-	g.setFont (neova_dash::font::dashFont.withHeight (14.0f));
+	g.setColour (neova_dash::colour::subText);
+	g.setFont (neova_dash::font::dashFontLight.withHeight (15.0f));
 	g.drawText ("THRESHOLD", thresholdSlider->getBounds().withSizeKeepingCentre (100, 50)
 														 .withY (thresholdSlider->getBounds().getBottom()),
 							 Justification::centredTop);

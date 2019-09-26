@@ -44,7 +44,7 @@ void UploadButton::paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted,
 
 	// Text Draw
 	g.setColour (neova_dash::colour::mainText);
-	g.setFont (neova_dash::font::dashFont.withHeight (15.0f));
+	g.setFont (neova_dash::font::dashFont.withHeight (16.0f));
 	g.drawText ("Upload", textArea.removeFromRight (textArea.getWidth()*3/4), Justification::centred);
 
 	// Upload Path Draw

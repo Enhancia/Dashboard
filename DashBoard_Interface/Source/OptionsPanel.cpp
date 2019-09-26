@@ -150,8 +150,9 @@ void OptionsPanel::paintProductInformations (Graphics& g, Rectangle<int> area)
     // Enhancia Logo
     auto enhanciaArea = area.removeFromLeft (area.getWidth()/2);
 
-    auto logoArea = enhanciaArea.removeFromTop (area.getHeight()*2/3)
-                                .withTrimmedTop (MARGIN*3)
+    auto logoArea = enhanciaArea.removeFromTop (area.getHeight()/2)
+                                .reduced (enhanciaArea.getWidth()/3, MARGIN)
+                                .withTrimmedTop (enhanciaArea.getHeight()/6)
                                 .toFloat();
 
     Path logo = neova_dash::path::createPath (neova_dash::path::enhanciaLogo);
@@ -165,7 +166,7 @@ void OptionsPanel::paintProductInformations (Graphics& g, Rectangle<int> area)
     g.setColour (neova_dash::colour::mainText);
     g.setFont (neova_dash::font::enhanciaFont.withHeight (25).withExtraKerningFactor (0.2f));
     g.drawText (String ("ENHANCIA "/* + String (CharPointer_UTF8 ("\xe2\x84\xa2"))*/), enhanciaArea.reduced (MARGIN*2),
-                   Justification::centred);
+                   Justification::centredTop);
 
   	// Dash Text
   	auto dashTextArea = area.reduced (MARGIN*2, area.getHeight()/4);
