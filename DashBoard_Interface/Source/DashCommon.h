@@ -113,7 +113,7 @@ namespace neova_dash
 
         enum MidiType
         {
-            pitchMidi =1,
+            pitchMidi =0,
             ccMidi,
             afterTouchMidi
         };

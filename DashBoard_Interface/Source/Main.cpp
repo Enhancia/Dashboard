@@ -73,7 +73,7 @@ public:
         MainWindow (String name , DashBoardInterface* dashInterface)
             : DocumentWindow (name, Desktop::getInstance().getDefaultLookAndFeel()
                                                           .findColour (ResizableWindow::backgroundColourId),
-                                    DocumentWindow::minimiseButton + DocumentWindow::closeButton)
+                                    DocumentWindow::allButtons/*DocumentWindow::minimiseButton + DocumentWindow::closeButton*/)
         {
             setUsingNativeTitleBar (true);
             setContentOwned (dashInterface, true);

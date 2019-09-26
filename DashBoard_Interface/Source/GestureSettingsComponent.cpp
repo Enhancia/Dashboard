@@ -101,8 +101,8 @@ void GestureSettingsComponent::resized()
 
     muteButton->setBounds (headerArea.removeFromRight (30).withSizeKeepingCentre (18, 18));
 
-    midiPanel->setBounds (area.removeFromBottom (getHeight()/3));
-    area.removeFromBottom (MARGIN);
+    midiPanel->setBounds (area.removeFromBottom (jmax (getHeight()/4, 80)));
+
     if (gestTuner != nullptr) gestTuner->setBounds (area);
 
 	repaint();

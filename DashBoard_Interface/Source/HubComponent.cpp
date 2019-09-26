@@ -93,7 +93,7 @@ void HubComponent::resized()
 
 	for (int i=0; i<neova_dash::gesture::NUM_GEST; i++)
 	{
-		leds[i]->setBounds (buttons[i]->getBounds().withHeight (20).translated (0, -hubSize*7/100));
+		leds[i]->setBounds (buttons[i]->getBounds().withHeight (20).translated (0, jmin (-20, -hubSize*7/100)));
 	}
 
 	buttons[CTRL_ID]->setBounds (Rectangle<int> (hubSize*86/1000,

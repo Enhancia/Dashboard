@@ -62,7 +62,7 @@ void MidiPanel::resized()
 
     auto rangeArea = area;
 
-    midiRangeTuner->setBounds (rangeArea.withSizeKeepingCentre (area.getWidth()*3/4 - 2*MARGIN, area.getHeight()));
+    midiRangeTuner->setBounds (rangeArea.withSizeKeepingCentre (area.getWidth()*3/4 - 2*MARGIN, 40));
 }
 
 //==============================================================================
@@ -100,13 +100,13 @@ void MidiPanel::comboBoxChanged (ComboBox* box)
 {
     if (box == midiTypeBox)
     {
-        bool isCC = (midiTypeBox->getSelectedId() == neova_dash::gesture::ccMidi);
+        bool isCC = (midiTypeBox->getSelectedId() == neova_dash::gesture::ccMidi + 1);
         
         // cc Label is visible & editable only if "CC" is selected
         ccLabel->setEditable (isCC, false, false);
         ccLabel->setVisible (isCC);
 
-        hubConfig.setUint8Value (id, HubConfiguration::midiType, midiTypeBox->getSelectedId());
+        hubConfig.setUint8Value (id, HubConfiguration::midiType, midiTypeBox->getSelectedId()-1);
 
         if (auto* gestPanel = getParentComponent()->getParentComponent())
             gestPanel->repaint();
@@ -133,10 +133,12 @@ MidiRangeTuner& MidiPanel::getTuner()
 void MidiPanel::createComboBox()
 {
     addAndMakeVisible (midiTypeBox = new ComboBox ("midiTypeBox"));
-    midiTypeBox->addItem ("Pitch", neova_dash::gesture::pitchMidi);
-    midiTypeBox->addItem ("CC", neova_dash::gesture::ccMidi);
-    //midiTypeBox->addItem ("AfterTouch", neova_dash::gesture::afterTouchMidi);
-    midiTypeBox->setSelectedId (int (hubConfig.getGestureData (id).midiType), dontSendNotification);
+
+    midiTypeBox->addItem ("Pitch", neova_dash::gesture::pitchMidi + 1);
+    midiTypeBox->addItem ("CC", neova_dash::gesture::ccMidi + 1);
+    //midiTypeBox->addItem ("AfterTouch", neova_dash::gesture::afterTouchMidi + 1);
+
+    midiTypeBox->setSelectedId (int (hubConfig.getGestureData (id).midiType) + 1, dontSendNotification);
     
     // ComboBox look
     midiTypeBox->setJustificationType (Justification::centred);
@@ -169,8 +171,8 @@ void MidiPanel::createLabels()
     ccLabel->setColour (Label::outlineColourId, neova_dash::colour::subText);
     
     // cc Label is visible & editable only if "CC" is selected
-    ccLabel->setEditable (midiTypeBox->getSelectedId() == neova_dash::gesture::ccMidi, false, false);
-    ccLabel->setVisible (midiTypeBox->getSelectedId() == neova_dash::gesture::ccMidi);
+    ccLabel->setEditable (midiTypeBox->getSelectedId() == neova_dash::gesture::ccMidi + 1, false, false);
+    ccLabel->setVisible (midiTypeBox->getSelectedId() == neova_dash::gesture::ccMidi + 1);
     
     ccLabel->addListener (this);
 }

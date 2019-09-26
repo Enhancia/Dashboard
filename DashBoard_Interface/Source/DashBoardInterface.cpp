@@ -53,6 +53,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     int dashWidth = jmin (screenArea.getHeight()*63/60, // screenH * 9/10 * AspectRatio^-1 (= 7/6)
                           screenArea.getWidth()*3/4);
 
+    //dashWidth = 600; // TO DELETE
+
     setSize (dashWidth,
              dashWidth*6/7);
 }
@@ -90,11 +92,11 @@ void DashBoardInterface::resized()
 
     header->setBounds (area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL, MARGIN));
 
-    presetSelector->setBounds (area.removeFromBottom (10).withSizeKeepingCentre (160, 30));
+    presetSelector->setBounds (area.removeFromBottom (10).withSizeKeepingCentre (area.getWidth()/6, 30));
     hubComponent->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight())
                                  .translated (0, -10));
-    uploadButton->setBounds (area.withSize (area.getWidth()/7, area.getHeight()/2)
-                                 .withSizeKeepingCentre (area.getWidth()/5, HEADER_HEIGHT));
+    uploadButton->setBounds (area.withSize (jmax (100, area.getWidth()/7), area.getHeight()*6/10)
+                                 .withSizeKeepingCentre (jmax (100, area.getWidth()/7), HEADER_HEIGHT));
 }
 
 //==============================================================================

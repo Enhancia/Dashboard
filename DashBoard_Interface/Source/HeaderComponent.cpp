@@ -48,7 +48,9 @@ void HeaderComponent::resized()
 {
 	auto area = getLocalBounds().reduced (neova_dash::ui::MARGIN, 0);
 
-	batteryComponent->setBounds (area.removeFromRight (area.getWidth()/9));
+	batteryComponent->setBounds (area.removeFromRight (jmax (area.getWidth()/9, 88)));
+    DBG ("Battery Comp " << batteryComponent->getWidth()); // TO DELETE
+
     optionsButton->setBounds (area.removeFromLeft (40));
 }
 
