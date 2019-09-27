@@ -9,8 +9,8 @@
 */
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "DashBoardInterface.h"
-#include "DashCommon.h"
+#include "UI/DashBoardInterface.h"
+#include "Common/DashCommon.h"
 
 //==============================================================================
 class Neova_DashBoard_Interface  : public JUCEApplication
@@ -73,7 +73,7 @@ public:
         MainWindow (String name , DashBoardInterface* dashInterface)
             : DocumentWindow (name, Desktop::getInstance().getDefaultLookAndFeel()
                                                           .findColour (ResizableWindow::backgroundColourId),
-                                    DocumentWindow::allButtons/*DocumentWindow::minimiseButton + DocumentWindow::closeButton*/)
+                                    DocumentWindow::allButtons)
         {
             setUsingNativeTitleBar (true);
             setContentOwned (dashInterface, true);
