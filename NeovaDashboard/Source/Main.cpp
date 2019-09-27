@@ -11,9 +11,12 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "UI/DashBoardInterface.h"
 #include "Common/DashCommon.h"
+#include "DataReader/DataReader.h"
+#include "DataReader/dashPipe.h"
 
 //==============================================================================
-class Neova_DashBoard_Interface  : public JUCEApplication
+class Neova_DashBoard_Interface  :	public JUCEApplication,
+									private ChangeListener
 {
 public:
     //==============================================================================
@@ -45,6 +48,11 @@ public:
         commandManager.registerAllCommandsForTarget (this);
         commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
                                                         (mainWindow->getContentComponent()));
+		dataReader = std::make_unique<DataReader>();
+		dataReader->addChangeListener(this);
+
+		dashPipe = std::make_unique<DashPipe>();
+		dashPipe->addChangeListener(this);
     }
 
     void shutdown() override
@@ -54,6 +62,9 @@ public:
 
         Logger::setCurrentLogger (nullptr);
         dashboardLogger = nullptr;
+
+		dataReader = nullptr;
+		dashPipe = nullptr;
     }
 
     //==============================================================================
@@ -65,6 +76,14 @@ public:
     void anotherInstanceStarted (const String& commandLine) override
     {
     }
+
+	//==============================================================================
+	void changeListenerCallback(ChangeBroadcaster* source)
+	{
+		//updateAllValues();
+		DBG("reception\n");
+
+	}
 
     //==============================================================================
     class MainWindow    : public DocumentWindow
@@ -142,6 +161,12 @@ public:
                 return true;
 
             case uploadConfigToHub:
+
+				/* For testing */
+				memcpy(data, "jeannine", sizeof("jeannine"));
+				ctrl = 0x03;
+				memcpy(data + 8, &ctrl, sizeof(uint32_t));
+				dashPipe->sendString(data, 12);
                 return true;
 
             case upgradeHub:
@@ -163,7 +188,13 @@ private:
     std::unique_ptr<MainWindow> mainWindow;
     HubConfiguration hubConfig;
 
+	std::unique_ptr<DataReader> dataReader;
+	std::unique_ptr<DashPipe> dashPipe;
+
     ScopedPointer<FileLogger> dashboardLogger;
+
+	uint8_t data[1024];
+	uint32_t ctrl = 0x03;
 };
 
 //==============================================================================
