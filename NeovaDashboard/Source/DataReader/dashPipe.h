@@ -38,6 +38,7 @@ class DashPipe : public Component,
 {
 public:
     static constexpr int DATA_SIZE = 7;
+	static constexpr int DATABUFFERSIZE = 512;
     
     //==============================================================================
 	DashPipe();
@@ -50,6 +51,7 @@ public:
     //==============================================================================
     bool readData(String s);
     const String getRawData(int index);
+	void getDataBuffer(uint8_t * buffer, int bytesToRead);
     bool getRawDataAsFloatArray(Array<float>& arrayToFill);
 
 	//==============================================================================
@@ -70,7 +72,9 @@ private:
     //==============================================================================
     bool connected;
     int pipeNumber = -1;
-    
+	std::unique_ptr<uint8_t[]> dataBuffer;
+	
+
     ScopedPointer<StringArray> data;
     ScopedPointer<Label> connectedLabel;
 

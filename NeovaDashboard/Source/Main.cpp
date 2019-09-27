@@ -82,6 +82,18 @@ public:
 	{
 		//updateAllValues();
 		DBG("reception\n");
+		dashPipe->getDataBuffer(data, 512);
+		switch (*(uint32_t*)(data+8))
+		{
+			case 0x05:
+				DBG("preset_active_received\n");
+				hubConfig.setPreset(*(uint8_t*)(data+12)-1, false);
+				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+				break;
+			default:
+				break;
+		}
+
 
 	}
 
@@ -164,7 +176,7 @@ public:
 
 				/* For testing */
 				memcpy(data, "jeannine", sizeof("jeannine"));
-				ctrl = 0x03;
+				ctrl = 0x01;
 				memcpy(data + 8, &ctrl, sizeof(uint32_t));
 				dashPipe->sendString(data, 12);
                 return true;

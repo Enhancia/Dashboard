@@ -16,7 +16,8 @@ DashPipe::DashPipe(): InterprocessConnection (true, 0x6a6d626e)
     
     // Data initialization
     data = new StringArray (StringArray::fromTokens ("0 0 0 0 0 0 0", " ", String()));
-    
+	dataBuffer = std::make_unique<uint8_t[]>(DATABUFFERSIZE);
+
     #if JUCE_MAC
         statutPipe = std::make_unique<StatutPipe> ();
         statutPipe->addChangeListener(this);
@@ -70,6 +71,14 @@ bool DashPipe::readData (String s)
 const String DashPipe::getRawData (int index)
 {
     return (*data)[index];
+}
+
+void DashPipe::getDataBuffer(uint8_t * buffer, int bytesToRead)
+{
+	if (bytesToRead <= DATABUFFERSIZE)
+	{
+		memcpy(buffer, &dataBuffer, bytesToRead);
+	}
 }
 
 bool DashPipe::getRawDataAsFloatArray(Array<float>& arrayToFill)
@@ -149,16 +158,16 @@ void DashPipe::connectionLost()
 
 void DashPipe::messageReceived (const MemoryBlock &message)
 {
-	sendChangeMessage();	
-	/* For testing */
-	/*
-	uint8_t data[1024];
-	memcpy(data, "jeannine", sizeof("jeannine"));
-	uint32_t ctrl = 0x03;
-	memcpy(data + 8, &ctrl, sizeof(uint32_t));
-
-	sendString(data, 12);
-	*/
+	uint64_t jeannine = *(uint64_t*)message.getData();
+	if (jeannine == 0x656E696E6E61656A && message.getSize() < DATABUFFERSIZE)
+	{
+		memcpy(&dataBuffer, message.getData(), message.getSize());
+		sendChangeMessage();
+	}
+	else
+	{
+		Logger::writeToLog("Hub message : Error");
+	}
 }
 
 void DashPipe::changeListenerCallback (ChangeBroadcaster * source)

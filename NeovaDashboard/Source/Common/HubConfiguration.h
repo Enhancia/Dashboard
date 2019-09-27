@@ -104,6 +104,7 @@ public:
     
     //==============================================================================
     void setPreset (const int gestureNumberToSelect);
+	void setPreset(const int gestureNumberToSelect, bool uploadToHub);
     const int getSelectedPreset();
 
     PresetData& getPresetData (const int presetNumber);

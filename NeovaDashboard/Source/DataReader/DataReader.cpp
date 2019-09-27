@@ -72,6 +72,7 @@ const String DataReader::getRawData (int index)
     return (*data)[index];
 }
 
+
 bool DataReader::getRawDataAsFloatArray(Array<float>& arrayToFill)
 {
     // Checks that the array has the right amont and type of data
