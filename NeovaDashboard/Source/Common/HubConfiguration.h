@@ -19,7 +19,9 @@ class HubConfiguration
 {
 public:
     //==============================================================================
-    struct GestureData // values for each gesture
+	static constexpr int CONFIGSIZE = 516;
+	
+	struct GestureData // values for each gesture
     {
         GestureData() = default;
         GestureData (GestureData& other);
@@ -50,7 +52,8 @@ public:
 
     struct ConfigData
     {
-    	uint8 midiChannel = 0;
+		uint8 active_preset = 0; //Ne sert à rien pour l'instant juste pour s'aligner au buffer du zub
+		uint8 midiChannel = 0;
 
     	PresetData presetData0;
     	PresetData presetData1;
@@ -84,6 +87,11 @@ public:
 	~HubConfiguration();
 
     //==============================================================================
+
+	void setConfig(uint8_t * data);
+	
+	void getConfig(uint8_t * data, int buffer_size);
+
     void setMidiChannel (const uint8 newMidiChannel, bool uploadToHub = true);
 
     void setUint8Value (const int gestureNumber, const uint8DataId dataId,

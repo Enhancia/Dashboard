@@ -53,6 +53,12 @@ public:
 
 		dashPipe = std::make_unique<DashPipe>();
 		dashPipe->addChangeListener(this);
+
+		/* For testing */
+		memcpy(data, "jeannine", sizeof("jeannine"));
+		ctrl = 0x01;
+		memcpy(data + 8, &ctrl, sizeof(uint32_t));
+		dashPipe->sendString(data, 12);
     }
 
     void shutdown() override
@@ -82,9 +88,15 @@ public:
 	{
 		//updateAllValues();
 		DBG("reception\n");
-		dashPipe->getDataBuffer(data, 512);
+		dashPipe->getDataBuffer(data, 1024);
+		uint32_t test = 0;
 		switch (*(uint32_t*)(data+8))
 		{
+			case 0x02:
+				DBG("config received\n");
+				hubConfig.setConfig(data + 12);
+				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+				break;
 			case 0x05:
 				DBG("preset_active_received\n");
 				hubConfig.setPreset(*(uint8_t*)(data+12)-1, false);
@@ -170,15 +182,18 @@ public:
         switch (info.commandID)
         {
             case flashHub:
+				memcpy(data, "jeannine", sizeof("jeannine"));
+				ctrl = 0x04;
+				memcpy(data + 8, &ctrl, sizeof(uint32_t));
+				dashPipe->sendString(data, 12);
                 return true;
 
             case uploadConfigToHub:
-
-				/* For testing */
+				hubConfig.getConfig(data+12, sizeof(data)-12);
 				memcpy(data, "jeannine", sizeof("jeannine"));
-				ctrl = 0x01;
+				ctrl = 0x03;
 				memcpy(data + 8, &ctrl, sizeof(uint32_t));
-				dashPipe->sendString(data, 12);
+				dashPipe->sendString(data, 12 + hubConfig.CONFIGSIZE);
                 return true;
 
             case upgradeHub:

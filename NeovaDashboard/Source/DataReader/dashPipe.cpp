@@ -15,7 +15,7 @@ DashPipe::DashPipe(): InterprocessConnection (true, 0x6a6d626e)
     connected = false;
     
     // Data initialization
-    data = new StringArray (StringArray::fromTokens ("0 0 0 0 0 0 0", " ", String()));
+    //data = new StringArray (StringArray::fromTokens ("0 0 0 0 0 0 0", " ", String()));
 	dataBuffer = std::make_unique<uint8_t[]>(DATABUFFERSIZE);
 
     #if JUCE_MAC
@@ -35,7 +35,10 @@ DashPipe::DashPipe(): InterprocessConnection (true, 0x6a6d626e)
 
 DashPipe::~DashPipe()
 {
-    data = nullptr;
+	TRACE_IN;
+
+	data = nullptr;
+	//dataBuffer = nullptr;
     connectedLabel = nullptr;
   #if JUCE_MAC
     statutPipe = nullptr;
@@ -55,7 +58,7 @@ void DashPipe::resized()
 //==============================================================================
 bool DashPipe::readData (String s)
 {
-	auto strArr = StringArray::fromTokens(s, " ", String());
+	/*auto strArr = StringArray::fromTokens(s, " ", String());
 
     // Checks for full lines
     if (strArr.size() == DATA_SIZE)
@@ -64,13 +67,15 @@ bool DashPipe::readData (String s)
         *data = strArr;
         return true;
     }
-    
+    */
 	return false;
 }
 
 const String DashPipe::getRawData (int index)
 {
-    return (*data)[index];
+	String test = "test";
+	return test;
+	//return (*data)[index];
 }
 
 void DashPipe::getDataBuffer(uint8_t * buffer, int bytesToRead)
@@ -83,7 +88,8 @@ void DashPipe::getDataBuffer(uint8_t * buffer, int bytesToRead)
 
 bool DashPipe::getRawDataAsFloatArray(Array<float>& arrayToFill)
 {
-    // Checks that the array has the right amont and type of data
+   /*
+	// Checks that the array has the right amont and type of data
     if (arrayToFill.isEmpty() == false) return false;
     
     //DBG ("Data: " << data->joinIntoString(", "));
@@ -94,7 +100,7 @@ bool DashPipe::getRawDataAsFloatArray(Array<float>& arrayToFill)
         arrayToFill.add ((*data)[i].getFloatValue());
         //DBG ("Value " << i << " = " << arrayToFill[i]);
     }
-    
+    */
     return true;
 }
 //==============================================================================

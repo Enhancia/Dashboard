@@ -12,6 +12,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "../Common/DashCommon.h"
 
 #if JUCE_MAC
 #include "DataReader/StatutPipe.h"
@@ -38,7 +39,7 @@ class DashPipe : public Component,
 {
 public:
     static constexpr int DATA_SIZE = 7;
-	static constexpr int DATABUFFERSIZE = 512;
+	static constexpr int DATABUFFERSIZE = 1024;
     
     //==============================================================================
 	DashPipe();

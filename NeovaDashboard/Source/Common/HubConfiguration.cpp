@@ -18,6 +18,19 @@ HubConfiguration::~HubConfiguration()
 {
 }
 
+void HubConfiguration::setConfig(uint8_t * data)
+{
+	memcpy(&config, data, sizeof(ConfigData));	
+}
+
+void HubConfiguration::getConfig(uint8_t * data, int buffer_size)
+{
+	if (buffer_size >=  sizeof(ConfigData))
+	{
+		memcpy(data, &config, sizeof(ConfigData));
+	}
+}
+
 void HubConfiguration::setMidiChannel (const uint8 newMidiChannel, bool uploadToHub)
 {
 	config.midiChannel = newMidiChannel;

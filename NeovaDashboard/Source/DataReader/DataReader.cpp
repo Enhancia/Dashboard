@@ -34,7 +34,9 @@ DataReader::DataReader(): InterprocessConnection (true, 0x6a6d626e)
 
 DataReader::~DataReader()
 {
-    data = nullptr;
+	TRACE_IN;
+
+	data = nullptr;
     connectedLabel = nullptr;
   #if JUCE_MAC
     statutPipe = nullptr;
