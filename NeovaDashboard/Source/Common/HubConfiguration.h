@@ -26,6 +26,8 @@ public:
         GestureData() = default;
         GestureData (GestureData& other);
 
+		uint16 align_to_word; //to align the size of GestureData to a multiple of word
+
     	uint8 on = 1;
     	uint8 type = neova_dash::gesture::none;
     	uint8 midiLow = 0;
@@ -52,6 +54,8 @@ public:
 
     struct ConfigData
     {
+		uint16 align_to_word; //to align the size of ConfigData to a multiple of word
+
 		uint8 active_preset = 0; //Ne sert à rien pour l'instant juste pour s'aligner au buffer du zub
 		uint8 midiChannel = 0;
 

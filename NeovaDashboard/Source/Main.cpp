@@ -92,7 +92,7 @@ public:
 		uint32_t test = 0;
 		switch (*(uint32_t*)(data+8))
 		{
-			case 0x02:
+			case 0x03:
 				DBG("config received\n");
 				hubConfig.setConfig(data + 12);
 				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);

@@ -37,8 +37,8 @@ DashPipe::~DashPipe()
 {
 	TRACE_IN;
 
-	data = nullptr;
-	//dataBuffer = nullptr;
+	//data = nullptr;
+	dataBuffer = nullptr;
     connectedLabel = nullptr;
   #if JUCE_MAC
     statutPipe = nullptr;

@@ -76,7 +76,7 @@ private:
 	std::unique_ptr<uint8_t[]> dataBuffer;
 	
 
-    ScopedPointer<StringArray> data;
+    //ScopedPointer<StringArray> data;
     ScopedPointer<Label> connectedLabel;
 
 	#if JUCE_MAC
