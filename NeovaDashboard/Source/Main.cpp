@@ -13,6 +13,9 @@
 #include "Common/DashCommon.h"
 #include "DataReader/DataReader.h"
 #include "DataReader/dashPipe.h"
+#include <windows.h>
+#include <stdio.h>
+#include <tchar.h>
 
 //==============================================================================
 class Neova_DashBoard_Interface  :	public JUCEApplication,
@@ -42,8 +45,8 @@ public:
     
         Logger::setCurrentLogger (dashboardLogger);
 
-        interface.reset (new DashBoardInterface (hubConfig));
-        mainWindow.reset (new MainWindow (getApplicationName(), interface.get()));
+        interface1.reset (new DashBoardInterface (hubConfig));
+        mainWindow.reset (new MainWindow (getApplicationName(), interface1.get()));
 
         commandManager.registerAllCommandsForTarget (this);
         commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
@@ -63,7 +66,7 @@ public:
 
     void shutdown() override
     {
-        interface = nullptr;
+        interface1 = nullptr;
         mainWindow = nullptr;
 
         Logger::setCurrentLogger (nullptr);
@@ -115,7 +118,40 @@ public:
 				break;
 			}
 		}
+	}
 
+	void launch_nrfutil()
+	{
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+
+		ZeroMemory(&si, sizeof(si));
+		si.cb = sizeof(si);
+		ZeroMemory(&pi, sizeof(pi));
+
+
+		// Start the child process. 
+		if (!CreateProcess((LPCSTR)"nrfutil.exe",   // No module name (use command line)
+			"" ,        // Command line
+			NULL,           // Process handle not inheritable
+			NULL,           // Thread handle not inheritable
+			FALSE,          // Set handle inheritance to FALSE
+			CREATE_NO_WINDOW,              // No creation flags
+			NULL,           // Use parent's environment block
+			NULL,           // Use parent's starting directory 
+			&si,            // Pointer to STARTUPINFO structure
+			&pi)           // Pointer to PROCESS_INFORMATION structure
+			)
+		{
+			Logger::writeToLog("CreateProcess failed (%d).\n" + String(GetLastError()));
+			return;
+		}
+
+		// Wait until child process exits.
+		WaitForSingleObject(pi.hProcess, INFINITE);
+		// Close process and thread handles. 
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
 	}
 
     //==============================================================================
@@ -191,20 +227,23 @@ public:
         switch (info.commandID)
         {
             case flashHub:
+				
 				memcpy(data, "jeannine", sizeof("jeannine"));
 				ctrl = 0x04;
 				memcpy(data + 8, &ctrl, sizeof(uint32_t));
 				dashPipe->sendString(data, 12);
-                return true;
+				return true;
             case uploadConfigToHub:
+
 				hubConfig.getConfig(data+12, sizeof(data)-12);
 				memcpy(data, "jeannine", sizeof("jeannine"));
 				ctrl = 0x03;
 				memcpy(data + 8, &ctrl, sizeof(uint32_t));
 				dashPipe->sendString(data, 12 + hubConfig.CONFIGSIZE);
-                return true;
+				return true;
 
             case upgradeHub:
+				launch_nrfutil();
                 return true;
 
             case upgradeRing:
@@ -217,7 +256,7 @@ public:
 
     //==============================================================================
     ApplicationCommandManager commandManager;
-    std::unique_ptr<DashBoardInterface> interface;
+    std::unique_ptr<DashBoardInterface> interface1;
 
 private:
     std::unique_ptr<MainWindow> mainWindow;
