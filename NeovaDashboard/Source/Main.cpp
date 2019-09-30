@@ -86,12 +86,14 @@ public:
 	//==============================================================================
 	void changeListenerCallback(ChangeBroadcaster* source)
 	{
-		//updateAllValues();
-		DBG("reception\n");
-		dashPipe->getDataBuffer(data, 1024);
-		uint32_t test = 0;
-		switch (*(uint32_t*)(data+8))
+		if (source == dashPipe.get())
 		{
+			//updateAllValues();
+			DBG("reception\n");
+			dashPipe->getDataBuffer(data, 1024);
+			uint32_t test = *(uint32_t*)(data + 8);
+			switch (test)
+			{
 			case 0x03:
 				DBG("config received\n");
 				hubConfig.setConfig(data + 12);
@@ -99,13 +101,20 @@ public:
 				break;
 			case 0x05:
 				DBG("preset_active_received\n");
-				hubConfig.setPreset(*(uint8_t*)(data+12)-1, false);
+				hubConfig.setPreset(*(uint8_t*)(data + 12) - 1, false);
 				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+				break;
+
+			case 127:
+				memcpy(data, "jeannine", sizeof("jeannine"));
+				ctrl = 0x01;
+				memcpy(data + 8, &ctrl, sizeof(uint32_t));
+				dashPipe->sendString(data, 12);
 				break;
 			default:
 				break;
+			}
 		}
-
 
 	}
 
@@ -187,7 +196,6 @@ public:
 				memcpy(data + 8, &ctrl, sizeof(uint32_t));
 				dashPipe->sendString(data, 12);
                 return true;
-
             case uploadConfigToHub:
 				hubConfig.getConfig(data+12, sizeof(data)-12);
 				memcpy(data, "jeannine", sizeof("jeannine"));

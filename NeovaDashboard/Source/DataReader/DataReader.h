@@ -70,7 +70,6 @@ private:
     int pipeNumber = -1;
     
     ScopedPointer<StringArray> data;
-    ScopedPointer<Label> connectedLabel;
 
 	#if JUCE_MAC
     std::unique_ptr<StatutPipe> statutPipe;

@@ -73,11 +73,10 @@ private:
     //==============================================================================
     bool connected;
     int pipeNumber = -1;
-	std::unique_ptr<uint8_t[]> dataBuffer;
+	//std::unique_ptr<uint8_t[]> dataBuffer;
 	
-
+	uint8_t dataBuffer[1024];
     //ScopedPointer<StringArray> data;
-    ScopedPointer<Label> connectedLabel;
 
 	#if JUCE_MAC
     std::unique_ptr<StatutPipe> statutPipe;

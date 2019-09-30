@@ -25,11 +25,6 @@ DataReader::DataReader(): InterprocessConnection (true, 0x6a6d626e)
         connectToExistingPipe();
     #endif
     
-    // Label creation
-    addAndMakeVisible (connectedLabel = new Label ("connectedLabel", TRANS ("Disconnected")));
-    connectedLabel->setColour (Label::textColourId, Colour (0xaaff0000));
-    connectedLabel->setColour (Label::backgroundColourId, Colour (0x00000000));
-    connectedLabel->setBounds (10, 5, 100, 40);
 }
 
 DataReader::~DataReader()
@@ -37,7 +32,6 @@ DataReader::~DataReader()
 	TRACE_IN;
 
 	data = nullptr;
-    connectedLabel = nullptr;
   #if JUCE_MAC
     statutPipe = nullptr;
   #endif
@@ -127,9 +121,6 @@ void DataReader::connectionMade()
         String test = "Start";
         sendMessage(MemoryBlock(test.toUTF8(), test.getNumBytesAsUTF8()));
     #endif
-    
-    connectedLabel->setColour (Label::textColourId, Colour (0xaa00ff00));
-    connectedLabel->setText (TRANS ("<Connected>" /* : pipe " + String(pipeNumber)*/), dontSendNotification);
 }
 
 void DataReader::connectionLost()
@@ -140,9 +131,7 @@ void DataReader::connectionLost()
         String test = "Stop";
         sendMessage(MemoryBlock(test.toUTF8(), test.getNumBytesAsUTF8()));
     #endif
-    
-    connectedLabel->setColour (Label::textColourId, Colour (0xaaff0000));
-    connectedLabel->setText (TRANS ("Disconnected"), dontSendNotification);
+
 }
 
 void DataReader::messageReceived (const MemoryBlock &message)

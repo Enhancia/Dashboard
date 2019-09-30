@@ -16,7 +16,7 @@ DashPipe::DashPipe(): InterprocessConnection (true, 0x6a6d626e)
     
     // Data initialization
     //data = new StringArray (StringArray::fromTokens ("0 0 0 0 0 0 0", " ", String()));
-	dataBuffer = std::make_unique<uint8_t[]>(DATABUFFERSIZE);
+	//dataBuffer = std::make_unique<uint8_t[]>(DATABUFFERSIZE);
 
     #if JUCE_MAC
         statutPipe = std::make_unique<StatutPipe> ();
@@ -25,12 +25,6 @@ DashPipe::DashPipe(): InterprocessConnection (true, 0x6a6d626e)
         // Pipe creation
         connectToExistingPipe();
     #endif
-    
-    // Label creation
-    addAndMakeVisible (connectedLabel = new Label ("connectedLabel", TRANS ("Disconnected")));
-    connectedLabel->setColour (Label::textColourId, Colour (0xaaff0000));
-    connectedLabel->setColour (Label::backgroundColourId, Colour (0x00000000));
-    connectedLabel->setBounds (10, 5, 100, 40);
 }
 
 DashPipe::~DashPipe()
@@ -38,8 +32,7 @@ DashPipe::~DashPipe()
 	TRACE_IN;
 
 	//data = nullptr;
-	dataBuffer = nullptr;
-    connectedLabel = nullptr;
+	//dataBuffer = nullptr;
   #if JUCE_MAC
     statutPipe = nullptr;
   #endif
@@ -48,11 +41,13 @@ DashPipe::~DashPipe()
 //==============================================================================
 void DashPipe::paint (Graphics& g)
 {
-    g.fillAll (Colour (0x42000000));
+	TRACE_IN;
+	g.fillAll (Colour (0x42000000));
 }
 
 void DashPipe::resized()
 {
+	TRACE_IN;
 }
 
 //==============================================================================
@@ -68,11 +63,13 @@ bool DashPipe::readData (String s)
         return true;
     }
     */
+	TRACE_IN;
 	return false;
 }
 
 const String DashPipe::getRawData (int index)
 {
+	TRACE_IN;
 	String test = "test";
 	return test;
 	//return (*data)[index];
@@ -80,15 +77,17 @@ const String DashPipe::getRawData (int index)
 
 void DashPipe::getDataBuffer(uint8_t * buffer, int bytesToRead)
 {
+	TRACE_IN;
 	if (bytesToRead <= DATABUFFERSIZE)
 	{
-		memcpy(buffer, &dataBuffer, bytesToRead);
+		memcpy(buffer, dataBuffer, bytesToRead);
 	}
 }
 
 bool DashPipe::getRawDataAsFloatArray(Array<float>& arrayToFill)
 {
-   /*
+	TRACE_IN;
+	/*
 	// Checks that the array has the right amont and type of data
     if (arrayToFill.isEmpty() == false) return false;
     
@@ -106,18 +105,22 @@ bool DashPipe::getRawDataAsFloatArray(Array<float>& arrayToFill)
 //==============================================================================
 void  DashPipe::sendString(uint8_t * data, int data_size)
 {
+	TRACE_IN;
 	sendMessage(MemoryBlock(data, data_size));
 }
 
 //==============================================================================
 bool DashPipe::connectToExistingPipe()
 {
+	TRACE_IN;
 	return connectToPipe ("dashpipe", -1);
 }
 
 bool DashPipe::connectToExistingPipe(int nbPipe)
 {
-    //only happens on MacOS
+	TRACE_IN;
+
+	//only happens on MacOS
   #if JUCE_MAC
     //get current userID
     uid_t currentUID;
@@ -132,42 +135,42 @@ bool DashPipe::connectToExistingPipe(int nbPipe)
 
 bool DashPipe::isConnected()
 {
-    return connected;
+	TRACE_IN;
+	return connected;
 }
 
 //==============================================================================
 void DashPipe::connectionMade()
 {
-    connected = true;
+	TRACE_IN;
+	connected = true;
     
     #if JUCE_MAC
         String test = "Start";
         sendMessage(MemoryBlock(test.toUTF8(), test.getNumBytesAsUTF8()));
     #endif
     
-    connectedLabel->setColour (Label::textColourId, Colour (0xaa00ff00));
-    connectedLabel->setText (TRANS ("<Connected>" /* : pipe " + String(pipeNumber)*/), dontSendNotification);
 }
 
 void DashPipe::connectionLost()
 {
-    connected = false;
+	TRACE_IN;
+	connected = false;
     
     #if JUCE_MAC
         String test = "Stop";
         sendMessage(MemoryBlock(test.toUTF8(), test.getNumBytesAsUTF8()));
     #endif
     
-    connectedLabel->setColour (Label::textColourId, Colour (0xaaff0000));
-    connectedLabel->setText (TRANS ("Disconnected"), dontSendNotification);
 }
 
 void DashPipe::messageReceived (const MemoryBlock &message)
 {
+	TRACE_IN;
 	uint64_t jeannine = *(uint64_t*)message.getData();
 	if (jeannine == 0x656E696E6E61656A && message.getSize() < DATABUFFERSIZE)
 	{
-		memcpy(&dataBuffer, message.getData(), message.getSize());
+		memcpy(dataBuffer, message.getData(), message.getSize());
 		sendChangeMessage();
 	}
 	else
@@ -178,7 +181,8 @@ void DashPipe::messageReceived (const MemoryBlock &message)
 
 void DashPipe::changeListenerCallback (ChangeBroadcaster * source)
 {
-    //only happens on MacOS
+	TRACE_IN;
+	//only happens on MacOS
   #if JUCE_MAC
     int nbPipeToConnect = statutPipe->getPipeToConnect();
     connectToExistingPipe(nbPipeToConnect);
