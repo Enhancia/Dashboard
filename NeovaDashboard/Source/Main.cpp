@@ -101,7 +101,7 @@ public:
 				break;
 			case 0x05:
 				DBG("preset_active_received\n");
-				hubConfig.setPreset(*(uint8_t*)(data + 12) - 1, false);
+				hubConfig.setPreset(*(uint8_t*)(data + 12), false);
 				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
 				break;
 

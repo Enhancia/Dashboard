@@ -20,25 +20,8 @@ HubConfiguration::~HubConfiguration()
 
 void HubConfiguration::setConfig(uint8_t * data)
 {
-	/*
-	config.align_to_word = *(uint16_t *)data;
-	config.active_preset = *(uint8_t *)(data+2);
-	config.midiChannel = *(uint8_t *)(data + 3);
-	config.presetData0.gestureData0.align_to_word = *(uint16_t *)(data + 4);
-	config.presetData0.gestureData0.on = *(uint8_t *)(data + 6);
-	config.presetData0.gestureData0.type = *(uint8_t *)(data + 7);
-	config.presetData0.gestureData0.midiLow = *(uint8_t *)(data + 8);
-	config.presetData0.gestureData0.midiHigh = *(uint8_t *)(data + 9);
-	config.presetData0.gestureData0.cc = *(uint8_t *)(data + 10);
-	config.presetData0.gestureData0.midiType = *(uint8_t *)(data + 11);
-	config.presetData0.gestureData0.gestureParam0 = *(float *)(data + 12);
-	config.presetData0.gestureData0.gestureParam1 = *(float *)(data + 16);
-	config.presetData0.gestureData0.gestureParam2 = *(float *)(data + 20);
-	config.presetData0.gestureData0.gestureParam3 = *(float *)(data + 24);
-	config.presetData0.gestureData0.gestureParam4 = *(float *)(data + 28);
-	config.presetData0.gestureData0.gestureParam5 = *(float *)(data + 32);
-	*/
 	memcpy(&config, data, sizeof(ConfigData));	
+	setPreset(config.active_preset);
 }
 
 void HubConfiguration::getConfig(uint8_t * data, int buffer_size)
@@ -156,6 +139,7 @@ void HubConfiguration::setPreset (const int gestureNumberToSelect)
 
 	selectedPreset = gestureNumberToSelect;
 	selectFirstExistingGesture();
+	config.active_preset = gestureNumberToSelect;
 	
 	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);	
 }
@@ -166,6 +150,7 @@ void HubConfiguration::setPreset(const int gestureNumberToSelect, bool uploadToH
 
 	selectedPreset = gestureNumberToSelect;
 	selectFirstExistingGesture();
+	config.active_preset = gestureNumberToSelect;
 
 	if (uploadToHub)
 	{
