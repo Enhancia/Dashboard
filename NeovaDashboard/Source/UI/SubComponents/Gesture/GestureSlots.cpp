@@ -26,6 +26,7 @@ GestureComponent::GestureComponent (HubConfiguration& hubCfg, ApplicationCommand
 {
     createLabel();
     createButton();
+	selected = hubConfig.getSelectedGesture() == id;
 }
 
 GestureComponent::~GestureComponent()

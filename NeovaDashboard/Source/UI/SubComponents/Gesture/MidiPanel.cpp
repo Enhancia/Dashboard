@@ -17,6 +17,14 @@ MidiPanel::MidiPanel (HubConfiguration& config, const int gestId)
     createLabels();
 
     addAndMakeVisible (midiRangeTuner = new MidiRangeTuner (hubConfig, id));
+
+    if (hubConfig.getGestureData (id).type == neova_dash::gesture::vibrato ||
+        hubConfig.getGestureData (id).type == neova_dash::gesture::pitchBend ||
+        hubConfig.getGestureData (id).type == neova_dash::gesture::none)
+    {
+        midiRangeTuner->setInterceptsMouseClicks (false, false);
+        midiRangeTuner->setAlpha (0.3f);
+    }
 }
 
 MidiPanel::~MidiPanel()

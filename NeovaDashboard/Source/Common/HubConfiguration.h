@@ -117,6 +117,7 @@ public:
     bool isGestureActive (const int gestureNumber);
 
     void setSelectedGesture (const int gestureToSelect);
+    void selectFirstExistingGesture();
     const int getSelectedGesture();
 
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber, const int presetNumber);
@@ -151,7 +152,6 @@ private:
 
     int findClosestIdToDuplicate (int idToDuplicateFrom, bool prioritizeHigherId);
     bool isIdAvailable (const int idToCheck);
-    void selectFirstExistingGesture();
 
     //==============================================================================
 	ApplicationCommandManager& commandManager = getCommandManager();

@@ -485,18 +485,21 @@ void GesturePanel::removeGestureAndGestureComponent (int gestureId)
     if (gestureId < 0 || gestureId > neova_dash::gesture::NUM_GEST) return;
     stopTimer();
 
+    hubConfig.setDefaultGestureValues (gestureId, neova_dash::gesture::none);
+
     if (gestureId == hubConfig.getSelectedGesture())
     {
-        unselectCurrentGesture();
-        gestureSettings.reset (new GestureSettingsComponent (neova_dash::gesture::NUM_GEST + 1,
+        //unselectCurrentGesture();
+        hubConfig.selectFirstExistingGesture();
+        gestureSettings.reset (new GestureSettingsComponent (hubConfig.getSelectedGesture(),
                                                              hubConfig, commandManager));
         addAndMakeVisible (*gestureSettings);
         resized();
     }
 
-    hubConfig.setDefaultGestureValues (gestureId, neova_dash::gesture::none);
     commandManager.invokeDirectly (neova_dash::commands::updateInterfaceLEDs, true);
-    updateSlotIfNeeded (gestureId);
+    updateGestureSlots();
+	//gestureSlots[hubConfig.getSelectedGesture()]->repaint();
 
     if (!isTimerRunning()) startTimerHz (freq);
 }
