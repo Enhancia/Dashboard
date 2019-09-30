@@ -55,6 +55,7 @@ public:
 private:
     //==============================================================================
     static void alertPanelCallback (int modalResult, DashBoardInterface* interface);
+    void paintShadows (Graphics& g);
 
     //==============================================================================
     std::unique_ptr<HeaderComponent> header;
@@ -67,6 +68,7 @@ private:
     std::unique_ptr<DashAlertPanel> alertPanel;
 
     DashBoardLookAndFeel dashBoardLookAndFeel;
+    DropShadowEffect shadowEffect;
     
     //==============================================================================
     HubConfiguration& hubConfig;

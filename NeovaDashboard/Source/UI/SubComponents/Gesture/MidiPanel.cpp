@@ -483,20 +483,20 @@ void MidiRangeTuner::updateHighlightColour()
 
 void MidiRangeTuner::setRangeLow (float val, bool uploadToHub)
 {
-	hubConfig.setUint8Value (id, HubConfiguration::midiLow, midiRange.convertFrom0to1 (val), uploadToHub);
+	hubConfig.setUint8Value (id, HubConfiguration::midiLow, uint8 (midiRange.convertFrom0to1 (val)), uploadToHub);
 }
 void MidiRangeTuner::setRangeHigh (float val, bool uploadToHub)
 {
-	hubConfig.setUint8Value (id, HubConfiguration::midiHigh, midiRange.convertFrom0to1 (val), uploadToHub);
+	hubConfig.setUint8Value (id, HubConfiguration::midiHigh, uint8 (midiRange.convertFrom0to1 (val)), uploadToHub);
 }
 
 float MidiRangeTuner::getRangeLow()
 {
-    return midiRange.convertTo0to1 (hubConfig.getGestureData (id).midiLow);
+    return midiRange.convertTo0to1 (float (hubConfig.getGestureData (id).midiLow));
 }
 float MidiRangeTuner::getRangeHigh()
 {
-    return midiRange.convertTo0to1 (hubConfig.getGestureData (id).midiHigh);
+    return midiRange.convertTo0to1 (float (hubConfig.getGestureData (id).midiHigh));
 }
 
 void MidiRangeTuner::createLabels()

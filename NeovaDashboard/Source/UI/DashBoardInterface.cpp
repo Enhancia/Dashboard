@@ -53,7 +53,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     int dashWidth = jmin (screenArea.getHeight()*63/60, // screenH * 9/10 * AspectRatio^-1 (= 7/6)
                           screenArea.getWidth()*3/4);
 
-    dashWidth = 650; // TO DELETE
+    //dashWidth = 950; // TO DELETE
 
     setSize (dashWidth,
              dashWidth*6/7);
@@ -76,6 +76,24 @@ DashBoardInterface::~DashBoardInterface()
 void DashBoardInterface::paint (Graphics& g)
 {
 	g.drawImage (backgroundImage, getLocalBounds().toFloat());
+
+    paintShadows (g);
+}
+
+void DashBoardInterface::paintShadows (Graphics& g)
+{
+    Path shadowPath;
+
+    // Header Shadow
+    {
+        auto headerShadowBounds = header->getBounds();
+    }
+
+    // Upload Button Shadow
+    {
+        auto uploadShadowBounds = uploadButton->getBounds();
+    }
+
 }
 
 void DashBoardInterface::resized()
