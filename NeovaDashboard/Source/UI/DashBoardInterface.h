@@ -36,10 +36,11 @@ public:
     void resized() override;
 
     //==============================================================================
-    void mouseEnter (const MouseEvent&);
-    void mouseExit (const MouseEvent&);
-    void mouseUp (const MouseEvent&);
-    void modifierKeysChanged (const ModifierKeys&);
+    void mouseEnter (const MouseEvent&) override;
+    void mouseExit (const MouseEvent&) override;
+    void mouseUp (const MouseEvent&) override;
+    void modifierKeysChanged (const ModifierKeys&) override;
+    bool keyPressed (const KeyPress& key) override;
 
     //==============================================================================
     ApplicationCommandTarget* getNextCommandTarget() override;

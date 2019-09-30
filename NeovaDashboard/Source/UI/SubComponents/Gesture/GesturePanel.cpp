@@ -55,18 +55,53 @@ void GesturePanel::update()
     }
 
     stopTimer();
-    initialiseGestureSlots();
+    updateGestureSlots();
 
     gestureSettings.reset (new GestureSettingsComponent (hubConfig.getSelectedGesture(), hubConfig, commandManager));
     addAndMakeVisible (*gestureSettings);
     
     resized();
+    /*
+    if (draggedGestureComponentId != -1 && draggedOverSlotId != draggedGestureComponentId)
+    {
+        repaint (gestureSlots[draggedGestureComponentId]->getBounds().expanded (13));
+        repaint (gestureSlots[draggedOverSlotId]->getBounds().expanded (13));
+    }*/
     startTimerHz (freq);
 }
 
 //==============================================================================
-void GesturePanel::paint (Graphics&)
+void GesturePanel::paint (Graphics& g)
 {
+    paintShadows (g);
+}
+
+
+void GesturePanel::paintShadows (Graphics& g)
+{
+    Path shadowPath;
+
+    {
+        // Gesture Settings
+        auto gestureSettingsArea = gestureSettings->getBounds();
+
+        shadowPath.addRoundedRectangle (gestureSettingsArea.toFloat(), 10.0f);
+    }
+    {
+        // Gesture Components
+        auto gestureSettingsArea = gestureSettings->getBounds();
+
+        for (int slot=0; slot < neova_dash::gesture::NUM_GEST; slot++)
+        {
+            if (auto* gestureComp = dynamic_cast<GestureComponent*> (gestureSlots[slot]))
+            {
+                shadowPath.addRoundedRectangle (gestureComp->getBounds().toFloat(), 10.0f);
+            }
+        }
+    }
+
+    DropShadow shadow (Colour (0x40000000), 10, {2, 3});
+    shadow.drawForPath (g, shadowPath);
 }
 
 void GesturePanel::paintOverChildren (Graphics&)
@@ -284,11 +319,22 @@ void GesturePanel::updateGestureSlots()
 
         if (hubConfig.getGestureData (i).type != uint8 (neova_dash::gesture::none))
         {
+            if (auto* emptySlot = dynamic_cast<EmptyGestureSlotComponent*> (gestureSlots[i]))
+            {
+                repaint (gestureSlots[i]->getBounds().expanded (13));
+            }
+
             gestureSlots.set (i, new GestureComponent (hubConfig, commandManager, i,
                                                        dragMode, draggedGestureComponentId, draggedOverSlotId));
+            
         }
         else
         {
+            if (auto* gestureComp = dynamic_cast<GestureComponent*> (gestureSlots[i]))
+            {
+                repaint (gestureSlots[i]->getBounds().expanded (13));
+            }
+
             gestureSlots.set (i, new EmptyGestureSlotComponent (hubConfig, i,
                                                                 dragMode, draggedGestureComponentId,
                                                                           draggedOverSlotId));

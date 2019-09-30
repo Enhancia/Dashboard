@@ -275,7 +275,7 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
     if (highlighted)
     {
         g.setColour (neova_dash::colour::emptySlotBackground);
-        g.fillRoundedRectangle (getLocalBounds().toFloat(), 10.0f);
+        g.fillRoundedRectangle (getLocalBounds().reduced (1).toFloat(), 10.0f);
     }
 
     if (dragMode && draggedGesture != id && draggedOverSlot == id)
@@ -291,6 +291,17 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
 
     // Plus Icon
     g.strokePath (plusIcon, {2.0f, PathStrokeType::mitered, PathStrokeType::rounded});
+
+    // Shadow
+    Path shadowPath;
+    shadowPath.addRectangle (getLocalBounds().expanded (3));
+    shadowPath.addRoundedRectangle (getLocalBounds().reduced (5).toFloat(), 6.0f);
+    shadowPath.setUsingNonZeroWinding (false);
+
+    g.saveState();
+    g.reduceClipRegion (outline);
+    DropShadow (Colour (0x40000000), 15, {0, 0}).drawForPath (g, shadowPath);
+    g.restoreState();
     
     // Outline
     if (dragMode && draggedGesture != id && draggedOverSlot == id)
@@ -298,10 +309,9 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
         g.setColour (neova_dash::gesture::getHighlightColour
                         (hubConfig.getGestureData (draggedGesture).type,
                          hubConfig.isGestureActive (draggedGesture)));
-		g.drawRoundedRectangle(getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 3.0f);
+		g.strokePath(outline, PathStrokeType(3.0f));
     }
-
-    else //if (highlighted)
+    else
     {
         g.setColour (neova_dash::colour::emptySlotOutline);
         PathStrokeType outlineStroke (1.0f, PathStrokeType::mitered, PathStrokeType::butt);

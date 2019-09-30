@@ -53,7 +53,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     int dashWidth = jmin (screenArea.getHeight()*63/60, // screenH * 9/10 * AspectRatio^-1 (= 7/6)
                           screenArea.getWidth()*3/4);
 
-    //dashWidth = 950; // TO DELETE
+    dashWidth = 850; // TO DELETE
 
     setSize (dashWidth,
              dashWidth*6/7);
@@ -87,13 +87,21 @@ void DashBoardInterface::paintShadows (Graphics& g)
     // Header Shadow
     {
         auto headerShadowBounds = header->getBounds();
+
+        shadowPath.addRoundedRectangle (headerShadowBounds.toFloat(), 3.0f);
     }
 
     // Upload Button Shadow
     {
-        auto uploadShadowBounds = uploadButton->getBounds();
+        auto uploadShadowBounds = uploadButton->getBounds().reduced (neova_dash::ui::MARGIN)
+                                                           .withLeft (getX()-10);
+        if (uploadButton->isDown()) uploadShadowBounds = uploadShadowBounds.withTrimmedRight (1);
+
+        shadowPath.addRoundedRectangle (uploadShadowBounds.toFloat(), 8.0f);
     }
 
+    DropShadow shadow (Colour (0x40000000), 10, {2, 3});
+    shadow.drawForPath (g, shadowPath);
 }
 
 void DashBoardInterface::resized()
@@ -165,6 +173,16 @@ void DashBoardInterface::modifierKeysChanged (const ModifierKeys& modifiers)
     }
 
     commandKeyDown = modifiers.isCommandDown();
+}
+
+bool DashBoardInterface::keyPressed (const KeyPress& key)
+{
+    if (key == KeyPress ('s', ModifierKeys (ModifierKeys::commandModifier), 's'))
+    {
+        uploadButton->triggerClick();
+    }
+
+    return false;
 }
 
 //==============================================================================
