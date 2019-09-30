@@ -42,7 +42,14 @@ void GestureSettingsComponent::paint (Graphics& g)
 
     //Advanced Settings text
     g.setColour (neova_dash::colour::subText);
-    g.setFont (neova_dash::font::dashFontLight.withHeight (11.0f));
+    const int advTextAreaWidth = getHeight()/3 - MARGIN;
+    const int stringWidth = neova_dash::font::dashFontLight.withHeight (11.0f)
+                                                           .getStringWidth ("ADVANCED PANEL");
+
+    float advTextHeight = advTextAreaWidth > stringWidth ? 11.0f
+                                                         : 11.0f*advTextAreaWidth/stringWidth;
+
+    g.setFont (neova_dash::font::dashFontLight.withHeight (advTextHeight));
     g.drawText ("ADVANCED PANEL",
                 headerArea.removeFromLeft (getWidth()/3)
                           .reduced (0, MARGIN_SMALL)

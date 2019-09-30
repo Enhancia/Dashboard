@@ -94,6 +94,20 @@ void GestureComponent::resized()
     auto headerArea = getLocalBounds().removeFromTop (30);
 
     gestureNameLabel->setBounds (headerArea.withSizeKeepingCentre (getWidth()*2/3, 25));
+    const int stringWidth = gestureNameLabel->getFont().getStringWidth (gestureNameLabel->getText());
+
+    if (stringWidth/2 > getWidth()/2-30)
+    {
+        gestureNameLabel->setBounds (gestureNameLabel->getBounds()
+                                                      .translated (-(gestureNameLabel->getRight()-getWidth()+30), 0));
+    }
+
+    if (gestureNameLabel->getWidth() < stringWidth)
+    {
+        gestureNameLabel->setFont (gestureNameLabel->getFont().getHeight()
+                                        *gestureNameLabel->getWidth()/stringWidth);
+    }
+
     muteButton->setBounds (headerArea.removeFromRight (30 + neova_dash::ui::MARGIN)
                                      .withSizeKeepingCentre (18, 18));
 }
