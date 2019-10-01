@@ -18,6 +18,20 @@ HubConfiguration::~HubConfiguration()
 {
 }
 
+void HubConfiguration::setConfig(uint8_t * data)
+{
+	memcpy(&config, data, sizeof(ConfigData));	
+	setPreset(config.active_preset);
+}
+
+void HubConfiguration::getConfig(uint8_t * data, int buffer_size)
+{
+	if (buffer_size >=  sizeof(ConfigData))
+	{
+		memcpy(data, &config, sizeof(ConfigData));
+	}
+}
+
 void HubConfiguration::setMidiChannel (const uint8 newMidiChannel, bool uploadToHub)
 {
 	config.midiChannel = newMidiChannel;
@@ -125,8 +139,23 @@ void HubConfiguration::setPreset (const int gestureNumberToSelect)
 
 	selectedPreset = gestureNumberToSelect;
 	selectFirstExistingGesture();
+	config.active_preset = gestureNumberToSelect;
 	
 	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);	
+}
+
+void HubConfiguration::setPreset(const int gestureNumberToSelect, bool uploadToHub)
+{
+	if (gestureNumberToSelect < 0 || gestureNumberToSelect > 4 || gestureNumberToSelect == selectedPreset) return;
+
+	selectedPreset = gestureNumberToSelect;
+	selectFirstExistingGesture();
+	config.active_preset = gestureNumberToSelect;
+
+	if (uploadToHub)
+	{
+		commandManager.invokeDirectly(neova_dash::commands::uploadConfigToHub, true);
+	}
 }
 
 const int HubConfiguration::getSelectedPreset()

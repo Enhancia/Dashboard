@@ -11,9 +11,15 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "UI/DashBoardInterface.h"
 #include "Common/DashCommon.h"
+#include "DataReader/DataReader.h"
+#include "DataReader/dashPipe.h"
+#include <windows.h>
+#include <stdio.h>
+#include <tchar.h>
 
 //==============================================================================
-class Neova_DashBoard_Interface  : public JUCEApplication
+class Neova_DashBoard_Interface  :	public JUCEApplication,
+									private ChangeListener
 {
 public:
     //==============================================================================
@@ -39,21 +45,36 @@ public:
     
         Logger::setCurrentLogger (dashboardLogger);
 
-        interface.reset (new DashBoardInterface (hubConfig));
-        mainWindow.reset (new MainWindow (getApplicationName(), interface.get()));
+        interface1.reset (new DashBoardInterface (hubConfig));
+        mainWindow.reset (new MainWindow (getApplicationName(), interface1.get()));
+        interface1->grabKeyboardFocus();
 
         commandManager.registerAllCommandsForTarget (this);
         commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
                                                         (mainWindow->getContentComponent()));
+		dataReader = std::make_unique<DataReader>();
+		dataReader->addChangeListener(this);
+
+		dashPipe = std::make_unique<DashPipe>();
+		dashPipe->addChangeListener(this);
+
+		/* For testing */
+		memcpy(data, "jeannine", sizeof("jeannine"));
+		ctrl = 0x01;
+		memcpy(data + 8, &ctrl, sizeof(uint32_t));
+		dashPipe->sendString(data, 12);
     }
 
     void shutdown() override
     {
-        interface = nullptr;
+        interface1 = nullptr;
         mainWindow = nullptr;
 
         Logger::setCurrentLogger (nullptr);
         dashboardLogger = nullptr;
+
+		dataReader = nullptr;
+		dashPipe = nullptr;
     }
 
     //==============================================================================
@@ -65,6 +86,78 @@ public:
     void anotherInstanceStarted (const String& commandLine) override
     {
     }
+
+	//==============================================================================
+	void changeListenerCallback(ChangeBroadcaster* source)
+	{
+		if (source == dashPipe.get())
+		{
+			//updateAllValues();
+			DBG("reception\n");
+			dashPipe->getDataBuffer(data, 1024);
+			uint32_t test = *(uint32_t*)(data + 8);
+			switch (test)
+			{
+			case 0x03:
+				DBG("config received\n");
+				hubConfig.setConfig(data + 12);
+
+				if (!interface1->hasKeyboardFocus (true)) interface1->grabKeyboardFocus();
+				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+				break;
+			case 0x05:
+				DBG("preset_active_received\n");
+				hubConfig.setPreset(*(uint8_t*)(data + 12), false);
+
+				if (!interface1->hasKeyboardFocus(true)) interface1->grabKeyboardFocus();
+				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+				break;
+
+			case 127:
+				memcpy(data, "jeannine", sizeof("jeannine"));
+				ctrl = 0x01;
+				memcpy(data + 8, &ctrl, sizeof(uint32_t));
+				dashPipe->sendString(data, 12);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	void launch_nrfutil()
+	{
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+
+		ZeroMemory(&si, sizeof(si));
+		si.cb = sizeof(si);
+		ZeroMemory(&pi, sizeof(pi));
+
+
+		// Start the child process. 
+		if (!CreateProcess((LPCSTR)"nrfutil.exe",   // No module name (use command line)
+			"" ,        // Command line
+			NULL,           // Process handle not inheritable
+			NULL,           // Thread handle not inheritable
+			FALSE,          // Set handle inheritance to FALSE
+			CREATE_NO_WINDOW,              // No creation flags
+			NULL,           // Use parent's environment block
+			NULL,           // Use parent's starting directory 
+			&si,            // Pointer to STARTUPINFO structure
+			&pi)           // Pointer to PROCESS_INFORMATION structure
+			)
+		{
+			Logger::writeToLog("CreateProcess failed (%d).\n" + String(GetLastError()));
+			return;
+		}
+
+		// Wait until child process exits.
+		WaitForSingleObject(pi.hProcess, INFINITE);
+		// Close process and thread handles. 
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	}
 
     //==============================================================================
     class MainWindow    : public DocumentWindow
@@ -139,12 +232,23 @@ public:
         switch (info.commandID)
         {
             case flashHub:
-                return true;
-
+				
+				memcpy(data, "jeannine", sizeof("jeannine"));
+				ctrl = 0x04;
+				memcpy(data + 8, &ctrl, sizeof(uint32_t));
+				dashPipe->sendString(data, 12);
+				return true;
             case uploadConfigToHub:
-                return true;
+
+				hubConfig.getConfig(data+12, sizeof(data)-12);
+				memcpy(data, "jeannine", sizeof("jeannine"));
+				ctrl = 0x03;
+				memcpy(data + 8, &ctrl, sizeof(uint32_t));
+				dashPipe->sendString(data, 12 + hubConfig.CONFIGSIZE);
+				return true;
 
             case upgradeHub:
+				launch_nrfutil();
                 return true;
 
             case upgradeRing:
@@ -157,13 +261,19 @@ public:
 
     //==============================================================================
     ApplicationCommandManager commandManager;
-    std::unique_ptr<DashBoardInterface> interface;
+    std::unique_ptr<DashBoardInterface> interface1;
 
 private:
     std::unique_ptr<MainWindow> mainWindow;
     HubConfiguration hubConfig;
 
+	std::unique_ptr<DataReader> dataReader;
+	std::unique_ptr<DashPipe> dashPipe;
+
     ScopedPointer<FileLogger> dashboardLogger;
+
+	uint8_t data[1024];
+	uint32_t ctrl = 0x03;
 };
 
 //==============================================================================

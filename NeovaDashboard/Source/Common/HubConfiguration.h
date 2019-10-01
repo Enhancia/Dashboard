@@ -19,17 +19,21 @@ class HubConfiguration
 {
 public:
     //==============================================================================
-    struct GestureData // values for each gesture
+	static constexpr int CONFIGSIZE = 516;
+	
+	struct GestureData // values for each gesture
     {
         GestureData() = default;
         GestureData (GestureData& other);
 
-    	uint8 on = 1;
-    	uint8 type = neova_dash::gesture::none;
-    	uint8 midiLow = 0;
-    	uint8 midiHigh = 127;
-    	uint8 cc = 0;
-        uint8 midiType = (type == neova_dash::gesture::vibrato || type == neova_dash::gesture::pitchBend)
+		uint16_t align_to_word; //to align the size of GestureData to a multiple of word
+
+		uint8_t on = 1;
+		uint8_t type = neova_dash::gesture::none;
+		uint8_t midiLow = 0;
+		uint8_t midiHigh = 127;
+		uint8_t cc = 0;
+		uint8_t midiType = (type == neova_dash::gesture::vibrato || type == neova_dash::gesture::pitchBend)
                               ? neova_dash::gesture::pitchMidi : neova_dash::gesture::ccMidi;
 
         float gestureParam0 = 0.0f;
@@ -50,7 +54,10 @@ public:
 
     struct ConfigData
     {
-    	uint8 midiChannel = 0;
+		uint16_t align_to_word; //to align the size of ConfigData to a multiple of word
+
+		uint8_t active_preset = 0; //Ne sert à rien pour l'instant juste pour s'aligner au buffer du zub
+		uint8_t midiChannel = 0;
 
     	PresetData presetData0;
     	PresetData presetData1;
@@ -84,6 +91,11 @@ public:
 	~HubConfiguration();
 
     //==============================================================================
+
+	void setConfig(uint8_t * data);
+	
+	void getConfig(uint8_t * data, int buffer_size);
+
     void setMidiChannel (const uint8 newMidiChannel, bool uploadToHub = true);
 
     void setUint8Value (const int gestureNumber, const uint8DataId dataId,
@@ -104,6 +116,7 @@ public:
     
     //==============================================================================
     void setPreset (const int gestureNumberToSelect);
+	void setPreset(const int gestureNumberToSelect, bool uploadToHub);
     const int getSelectedPreset();
 
     PresetData& getPresetData (const int presetNumber);
