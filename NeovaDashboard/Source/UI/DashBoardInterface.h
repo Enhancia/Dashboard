@@ -42,11 +42,17 @@ public:
     void modifierKeysChanged (const ModifierKeys&) override;
     bool keyPressed (const KeyPress& key) override;
 
+    void broughtToFront() override;
+    void focusGained (FocusChangeType cause) override;
+
     //==============================================================================
     ApplicationCommandTarget* getNextCommandTarget() override;
     void getAllCommands (Array<CommandID> &commands) override;
     void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override;
     bool perform (const InvocationInfo& info) override;
+
+    //==============================================================================
+    void update();
 
     //==============================================================================
     void createAndShowAlertPanel (const String& title, const String& message,

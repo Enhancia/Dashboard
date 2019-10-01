@@ -185,6 +185,16 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
     return false;
 }
 
+void DashBoardInterface::broughtToFront()
+{
+    //update();
+}
+
+void DashBoardInterface::focusGained (FocusChangeType cause)
+{
+    update();
+}
+
 //==============================================================================
 ApplicationCommandTarget* DashBoardInterface::getNextCommandTarget()
 {
@@ -228,9 +238,7 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
     switch (info.commandID)
     {
         case updateDashInterface:
-            hubComponent->update();
-            gesturePanel->update();
-            presetSelector->update();
+            update();
 			return true;
 
         case updateInterfaceLEDs:
@@ -268,4 +276,14 @@ void DashBoardInterface::closePendingAlertPanel()
 void DashBoardInterface::alertPanelCallback (int modalResult, DashBoardInterface* interface)
 {
     interface->closePendingAlertPanel();
+}
+
+//==============================================================================
+void DashBoardInterface::update()
+{
+	DBG ("update");
+
+    hubComponent->update();
+    gesturePanel->update();
+    presetSelector->update();
 }

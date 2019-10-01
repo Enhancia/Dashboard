@@ -330,6 +330,7 @@ void HubConfiguration::swapGestures (const int firstId, const int secondId)
     // Copies second gesture to first Id
     getGestureData (firstId) = secondGestureCopy;
 
+    commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
     commandManager.invokeDirectly (neova_dash::commands::updateInterfaceLEDs, true);
 }
 
