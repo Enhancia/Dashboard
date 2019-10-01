@@ -26,6 +26,14 @@
       </GROUP>
     </GROUP>
     <GROUP id="{D6F09228-5F31-FBA3-77A9-E4EDF3219389}" name="Source">
+      <GROUP id="{F1A202D6-9B60-4E7E-8087-5D8D2D86697D}" name="DataReader">
+        <FILE id="LxyiW7" name="dashPipe.cpp" compile="1" resource="0" file="Source/DataReader/dashPipe.cpp"/>
+        <FILE id="NnGjmL" name="dashPipe.h" compile="0" resource="0" file="Source/DataReader/dashPipe.h"/>
+        <FILE id="ZkLoBX" name="DataReader.cpp" compile="1" resource="0" file="Source/DataReader/DataReader.cpp"/>
+        <FILE id="JVzsaa" name="DataReader.h" compile="0" resource="0" file="Source/DataReader/DataReader.h"/>
+        <FILE id="iu2Cq4" name="StatutPipe.cpp" compile="1" resource="0" file="Source/DataReader/StatutPipe.cpp"/>
+        <FILE id="HqWmeQ" name="StatutPipe.h" compile="0" resource="0" file="Source/DataReader/StatutPipe.h"/>
+      </GROUP>
       <GROUP id="{20F35A03-D4FE-4E51-5385-9903857C607D}" name="Common">
         <FILE id="oaEuHa" name="DashCommon.cpp" compile="1" resource="0" file="Source/Common/DashCommon.cpp"/>
         <FILE id="hNibiL" name="DashCommon.h" compile="0" resource="0" file="Source/Common/DashCommon.h"/>
