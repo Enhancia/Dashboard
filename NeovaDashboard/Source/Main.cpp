@@ -47,6 +47,7 @@ public:
 
         interface1.reset (new DashBoardInterface (hubConfig));
         mainWindow.reset (new MainWindow (getApplicationName(), interface1.get()));
+        interface1->grabKeyboardFocus();
 
         commandManager.registerAllCommandsForTarget (this);
         commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
@@ -100,11 +101,15 @@ public:
 			case 0x03:
 				DBG("config received\n");
 				hubConfig.setConfig(data + 12);
+
+				if (!interface1->hasKeyboardFocus (true)) interface1->grabKeyboardFocus();
 				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
 				break;
 			case 0x05:
 				DBG("preset_active_received\n");
 				hubConfig.setPreset(*(uint8_t*)(data + 12), false);
+
+				if (!interface1->hasKeyboardFocus(true)) interface1->grabKeyboardFocus();
 				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
 				break;
 

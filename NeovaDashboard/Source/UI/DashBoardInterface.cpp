@@ -53,7 +53,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     int dashWidth = jmin (screenArea.getHeight()*63/60, // screenH * 9/10 * AspectRatio^-1 (= 7/6)
                           screenArea.getWidth()*3/4);
 
-    dashWidth = 850; // TO DELETE
+    //dashWidth = 850; // TO DELETE
 
     setSize (dashWidth,
              dashWidth*6/7);
@@ -183,16 +183,6 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
     }
 
     return false;
-}
-
-void DashBoardInterface::broughtToFront()
-{
-    //update();
-}
-
-void DashBoardInterface::focusGained (FocusChangeType cause)
-{
-    update();
 }
 
 //==============================================================================
