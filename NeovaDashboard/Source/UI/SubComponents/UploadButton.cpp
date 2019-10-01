@@ -27,7 +27,7 @@ void UploadButton::resized()
 void UploadButton::paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
 	g.setColour (shouldDrawButtonAsDown
-					 ? neova_dash::colour::uploadButtonBackground.withAlpha (0.7f)
+					 ? neova_dash::colour::uploadButtonBackground.darker (0.3f)
 				     : shouldDrawButtonAsHighlighted ? neova_dash::colour::uploadButtonBackground.brighter (0.07f)
 				     								 : neova_dash::colour::uploadButtonBackground);
 

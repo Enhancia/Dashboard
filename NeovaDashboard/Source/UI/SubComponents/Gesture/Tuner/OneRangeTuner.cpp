@@ -334,7 +334,7 @@ void OneRangeTuner::handleSingleClick (const MouseEvent& e)
     }
 
     updateMouseCursor();
-    repaint();
+    repaint (sliderBounds);
 }
 
 void OneRangeTuner::handleDoubleClick (const MouseEvent& e)
@@ -381,7 +381,7 @@ void OneRangeTuner::mouseDrag (const MouseEvent& e)
         }
     }
 
-    repaint();
+    repaint (sliderBounds);
 }
 
 void OneRangeTuner::mouseUp (const MouseEvent& e)

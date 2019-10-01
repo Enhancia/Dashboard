@@ -50,7 +50,7 @@ private:
 
 	private:
 		//==========================================================================
-		float batteryValueRef = 1.0f;
+		float batteryValueRef = 0.8f;
 
 		//==========================================================================
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BatteryComponent)

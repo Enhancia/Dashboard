@@ -36,16 +36,23 @@ public:
     void resized() override;
 
     //==============================================================================
-    void mouseEnter (const MouseEvent&);
-    void mouseExit (const MouseEvent&);
-    void mouseUp (const MouseEvent&);
-    void modifierKeysChanged (const ModifierKeys&);
+    void mouseEnter (const MouseEvent&) override;
+    void mouseExit (const MouseEvent&) override;
+    void mouseUp (const MouseEvent&) override;
+    void modifierKeysChanged (const ModifierKeys&) override;
+    bool keyPressed (const KeyPress& key) override;
+
+    void broughtToFront() override;
+    void focusGained (FocusChangeType cause) override;
 
     //==============================================================================
     ApplicationCommandTarget* getNextCommandTarget() override;
     void getAllCommands (Array<CommandID> &commands) override;
     void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override;
     bool perform (const InvocationInfo& info) override;
+
+    //==============================================================================
+    void update();
 
     //==============================================================================
     void createAndShowAlertPanel (const String& title, const String& message,
@@ -55,6 +62,7 @@ public:
 private:
     //==============================================================================
     static void alertPanelCallback (int modalResult, DashBoardInterface* interface);
+    void paintShadows (Graphics& g);
 
     //==============================================================================
     std::unique_ptr<HeaderComponent> header;
@@ -67,6 +75,7 @@ private:
     std::unique_ptr<DashAlertPanel> alertPanel;
 
     DashBoardLookAndFeel dashBoardLookAndFeel;
+    DropShadowEffect shadowEffect;
     
     //==============================================================================
     HubConfiguration& hubConfig;

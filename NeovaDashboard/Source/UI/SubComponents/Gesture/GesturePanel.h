@@ -78,6 +78,9 @@ private:
     void endDragMode();
 
     //==============================================================================
+    void paintShadows (Graphics& g);
+    
+    //==============================================================================
     OwnedArray<Component> gestureSlots;
     std::unique_ptr<GestureSettingsComponent> gestureSettings;
 

@@ -53,7 +53,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     int dashWidth = jmin (screenArea.getHeight()*63/60, // screenH * 9/10 * AspectRatio^-1 (= 7/6)
                           screenArea.getWidth()*3/4);
 
-    //dashWidth = 650; // TO DELETE
+    dashWidth = 850; // TO DELETE
 
     setSize (dashWidth,
              dashWidth*6/7);
@@ -76,6 +76,32 @@ DashBoardInterface::~DashBoardInterface()
 void DashBoardInterface::paint (Graphics& g)
 {
 	g.drawImage (backgroundImage, getLocalBounds().toFloat());
+
+    paintShadows (g);
+}
+
+void DashBoardInterface::paintShadows (Graphics& g)
+{
+    Path shadowPath;
+
+    // Header Shadow
+    {
+        auto headerShadowBounds = header->getBounds();
+
+        shadowPath.addRoundedRectangle (headerShadowBounds.toFloat(), 3.0f);
+    }
+
+    // Upload Button Shadow
+    {
+        auto uploadShadowBounds = uploadButton->getBounds().reduced (neova_dash::ui::MARGIN)
+                                                           .withLeft (getX()-10);
+        if (uploadButton->isDown()) uploadShadowBounds = uploadShadowBounds.withTrimmedRight (1);
+
+        shadowPath.addRoundedRectangle (uploadShadowBounds.toFloat(), 8.0f);
+    }
+
+    DropShadow shadow (Colour (0x40000000), 10, {2, 3});
+    shadow.drawForPath (g, shadowPath);
 }
 
 void DashBoardInterface::resized()
@@ -149,6 +175,26 @@ void DashBoardInterface::modifierKeysChanged (const ModifierKeys& modifiers)
     commandKeyDown = modifiers.isCommandDown();
 }
 
+bool DashBoardInterface::keyPressed (const KeyPress& key)
+{
+    if (key == KeyPress ('s', ModifierKeys (ModifierKeys::commandModifier), 's'))
+    {
+        uploadButton->triggerClick();
+    }
+
+    return false;
+}
+
+void DashBoardInterface::broughtToFront()
+{
+    //update();
+}
+
+void DashBoardInterface::focusGained (FocusChangeType cause)
+{
+    update();
+}
+
 //==============================================================================
 ApplicationCommandTarget* DashBoardInterface::getNextCommandTarget()
 {
@@ -192,9 +238,7 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
     switch (info.commandID)
     {
         case updateDashInterface:
-            hubComponent->update();
-            gesturePanel->update();
-            presetSelector->update();
+            update();
 			return true;
 
         case updateInterfaceLEDs:
@@ -232,4 +276,14 @@ void DashBoardInterface::closePendingAlertPanel()
 void DashBoardInterface::alertPanelCallback (int modalResult, DashBoardInterface* interface)
 {
     interface->closePendingAlertPanel();
+}
+
+//==============================================================================
+void DashBoardInterface::update()
+{
+	DBG ("update");
+
+    hubComponent->update();
+    gesturePanel->update();
+    presetSelector->update();
 }
