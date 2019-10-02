@@ -13,9 +13,12 @@
 #include "Common/DashCommon.h"
 #include "DataReader/DataReader.h"
 #include "DataReader/dashPipe.h"
-#include <windows.h>
-#include <stdio.h>
-#include <tchar.h>
+
+#if JUCE_WINDOWS
+    #include <windows.h>
+    #include <stdio.h>
+    #include <tchar.h>
+#endif //JUCE_WINDOWS
 
 //==============================================================================
 class Neova_DashBoard_Interface  :	public JUCEApplication,
@@ -62,6 +65,7 @@ public:
 		ctrl = 0x01;
 		memcpy(data + 8, &ctrl, sizeof(uint32_t));
 		dashPipe->sendString(data, 12);
+        
     }
 
     void shutdown() override
@@ -72,6 +76,10 @@ public:
         Logger::setCurrentLogger (nullptr);
         dashboardLogger = nullptr;
 
+        dataReader->removeChangeListener(this);
+        dataReader->connectionLost();
+        dashPipe->removeChangeListener(this);
+        dashPipe->connectionLost();
 		dataReader = nullptr;
 		dashPipe = nullptr;
     }
@@ -120,6 +128,7 @@ public:
 		}
 	}
 
+#if JUCE_WINDOWS
 	void launch_nrfutil()
 	{
 		STARTUPINFO si;
@@ -153,6 +162,7 @@ public:
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 	}
+#endif //JUCE_WINDOWS
 
     //==============================================================================
     class MainWindow    : public DocumentWindow
@@ -243,7 +253,7 @@ public:
 				return true;
 
             case upgradeHub:
-				launch_nrfutil();
+				//launch_nrfutil();
                 return true;
 
             case upgradeRing:

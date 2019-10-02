@@ -8,11 +8,12 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #if JUCE_MAC
-#include "DataReader/StatutPipe.h"
+#include "StatutPipe.h"
 
 //==============================================================================
 StatutPipe::StatutPipe(): InterprocessConnection (true, 0x6a6d626e)
 {
+
     connected = false;
     nbPipeToConnect = 0;
     connectNewPipe();
@@ -42,6 +43,7 @@ int StatutPipe::getPipeToConnect()
 //==============================================================================
 void StatutPipe::connectionMade()
 {
+
     connected = true;
     String test = "Start";
     sendMessage(MemoryBlock(test.toUTF8(), test.getNumBytesAsUTF8()));

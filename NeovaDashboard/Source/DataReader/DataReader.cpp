@@ -29,8 +29,6 @@ DataReader::DataReader(): InterprocessConnection (true, 0x6a6d626e)
 
 DataReader::~DataReader()
 {
-	TRACE_IN;
-
 	data = nullptr;
   #if JUCE_MAC
     statutPipe = nullptr;
@@ -89,7 +87,7 @@ bool DataReader::getRawDataAsFloatArray(Array<float>& arrayToFill)
 //==============================================================================
 bool DataReader::connectToExistingPipe()
 {
-	return connectToPipe ("mynamedpipe", -1);
+    return connectToPipe ("mynamedpipe", -1);
 }
 
 bool DataReader::connectToExistingPipe(int nbPipe)

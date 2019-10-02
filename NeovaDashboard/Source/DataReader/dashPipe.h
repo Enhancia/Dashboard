@@ -15,9 +15,8 @@
 #include "../Common/DashCommon.h"
 
 #if JUCE_MAC
-#include "DataReader/StatutPipe.h"
-#endif
-
+#include <SystemConfiguration/SystemConfiguration.h>
+#endif //JUCE_MAC
 //==============================================================================
 /*
     This component lives inside our window, and this is where you should put all
@@ -34,8 +33,7 @@
  */
 class DashPipe : public Component,
                      private InterprocessConnection,
-                     public ChangeBroadcaster,
-                     public ChangeListener
+                     public ChangeBroadcaster
 {
 public:
     static constexpr int DATA_SIZE = 7;
@@ -60,14 +58,12 @@ public:
     
     //==============================================================================
     bool connectToExistingPipe();
-    bool connectToExistingPipe(int nbPipe);
     bool isConnected();
     
     //==============================================================================
     void connectionMade() override;
     void connectionLost() override;
     void messageReceived(const MemoryBlock &message) override;
-    void changeListenerCallback(ChangeBroadcaster* source) override;
     
 private:
     //==============================================================================
@@ -77,10 +73,6 @@ private:
 	
 	uint8_t dataBuffer[1024];
     //ScopedPointer<StringArray> data;
-
-	#if JUCE_MAC
-    std::unique_ptr<StatutPipe> statutPipe;
-	#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DashPipe)
 };
