@@ -143,6 +143,28 @@ namespace neova_dash
         extern const Colour getHighlightColour (const int typeInt, const bool active = true);
     };
 
+    namespace data
+    {
+        enum hubData
+        {
+            variance =0,
+            acceleration,
+            tilt,
+            roll,
+            battery,
+
+            numData
+        };
+
+        static float convertRawBatteryToPercentage (float rawBatteryValue)
+        {
+            if (rawBatteryValue <= 3.0f)      return 0.0f;
+            else if (rawBatteryValue >= 4.2f) return 1.0f;
+
+            else return (rawBatteryValue - 3.0f)/(4.2f - 3.0f);
+        }
+    }
+
     namespace font
     {
         enum DashFontId
