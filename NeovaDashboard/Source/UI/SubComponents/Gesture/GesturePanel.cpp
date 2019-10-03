@@ -269,15 +269,8 @@ bool GesturePanel::keyPressed (const KeyPress &key)
         if (key.getKeyCode() == KeyPress::deleteKey || key.getKeyCode() == KeyPress::backspaceKey)
         {
             removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
+            update();
         }
-        /*
-        else if (key.getTextCharacter() == 'r')
-        {
-			if (key.getModifiers().isAltDown())
-			{
-				renameGestureInSlot (hubConfig.getSelectedGesture());
-			}
-        }*/
     }
 
 	return false;
@@ -470,7 +463,6 @@ void GesturePanel::renameGestureInSlot (int slotNumber)
     if (auto* gestureComponent = dynamic_cast<GestureComponent*> (gestureSlots[slotNumber]))
     {
         DBG ("Renaming?? We don't do that here..");
-        //gestureComponent->startNameEntry();
     }
     else
     {

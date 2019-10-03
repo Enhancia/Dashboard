@@ -25,7 +25,7 @@ public:
     //==============================================================================
     Neova_DashBoard_Interface() {}
 
-    const String getApplicationName() override       { return "Neova Dash Board [Interface]"; }
+    const String getApplicationName() override       { return "Neova Dashboard"; }
     const String getApplicationVersion() override    { return ProjectInfo::versionString; }
     bool moreThanOneInstanceAllowed() override       { return false; }
 
@@ -45,9 +45,9 @@ public:
     
         Logger::setCurrentLogger (dashboardLogger);
 
-        interface1.reset (new DashBoardInterface (hubConfig));
-        mainWindow.reset (new MainWindow (getApplicationName(), interface1.get()));
-        interface1->grabKeyboardFocus();
+        dashInterface.reset (new DashBoardInterface (hubConfig));
+        mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get()));
+        dashInterface->grabKeyboardFocus();
 
         commandManager.registerAllCommandsForTarget (this);
         commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
@@ -67,7 +67,7 @@ public:
 
     void shutdown() override
     {
-        interface1 = nullptr;
+        dashInterface = nullptr;
         mainWindow = nullptr;
 
         Logger::setCurrentLogger (nullptr);
@@ -102,14 +102,14 @@ public:
 				DBG("config received\n");
 				hubConfig.setConfig(data + 12);
 
-				if (!interface1->hasKeyboardFocus (true)) interface1->grabKeyboardFocus();
+				if (!dashInterface->hasKeyboardFocus (true)) dashInterface->grabKeyboardFocus();
 				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
 				break;
 			case 0x05:
 				DBG("preset_active_received\n");
 				hubConfig.setPreset(*(uint8_t*)(data + 12), false);
 
-				if (!interface1->hasKeyboardFocus(true)) interface1->grabKeyboardFocus();
+				if (!dashInterface->hasKeyboardFocus(true)) dashInterface->grabKeyboardFocus();
 				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
 				break;
 
@@ -261,7 +261,7 @@ public:
 
     //==============================================================================
     ApplicationCommandManager commandManager;
-    std::unique_ptr<DashBoardInterface> interface1;
+    std::unique_ptr<DashBoardInterface> dashInterface;
 
 private:
     std::unique_ptr<MainWindow> mainWindow;
