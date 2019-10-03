@@ -270,14 +270,6 @@ bool GesturePanel::keyPressed (const KeyPress &key)
         {
             removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
         }
-        /*
-        else if (key.getTextCharacter() == 'r')
-        {
-			if (key.getModifiers().isAltDown())
-			{
-				renameGestureInSlot (hubConfig.getSelectedGesture());
-			}
-        }*/
     }
 
 	return false;
@@ -470,7 +462,6 @@ void GesturePanel::renameGestureInSlot (int slotNumber)
     if (auto* gestureComponent = dynamic_cast<GestureComponent*> (gestureSlots[slotNumber]))
     {
         DBG ("Renaming?? We don't do that here..");
-        //gestureComponent->startNameEntry();
     }
     else
     {
@@ -502,6 +493,7 @@ void GesturePanel::removeGestureAndGestureComponent (int gestureId)
 	//gestureSlots[hubConfig.getSelectedGesture()]->repaint();
 
     if (!isTimerRunning()) startTimerHz (freq);
+    update();
 }
 
 bool GesturePanel::hasSelectedGesture()
@@ -617,7 +609,6 @@ void GesturePanel::handleMenuResult (int gestureId, const int menuResult)
 
         case 2: // Delete gesture
             removeGestureAndGestureComponent (gestureId);
-            update();
     }
 }
 

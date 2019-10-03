@@ -16,15 +16,9 @@ MidiPanel::MidiPanel (HubConfiguration& config, const int gestId)
     createComboBox();
     createLabels();
 
-    addAndMakeVisible (midiRangeTuner = new MidiRangeTuner (hubConfig, id));
+    addAndMakeVisible (midiRangeTuner = new MidiRangeTuner (config, gestId));
 
-    if (hubConfig.getGestureData (id).type == neova_dash::gesture::vibrato ||
-        hubConfig.getGestureData (id).type == neova_dash::gesture::pitchBend ||
-        hubConfig.getGestureData (id).type == neova_dash::gesture::none)
-    {
-        midiRangeTuner->setInterceptsMouseClicks (false, false);
-        midiRangeTuner->setAlpha (0.3f);
-    }
+    setComponentsVisibility();
 }
 
 MidiPanel::~MidiPanel()
@@ -110,16 +104,12 @@ void MidiPanel::comboBoxChanged (ComboBox* box)
 {
     if (box == midiTypeBox)
     {
-        bool isCC = (midiTypeBox->getSelectedId() == neova_dash::gesture::ccMidi + 1);
-        
-        // cc Label is visible & editable only if "CC" is selected
-        ccLabel->setEditable (isCC, false, false);
-        ccLabel->setVisible (isCC);
-
         hubConfig.setUint8Value (id, HubConfiguration::midiType, midiTypeBox->getSelectedId()-1);
 
         if (auto* gestPanel = getParentComponent()->getParentComponent())
             gestPanel->repaint();
+        
+        setComponentsVisibility();
     }
 }
 
@@ -148,7 +138,14 @@ void MidiPanel::createComboBox()
     midiTypeBox->addItem ("CC", neova_dash::gesture::ccMidi + 1);
     //midiTypeBox->addItem ("AfterTouch", neova_dash::gesture::afterTouchMidi + 1);
 
-    midiTypeBox->setSelectedId (int (hubConfig.getGestureData (id).midiType) + 1, dontSendNotification);
+    if (hubConfig.getGestureData (id).type == neova_dash::gesture::none)
+    {
+        midiTypeBox->setSelectedId (0, dontSendNotification);
+    }
+    else
+    {
+        midiTypeBox->setSelectedId (int (hubConfig.getGestureData (id).midiType) + 1, dontSendNotification);
+    }
     
     // ComboBox look
     midiTypeBox->setJustificationType (Justification::centred);
@@ -156,13 +153,6 @@ void MidiPanel::createComboBox()
     midiTypeBox->setColour (ComboBox::textColourId, neova_dash::colour::mainText);
     midiTypeBox->setColour (ComboBox::arrowColourId, neova_dash::colour::subText);
 
-    if (hubConfig.getGestureData (id).type == neova_dash::gesture::vibrato ||
-        hubConfig.getGestureData (id).type == neova_dash::gesture::pitchBend)
-    {
-    	midiTypeBox->setAlpha (0.3f);
-    	midiTypeBox->setInterceptsMouseClicks (false, false);
-    }
-    
     midiTypeBox->addListener (this);
 }
 
@@ -180,12 +170,36 @@ void MidiPanel::createLabels()
     ccLabel->setColour (Label::textColourId, neova_dash::colour::mainText);
     ccLabel->setColour (Label::outlineColourId, neova_dash::colour::subText);
     
-    // cc Label is visible & editable only if "CC" is selected
-    ccLabel->setEditable (midiTypeBox->getSelectedId() == neova_dash::gesture::ccMidi + 1, false, false);
-    ccLabel->setVisible (midiTypeBox->getSelectedId() == neova_dash::gesture::ccMidi + 1);
-    
     ccLabel->addListener (this);
 }
+
+void MidiPanel::setComponentsVisibility()
+{
+    bool shouldGrayOutBox =   (hubConfig.getGestureData (id).type == neova_dash::gesture::vibrato ||
+                               hubConfig.getGestureData (id).type == neova_dash::gesture::pitchBend ||
+                               hubConfig.getGestureData (id).type == neova_dash::gesture::none);
+
+    bool shouldGrayOutTuner = (hubConfig.getGestureData (id).midiType == neova_dash::gesture::pitchMidi||
+                               hubConfig.getGestureData (id).type == neova_dash::gesture::none);
+
+    midiTypeBox->setAlpha (shouldGrayOutBox ? 0.3f : 1.0f);
+    midiTypeBox->setInterceptsMouseClicks (!shouldGrayOutBox, false);
+
+    midiRangeTuner->setAlpha (shouldGrayOutTuner ? 0.3f : 1.0f);
+    midiRangeTuner->setInterceptsMouseClicks (!shouldGrayOutTuner, false);
+    
+    /* TODO AFTER RANGE 0 - 127 MidiRangeTuner
+    midiRangeTuner->setRangeLow (shouldGrayOutTuner ? 0.0f
+                                                    : float (hubConfig.getGestureData (id).midiLow));
+    midiRangeTuner->setRangeHigh (shouldGrayOutTuner ? 127.0f
+                                                     : float (hubConfig.getGestureData (id).midiHigh));
+    
+    */
+
+    ccLabel->setEditable (midiTypeBox->getSelectedId() == neova_dash::gesture::ccMidi + 1, false, false);
+    ccLabel->setVisible (midiTypeBox->getSelectedId() == neova_dash::gesture::ccMidi + 1);
+}
+
 //==============================================================================
 // Midi Range Tuner
 
