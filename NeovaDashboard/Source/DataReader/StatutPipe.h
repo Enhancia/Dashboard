@@ -12,6 +12,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "../Common/DashCommon.h"
 
 #if JUCE_MAC
 #include <SystemConfiguration/SystemConfiguration.h>

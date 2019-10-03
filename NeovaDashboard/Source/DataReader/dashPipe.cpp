@@ -18,24 +18,12 @@ DashPipe::DashPipe(): InterprocessConnection (true, 0x6a6d626e)
     //data = new StringArray (StringArray::fromTokens ("0 0 0 0 0 0 0", " ", String()));
 	//dataBuffer = std::make_unique<uint8_t[]>(DATABUFFERSIZE);
 
-    #if JUCE_MAC
-        statutPipe = std::make_unique<StatutPipe> ();
-        statutPipe->addChangeListener(this);
-    #else
-        // Pipe creation
-        connectToExistingPipe();
-    #endif
+    connectToExistingPipe();
 }
 
 DashPipe::~DashPipe()
 {
 	TRACE_IN;
-
-	//data = nullptr;
-	//dataBuffer = nullptr;
-  #if JUCE_MAC
-    statutPipe = nullptr;
-  #endif
 }
 
 //==============================================================================
@@ -106,32 +94,28 @@ bool DashPipe::getRawDataAsFloatArray(Array<float>& arrayToFill)
 void  DashPipe::sendString(uint8_t * data, int data_size)
 {
 	TRACE_IN;
-	sendMessage(MemoryBlock(data, data_size));
+	bool test = sendMessage(MemoryBlock(data, data_size));
+    DBG("Send string return :" + String(int(test)));
 }
 
 //==============================================================================
 bool DashPipe::connectToExistingPipe()
 {
 	TRACE_IN;
-	return connectToPipe ("dashpipe", -1);
+	
+    
+    #if JUCE_MAC
+        //get current userID
+        uid_t currentUID;
+        SCDynamicStoreCopyConsoleUser(NULL, &currentUID, NULL);
+
+        //create namedpipe  with currentUID to enable multi user session
+        return connectToPipe("dashpipe" + String (currentUID), -1);
+    #elif JUCE_WINDOWS
+        return connectToPipe ("dashpipe", -1);
+    #endif
 }
 
-bool DashPipe::connectToExistingPipe(int nbPipe)
-{
-	TRACE_IN;
-
-	//only happens on MacOS
-  #if JUCE_MAC
-    //get current userID
-    uid_t currentUID;
-    SCDynamicStoreCopyConsoleUser(NULL, &currentUID, NULL);
-
-    //create namedpipe  with currentUID to enable multi user session
-    return connectToPipe("mynamedpipe" + String (currentUID) + String(nbPipe), -1);
-  #elif JUCE_WINDOWS
-	return false;
-  #endif
-}
 
 bool DashPipe::isConnected()
 {
@@ -177,16 +161,4 @@ void DashPipe::messageReceived (const MemoryBlock &message)
 	{
 		Logger::writeToLog("Hub message : Error");
 	}
-}
-
-void DashPipe::changeListenerCallback (ChangeBroadcaster * source)
-{
-	TRACE_IN;
-	//only happens on MacOS
-  #if JUCE_MAC
-    int nbPipeToConnect = statutPipe->getPipeToConnect();
-    connectToExistingPipe(nbPipeToConnect);
-    statutPipe->disconnect();
-    statutPipe.reset();
-  #endif
 }

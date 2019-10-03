@@ -15,7 +15,7 @@
 #include "../Common/DashCommon.h"
 
 #if JUCE_MAC
-#include "DataReader/StatutPipe.h"
+#include "StatutPipe.h"
 #endif
 
 //==============================================================================
