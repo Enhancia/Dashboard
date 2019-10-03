@@ -269,7 +269,6 @@ bool GesturePanel::keyPressed (const KeyPress &key)
         if (key.getKeyCode() == KeyPress::deleteKey || key.getKeyCode() == KeyPress::backspaceKey)
         {
             removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
-            update();
         }
     }
 
@@ -494,6 +493,7 @@ void GesturePanel::removeGestureAndGestureComponent (int gestureId)
 	//gestureSlots[hubConfig.getSelectedGesture()]->repaint();
 
     if (!isTimerRunning()) startTimerHz (freq);
+    update();
 }
 
 bool GesturePanel::hasSelectedGesture()
@@ -609,7 +609,6 @@ void GesturePanel::handleMenuResult (int gestureId, const int menuResult)
 
         case 2: // Delete gesture
             removeGestureAndGestureComponent (gestureId);
-            update();
     }
 }
 

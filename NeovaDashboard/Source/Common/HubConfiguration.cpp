@@ -106,7 +106,7 @@ void HubConfiguration::setDefaultGestureValues (const int gestureNumber, const n
 	switch (type)
 	{
 		case vibrato:
-			setGestureParameters (presetNumber, gestureNumber, 40.0f, 400.0f);
+			setGestureParameters (presetNumber, gestureNumber, 400.0f, 40.0f);
 			break;
 		case pitchBend:
 			setGestureParameters (presetNumber, gestureNumber, -50.0f, -20.0f, 30.0f, 60.0f);

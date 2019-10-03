@@ -45,7 +45,7 @@ namespace neova_dash
 
         // Gesture tuner display ranges
         const float VIBRATO_DISPLAY_MAX  = 500.0f;
-        const float VIBRATO_THRESH_DISPLAY_MAX = 500.0f;
+        const float VIBRATO_THRESH_DISPLAY_MAX = 100.0f;
     
         const float PITCHBEND_DISPLAY_MIN = -90.0f;
         const float PITCHBEND_DISPLAY_MAX =  90.0f;
