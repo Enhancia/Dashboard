@@ -132,6 +132,7 @@ private:
     //==============================================================================
     void createComboBox();
     void createLabels();
+    void setComponentsVisibility();
     
     //==============================================================================
     ScopedPointer<ComboBox> midiTypeBox;
