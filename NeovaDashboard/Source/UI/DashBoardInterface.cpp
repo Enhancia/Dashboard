@@ -271,8 +271,6 @@ void DashBoardInterface::alertPanelCallback (int modalResult, DashBoardInterface
 //==============================================================================
 void DashBoardInterface::update()
 {
-	DBG ("update");
-
     hubComponent->update();
     gesturePanel->update();
     presetSelector->update();

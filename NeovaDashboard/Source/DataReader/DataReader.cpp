@@ -16,6 +16,13 @@ DataReader::DataReader(): InterprocessConnection (true, 0x6a6d626e)
     
     // Data initialization
     data = new StringArray (StringArray::fromTokens ("0 0 0 0 0 0", " ", String()));
+
+    for (int i=0; i<neova_dash::data::numDatas; i++)
+    {
+        floatData.add (0.0f);
+    }
+
+    jassert (floatData.size() == 5);
     
     #if JUCE_MAC
         statutPipe = std::make_unique<StatutPipe> ();
@@ -30,6 +37,8 @@ DataReader::DataReader(): InterprocessConnection (true, 0x6a6d626e)
 DataReader::~DataReader()
 {
 	data = nullptr;
+    floatData.clear();
+
   #if JUCE_MAC
     statutPipe = nullptr;
   #endif
@@ -55,6 +64,21 @@ bool DataReader::readData (String s)
     {
         // Splits the string into 7 separate ones
         *data = strArr;
+
+        for (int i=0; i<neova_dash::data::numDatas; i++)
+        {
+            floatData[i] == (*data)[i].getFloatValue();
+        }
+
+        return true;
+    }
+
+    // If ring charges, battery data only
+    if (strArr.size() == 1 && strArr[0].containsOnly (".0123456789"))
+    {
+        (*data).set (neova_dash::data::battery, strArr[0]);
+        floatData.set (neova_dash::data::battery, strArr[0].getFloatValue());
+
         return true;
     }
     
@@ -66,6 +90,12 @@ const String DataReader::getRawData (int index)
     return (*data)[index];
 }
 
+const float& DataReader::getFloatValueReference (const neova_dash::data::HubData dataId)
+{
+    if (dataId == neova_dash::data::numDatas) return floatData.getReference (int (neova_dash::data::battery));
+
+    return floatData.getReference (int (dataId));
+}
 
 bool DataReader::getRawDataAsFloatArray(Array<float>& arrayToFill)
 {
@@ -77,8 +107,8 @@ bool DataReader::getRawDataAsFloatArray(Array<float>& arrayToFill)
     // Fills the array with new values taken from the "Data" StringArray
     for (int i =0; i<DATA_SIZE; i++)
     {
-        arrayToFill.add ((*data)[i].getFloatValue());
-        //DBG ("Value " << i << " = " << arrayToFill[i]);
+        //arrayToFill.add ((*data)[i].getFloatValue());
+        arrayToFill.addArray (floatData, floatData.size());
     }
     
     return true;
@@ -117,7 +147,7 @@ void DataReader::connectionMade()
     
     #if JUCE_MAC
         String test = "Start";
-        sendMessage(MemoryBlock(test.toUTF8(), test.getNumBytesAsUTF8()));
+        sendMessage (MemoryBlock (test.toUTF8(), test.getNumBytesAsUTF8()));
     #endif
 }
 
@@ -127,7 +157,7 @@ void DataReader::connectionLost()
     
     #if JUCE_MAC
         String test = "Stop";
-        sendMessage(MemoryBlock(test.toUTF8(), test.getNumBytesAsUTF8()));
+        sendMessage (MemoryBlock (test.toUTF8(), test.getNumBytesAsUTF8()));
     #endif
 
 }

@@ -52,6 +52,7 @@ public:
     bool readData(String s);
     const String getRawData(int index);
     bool getRawDataAsFloatArray(Array<float>& arrayToFill);
+    const float& getFloatValueReference (const neova_dash::data::HubData dataId);
     
     //==============================================================================
     bool connectToExistingPipe();
@@ -70,6 +71,7 @@ private:
     int pipeNumber = -1;
     
     ScopedPointer<StringArray> data;
+    Array<float> floatData;
 
 	#if JUCE_MAC
     std::unique_ptr<StatutPipe> statutPipe;

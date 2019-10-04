@@ -145,7 +145,7 @@ namespace neova_dash
 
     namespace data
     {
-        enum hubData
+        enum HubData
         {
             variance =0,
             acceleration,
@@ -153,7 +153,7 @@ namespace neova_dash
             roll,
             battery,
 
-            numData
+            numDatas
         };
 
         static float convertRawBatteryToPercentage (float rawBatteryValue)
