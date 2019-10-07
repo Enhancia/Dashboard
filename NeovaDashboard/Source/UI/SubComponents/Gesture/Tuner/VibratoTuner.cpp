@@ -24,10 +24,12 @@ VibratoTuner::VibratoTuner (HubConfiguration& config, const float& val,
     createLabels();
 }
 
-VibratoTuner::VibratoTuner (HubConfiguration& config, const int gestureId)
+VibratoTuner::VibratoTuner (HubConfiguration& config, DataReader& reader, const int gestureId)
     : VibratoTuner (config,
-		            config.data[0], NormalisableRange<float> (-180.0f, 180.0f), gestureId,
-    				config.data[1], 1000.0f,
+    				reader.getFloatValueReference (neova_dash::data::variance),
+    				NormalisableRange<float> (-180.0f, 180.0f), gestureId,
+    				reader.getFloatValueReference (neova_dash::data::acceleration),
+    				1000.0f,
     	            Range<float> (0.0f, neova_dash::ui::VIBRATO_DISPLAY_MAX),
     	            Range<float> (0.0f, neova_dash::ui::VIBRATO_THRESH_DISPLAY_MAX))
 {
@@ -45,8 +47,8 @@ VibratoTuner::~VibratoTuner()
 //==============================================================================
 void VibratoTuner::paint (Graphics& g)
 {
-	//drawValueCursor (g);
-	//drawIntensityCursor (g);
+	drawValueCursor (g);
+	drawIntensityCursor (g);
 
 	g.setColour (neova_dash::colour::subText);
 	g.setFont (neova_dash::font::dashFontLight.withHeight (15.0f));

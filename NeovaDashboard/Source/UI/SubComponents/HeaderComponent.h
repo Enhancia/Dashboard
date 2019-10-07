@@ -12,6 +12,7 @@
 
 #include "../../../JuceLibraryCode/JuceHeader.h"
 #include "../../Common/DashCommon.h"
+#include "../../DataReader/DataReader.h"
 #include "Top/OptionsPanel.h"
 
 //==============================================================================
@@ -23,7 +24,7 @@ class HeaderComponent    : public Component,
 {
 public:
     //==============================================================================
-    HeaderComponent (OptionsPanel& options);
+    HeaderComponent (OptionsPanel& options, DataReader& reader);
     ~HeaderComponent();
 
     //==============================================================================
@@ -41,7 +42,7 @@ private:
 	{
 	public:
 		//==========================================================================
-		BatteryComponent(/*float& batteryValRef*/) /*: batteryValueRef (batteryValRef)*/ {}
+		BatteryComponent (const float& batteryValRef) : batteryValueRef (batteryValRef) {}
 		~BatteryComponent() {}
 
 		//==========================================================================
@@ -50,7 +51,7 @@ private:
 
 	private:
 		//==========================================================================
-		float batteryValueRef = 0.8f;
+		const float& batteryValueRef;
 
 		//==========================================================================
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BatteryComponent)

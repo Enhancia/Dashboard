@@ -22,6 +22,8 @@ DataReader::DataReader(): InterprocessConnection (true, 0x6a6d626e)
         floatData.add (0.0f);
     }
 
+    floatData.set (neova_dash::data::battery, 0.8f); // TO DELETE
+
     jassert (floatData.size() == 5);
     
     #if JUCE_MAC
@@ -31,7 +33,6 @@ DataReader::DataReader(): InterprocessConnection (true, 0x6a6d626e)
         // Pipe creation
         connectToExistingPipe();
     #endif
-    
 }
 
 DataReader::~DataReader()

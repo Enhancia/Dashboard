@@ -11,9 +11,11 @@
 #include "GesturePanel.h"
 
 //==============================================================================
-GesturePanel::GesturePanel (HubConfiguration& data, NewGesturePanel& newGest, ApplicationCommandManager& manager,
+GesturePanel::GesturePanel (HubConfiguration& data, DataReader& reader,
+                            NewGesturePanel& newGest, ApplicationCommandManager& manager,
                             int freqHz)
-                            : hubConfig (data), newGesturePanel (newGest), commandManager (manager),
+                            : hubConfig (data), dataReader (reader),
+                              newGesturePanel (newGest),commandManager (manager),
                               freq (freqHz)
 {
     TRACE_IN;
@@ -24,7 +26,7 @@ GesturePanel::GesturePanel (HubConfiguration& data, NewGesturePanel& newGest, Ap
     gestureSettings = std::make_unique<GestureSettingsComponent> (int (hubConfig.getGestureData
                                                                     (hubConfig.getSelectedGesture())
                                                                                      .type),
-                                                                  hubConfig, commandManager);
+                                                                  hubConfig, commandManager, dataReader);
     addAndMakeVisible (*gestureSettings);
 
     initialiseGestureSlots();
@@ -57,7 +59,9 @@ void GesturePanel::update()
     stopTimer();
     updateGestureSlots();
 
-    gestureSettings.reset (new GestureSettingsComponent (hubConfig.getSelectedGesture(), hubConfig, commandManager));
+    gestureSettings.reset (new GestureSettingsComponent (hubConfig.getSelectedGesture(), hubConfig,
+                                                                                         commandManager,
+                                                                                         dataReader));
     addAndMakeVisible (*gestureSettings);
     
     resized();
@@ -483,7 +487,7 @@ void GesturePanel::removeGestureAndGestureComponent (int gestureId)
         //unselectCurrentGesture();
         hubConfig.selectFirstExistingGesture();
         gestureSettings.reset (new GestureSettingsComponent (hubConfig.getSelectedGesture(),
-                                                             hubConfig, commandManager));
+                                                             hubConfig, commandManager, dataReader));
         addAndMakeVisible (*gestureSettings);
         resized();
     }
@@ -530,7 +534,7 @@ void GesturePanel::selectGestureExclusive (GestureComponent& gestureComponentToS
     }
 
     gestureSettings.reset (new GestureSettingsComponent (gestureComponentToSelect.id, hubConfig,
-			                                             commandManager));
+			                                             commandManager, dataReader));
     addAndMakeVisible (*gestureSettings);
     hubConfig.setSelectedGesture (gestureComponentToSelect.id);
     resized();
@@ -564,7 +568,7 @@ void GesturePanel::unselectCurrentGesture()
 
         hubConfig.setSelectedGesture (-1);
         gestureSettings.reset (new GestureSettingsComponent (neova_dash::gesture::NUM_GEST + 1,
-			                                                 hubConfig, commandManager));
+			                                                 hubConfig, commandManager, dataReader));
         addAndMakeVisible (*gestureSettings);
         resized();
 

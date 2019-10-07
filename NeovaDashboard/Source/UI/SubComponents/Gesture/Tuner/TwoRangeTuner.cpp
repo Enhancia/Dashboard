@@ -46,7 +46,7 @@ TwoRangeTuner::~TwoRangeTuner()
 void TwoRangeTuner::paint (Graphics& g)
 {   
     drawTunerSliderBackground (g);
-    //drawValueCursor (g);
+    drawValueCursor (g);
 }
 
 void TwoRangeTuner::resized()

@@ -42,7 +42,7 @@ OneRangeTuner::~OneRangeTuner()
 void OneRangeTuner::paint (Graphics& g)
 {
     drawTunerSliderBackground (g);
-    //drawValueCursor (g);
+    drawValueCursor (g);
 }
 
 void OneRangeTuner::resized()

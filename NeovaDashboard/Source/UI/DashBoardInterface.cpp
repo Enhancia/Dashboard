@@ -9,7 +9,8 @@
 #include "DashBoardInterface.h"
 
 //==============================================================================
-DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (data)
+DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& reader)
+    : hubConfig (data), dataReader (reader)
 {
     TRACE_IN;
 
@@ -19,7 +20,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     optionsPanel = std::make_unique<OptionsPanel> (hubConfig, getCommandManager());
     addAndMakeVisible (*optionsPanel);
 
-    header = std::make_unique<HeaderComponent> (*optionsPanel);
+    header = std::make_unique<HeaderComponent> (*optionsPanel, dataReader);
     addAndMakeVisible (*header);
 	
     uploadButton = std::make_unique<UploadButton> (getCommandManager());
@@ -28,7 +29,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     newGesturePanel = std::make_unique<NewGesturePanel> (hubConfig, getCommandManager());
     addAndMakeVisible (*newGesturePanel);
 
-    gesturePanel = std::make_unique<GesturePanel> (hubConfig, *newGesturePanel,
+    gesturePanel = std::make_unique<GesturePanel> (hubConfig, dataReader, *newGesturePanel,
                                                    getCommandManager(), neova_dash::ui::FRAMERATE);
     addAndMakeVisible (*gesturePanel);
 

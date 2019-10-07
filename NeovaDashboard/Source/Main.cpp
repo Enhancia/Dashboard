@@ -48,13 +48,6 @@ public:
     
         Logger::setCurrentLogger (dashboardLogger);
 
-        dashInterface.reset (new DashBoardInterface (hubConfig));
-        mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get()));
-        dashInterface->grabKeyboardFocus();
-
-        commandManager.registerAllCommandsForTarget (this);
-        commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
-                                                        (mainWindow->getContentComponent()));
 		dataReader = std::make_unique<DataReader>();
 		dataReader->addChangeListener(this);
 
@@ -66,6 +59,14 @@ public:
 		ctrl = 0x01;
 		memcpy(data + 8, &ctrl, sizeof(uint32_t));
 		dashPipe->sendString(data, 12);
+        
+        dashInterface.reset (new DashBoardInterface (hubConfig, *dataReader));
+        mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get()));
+        dashInterface->grabKeyboardFocus();
+
+        commandManager.registerAllCommandsForTarget (this);
+        commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
+                                                        (mainWindow->getContentComponent()));
         
     }
 

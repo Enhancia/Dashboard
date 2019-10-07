@@ -49,9 +49,9 @@ public:
     void resized() override;
 
     //==============================================================================
-    bool readData(String s);
-    const String getRawData(int index);
-    bool getRawDataAsFloatArray(Array<float>& arrayToFill);
+    bool readData (String s);
+    const String getRawData (int index);
+    bool getRawDataAsFloatArray (Array<float>& arrayToFill);
     const float& getFloatValueReference (const neova_dash::data::HubData dataId);
     
     //==============================================================================

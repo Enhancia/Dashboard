@@ -11,10 +11,11 @@
 #include "HeaderComponent.h"
 
 //==============================================================================
-HeaderComponent::HeaderComponent (OptionsPanel& options) : optionsPanel (options)
+HeaderComponent::HeaderComponent (OptionsPanel& options, DataReader& reader)
+    : optionsPanel (options)
 {
     TRACE_IN;
-    batteryComponent = std::make_unique<BatteryComponent>();
+    batteryComponent = std::make_unique<BatteryComponent> (reader.getFloatValueReference (neova_dash::data::battery));
     addAndMakeVisible (*batteryComponent);
 
     createButton();
