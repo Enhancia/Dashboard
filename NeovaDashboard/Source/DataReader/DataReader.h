@@ -65,6 +65,9 @@ public:
     void messageReceived(const MemoryBlock &message) override;
     void changeListenerCallback(ChangeBroadcaster* source) override;
     
+
+    void incrementDataValue (const float valueToAdd, neova_dash::data::HubData dataToIncrement); //TO DELETE
+    
 private:
     //==============================================================================
     bool connected;

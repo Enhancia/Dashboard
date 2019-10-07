@@ -12,6 +12,7 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "DashPath.h"
+#include "DashGestures.h"
 
 // Preprocessor expressions
 #define TRACE_IN  Logger::writeToLog ("[+] Entering: " + String(__FUNCTION__) + "\n")
@@ -95,54 +96,6 @@ namespace neova_dash
         const Colour wave                   (0xff7c80de);
     };
 
-    namespace gesture
-    {
-        const int NUM_GEST = 4;
-
-        enum GestureType
-        {
-            vibrato =0,
-            pitchBend,
-            tilt,
-            roll,
-            wave,
-
-            numTypes,
-            none
-        };
-
-        enum MidiType
-        {
-            pitchMidi =0,
-            ccMidi,
-            afterTouchMidi
-        };
-
-        // gesture max range values
-        const float VIBRATO_RANGE_MAX  = 500.0f;
-        const float VIBRATO_THRESH_MAX = 300.0f;
-        
-        const float PITCHBEND_MIN = -180.0f;
-        const float PITCHBEND_MAX =  180.0f;
-        
-        const float TILT_MIN = -180.0f;
-        const float TILT_MAX =  180.0f;
-        
-        const float ROLL_MIN = -180.0f;
-        const float ROLL_MAX =  180.0f;
-        
-        const float WAVE_MIN = -180.0f;
-        const float WAVE_MAX =  180.0f;
-
-        // Helper methods for gestures
-        extern GestureType intToGestureType (const int typeInt);
-        extern const String getTypeString (const GestureType type, const bool withSpacingAndCase);
-        extern const String getTypeString (const int typeInt, const bool withSpacingAndCase);
-        extern const String getDescriptionString (const GestureType type);
-        extern const Colour getHighlightColour (const GestureType type, const bool active = true);
-        extern const Colour getHighlightColour (const int typeInt, const bool active = true);
-    };
-
     namespace data
     {
         enum HubData
@@ -180,4 +133,10 @@ namespace neova_dash
         extern const Font dashFontLight;
         extern const Font enhanciaFont;
     };
+
+    namespace gesture
+    {
+        extern const Colour getHighlightColour (const GestureType type, const bool active = true);
+        extern const Colour getHighlightColour (const int typeInt, const bool active = true);
+    }
 };

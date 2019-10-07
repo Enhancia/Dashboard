@@ -183,6 +183,21 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
         uploadButton->triggerClick();
     }
 
+    // TO DELETE
+    else if (key == KeyPress ('l', ModifierKeys (ModifierKeys::noModifiers), 'l'))
+    {
+        dataReader.incrementDataValue (0.1f, neova_dash::data::tilt);
+        dataReader.incrementDataValue (0.1f, neova_dash::data::roll);
+        dataReader.incrementDataValue (0.1f, neova_dash::data::battery);
+    }
+    else if (key == KeyPress ('k', ModifierKeys (ModifierKeys::noModifiers), 'k'))
+    {
+        dataReader.incrementDataValue (-0.1f, neova_dash::data::tilt);
+        dataReader.incrementDataValue (-0.1f, neova_dash::data::roll);
+        dataReader.incrementDataValue (-0.1f, neova_dash::data::battery);
+    }
+    // \TO DELETE
+
     return false;
 }
 
@@ -198,7 +213,8 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
 
     commands.addArray ({
                             updateDashInterface,
-                            updateInterfaceLEDs
+                            updateInterfaceLEDs//,
+                            //updateBatteryDisplay
                        });
 }
 
@@ -214,6 +230,10 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
         case updateInterfaceLEDs:
             result.setInfo ("Update LEDs", "Udpates Hub LEDs To Current Hub Configuration", "Interface", 0);
             break;
+		/*
+        case updateBatteryDisplay:
+            result.setInfo ("Update battery display", "Udpates Battery Display", "Interface", 0);
+            break;*/
         default:
             break;
     }
@@ -231,6 +251,10 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
         case updateDashInterface:
             update();
 			return true;
+			/*
+        case updateBatteryDisplay:
+            header->update();
+            return true;*/
 
         case updateInterfaceLEDs:
             hubComponent->repaintLEDs();

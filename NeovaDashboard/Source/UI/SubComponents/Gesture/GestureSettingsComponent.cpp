@@ -123,13 +123,12 @@ void GestureSettingsComponent::updateDisplay()
 
     if (!disabled)
     {
-        if (hubConfig.getGestureData (gestureId).on != 0
-			&& gestTuner != nullptr)
+        if (gestTuner != nullptr)
         {
-            //gestTuner->updateDisplay();
+            gestTuner->updateDisplay();
         }
         
-        //midiPanel->updateDisplay();
+        midiPanel->updateDisplay();
     }
 }
 
@@ -209,7 +208,7 @@ void GestureSettingsComponent::createToggles()
 
 void GestureSettingsComponent::createMidiPanel()
 {
-    midiPanel = std::make_unique<MidiPanel> (hubConfig, gestureId);
+    midiPanel = std::make_unique<MidiPanel> (hubConfig, dataReader, gestureId);
     addAndMakeVisible (*midiPanel);
 }
 

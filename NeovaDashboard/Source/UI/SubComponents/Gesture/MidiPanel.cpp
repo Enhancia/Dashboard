@@ -10,13 +10,13 @@
 
 #include "MidiPanel.h"
 
-MidiPanel::MidiPanel (HubConfiguration& config, const int gestId)
-    : hubConfig (config), id (gestId)
+MidiPanel::MidiPanel (HubConfiguration& config, DataReader& reader, const int gestId)
+    : hubConfig (config), dataReader (reader), id (gestId)
 {
     createComboBox();
     createLabels();
 
-    addAndMakeVisible (midiRangeTuner = new MidiRangeTuner (config, gestId));
+    addAndMakeVisible (midiRangeTuner = new MidiRangeTuner (config, dataReader, gestId));
 
     setComponentsVisibility();
 }
@@ -203,8 +203,8 @@ void MidiPanel::setComponentsVisibility()
 //==============================================================================
 // Midi Range Tuner
 
-MidiRangeTuner::MidiRangeTuner (HubConfiguration& config, const int gestId)
-	: hubConfig (config), id (gestId)
+MidiRangeTuner::MidiRangeTuner (HubConfiguration& config, DataReader& reader, const int gestId)
+    : hubConfig (config), dataReader (reader), id (gestId)
 {
     highlightColour = neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (id).type,
     														   hubConfig.isGestureActive (id));
@@ -446,9 +446,29 @@ void MidiRangeTuner::mouseUp (const MouseEvent& e)
 
 void MidiRangeTuner::updateDisplay()
 {
-    //if (gesture.getRescaledMidiValue() != lastValue)
+    using namespace neova_dash::gesture;
+
+    HubConfiguration::GestureData gestureData (hubConfig.getGestureData (id));
+    const int type = gestureData.type;
+
+    if (type == none) return;
+
+    const float& value =  (type == vibrato) ? dataReader.getFloatValueReference (neova_dash::data::variance)
+                         :(type == pitchBend) ? dataReader.getFloatValueReference (neova_dash::data::roll)
+                         :(type == roll) ? dataReader.getFloatValueReference (neova_dash::data::roll)
+                         :(type == tilt) ? dataReader.getFloatValueReference (neova_dash::data::tilt)
+                         : dataReader.getFloatValueReference (neova_dash::data::tilt); // default: tilt value
+
+    const int rescaledMidiValue = computeMidiValue (type, value, gestureData.gestureParam0,
+                                                                 gestureData.gestureParam1,
+                                                                 gestureData.gestureParam2,
+                                                                 gestureData.gestureParam3,
+                                                                 gestureData.gestureParam4,
+                                                                 gestureData.gestureParam5);
+
+    if (rescaledMidiValue != lastValue)
     {
-        //lastValue = gesture.getRescaledMidiValue();
+        lastValue = rescaledMidiValue;
         
         repaint (lowSlider->getBounds().withY (lowSlider->getBounds().getCentreY() - 13)
                                        .withHeight (8));

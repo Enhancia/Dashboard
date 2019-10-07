@@ -11,11 +11,12 @@
 #include "HeaderComponent.h"
 
 //==============================================================================
-HeaderComponent::HeaderComponent (OptionsPanel& options, DataReader& reader)
+HeaderComponent::HeaderComponent (OptionsPanel& options, HubConfiguration& config, DataReader& reader)
     : optionsPanel (options)
 {
     TRACE_IN;
-    batteryComponent = std::make_unique<BatteryComponent> (reader.getFloatValueReference (neova_dash::data::battery));
+    batteryComponent = std::make_unique<BatteryComponent> (reader.getFloatValueReference (neova_dash::data::battery),
+                                                           config);
     addAndMakeVisible (*batteryComponent);
 
     createButton();
@@ -61,33 +62,6 @@ void HeaderComponent::buttonClicked (Button* bttn)
     }
 }
 
-void HeaderComponent::mouseUp (const MouseEvent& e)
-{
-    /*
-    if (e.eventComponent == batteryComponent.get())
-    {
-        ScopedPointer<AlertWindow> beulAlert = new AlertWindow ("Beul Window",
-                                                                "Ceci est une fenetre concue pour que Beul "
-                                                                "puisse dire des conneries dans mon interface",
-                                                                AlertWindow::NoIcon,
-                                                                getParentComponent());
-        beulAlert->addButton ("Oui", 0, KeyPress (KeyPress::escapeKey));
-        beulAlert->setOpaque (false);
-        beulAlert->setLookAndFeel (&getLookAndFeel());
-        beulAlert->runModalLoop();
-
-        
-        //AlertWindow::showMessageBox (AlertWindow::NoIcon,
-        //                                  "Beul Window",
-        //                                  "Ceci est une fenetre concue pour que Beul "
-        //                                  "puisse dire des conneries dans mon interface",
-        //                                  "Jambon",
-        //                                  getParentComponent());
-
-
-    }*/
-}
-
 void HeaderComponent::createButton()
 {
     // Close button
@@ -101,6 +75,21 @@ void HeaderComponent::createButton()
     optionsButton->setPaintMode (DashShapeButton::fillAndStroke);
     optionsButton->setStrokeThickness (1.8f);
     optionsButton->addListener (this);
+}
+
+void HeaderComponent::timerCallback()
+{
+    update();
+}
+
+void HeaderComponent::update()
+{
+    repaintBattery();
+}
+
+void HeaderComponent::repaintBattery()
+{
+    batteryComponent->repaintIfNeeded();
 }
 
 void HeaderComponent::BatteryComponent::paint (Graphics& g)
@@ -120,12 +109,24 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
 
 	g.drawRect (juce::Rectangle<int>(2, 4).withPosition ({batteryArea.getRight(), batteryArea.getY() + 2}), 1);
 
-	float battery = jmax (jmin (batteryValueRef, 1.0f), 0.0f);
-
-	if (battery <= 0.2f) g.setColour (Colours::red);
-	else if (battery == 1.0f) g.setColour (Colours::lime);
+	g.setColour ((lastBattery <= 0.2f) ? Colours::red
+                                       : (lastBattery == 1.0f) ? Colours::lime
+                                                               : neova_dash::colour::mainText);
 
     g.fillRect (batteryArea.reduced (2)
     					   .withRight (batteryArea.getX() + 2
-    					   				   + int ((batteryArea.getWidth() - 4) * battery)));
+    					   				   + int ((batteryArea.getWidth() - 4) * lastBattery)));
+}
+
+void HeaderComponent::BatteryComponent::repaintIfNeeded()
+{
+    const float battery = jmax (jmin (neova_dash::dataconvertRawBatteryToPercentage (batteryValueRef),
+                                      1.0f),
+                                0.0f);
+
+    if (battery != lastBattery)
+    {
+        lastBattery = battery;
+        repaint();
+    }
 }

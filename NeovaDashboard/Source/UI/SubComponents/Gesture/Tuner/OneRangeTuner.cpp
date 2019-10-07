@@ -280,12 +280,14 @@ void OneRangeTuner::buttonClicked (Button* bttn)
 {
     if (bttn == minAngleButton)
     {
-        lowSlider->setValue (gestureRange.convertFrom0to1 (value), sendNotification);
+        lowSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
+        setRangeLow (float (lowSlider->getValue()));
     }
 
     else if (bttn == maxAngleButton)
     {
-        highSlider->setValue (gestureRange.convertFrom0to1 (value), sendNotification);
+        highSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
+        setRangeHigh (float (highSlider->getValue()));
     }
 }
 
@@ -685,7 +687,7 @@ void OneRangeTuner::updateLabelBounds (Label* labelToUpdate)
 
 float OneRangeTuner::getValueAngle()
 {
-    float convertedValue = gestureRange.convertFrom0to1 (value);
+    float convertedValue = value; //gestureRange.convertFrom0to1 (value);
 
     float cursorAngle;
 
@@ -729,8 +731,8 @@ void OneRangeTuner::drawValueCursor (Graphics& g)
                                                            cursorPath.getBounds().getCentreX(),
                                                            cursorPath.getBounds().getCentreY());
 
-    g.setColour ((gestureRange.convertFrom0to1 (value) >= getRangeLow())
-                 && (gestureRange.convertFrom0to1 (value) <= getRangeHigh()) ? tunerColour
+    g.setColour ((/*gestureRange.convertFrom0to1 (value)*/ value >= getRangeLow())
+                 && (/*gestureRange.convertFrom0to1 (value)*/ value <= getRangeHigh()) ? tunerColour
                                                                              : Colour (0x80808080));
     g.fillPath (cursorPath, transform);
 }

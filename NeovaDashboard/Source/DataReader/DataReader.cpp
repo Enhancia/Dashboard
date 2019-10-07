@@ -22,8 +22,6 @@ DataReader::DataReader(): InterprocessConnection (true, 0x6a6d626e)
         floatData.add (0.0f);
     }
 
-    floatData.set (neova_dash::data::battery, 0.8f); // TO DELETE
-
     jassert (floatData.size() == 5);
     
     #if JUCE_MAC
@@ -68,8 +66,13 @@ bool DataReader::readData (String s)
 
         for (int i=0; i<neova_dash::data::numDatas; i++)
         {
-            floatData[i] == (*data)[i].getFloatValue();
+            floatData.set (i, (*data)[i].getFloatValue());
         }
+
+        DBG ("Data : " << data->joinIntoString (" "));
+
+        // Notifies Ring is no longer in chargeMode
+        //if (hubConfig.getRingIsCharging()) hubConfig.setRingIsCharging (false);
 
         return true;
     }
@@ -79,6 +82,11 @@ bool DataReader::readData (String s)
     {
         (*data).set (neova_dash::data::battery, strArr[0]);
         floatData.set (neova_dash::data::battery, strArr[0].getFloatValue());
+
+		DBG ("Battery : " << (*data) [neova_dash::data::battery]);
+
+        // Notifies Ring is in ChargeMode
+        //if (!hubConfig.getRingIsCharging()) hubConfig.setRingIsCharging (true);
 
         return true;
     }
@@ -184,4 +192,11 @@ void DataReader::changeListenerCallback (ChangeBroadcaster * source)
     statutPipe->disconnect();
     statutPipe.reset();
   #endif
+}
+
+
+// TO DELETE, FOR TESTING PURPOSE
+void DataReader::incrementDataValue (const float valueToAdd, neova_dash::data::HubData dataToIncrement)
+{
+    floatData.set (dataToIncrement, jmin (1.0f, jmax (0.0f, floatData[dataToIncrement] + valueToAdd)));
 }

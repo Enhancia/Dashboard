@@ -139,8 +139,9 @@ public:
     //const String getHubFirm();
     //const String getRingFirm();
 
-    
-    Array<float> data {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+    //==============================================================================
+    void setRingIsCharging (bool isCharging);
+    bool getRingIsCharging();
 
 private:
     //==============================================================================
@@ -170,7 +171,11 @@ private:
 	ApplicationCommandManager& commandManager = getCommandManager();
 	int selectedPreset = 0;
     int selectedGesture = -1;
-    
+
+    //==============================================================================
+    bool ringIsCharging = false;
+
+    //==============================================================================
 	ConfigData config;
 
     //==============================================================================

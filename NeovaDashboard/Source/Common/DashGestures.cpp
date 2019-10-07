@@ -1,0 +1,154 @@
+/*
+  ==============================================================================
+
+    DashGestures.cpp
+    Created: 7 Oct 2019 3:01:29pm
+    Author:  Enhancia Dev
+
+  ==============================================================================
+*/
+
+#include "../../JuceLibraryCode/JuceHeader.h"
+#include "DashGestures.h"
+
+namespace neova_dash
+{
+namespace gesture
+{
+	int computeMidiValue (int type, float value, float parameter0,
+		 										 float parameter1,
+		 										 float parameter2,
+		 										 float parameter3,
+		 										 float parameter4,
+		 										 float parameter5)
+	{
+		if (type == numTypes) return 0;
+
+		else if (type == int (vibrato))
+		{
+			const float gain = parameter0;
+			const float threshold = parameter1;
+			const float intensity = parameter2;
+			const float maxRange = float (VIBRATO_RANGE_MAX);
+
+			if (intensity < threshold)
+			{
+				return 64;
+			}
+
+			return map (value, -(maxRange - gain), (maxRange + 0.01f - gain), 0, 127);
+		}
+		else if (type == int (pitchBend))
+		{
+			// Right side
+		    if (value >= parameter2 && value < 140.0f)
+		    {
+		        if (parameter2 == parameter3) return 64;
+		        
+		        return map (value, parameter2, parameter3, 64, 127);
+		    }
+		    
+		    // Left side
+		    else if (value < parameter1 && value > -140.0f)
+		    {
+		        if (parameter0 == parameter1) return 64;
+		        
+		        return map (value, parameter0, parameter1, 0, 63);
+		    }
+
+		    return 64;
+		}
+		else if (type == int (tilt))
+		{
+			return map (value, parameter0, parameter1, 0, 127);
+		}
+		else if (type == int (roll))
+		{
+			return map (value, parameter0, parameter1, 0, 127);
+		}
+		else if (type == int (wave))
+		{
+			return 0;
+		}
+
+		return 0;
+	}
+
+	int map (float val, float minVal, float maxVal, int minNew, int maxNew)
+	{
+	    if (minVal == maxVal && val == minVal) return minNew;
+
+	    if (val < minVal) return minNew;
+	    if (val > maxVal) return maxNew;
+
+	    return (minNew + int ((maxNew - minNew)*(val - minVal)/(maxVal-minVal)));
+	}
+
+	neova_dash::gesture::GestureType intToGestureType (const int typeInt)
+	{
+		switch (typeInt)
+		{
+			case int (neova_dash::gesture::vibrato):   return neova_dash::gesture::vibrato;
+	        case int (neova_dash::gesture::pitchBend): return neova_dash::gesture::pitchBend;
+	        case int (neova_dash::gesture::tilt):      return neova_dash::gesture::tilt;
+	        case int (neova_dash::gesture::roll):      return neova_dash::gesture::roll;
+	        case int (neova_dash::gesture::wave):      return neova_dash::gesture::wave;
+	        default:                                   return neova_dash::gesture::none;
+		}
+	}
+
+	const String getTypeString (const neova_dash::gesture::GestureType type, const bool withSpacingAndCase)
+	{
+		switch (type)
+		{
+			case neova_dash::gesture::vibrato:
+				return withSpacingAndCase ? "Vibrato"  : "vibrato";
+			
+			case neova_dash::gesture::pitchBend:
+				return withSpacingAndCase ? "Pitch Bend" : "pitchBend" ;
+			
+			case neova_dash::gesture::tilt:
+				return withSpacingAndCase ? "Tilt"  : "tilt";
+			
+			case neova_dash::gesture::roll:
+				return withSpacingAndCase ? "Roll"  : "roll";
+			
+			case neova_dash::gesture::wave:
+				return withSpacingAndCase ? "Wave"  : "wave";
+
+			default:
+				return "none";
+		}
+	}
+	const String getTypeString (const int typeInt, const bool withSpacingAndCase)
+	{
+		return getTypeString (intToGestureType (typeInt), withSpacingAndCase);
+	}
+
+	const String getDescriptionString (const neova_dash::gesture::GestureType type)
+	{
+		switch (type)
+		{
+			case neova_dash::gesture::vibrato:
+				return "Quickly move your finger back and forth "
+                   	   "to change the pitch in a sine shape.\n";
+			
+			case neova_dash::gesture::pitchBend:
+				return "Lean your hand to either side "
+                   	   "to change the pitch of your note\n";
+			
+			case neova_dash::gesture::tilt:
+				return "Tilt your hand upwards or downwards to modulate your sound.\n";
+			
+			case neova_dash::gesture::roll:
+				return "Rotate your hand sideways to modulate your sound.\n";
+			
+			case neova_dash::gesture::wave:
+				return "TBD.\n";
+
+			default:
+				return "-";
+		}
+	}
+}; // namespace gesture
+} // namespace neova_dash

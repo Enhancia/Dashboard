@@ -353,33 +353,37 @@ void TwoRangeTuner::buttonClicked (Button* bttn)
 {
     if (bttn == minLeftAngleButton)
     {
-        if (gestureRange.convertFrom0to1 (value) > getRangeRightLow())
+        if (/*gestureRange.convertFrom0to1 (value)*/ value > getRangeRightLow())
         {
             leftLowSlider->setValue (getRangeRightLow(), sendNotification);
         }
         else
         {
-            leftLowSlider->setValue (gestureRange.convertFrom0to1 (value), sendNotification);
+            leftLowSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
         }
+        setRangeLeftLow (float (leftLowSlider->getValue()));
     }
     else if (bttn == maxLeftAngleButton)
     {
-        leftHighSlider->setValue (gestureRange.convertFrom0to1 (value), sendNotification);
+        leftHighSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
+        setRangeLeftHigh (float (leftHighSlider->getValue()));
     }
      if (bttn == minRightAngleButton)
     {
-        rightLowSlider->setValue (gestureRange.convertFrom0to1 (value), sendNotification);
+        rightLowSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
+        setRangeRightLow (float (rightLowSlider->getValue()));
     }
     else if (bttn == maxRightAngleButton)
     {
-        if (gestureRange.convertFrom0to1 (value) < getRangeLeftHigh())
+        if (/*gestureRange.convertFrom0to1 (value)*/ value < getRangeLeftHigh())
         {
             rightHighSlider->setValue (getRangeLeftHigh(), sendNotification);
         }
         else
         {
-            rightHighSlider->setValue (gestureRange.convertFrom0to1 (value), sendNotification);
+            rightHighSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
         }
+        setRangeRightHigh (float (rightHighSlider->getValue()));
     }
 }
 
@@ -930,7 +934,7 @@ void TwoRangeTuner::updateLabelBounds (Label* labelToUpdate)
 
 float TwoRangeTuner::getValueAngle()
 {
-    float convertedValue = gestureRange.convertFrom0to1 (value);
+	float convertedValue = value;//gestureRange.convertFrom0to1 (value);
 
     float cursorAngle;
 
@@ -973,10 +977,10 @@ void TwoRangeTuner::drawValueCursor (Graphics& g)
                                                            cursorPath.getBounds().getCentreX(),
                                                            cursorPath.getBounds().getCentreY());
 
-    g.setColour (   ((gestureRange.convertFrom0to1 (value) >= getRangeLeftLow())
-                        && (gestureRange.convertFrom0to1 (value) <= getRangeLeftHigh()))
-                 ||  ((gestureRange.convertFrom0to1 (value) >= getRangeRightLow())
-                        && (gestureRange.convertFrom0to1 (value) <= getRangeRightHigh()))
+    g.setColour (   ((/*gestureRange.convertFrom0to1 (value)*/ value >= getRangeLeftLow())
+                        && (/*gestureRange.convertFrom0to1 (value)*/ value <= getRangeLeftHigh()))
+                 ||  ((/*gestureRange.convertFrom0to1 (value)*/ value >= getRangeRightLow())
+                        && (/*gestureRange.convertFrom0to1 (value)*/ value <= getRangeRightHigh()))
                   ? tunerColour
                   : Colour (0x80808080));
     g.fillPath (cursorPath, transform);

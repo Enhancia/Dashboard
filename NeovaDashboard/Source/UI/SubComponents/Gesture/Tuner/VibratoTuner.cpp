@@ -27,9 +27,11 @@ VibratoTuner::VibratoTuner (HubConfiguration& config, const float& val,
 VibratoTuner::VibratoTuner (HubConfiguration& config, DataReader& reader, const int gestureId)
     : VibratoTuner (config,
     				reader.getFloatValueReference (neova_dash::data::variance),
-    				NormalisableRange<float> (-180.0f, 180.0f), gestureId,
+    				NormalisableRange<float> (-neova_dash::gesture::VIBRATO_RANGE_MAX,
+    										  neova_dash::gesture::VIBRATO_RANGE_MAX),
+    				gestureId,
     				reader.getFloatValueReference (neova_dash::data::acceleration),
-    				1000.0f,
+    				100.0f,
     	            Range<float> (0.0f, neova_dash::ui::VIBRATO_DISPLAY_MAX),
     	            Range<float> (0.0f, neova_dash::ui::VIBRATO_THRESH_DISPLAY_MAX))
 {
@@ -103,9 +105,11 @@ void VibratoTuner::updateComponents()
 
 void VibratoTuner::updateDisplay()
 {
-	computeSmoothIntensity (2.0f);
+	computeSmoothIntensity (1.5f);
 
-	if (smoothIntensity > intensity || intensity != lastIntensity || value != lastValue)
+	if (!std::isnan(smoothIntensity) && (smoothIntensity > intensity
+									     || intensity != lastIntensity
+									     || value != lastValue))
 	{
 		repaint();
 	}
@@ -362,9 +366,11 @@ void VibratoTuner::drawValueCursor (Graphics& g)
 {
 	lastValue = value;
 
+	float convertedValue = gestureRange.convertTo0to1 (value);
+
 	int offset = (intensity < getThreshold()) ? 0
-	                                          : (value - 0.5f) * (gainSlider->getWidth() - 30)
-	                                                           * ((int) getGain())/50;
+	                                          : (convertedValue - 0.5f) * (gainSlider->getWidth() - 30)
+	                                                                    * ((int) getGain())/50;
 
 	Point<int> cursorPoint = {gainSlider->getBounds().getCentreX() + offset,
 							  gainSlider->getBounds().getCentreY()};
@@ -379,7 +385,7 @@ void VibratoTuner::drawIntensityCursor (Graphics& g)
 
     Point<float> cursorPoint (thresholdSlider->getBounds().getCentreX() - 10,
                               jmax (thresholdSlider->getBottom() - 10 - (thresholdSlider->getHeight() - 20)
-                              											    * smoothIntensity/500,
+                              											    * smoothIntensity/maxIntensity,
                               		(float) (thresholdSlider->getY() + 10)));
 
 	Path cursorPath;
