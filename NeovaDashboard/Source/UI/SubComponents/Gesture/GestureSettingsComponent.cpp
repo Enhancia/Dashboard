@@ -10,8 +10,9 @@
 
 #include "GestureSettingsComponent.h"
 
-GestureSettingsComponent::GestureSettingsComponent (const int gestId, HubConfiguration& config, ApplicationCommandManager& manager)
-	: gestureId (gestId), hubConfig (config), commandManager (manager)
+GestureSettingsComponent::GestureSettingsComponent (const int gestId, HubConfiguration& config,
+                                                    ApplicationCommandManager& manager, DataReader& reader)
+	: gestureId (gestId), hubConfig (config), commandManager (manager), dataReader (reader)
 {
     TRACE_IN;
 
@@ -122,13 +123,12 @@ void GestureSettingsComponent::updateDisplay()
 
     if (!disabled)
     {
-        if (hubConfig.getGestureData (gestureId).on != 0
-			&& gestTuner != nullptr)
+        if (gestTuner != nullptr)
         {
-            //gestTuner->updateDisplay();
+            gestTuner->updateDisplay();
         }
         
-        //midiPanel->updateDisplay();
+        midiPanel->updateDisplay();
     }
 }
 
@@ -149,30 +149,30 @@ void GestureSettingsComponent::createTuner()
 {
 	if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::vibrato))
     {
-        gestTuner = std::make_unique <VibratoTuner> (hubConfig, gestureId);
+        gestTuner = std::make_unique <VibratoTuner> (hubConfig, dataReader, gestureId);
         addAndMakeVisible (*gestTuner);
     }
     else if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::pitchBend))
     {
-        gestTuner = std::make_unique <PitchBendTuner> (hubConfig, gestureId);
+        gestTuner = std::make_unique <PitchBendTuner> (hubConfig, dataReader, gestureId);
         addAndMakeVisible (*gestTuner);
     }
     
     else if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::tilt))
     {
-        gestTuner = std::make_unique <TiltTuner> (hubConfig, gestureId);
+        gestTuner = std::make_unique <TiltTuner> (hubConfig, dataReader, gestureId);
         addAndMakeVisible (*gestTuner);
     }
     /*  Un-comment when the wave gesture is implemented
     else if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::wave))
     {
-        gestTuner = std::make_unique <WaveTuner> (hubConfig, gestureId);
+        gestTuner = std::make_unique <WaveTuner> (hubConfig, dataReader, gestureId);
         addAndMakeVisible (*gestTuner);
     }
     */
     else if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::roll))
     {
-        gestTuner = std::make_unique <RollTuner> (hubConfig, gestureId);
+        gestTuner = std::make_unique <RollTuner> (hubConfig, dataReader, gestureId);
         addAndMakeVisible (*gestTuner);
     }
     else
@@ -208,7 +208,7 @@ void GestureSettingsComponent::createToggles()
 
 void GestureSettingsComponent::createMidiPanel()
 {
-    midiPanel = std::make_unique<MidiPanel> (hubConfig, gestureId);
+    midiPanel = std::make_unique<MidiPanel> (hubConfig, dataReader, gestureId);
     addAndMakeVisible (*midiPanel);
 }
 

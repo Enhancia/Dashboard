@@ -144,7 +144,7 @@ void HubConfiguration::setPreset (const int gestureNumberToSelect)
 	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);	
 }
 
-void HubConfiguration::setPreset(const int gestureNumberToSelect, bool uploadToHub)
+void HubConfiguration::setPreset (const int gestureNumberToSelect, bool uploadToHub)
 {
 	if (gestureNumberToSelect < 0 || gestureNumberToSelect > 4 || gestureNumberToSelect == selectedPreset) return;
 
@@ -233,6 +233,16 @@ void HubConfiguration::setSelectedGesture (const int gestureToSelect)
 const int HubConfiguration::getSelectedGesture()
 {
 	return selectedGesture;
+}
+
+void HubConfiguration::setRingIsCharging (bool isCharging)
+{
+	ringIsCharging = isCharging;
+}
+
+bool HubConfiguration::getRingIsCharging()
+{
+	return ringIsCharging;
 }
 
 void HubConfiguration::setDefaultConfig()

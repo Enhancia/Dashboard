@@ -12,6 +12,7 @@
 
 #include "../../../../JuceLibraryCode/JuceHeader.h"
 #include "../../../Common/DashCommon.h"
+#include "../../../DataReader/DataReader.h"
 
 #include "../../../Common/HubConfiguration.h"
 #include "GestureSlots.h"
@@ -26,7 +27,8 @@ class GesturePanel    : public Component,
 {
 public:
     //==============================================================================
-    GesturePanel (HubConfiguration& data, NewGesturePanel& newGest, ApplicationCommandManager& manager,
+    GesturePanel (HubConfiguration& data, DataReader& reader,
+                  NewGesturePanel& newGest, ApplicationCommandManager& manager,
                   int freqHz = 60);
     ~GesturePanel();
 
@@ -97,6 +99,7 @@ private:
     HubConfiguration& hubConfig;
     NewGesturePanel& newGesturePanel;
     ApplicationCommandManager& commandManager;
+    DataReader& dataReader;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GesturePanel)

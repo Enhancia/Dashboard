@@ -13,6 +13,7 @@
 #include "../../../../../JuceLibraryCode/JuceHeader.h"
 #include "../../../../Common/DashCommon.h"
 #include "../../../../Common/HubConfiguration.h"
+#include "../../../../DataReader/DataReader.h"
 #include "Tuner.h"
 
 class VibratoTuner:    public Tuner,
@@ -21,7 +22,7 @@ class VibratoTuner:    public Tuner,
 {
 public:
     //==============================================================================
-    VibratoTuner (HubConfiguration& config, const int gestureId);
+    VibratoTuner (HubConfiguration& config, DataReader& reader, const int gestureId);
     ~VibratoTuner();
     
     //==============================================================================
