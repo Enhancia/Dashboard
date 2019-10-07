@@ -48,7 +48,7 @@ public:
     
         Logger::setCurrentLogger (dashboardLogger);
 
-		dataReader = std::make_unique<DataReader>();
+		dataReader = std::make_unique<DataReader>(commandManager, hubConfig);
 		dataReader->addChangeListener(this);
 
 		dashPipe = std::make_unique<DashPipe>();

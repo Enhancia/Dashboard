@@ -26,14 +26,15 @@ namespace neova_dash
     	enum commandIDs
     	{
             // Backend commands
-    		flashHub            = 0x00000001, // Writes Temp Hub Config To Its Memory
-    		upgradeHub          = 0x00000002, // Upgrades Hub Firm
-    		upgradeRing         = 0x00000003, // Upgrades Ring Firm
-    		uploadConfigToHub   = 0x00000004, // Uploads config to HUB
+    		flashHub             = 0x00000001, // Writes Temp Hub Config To Its Memory
+    		upgradeHub           = 0x00000002, // Upgrades Hub Firm
+    		upgradeRing          = 0x00000003, // Upgrades Ring Firm
+    		uploadConfigToHub    = 0x00000004, // Uploads config to HUB
 
             // Frontend commands
-    		updateDashInterface = 0x01000001, // Updates Dash interface to match the HUB data
-            updateInterfaceLEDs = 0x01000002  // Updates the Hub lEDs in the Dash interface
+    		updateDashInterface  = 0x01000001, // Updates Dash interface to match the HUB data
+            updateInterfaceLEDs  = 0x01000002, // Updates the Hub lEDs in the Dash interface
+            updateBatteryDisplay = 0x01000003  // Updates the battery display in the header
     	};
     };
 

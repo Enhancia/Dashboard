@@ -9,7 +9,8 @@
 #include "DataReader.h"
 
 //==============================================================================
-DataReader::DataReader(): InterprocessConnection (true, 0x6a6d626e)
+DataReader::DataReader (ApplicationCommandManager& manager, HubConfiguration& config)
+    : InterprocessConnection (true, 0x6a6d626e), commandManager (manager), hubConfig (config)
 {
     setSize (120, 50);
     connected = false;
@@ -72,7 +73,11 @@ bool DataReader::readData (String s)
         DBG ("Data : " << data->joinIntoString (" "));
 
         // Notifies Ring is no longer in chargeMode
-        //if (hubConfig.getRingIsCharging()) hubConfig.setRingIsCharging (false);
+        if (hubConfig.getRingIsCharging())
+        {
+            hubConfig.setRingIsCharging (false);
+            //commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
+        }
 
         return true;
     }
@@ -86,7 +91,11 @@ bool DataReader::readData (String s)
 		DBG ("Battery : " << (*data) [neova_dash::data::battery]);
 
         // Notifies Ring is in ChargeMode
-        //if (!hubConfig.getRingIsCharging()) hubConfig.setRingIsCharging (true);
+        if (!hubConfig.getRingIsCharging())
+        {
+            hubConfig.setRingIsCharging (true);
+            //commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
+        }
 
         return true;
     }

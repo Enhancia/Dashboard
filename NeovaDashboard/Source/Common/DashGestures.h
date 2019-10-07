@@ -57,7 +57,9 @@ namespace neova_dash
         extern const String getTypeString (const int typeInt, const bool withSpacingAndCase);
         extern const String getDescriptionString (const GestureType type);
 
-        extern int computeMidiValue (int type, float value, float parameter0,
+        extern int computeMidiValue (int type, float value, int rangeLow,
+                                                            int rangeHigh,
+                                                            float parameter0,
 		 													float parameter1,
 		 													float parameter2 = 0.0f,
 		 													float parameter3 = 0.0f,
@@ -65,5 +67,6 @@ namespace neova_dash
 		 													float parameter5 = 0.0f);
 
         static int map (float val, float minVal, float maxVal, int minNew, int maxNew);
+        static int mapInt (int val, int minVal, int maxVal, int minNew, int maxNew);
     };
 }

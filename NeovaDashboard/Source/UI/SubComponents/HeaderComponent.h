@@ -21,7 +21,6 @@
 */
 
 class HeaderComponent    : public Component,
-                           public Timer,
 						   private Button::Listener
 
 {
@@ -38,27 +37,28 @@ public:
     void buttonClicked (Button* bttn) override;
     
     //==============================================================================
-    void timerCallback() override;
 
     //==============================================================================
-    void repaintBattery();
     void update();
 
 private:
-	class BatteryComponent : public Component
+	class BatteryComponent : public Component,
+                             public Timer
 	{
 	public:
 		//==========================================================================
-		BatteryComponent (const float& batteryValRef, HubConfiguration& config)
-            : batteryValueRef (batteryValRef), hubConfig (config) {}
-		~BatteryComponent() {}
+		BatteryComponent (const float& batteryValRef, HubConfiguration& config);
+		~BatteryComponent();
 
 		//==========================================================================
 		void paint(Graphics&) override;
 		void resized() override { repaint(); }
 
         //==========================================================================
-        vid repaintIfNeeded();
+        void timerCallback() override;
+        
+        //==========================================================================
+        void repaintIfNeeded();
 
 		//==========================================================================
 		const float& batteryValueRef;

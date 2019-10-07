@@ -15,7 +15,9 @@ namespace neova_dash
 {
 namespace gesture
 {
-	int computeMidiValue (int type, float value, float parameter0,
+	int computeMidiValue (int type, float value, int rangeLow,
+												 int rangeHigh,
+												 float parameter0,
 		 										 float parameter1,
 		 										 float parameter2,
 		 										 float parameter3,
@@ -24,54 +26,50 @@ namespace gesture
 	{
 		if (type == numTypes) return 0;
 
-		else if (type == int (vibrato))
+		int midiVal = 0;
+
+		if (type == int (vibrato))
 		{
 			const float gain = parameter0;
 			const float threshold = parameter1;
 			const float intensity = parameter2;
 			const float maxRange = float (VIBRATO_RANGE_MAX);
 
-			if (intensity < threshold)
-			{
-				return 64;
-			}
-
-			return map (value, -(maxRange - gain), (maxRange + 0.01f - gain), 0, 127);
+			midiVal = (intensity < threshold) ? 64
+											  : map (value, -(maxRange - gain), (maxRange + 0.01f - gain), 0, 127);
 		}
 		else if (type == int (pitchBend))
 		{
 			// Right side
 		    if (value >= parameter2 && value < 140.0f)
 		    {
-		        if (parameter2 == parameter3) return 64;
-		        
-		        return map (value, parameter2, parameter3, 64, 127);
+		        midiVal = (parameter2 == parameter3) ? 64
+		        								     : map (value, parameter2, parameter3, 64, 127);
 		    }
 		    
 		    // Left side
 		    else if (value < parameter1 && value > -140.0f)
 		    {
-		        if (parameter0 == parameter1) return 64;
-		        
-		        return map (value, parameter0, parameter1, 0, 63);
+		        midiVal = (parameter0 == parameter1) ? 64
+		        									 : map (value, parameter0, parameter1, 0, 63);
 		    }
 
-		    return 64;
+		    else midiVal = 64;
 		}
 		else if (type == int (tilt))
 		{
-			return map (value, parameter0, parameter1, 0, 127);
+			midiVal = map (value, parameter0, parameter1, 0, 127);
 		}
 		else if (type == int (roll))
 		{
-			return map (value, parameter0, parameter1, 0, 127);
+			midiVal = map (value, parameter0, parameter1, 0, 127);
 		}
 		else if (type == int (wave))
 		{
-			return 0;
+			midiVal = 0;
 		}
 
-		return 0;
+		return mapInt (midiVal, 0, 127, rangeLow, rangeHigh);
 	}
 
 	int map (float val, float minVal, float maxVal, int minNew, int maxNew)
@@ -82,6 +80,17 @@ namespace gesture
 	    if (val > maxVal) return maxNew;
 
 	    return (minNew + int ((maxNew - minNew)*(val - minVal)/(maxVal-minVal)));
+	}
+
+	int mapInt (int val, int minVal, int maxVal, int minNew, int maxNew)
+	{
+	    if (minVal == maxVal && val == minVal) return minNew;
+	    else if (minVal == minNew && maxVal == maxNew) return val;
+
+	    if (val < minVal) return minNew;
+	    if (val > maxVal) return maxNew;
+
+	    return (minNew + (maxNew - minNew)*(val - minVal)/(maxVal-minVal));
 	}
 
 	neova_dash::gesture::GestureType intToGestureType (const int typeInt)

@@ -20,7 +20,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     optionsPanel = std::make_unique<OptionsPanel> (hubConfig, getCommandManager());
     addAndMakeVisible (*optionsPanel);
 
-    header = std::make_unique<HeaderComponent> (*optionsPanel, dataReader);
+    header = std::make_unique<HeaderComponent> (*optionsPanel, hubConfig, dataReader);
     addAndMakeVisible (*header);
 	
     uploadButton = std::make_unique<UploadButton> (getCommandManager());
@@ -213,8 +213,8 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
 
     commands.addArray ({
                             updateDashInterface,
-                            updateInterfaceLEDs//,
-                            //updateBatteryDisplay
+                            updateInterfaceLEDs,
+                            updateBatteryDisplay
                        });
 }
 
@@ -230,10 +230,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
         case updateInterfaceLEDs:
             result.setInfo ("Update LEDs", "Udpates Hub LEDs To Current Hub Configuration", "Interface", 0);
             break;
-		/*
         case updateBatteryDisplay:
-            result.setInfo ("Update battery display", "Udpates Battery Display", "Interface", 0);
-            break;*/
+            result.setInfo ("Update Battery Display", "Udpates Battery Display Inside The Header", "Interface", 0);
+            break;
         default:
             break;
     }
@@ -251,10 +250,10 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
         case updateDashInterface:
             update();
 			return true;
-			/*
+			
         case updateBatteryDisplay:
             header->update();
-            return true;*/
+            return true;
 
         case updateInterfaceLEDs:
             hubComponent->repaintLEDs();
@@ -299,4 +298,5 @@ void DashBoardInterface::update()
     hubComponent->update();
     gesturePanel->update();
     presetSelector->update();
+    header->update();
 }

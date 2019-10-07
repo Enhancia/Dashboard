@@ -77,19 +77,20 @@ void HeaderComponent::createButton()
     optionsButton->addListener (this);
 }
 
-void HeaderComponent::timerCallback()
-{
-    update();
-}
-
 void HeaderComponent::update()
 {
-    repaintBattery();
+    batteryComponent->repaintIfNeeded();
 }
 
-void HeaderComponent::repaintBattery()
+HeaderComponent::BatteryComponent::BatteryComponent (const float& batteryValRef, HubConfiguration& config)
+        : batteryValueRef (batteryValRef), hubConfig (config)
 {
-    batteryComponent->repaintIfNeeded();
+    startTimer (10000);
+}
+
+HeaderComponent::BatteryComponent::~BatteryComponent()
+{
+    stopTimer();
 }
 
 void HeaderComponent::BatteryComponent::paint (Graphics& g)
@@ -101,6 +102,8 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
     g.setFont (neova_dash::font::dashFont.withHeight (12.0f));
     g.drawText ("Ring Battery", getLocalBounds().withWidth (getWidth()*2/3), Justification::centred, true);
 
+    // TODO : draw differently when ring charges (lastChargeState == true)
+    //g.setColour (lastChargeState ? Colours::yellow : neova_dash::colour::mainText);
     auto batteryArea = area.withLeft (getWidth()*2/3)
     					   .withSizeKeepingCentre (15, 8)
     					   .translated (0, 1);
@@ -118,15 +121,21 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
     					   				   + int ((batteryArea.getWidth() - 4) * lastBattery)));
 }
 
+void HeaderComponent::BatteryComponent::timerCallback()
+{
+    repaintIfNeeded();
+}
+
 void HeaderComponent::BatteryComponent::repaintIfNeeded()
 {
-    const float battery = jmax (jmin (neova_dash::dataconvertRawBatteryToPercentage (batteryValueRef),
+    const float battery = jmax (jmin (neova_dash::data::convertRawBatteryToPercentage (batteryValueRef),
                                       1.0f),
                                 0.0f);
 
-    if (battery != lastBattery)
+    if (battery != lastBattery || hubConfig.getRingIsCharging() != lastChargeState)
     {
         lastBattery = battery;
+        lastChargeState = hubConfig.getRingIsCharging();
         repaint();
     }
 }

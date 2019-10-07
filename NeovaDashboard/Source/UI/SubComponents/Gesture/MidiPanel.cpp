@@ -187,6 +187,7 @@ void MidiPanel::setComponentsVisibility()
 
     midiRangeTuner->setAlpha (shouldGrayOutTuner ? 0.3f : 1.0f);
     midiRangeTuner->setInterceptsMouseClicks (!shouldGrayOutTuner, false);
+    midiRangeTuner->setEnabled (!shouldGrayOutTuner);
     
     /* TODO AFTER RANGE 0 - 127 MidiRangeTuner
     midiRangeTuner->setRangeLow (shouldGrayOutTuner ? 0.0f
@@ -451,7 +452,7 @@ void MidiRangeTuner::updateDisplay()
     HubConfiguration::GestureData gestureData (hubConfig.getGestureData (id));
     const int type = gestureData.type;
 
-    if (type == none) return;
+    if (type == none || !isEnabled()) return;
 
     const float& value =  (type == vibrato) ? dataReader.getFloatValueReference (neova_dash::data::variance)
                          :(type == pitchBend) ? dataReader.getFloatValueReference (neova_dash::data::roll)
@@ -459,7 +460,9 @@ void MidiRangeTuner::updateDisplay()
                          :(type == tilt) ? dataReader.getFloatValueReference (neova_dash::data::tilt)
                          : dataReader.getFloatValueReference (neova_dash::data::tilt); // default: tilt value
 
-    const int rescaledMidiValue = computeMidiValue (type, value, gestureData.gestureParam0,
+    const int rescaledMidiValue = computeMidiValue (type, value, gestureData.midiLow,
+                                                                 gestureData.midiHigh,
+                                                                 gestureData.gestureParam0,
                                                                  gestureData.gestureParam1,
                                                                  gestureData.gestureParam2,
                                                                  gestureData.gestureParam3,
