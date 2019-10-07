@@ -27,6 +27,13 @@ class DashBoardInterface   : public Component,
                              public ApplicationCommandTarget
 {
 public:
+    enum InterfaceState
+    {
+        connected =0,
+        waitingForConnection,
+        pause
+    };
+
     //==============================================================================
     DashBoardInterface (HubConfiguration& data);
     ~DashBoardInterface();
@@ -49,6 +56,9 @@ public:
     bool perform (const InvocationInfo& info) override;
 
     //==============================================================================
+    void setInterfaceStateAndUpdate (const InterfaceState newState);
+
+    //==============================================================================
     void update();
 
     //==============================================================================
@@ -60,6 +70,7 @@ private:
     //==============================================================================
     static void alertPanelCallback (int modalResult, DashBoardInterface* interface);
     void paintShadows (Graphics& g);
+    void drawStateMessage (Graphics& g);
 
     //==============================================================================
     std::unique_ptr<HeaderComponent> header;
@@ -77,6 +88,8 @@ private:
     //==============================================================================
     HubConfiguration& hubConfig;
     bool commandKeyDown = ModifierKeys::currentModifiers.isCommandDown();
+
+    InterfaceState state = connected;
 
     //==============================================================================
     Image backgroundImage = ImageFileFormat::loadFrom (DashData::HUBBG_png, DashData::HUBBG_pngSize);
