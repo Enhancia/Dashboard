@@ -183,21 +183,6 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
         uploadButton->triggerClick();
     }
 
-    // TO DELETE
-    else if (key == KeyPress ('l', ModifierKeys (ModifierKeys::noModifiers), 'l'))
-    {
-        dataReader.incrementDataValue (0.1f, neova_dash::data::tilt);
-        dataReader.incrementDataValue (0.1f, neova_dash::data::roll);
-        dataReader.incrementDataValue (0.1f, neova_dash::data::battery);
-    }
-    else if (key == KeyPress ('k', ModifierKeys (ModifierKeys::noModifiers), 'k'))
-    {
-        dataReader.incrementDataValue (-0.1f, neova_dash::data::tilt);
-        dataReader.incrementDataValue (-0.1f, neova_dash::data::roll);
-        dataReader.incrementDataValue (-0.1f, neova_dash::data::battery);
-    }
-    // \TO DELETE
-
     return false;
 }
 

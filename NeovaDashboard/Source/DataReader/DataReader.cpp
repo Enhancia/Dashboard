@@ -202,10 +202,3 @@ void DataReader::changeListenerCallback (ChangeBroadcaster * source)
     statutPipe.reset();
   #endif
 }
-
-
-// TO DELETE, FOR TESTING PURPOSE
-void DataReader::incrementDataValue (const float valueToAdd, neova_dash::data::HubData dataToIncrement)
-{
-    floatData.set (dataToIncrement, jmin (1.0f, jmax (0.0f, floatData[dataToIncrement] + valueToAdd)));
-}
