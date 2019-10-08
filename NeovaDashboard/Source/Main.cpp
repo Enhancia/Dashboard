@@ -155,9 +155,20 @@ public:
 				else
 				{
 					hubPowerState = *(uint8_t*)(data + 12);
+					if (hubPowerState == POWER_ON)
+					{
+						dashInterface->setInterfaceStateAndUpdate(DashBoardInterface::connected);
+					}
+					else if (hubPowerState == POWER_OFF)
+					{
+						dashInterface->setInterfaceStateAndUpdate(DashBoardInterface::waitingForConnection);
+					}
+					else
+					{
+						dashInterface->setInterfaceStateAndUpdate(DashBoardInterface::pause);
+					}
 					//TODO => mettre interface en mode new POWER_STATE
-                    dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::pause);
-
+                    
 					if (!dashInterface->hasKeyboardFocus(true)) dashInterface->grabKeyboardFocus();
 					commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
 					DBG("POWER STATE : " + String(hubPowerState) + " \n");
