@@ -12,7 +12,7 @@
 
 HubConfiguration::HubConfiguration()
 {
-	setDefaultConfig();
+	//setDefaultConfig();
 }
 HubConfiguration::~HubConfiguration()
 {
