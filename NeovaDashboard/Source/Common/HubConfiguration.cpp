@@ -326,7 +326,8 @@ void HubConfiguration::setGestureParameters (int presetNum, int gestureNum, floa
 HubConfiguration::GestureData::GestureData (GestureData& other)
 {
     on = other.on; type = other.type;
-    midiLow = other.midiLow; midiHigh = other.midiHigh; cc = other.cc;
+    midiLow = other.midiLow; midiHigh = other.midiHigh;
+    cc = other.cc; midiType = other.midiType;
 
     gestureParam0 = other.gestureParam0; gestureParam1 = other.gestureParam1;
     gestureParam2 = other.gestureParam2; gestureParam3 = other.gestureParam3;
@@ -368,6 +369,7 @@ void HubConfiguration::swapGestures (const int firstId, const int secondId)
 
     // Copies second gesture to first Id
     getGestureData (firstId) = secondGestureCopy;
+
 
     commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
     commandManager.invokeDirectly (neova_dash::commands::updateInterfaceLEDs, true);
