@@ -12,6 +12,7 @@
 #include "../Common/DashCommon.h"
 #include "LookAndFeel/DashBoardLookAndFeel.h"
 
+#include "../DataReader/DataReader.h"
 #include "SubComponents/Gesture/GesturePanel.h"
 #include "SubComponents/Top/NewGesturePanel.h"
 #include "SubComponents/HeaderComponent.h"
@@ -35,7 +36,7 @@ public:
     };
 
     //==============================================================================
-    DashBoardInterface (HubConfiguration& data);
+    DashBoardInterface (HubConfiguration& data, DataReader& reader);
     ~DashBoardInterface();
 
     //==============================================================================
@@ -87,6 +88,8 @@ private:
     
     //==============================================================================
     HubConfiguration& hubConfig;
+    DataReader& dataReader;
+
     bool commandKeyDown = ModifierKeys::currentModifiers.isCommandDown();
 
     InterfaceState state = connected;

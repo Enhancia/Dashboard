@@ -13,6 +13,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../Common/DashCommon.h"
+#include "../Common/HubConfiguration.h"
 
 #if JUCE_MAC
 #include "StatutPipe.h"
@@ -41,7 +42,7 @@ public:
     static constexpr int DATA_SIZE = 5;
     
     //==============================================================================
-    DataReader();
+    DataReader (ApplicationCommandManager& manager, HubConfiguration& config);
     ~DataReader();
 
     //==============================================================================
@@ -49,9 +50,10 @@ public:
     void resized() override;
 
     //==============================================================================
-    bool readData(String s);
-    const String getRawData(int index);
-    bool getRawDataAsFloatArray(Array<float>& arrayToFill);
+    bool readData (String s);
+    const String getRawData (int index);
+    bool getRawDataAsFloatArray (Array<float>& arrayToFill);
+    const float& getFloatValueReference (const neova_dash::data::HubData dataId);
     
     //==============================================================================
     bool connectToExistingPipe();
@@ -69,12 +71,19 @@ private:
     bool connected;
     int pipeNumber = -1;
     
+    //==============================================================================
     ScopedPointer<StringArray> data;
+    Array<float> floatData;
 
 	#if JUCE_MAC
     std::unique_ptr<StatutPipe> statutPipe;
 	#endif
 
+    //==============================================================================
+    HubConfiguration& hubConfig;
+    ApplicationCommandManager& commandManager;
+
+    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DataReader)
 };
 

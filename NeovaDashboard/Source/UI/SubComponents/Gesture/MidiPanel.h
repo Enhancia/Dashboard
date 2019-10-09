@@ -12,6 +12,7 @@
 
 #include "../../../../JuceLibraryCode/JuceHeader.h"
 #include "../../../Common/DashCommon.h"
+#include "../../../DataReader/DataReader.h"
 #include "../../../Common/HubConfiguration.h"
 #include "../../LookAndFeel/DashBoardLookAndFeel.h"
 
@@ -34,7 +35,7 @@ public:
     };
 
     //==============================================================================
-    MidiRangeTuner (HubConfiguration& config, const int gestId);
+    MidiRangeTuner (HubConfiguration& config, DataReader& reader, const int gestId);
     ~MidiRangeTuner();
 
     //==============================================================================
@@ -84,6 +85,7 @@ private:
 
     //==============================================================================
     HubConfiguration& hubConfig;
+    DataReader& dataReader;
     int lastValue = -1;
 
     //==============================================================================
@@ -108,7 +110,7 @@ class MidiPanel    : public Component,
                      private ComboBox::Listener
 {
 public:
-    MidiPanel (HubConfiguration& config, const int gestId);
+    MidiPanel (HubConfiguration& config, DataReader& reader, const int gestId);
     ~MidiPanel();
 
     //==============================================================================
@@ -143,6 +145,8 @@ private:
 
     //==============================================================================
     HubConfiguration& hubConfig;
-    
+    DataReader& dataReader;
+
+    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiPanel)
 };

@@ -74,75 +74,37 @@ namespace ui
     }
 }; // namespace ui
 
+namespace font
+{
+	const Font getDashFont (DashFontId type = regular)
+    {
+        // Halis Grotesque
+        if (type == regular)
+            return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRRegular_otf,
+                                                            DashData::Ahmet_Altun__HalisGRRegular_otfSize));
+        else if (type == bold)
+            return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRBold_otf,
+                                                            DashData::Ahmet_Altun__HalisGRBold_otfSize));
+        else if (type == light)
+            return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRLight_otf,
+                                                            DashData::Ahmet_Altun__HalisGRLight_otfSize));
+        // Enhancia logo (capital only)
+        else if (type == enhanciaLogo)
+            return Font (Typeface::createSystemTypefaceFor (DashData::NOOADemiSerifDEMO_ttf,
+                                                            DashData::NOOADemiSerifDEMO_ttfSize));
+          
+        return Font();
+    }
+
+    const Font dashFont      = getDashFont();
+    const Font dashFontBold  = getDashFont (bold);
+    const Font dashFontLight = getDashFont (light);
+    const Font enhanciaFont  = getDashFont (enhanciaLogo);
+
+}; // namespace font
+
 namespace gesture
 {
-	neova_dash::gesture::GestureType intToGestureType (const int typeInt)
-	{
-		switch (typeInt)
-		{
-			case int (neova_dash::gesture::vibrato):   return neova_dash::gesture::vibrato;
-	        case int (neova_dash::gesture::pitchBend): return neova_dash::gesture::pitchBend;
-	        case int (neova_dash::gesture::tilt):      return neova_dash::gesture::tilt;
-	        case int (neova_dash::gesture::roll):      return neova_dash::gesture::roll;
-	        case int (neova_dash::gesture::wave):      return neova_dash::gesture::wave;
-	        default:                                   return neova_dash::gesture::none;
-		}
-	}
-
-	const String getTypeString (const neova_dash::gesture::GestureType type, const bool withSpacingAndCase)
-	{
-		switch (type)
-		{
-			case neova_dash::gesture::vibrato:
-				return withSpacingAndCase ? "Vibrato"  : "vibrato";
-			
-			case neova_dash::gesture::pitchBend:
-				return withSpacingAndCase ? "Pitch Bend" : "pitchBend" ;
-			
-			case neova_dash::gesture::tilt:
-				return withSpacingAndCase ? "Tilt"  : "tilt";
-			
-			case neova_dash::gesture::roll:
-				return withSpacingAndCase ? "Roll"  : "roll";
-			
-			case neova_dash::gesture::wave:
-				return withSpacingAndCase ? "Wave"  : "wave";
-
-			default:
-				return "none";
-		}
-	}
-	const String getTypeString (const int typeInt, const bool withSpacingAndCase)
-	{
-		return getTypeString (intToGestureType (typeInt), withSpacingAndCase);
-	}
-
-	const String getDescriptionString (const neova_dash::gesture::GestureType type)
-	{
-		switch (type)
-		{
-			case neova_dash::gesture::vibrato:
-				return "Quickly move your finger back and forth "
-                   	   "to change the pitch in a sine shape.\n";
-			
-			case neova_dash::gesture::pitchBend:
-				return "Lean your hand to either side "
-                   	   "to change the pitch of your note\n";
-			
-			case neova_dash::gesture::tilt:
-				return "Tilt your hand upwards or downwards to modulate your sound.\n";
-			
-			case neova_dash::gesture::roll:
-				return "Rotate your hand sideways to modulate your sound.\n";
-			
-			case neova_dash::gesture::wave:
-				return "TBD.\n";
-
-			default:
-				return "-";
-		}
-	}
-
 	const Colour getHighlightColour (const neova_dash::gesture::GestureType type, const bool active)
 	{
 		if (!active) return neova_dash::colour::inactiveGesture;
@@ -173,35 +135,5 @@ namespace gesture
     {
     	return getHighlightColour (intToGestureType (typeInt), active);
     }
-
-}; // namespace gesture
-
-namespace font
-{
-	const Font getDashFont (DashFontId type = regular)
-    {
-        // Halis Grotesque
-        if (type == regular)
-            return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRRegular_otf,
-                                                            DashData::Ahmet_Altun__HalisGRRegular_otfSize));
-        else if (type == bold)
-            return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRBold_otf,
-                                                            DashData::Ahmet_Altun__HalisGRBold_otfSize));
-        else if (type == light)
-            return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRLight_otf,
-                                                            DashData::Ahmet_Altun__HalisGRLight_otfSize));
-        // Enhancia logo (capital only)
-        else if (type == enhanciaLogo)
-            return Font (Typeface::createSystemTypefaceFor (DashData::NOOADemiSerifDEMO_ttf,
-                                                            DashData::NOOADemiSerifDEMO_ttfSize));
-          
-        return Font();
-    }
-
-    const Font dashFont      = getDashFont();
-    const Font dashFontBold  = getDashFont (bold);
-    const Font dashFontLight = getDashFont (light);
-    const Font enhanciaFont  = getDashFont (enhanciaLogo);
-
-}; // namespace font
+} // namespace gesture
 }; // namespace neova_dash

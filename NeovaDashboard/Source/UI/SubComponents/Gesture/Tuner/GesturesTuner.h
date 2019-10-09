@@ -14,6 +14,7 @@
 #include "../../../../Common/DashCommon.h"
 #include "../../../LookAndFeel/DashBoardLookAndFeel.h"
 #include "../../../../Common/HubConfiguration.h"
+#include "../../../../DataReader/DataReader.h"
 
 #include "Tuner.h"
 #include "TwoRangeTuner.h"
@@ -24,8 +25,8 @@
 class PitchBendTuner: public TwoRangeTuner
 {
 public:
-    PitchBendTuner (HubConfiguration& config, const int gestureId)
-        :   TwoRangeTuner (config, gestureId, config.data[4], 
+    PitchBendTuner (HubConfiguration& config, DataReader& reader, const int gestureId)
+        :   TwoRangeTuner (config, gestureId, reader.getFloatValueReference (neova_dash::data::roll), 
         				   NormalisableRange<float> (neova_dash::gesture::PITCHBEND_MIN, neova_dash::gesture::PITCHBEND_MAX),
 			               Range<float> (neova_dash::ui::PITCHBEND_DISPLAY_MIN, neova_dash::ui::PITCHBEND_DISPLAY_MAX),
                            String (CharPointer_UTF8 ("\xc2\xb0")))
@@ -43,8 +44,8 @@ private:
 class TiltTuner: public OneRangeTuner
 {
 public:
-    TiltTuner (HubConfiguration& config, const int gestureId)
-        :   OneRangeTuner (config, gestureId, config.data[3], 
+    TiltTuner (HubConfiguration& config, DataReader& reader, const int gestureId)
+        :   OneRangeTuner (config, gestureId, reader.getFloatValueReference (neova_dash::data::tilt), 
         				   NormalisableRange<float> (neova_dash::gesture::TILT_MIN, neova_dash::gesture::TILT_MAX),
 			               Range<float> (neova_dash::ui::TILT_DISPLAY_MIN, neova_dash::ui::TILT_DISPLAY_MAX),
                            String (CharPointer_UTF8 ("\xc2\xb0")), OneRangeTuner::tilt)
@@ -62,8 +63,8 @@ private:
 class WaveTuner: public OneRangeTuner
 {
 public:
-    WaveTuner (HubConfiguration& config, const int gestureId)
-        :   OneRangeTuner (config, gestureId, config.data[4],
+    WaveTuner (HubConfiguration& config, DataReader& reader, const int gestureId)
+        :   OneRangeTuner (config, gestureId, reader.getFloatValueReference (neova_dash::data::tilt),
         				   NormalisableRange<float> (neova_dash::gesture::WAVE_MIN, neova_dash::gesture::WAVE_MAX),
 			               Range<float> (neova_dash::ui::WAVE_DISPLAY_MIN, neova_dash::ui::WAVE_DISPLAY_MAX),
                            String (CharPointer_UTF8 ("\xc2\xb0")), OneRangeTuner::wave)
@@ -81,8 +82,8 @@ private:
 class RollTuner: public OneRangeTuner
 {
 public:
-    RollTuner (HubConfiguration& config, const int gestureId)
-        :   OneRangeTuner (config, gestureId, config.data[4], 
+    RollTuner (HubConfiguration& config, DataReader& reader, const int gestureId)
+        :   OneRangeTuner (config, gestureId, reader.getFloatValueReference (neova_dash::data::roll), 
         				   NormalisableRange<float> (neova_dash::gesture::ROLL_MIN, neova_dash::gesture::ROLL_MAX),
 			               Range<float> (neova_dash::ui::ROLL_DISPLAY_MIN, neova_dash::ui::ROLL_DISPLAY_MAX),
                            String (CharPointer_UTF8 ("\xc2\xb0")), OneRangeTuner::roll)

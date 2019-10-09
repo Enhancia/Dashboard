@@ -12,6 +12,7 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "DashPath.h"
+#include "DashGestures.h"
 
 // Preprocessor expressions
 #define TRACE_IN  Logger::writeToLog ("[+] Entering: " + String(__FUNCTION__) + "\n")
@@ -25,14 +26,15 @@ namespace neova_dash
     	enum commandIDs
     	{
             // Backend commands
-    		flashHub            = 0x00000001, // Writes Temp Hub Config To Its Memory
-    		upgradeHub          = 0x00000002, // Upgrades Hub Firm
-    		upgradeRing         = 0x00000003, // Upgrades Ring Firm
-    		uploadConfigToHub   = 0x00000004, // Uploads config to HUB
+    		flashHub             = 0x00000001, // Writes Temp Hub Config To Its Memory
+    		upgradeHub           = 0x00000002, // Upgrades Hub Firm
+    		upgradeRing          = 0x00000003, // Upgrades Ring Firm
+    		uploadConfigToHub    = 0x00000004, // Uploads config to HUB
 
             // Frontend commands
-    		updateDashInterface = 0x01000001, // Updates Dash interface to match the HUB data
-            updateInterfaceLEDs = 0x01000002  // Updates the Hub lEDs in the Dash interface
+    		updateDashInterface  = 0x01000001, // Updates Dash interface to match the HUB data
+            updateInterfaceLEDs  = 0x01000002, // Updates the Hub lEDs in the Dash interface
+            updateBatteryDisplay = 0x01000003  // Updates the battery display in the header
     	};
     };
 
@@ -95,53 +97,27 @@ namespace neova_dash
         const Colour wave                   (0xff7c80de);
     };
 
-    namespace gesture
+    namespace data
     {
-        const int NUM_GEST = 4;
-
-        enum GestureType
+        enum HubData
         {
-            vibrato =0,
-            pitchBend,
+            variance =0,
+            acceleration,
             tilt,
             roll,
-            wave,
+            battery,
 
-            numTypes,
-            none
+            numDatas
         };
 
-        enum MidiType
+        static float convertRawBatteryToPercentage (float rawBatteryValue)
         {
-            pitchMidi =0,
-            ccMidi,
-            afterTouchMidi
-        };
+            if (rawBatteryValue <= 3.0f)      return 0.0f;
+            else if (rawBatteryValue >= 4.2f) return 1.0f;
 
-        // gesture max range values
-        const float VIBRATO_RANGE_MAX  = 500.0f;
-        const float VIBRATO_THRESH_MAX = 300.0f;
-        
-        const float PITCHBEND_MIN = -180.0f;
-        const float PITCHBEND_MAX =  180.0f;
-        
-        const float TILT_MIN = -180.0f;
-        const float TILT_MAX =  180.0f;
-        
-        const float ROLL_MIN = -180.0f;
-        const float ROLL_MAX =  180.0f;
-        
-        const float WAVE_MIN = -180.0f;
-        const float WAVE_MAX =  180.0f;
-
-        // Helper methods for gestures
-        extern GestureType intToGestureType (const int typeInt);
-        extern const String getTypeString (const GestureType type, const bool withSpacingAndCase);
-        extern const String getTypeString (const int typeInt, const bool withSpacingAndCase);
-        extern const String getDescriptionString (const GestureType type);
-        extern const Colour getHighlightColour (const GestureType type, const bool active = true);
-        extern const Colour getHighlightColour (const int typeInt, const bool active = true);
-    };
+            else return (rawBatteryValue - 3.0f)/(4.2f - 3.0f);
+        }
+    }
 
     namespace font
     {
@@ -158,4 +134,10 @@ namespace neova_dash
         extern const Font dashFontLight;
         extern const Font enhanciaFont;
     };
+
+    namespace gesture
+    {
+        extern const Colour getHighlightColour (const GestureType type, const bool active = true);
+        extern const Colour getHighlightColour (const int typeInt, const bool active = true);
+    }
 };

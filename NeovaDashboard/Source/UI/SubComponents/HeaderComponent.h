@@ -12,6 +12,8 @@
 
 #include "../../../JuceLibraryCode/JuceHeader.h"
 #include "../../Common/DashCommon.h"
+#include "../../Common/HubConfiguration.h"
+#include "../../DataReader/DataReader.h"
 #include "Top/OptionsPanel.h"
 
 //==============================================================================
@@ -20,10 +22,11 @@
 
 class HeaderComponent    : public Component,
 						   private Button::Listener
+
 {
 public:
     //==============================================================================
-    HeaderComponent (OptionsPanel& options);
+    HeaderComponent (OptionsPanel& options, HubConfiguration& config, DataReader& reader);
     ~HeaderComponent();
 
     //==============================================================================
@@ -34,23 +37,37 @@ public:
     void buttonClicked (Button* bttn) override;
     
     //==============================================================================
-    void mouseUp (const MouseEvent&) override;
+
+    //==============================================================================
+    void update();
 
 private:
-	class BatteryComponent : public Component
+	class BatteryComponent : public Component,
+                             public Timer
 	{
 	public:
 		//==========================================================================
-		BatteryComponent(/*float& batteryValRef*/) /*: batteryValueRef (batteryValRef)*/ {}
-		~BatteryComponent() {}
+		BatteryComponent (const float& batteryValRef, HubConfiguration& config);
+		~BatteryComponent();
 
 		//==========================================================================
 		void paint(Graphics&) override;
 		void resized() override { repaint(); }
 
-	private:
+        //==========================================================================
+        void timerCallback() override;
+        
+        //==========================================================================
+        void repaintIfNeeded();
+
 		//==========================================================================
-		float batteryValueRef = 0.8f;
+		const float& batteryValueRef;
+
+	private:
+        //==========================================================================
+        HubConfiguration& hubConfig;
+        bool lastChargeState = false;
+        float lastBattery = -1.0f;
 
 		//==========================================================================
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BatteryComponent)

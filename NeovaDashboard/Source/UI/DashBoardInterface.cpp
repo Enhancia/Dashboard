@@ -9,7 +9,8 @@
 #include "DashBoardInterface.h"
 
 //==============================================================================
-DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (data)
+DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& reader)
+    : hubConfig (data), dataReader (reader)
 {
     TRACE_IN;
 
@@ -19,7 +20,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     optionsPanel = std::make_unique<OptionsPanel> (hubConfig, getCommandManager());
     addAndMakeVisible (*optionsPanel);
 
-    header = std::make_unique<HeaderComponent> (*optionsPanel);
+    header = std::make_unique<HeaderComponent> (*optionsPanel, hubConfig, dataReader);
     addAndMakeVisible (*header);
 	
     uploadButton = std::make_unique<UploadButton> (getCommandManager());
@@ -28,7 +29,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data) : hubConfig (dat
     newGesturePanel = std::make_unique<NewGesturePanel> (hubConfig, getCommandManager());
     addAndMakeVisible (*newGesturePanel);
 
-    gesturePanel = std::make_unique<GesturePanel> (hubConfig, *newGesturePanel,
+    gesturePanel = std::make_unique<GesturePanel> (hubConfig, dataReader, *newGesturePanel,
                                                    getCommandManager(), neova_dash::ui::FRAMERATE);
     addAndMakeVisible (*gesturePanel);
 
@@ -234,7 +235,8 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
 
     commands.addArray ({
                             updateDashInterface,
-                            updateInterfaceLEDs
+                            updateInterfaceLEDs,
+                            updateBatteryDisplay
                        });
 }
 
@@ -249,6 +251,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
             break;
         case updateInterfaceLEDs:
             result.setInfo ("Update LEDs", "Udpates Hub LEDs To Current Hub Configuration", "Interface", 0);
+            break;
+        case updateBatteryDisplay:
+            result.setInfo ("Update Battery Display", "Udpates Battery Display Inside The Header", "Interface", 0);
             break;
         default:
             break;
@@ -267,6 +272,10 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
         case updateDashInterface:
             update();
 			return true;
+			
+        case updateBatteryDisplay:
+            header->update();
+            return true;
 
         case updateInterfaceLEDs:
             hubComponent->repaintLEDs();
@@ -336,10 +345,9 @@ void DashBoardInterface::update()
 {
     if (state == connected)
     {
-        DBG ("update");
-
         hubComponent->update();
         gesturePanel->update();
         presetSelector->update();
+        header->update();
     }
 }

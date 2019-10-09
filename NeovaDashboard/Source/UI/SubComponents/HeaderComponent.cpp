@@ -11,10 +11,12 @@
 #include "HeaderComponent.h"
 
 //==============================================================================
-HeaderComponent::HeaderComponent (OptionsPanel& options) : optionsPanel (options)
+HeaderComponent::HeaderComponent (OptionsPanel& options, HubConfiguration& config, DataReader& reader)
+    : optionsPanel (options)
 {
     TRACE_IN;
-    batteryComponent = std::make_unique<BatteryComponent>();
+    batteryComponent = std::make_unique<BatteryComponent> (reader.getFloatValueReference (neova_dash::data::battery),
+                                                           config);
     addAndMakeVisible (*batteryComponent);
 
     createButton();
@@ -47,7 +49,6 @@ void HeaderComponent::resized()
 	auto area = getLocalBounds().reduced (neova_dash::ui::MARGIN, 0);
 
 	batteryComponent->setBounds (area.removeFromRight (jmax (area.getWidth()/9, 88)));
-    DBG ("Battery Comp " << batteryComponent->getWidth()); // TO DELETE
 
     optionsButton->setBounds (area.removeFromLeft (40));
 }
@@ -58,33 +59,6 @@ void HeaderComponent::buttonClicked (Button* bttn)
     {
         optionsPanel.setVisible (true);
     }
-}
-
-void HeaderComponent::mouseUp (const MouseEvent& e)
-{
-    /*
-    if (e.eventComponent == batteryComponent.get())
-    {
-        ScopedPointer<AlertWindow> beulAlert = new AlertWindow ("Beul Window",
-                                                                "Ceci est une fenetre concue pour que Beul "
-                                                                "puisse dire des conneries dans mon interface",
-                                                                AlertWindow::NoIcon,
-                                                                getParentComponent());
-        beulAlert->addButton ("Oui", 0, KeyPress (KeyPress::escapeKey));
-        beulAlert->setOpaque (false);
-        beulAlert->setLookAndFeel (&getLookAndFeel());
-        beulAlert->runModalLoop();
-
-        
-        //AlertWindow::showMessageBox (AlertWindow::NoIcon,
-        //                                  "Beul Window",
-        //                                  "Ceci est une fenetre concue pour que Beul "
-        //                                  "puisse dire des conneries dans mon interface",
-        //                                  "Jambon",
-        //                                  getParentComponent());
-
-
-    }*/
 }
 
 void HeaderComponent::createButton()
@@ -102,6 +76,22 @@ void HeaderComponent::createButton()
     optionsButton->addListener (this);
 }
 
+void HeaderComponent::update()
+{
+    batteryComponent->repaintIfNeeded();
+}
+
+HeaderComponent::BatteryComponent::BatteryComponent (const float& batteryValRef, HubConfiguration& config)
+        : batteryValueRef (batteryValRef), hubConfig (config)
+{
+    startTimer (10000);
+}
+
+HeaderComponent::BatteryComponent::~BatteryComponent()
+{
+    stopTimer();
+}
+
 void HeaderComponent::BatteryComponent::paint (Graphics& g)
 {
 	g.setColour (neova_dash::colour::mainText);
@@ -111,6 +101,8 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
     g.setFont (neova_dash::font::dashFont.withHeight (12.0f));
     g.drawText ("Ring Battery", getLocalBounds().withWidth (getWidth()*2/3), Justification::centred, true);
 
+    // TODO : draw differently when ring charges (lastChargeState == true)
+    //g.setColour (lastChargeState ? Colours::yellow : neova_dash::colour::mainText);
     auto batteryArea = area.withLeft (getWidth()*2/3)
     					   .withSizeKeepingCentre (15, 8)
     					   .translated (0, 1);
@@ -119,12 +111,30 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
 
 	g.drawRect (juce::Rectangle<int>(2, 4).withPosition ({batteryArea.getRight(), batteryArea.getY() + 2}), 1);
 
-	float battery = jmax (jmin (batteryValueRef, 1.0f), 0.0f);
-
-	if (battery <= 0.2f) g.setColour (Colours::red);
-	else if (battery == 1.0f) g.setColour (Colours::lime);
+	g.setColour ((lastBattery <= 0.2f) ? Colours::red
+                                       : (lastBattery == 1.0f) ? Colours::lime
+                                                               : neova_dash::colour::mainText);
 
     g.fillRect (batteryArea.reduced (2)
     					   .withRight (batteryArea.getX() + 2
-    					   				   + int ((batteryArea.getWidth() - 4) * battery)));
+    					   				   + int ((batteryArea.getWidth() - 4) * lastBattery)));
+}
+
+void HeaderComponent::BatteryComponent::timerCallback()
+{
+    repaintIfNeeded();
+}
+
+void HeaderComponent::BatteryComponent::repaintIfNeeded()
+{
+    const float battery = jmax (jmin (neova_dash::data::convertRawBatteryToPercentage (batteryValueRef),
+                                      1.0f),
+                                0.0f);
+
+    if (battery != lastBattery || hubConfig.getRingIsCharging() != lastChargeState)
+    {
+        lastBattery = battery;
+        lastChargeState = hubConfig.getRingIsCharging();
+        repaint();
+    }
 }
