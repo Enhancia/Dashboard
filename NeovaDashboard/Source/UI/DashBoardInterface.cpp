@@ -299,6 +299,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         uploadButton->setVisible (true);
         presetSelector->setVisible (true);
         hubComponent->setInterceptsMouseClicks (true, true);
+        hubComponent->update();
         hubConfig.selectFirstExistingGesture();
     }
 
@@ -309,6 +310,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         uploadButton->setVisible (false);
         presetSelector->setVisible (false);
         hubComponent->setInterceptsMouseClicks (false, false);
+        hubComponent->update();
     }
 
     resized();

@@ -259,8 +259,9 @@ void HubComponent::GestureLED::paint (Graphics& g)
 									 float (jmin (getHeight(), getWidth()))).withCentre (getLocalBounds().getCentre()
 																			                             .toFloat());
 
-	if ((mode == HubComponent::gestureMute && hubConfig.getGestureData (id).type != int (neova_dash::gesture::none))
-		|| (mode == HubComponent::presetSelection && hubConfig.getSelectedPreset() == id))
+	if (!forceOff &&
+		((mode == HubComponent::gestureMute && hubConfig.getGestureData (id).type != int (neova_dash::gesture::none))
+		|| (mode == HubComponent::presetSelection && hubConfig.getSelectedPreset() == id)))
 	{
 		Colour ledColour;
 
