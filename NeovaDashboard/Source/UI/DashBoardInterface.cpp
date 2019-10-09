@@ -118,20 +118,21 @@ void DashBoardInterface::drawStateMessage (Graphics& g)
     auto area = getLocalBounds().withTop (hubComponent->getBounds().getBottom())
                                 .reduced (neova_dash::ui::MARGIN*2);
     g.setColour (neova_dash::colour::mainText);
-    g.setFont (neova_dash::font::dashFont.withHeight (25.0f));
+    g.setFont (neova_dash::font::dashFontLight.withHeight (35.0f));
 
     String stateMessage;
 
     if (state == int (waitingForConnection))
     {
-        stateMessage = "Please connect your HUB to your computer to proceed.";
+        stateMessage = "Welcome to NEOVA DASHBOARD"
+                       "\nPlease connect your HUB.";
     }
     else if (state == int (pause))
     {
-        stateMessage = "Your HUB is paused.";
+        stateMessage = "PAUSE";
     }
 
-    g.drawText (stateMessage, area, Justification::centred, true);
+    g.drawFittedText (stateMessage, area, Justification::centred, 2);
 }
 
 void DashBoardInterface::resized()
@@ -153,10 +154,10 @@ void DashBoardInterface::resized()
     hubComponent->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight())
                                  .translated (0, -10));
 
-    if (state != connected)
+    if (state == waitingForConnection)
     {
         hubComponent->setBounds (Rectangle<int> (area.getHeight(), area.getHeight())
-                                                        .withCentre ({getWidth()/2, getHeight()/3}));
+                                                        .withCentre ({getWidth()/2, getHeight()*3/8}));
     }
 
     uploadButton->setBounds (area.withSize (jmax (100, area.getWidth()/7), area.getHeight()*6/10)

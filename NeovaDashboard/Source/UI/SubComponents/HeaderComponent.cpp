@@ -110,8 +110,8 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
 
     if (lastChargeState)
     {
-        drawLightningPath (g, batteryArea.withTop (getX())
-                                         .withBottom (batteryArea.getX())
+        drawLightningPath (g, batteryArea.withTop (getY())
+                                         .withBottom (batteryArea.getY())
                                          .reduced (0, neova_dash::ui::MARGIN_SMALL)
                                          .toFloat());
     }

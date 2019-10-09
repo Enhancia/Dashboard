@@ -243,11 +243,11 @@ void MidiRangeTuner::resized()
 void MidiRangeTuner::labelTextChanged (Label* lbl)
 {
     // checks that the string is numbers only (and dot)
-    if (lbl->getText().containsOnly ("-.0123456789") == false)
+    if (lbl->getText().containsOnly ("0123456789") == false)
     {
-        if (lbl == rangeLabelMin)       lbl->setText (String (getRangeLow(), 2),
+        if (lbl == rangeLabelMin)       lbl->setText (String (getRangeLow()),
         											  dontSendNotification);
-        else if (lbl == rangeLabelMax)  lbl->setText (String (getRangeHigh(), 2),
+        else if (lbl == rangeLabelMax)  lbl->setText (String (getRangeHigh()),
         											  dontSendNotification);
 
         return;
@@ -257,7 +257,7 @@ void MidiRangeTuner::labelTextChanged (Label* lbl)
     float val = lbl->getText().getFloatValue();
     
     if (val < 0.0f)      val = 0.0f;
-    else if (val > 1.0f) val = 1.0f;
+    else if (val > 127.0f) val = 127.0f;
     
     // Sets slider and labels accordingly
     if (lbl == rangeLabelMin)
@@ -268,7 +268,7 @@ void MidiRangeTuner::labelTextChanged (Label* lbl)
         // Normal case
         {
             setRangeLow (val);
-            lbl->setText (String (val, 2), dontSendNotification);
+            lbl->setText (String (val), dontSendNotification);
             lowSlider->setValue (val, dontSendNotification);
             setLabelBounds (*rangeLabelMin);
             rangeLabelMin->setVisible (false);
@@ -282,7 +282,7 @@ void MidiRangeTuner::labelTextChanged (Label* lbl)
         // Normal case
         {
             setRangeHigh (val);
-            lbl->setText (String (val, 2), dontSendNotification);
+            lbl->setText (String (val), dontSendNotification);
             highSlider->setValue (val, dontSendNotification);
             setLabelBounds (*rangeLabelMax);
             rangeLabelMax->setVisible (false);
@@ -299,7 +299,7 @@ void MidiRangeTuner::sliderValueChanged (Slider* sldr)
 {
     if (sldr == lowSlider)
     {
-        rangeLabelMin->setText (String (lowSlider->getValue(), 2), dontSendNotification);
+        rangeLabelMin->setText (String (lowSlider->getValue()), dontSendNotification);
         setLabelBounds (*rangeLabelMin);
 
         // in case the other thumb is dragged along..
@@ -307,13 +307,13 @@ void MidiRangeTuner::sliderValueChanged (Slider* sldr)
         {
             highSlider->setValue (sldr->getValue(), dontSendNotification);
             setLabelBounds (*rangeLabelMax);
-            rangeLabelMax->setText (String (highSlider->getValue(), 2), dontSendNotification);
+            rangeLabelMax->setText (String (highSlider->getValue()), dontSendNotification);
         }
     }
 
     else if (sldr == highSlider)
     {
-        rangeLabelMax->setText (String (highSlider->getValue(), 2), dontSendNotification);
+        rangeLabelMax->setText (String (highSlider->getValue()), dontSendNotification);
         setLabelBounds (*rangeLabelMax);
 
         // in case the other thumb is dragged along..
@@ -321,7 +321,7 @@ void MidiRangeTuner::sliderValueChanged (Slider* sldr)
         {
             lowSlider->setValue (sldr->getValue(), dontSendNotification);
             setLabelBounds (*rangeLabelMin);
-            rangeLabelMin->setText (String (lowSlider->getValue(), 2), dontSendNotification);
+            rangeLabelMin->setText (String (lowSlider->getValue()), dontSendNotification);
         }
     }
 }
@@ -528,26 +528,26 @@ void MidiRangeTuner::updateHighlightColour()
 
 void MidiRangeTuner::setRangeLow (float val, bool uploadToHub)
 {
-	hubConfig.setUint8Value (id, HubConfiguration::midiLow, uint8 (midiRange.convertFrom0to1 (val)), uploadToHub);
+	hubConfig.setUint8Value (id, HubConfiguration::midiLow, uint8 (val), uploadToHub);
 }
 void MidiRangeTuner::setRangeHigh (float val, bool uploadToHub)
 {
-	hubConfig.setUint8Value (id, HubConfiguration::midiHigh, uint8 (midiRange.convertFrom0to1 (val)), uploadToHub);
+	hubConfig.setUint8Value (id, HubConfiguration::midiHigh, uint8 (val), uploadToHub);
 }
 
 float MidiRangeTuner::getRangeLow()
 {
-    return midiRange.convertTo0to1 (float (hubConfig.getGestureData (id).midiLow));
+    return float (hubConfig.getGestureData (id).midiLow);
 }
 float MidiRangeTuner::getRangeHigh()
 {
-    return midiRange.convertTo0to1 (float (hubConfig.getGestureData (id).midiHigh));
+    return float (hubConfig.getGestureData (id).midiHigh);
 }
 
 void MidiRangeTuner::createLabels()
 {
-    addAndMakeVisible (rangeLabelMin = new Label ("Min Label", String (getRangeLow(), 2)));
-    addAndMakeVisible (rangeLabelMax = new Label ("Max Label", String (getRangeHigh(), 2)));
+    addAndMakeVisible (rangeLabelMin = new Label ("Min Label", String (getRangeLow())));
+    addAndMakeVisible (rangeLabelMax = new Label ("Max Label", String (getRangeHigh())));
     
     // Label style
 
@@ -599,7 +599,7 @@ void MidiRangeTuner::createSliders()
         slider.setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
         slider.setColour (Slider::backgroundColourId, Colour (0x00000000));
         slider.setColour (Slider::trackColourId, Colour (0x00000000));
-        slider.setRange (0.0, 1.0, 0.01);
+        slider.setRange (0.0, 127.0, 1.0);
         slider.setValue (valueToSet);
         slider.setInterceptsMouseClicks (false, false);
         slider.addListener (this);
@@ -613,12 +613,12 @@ float MidiRangeTuner::getThumbX (DraggableObject thumb)
 {
     if (thumb == lowThumb)
     {
-        return lowSlider->getX() + 11.5f + (lowSlider->getWidth() - 23.0f) * lowSlider->getValue();
+        return lowSlider->getX() + 11.5f + (lowSlider->getWidth() - 23.0f) * lowSlider->getValue()/127.0f;
     }
 
     if (thumb == highThumb)
     {
-        return highSlider->getX() + 11.5f + (highSlider->getWidth() - 23.0f) * highSlider->getValue();
+        return highSlider->getX() + 11.5f + (highSlider->getWidth() - 23.0f) * highSlider->getValue()/127.0f;
     }
 
     return -1.0f;

@@ -270,7 +270,7 @@ bool GesturePanel::keyPressed (const KeyPress &key)
 {
     if (hasSelectedGesture() && key.isValid())
     {
-        if (key.getKeyCode() == KeyPress::deleteKey || key.getKeyCode() == KeyPress::backspaceKey)
+        if (key.getKeyCode() == KeyPress::deleteKey)
         {
             removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
         }
