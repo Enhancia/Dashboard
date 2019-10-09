@@ -25,6 +25,14 @@ class Neova_DashBoard_Interface  :	public JUCEApplication,
 									private ChangeListener
 {
 public:
+
+	enum PowerState
+	{
+		POWER_ON = 0,
+		POWER_OFF,
+		POWER_PAUSE
+	};
+
     //==============================================================================
     Neova_DashBoard_Interface() {}
 
@@ -59,15 +67,17 @@ public:
 		ctrl = 0x01;
 		memcpy(data + 8, &ctrl, sizeof(uint32_t));
 		dashPipe->sendString(data, 12);
-        
-        dashInterface.reset (new DashBoardInterface (hubConfig, *dataReader));
-        mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get()));
-        dashInterface->grabKeyboardFocus();
-
-        commandManager.registerAllCommandsForTarget (this);
-        commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
+    
+    dashInterface.reset (new DashBoardInterface (hubConfig, *dataReader));
+    mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get()));
+    dashInterface->grabKeyboardFocus();
+    
+    dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::waitingForConnection);
+		DBG("POWER STATE : " + String(hubPowerState) + " \n");
+    
+    commandManager.registerAllCommandsForTarget (this);
+    commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
                                                         (mainWindow->getContentComponent()));
-        
     }
 
     void shutdown() override
@@ -82,8 +92,8 @@ public:
         dataReader->connectionLost();
         dashPipe->removeChangeListener(this);
         dashPipe->connectionLost();
-		dataReader = nullptr;
-		dashPipe = nullptr;
+		    dataReader = nullptr;
+		    dashPipe = nullptr;
     }
 
     //==============================================================================
@@ -110,7 +120,13 @@ public:
 			case 0x03:
 				DBG("config received\n");
 				hubConfig.setConfig(data + 12);
-
+				if (hubPowerState == POWER_OFF)
+				{
+					hubPowerState = POWER_ON;
+					DBG("POWER STATE : " + String(hubPowerState) + " \n");
+					//TODO => mettre interface en mode POWER_ON
+                    dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
+				}
 				if (!dashInterface->hasKeyboardFocus (true)) dashInterface->grabKeyboardFocus();
 				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
 				break;
@@ -122,11 +138,41 @@ public:
 				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
 				break;
 
-			case 127:
-				memcpy(data, "jeannine", sizeof("jeannine"));
-				ctrl = 0x01;
-				memcpy(data + 8, &ctrl, sizeof(uint32_t));
-				dashPipe->sendString(data, 12);
+			case 0x06:
+				DBG("hub_power_state received\n");
+				if (hubPowerState == POWER_OFF && *(uint8_t*)(data + 12) == POWER_ON)
+				{
+					/*2 cas possibles :	- hub branché après lancement dashBoard et driver envoie POWER_ON CMD à sa connexion
+					/					- hub branché avant lancement dashBoard mais en pause (=> ne renvoie pas sa config) et hub envoie POWER_ON CMD à sa sortie de Pause	
+					/ => on demande la config et on laisse l'état actuel à POWER_OFF, il passera à POWER_ON une fois la config reçue 
+					*/
+					memcpy(data, "jeannine", sizeof("jeannine"));
+					ctrl = 0x01;
+					memcpy(data + 8, &ctrl, sizeof(uint32_t));
+					dashPipe->sendString(data, 12);
+					DBG("Previous hubPowerState was POWER_OFF => ask config\n");
+				}
+				else
+				{
+					hubPowerState = *(uint8_t*)(data + 12);
+					if (hubPowerState == POWER_ON)
+					{
+						dashInterface->setInterfaceStateAndUpdate(DashBoardInterface::connected);
+					}
+					else if (hubPowerState == POWER_OFF)
+					{
+						dashInterface->setInterfaceStateAndUpdate(DashBoardInterface::waitingForConnection);
+					}
+					else
+					{
+						dashInterface->setInterfaceStateAndUpdate(DashBoardInterface::pause);
+					}
+					//TODO => mettre interface en mode new POWER_STATE
+                    
+					if (!dashInterface->hasKeyboardFocus(true)) dashInterface->grabKeyboardFocus();
+					commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+					DBG("POWER STATE : " + String(hubPowerState) + " \n");
+				}
 				break;
 			default:
 				break;
@@ -280,6 +326,9 @@ private:
 
 	std::unique_ptr<DataReader> dataReader;
 	std::unique_ptr<DashPipe> dashPipe;
+
+	uint8_t hubPowerState = POWER_OFF;
+
 
     ScopedPointer<FileLogger> dashboardLogger;
 

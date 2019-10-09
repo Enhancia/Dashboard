@@ -58,6 +58,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
 
     setSize (dashWidth,
              dashWidth*6/7);
+
+    setInterfaceStateAndUpdate (waitingForConnection);
 }
 
 DashBoardInterface::~DashBoardInterface()
@@ -79,6 +81,11 @@ void DashBoardInterface::paint (Graphics& g)
 	g.drawImage (backgroundImage, getLocalBounds().toFloat());
 
     paintShadows (g);
+
+    if (state != connected)
+    {
+        drawStateMessage (g);
+    }
 }
 
 void DashBoardInterface::paintShadows (Graphics& g)
@@ -93,6 +100,7 @@ void DashBoardInterface::paintShadows (Graphics& g)
     }
 
     // Upload Button Shadow
+    if (state == connected)
     {
         auto uploadShadowBounds = uploadButton->getBounds().reduced (neova_dash::ui::MARGIN)
                                                            .withLeft (getX()-10);
@@ -103,6 +111,27 @@ void DashBoardInterface::paintShadows (Graphics& g)
 
     DropShadow shadow (Colour (0x40000000), 10, {2, 3});
     shadow.drawForPath (g, shadowPath);
+}
+
+void DashBoardInterface::drawStateMessage (Graphics& g)
+{
+    auto area = getLocalBounds().withTop (hubComponent->getBounds().getBottom())
+                                .reduced (neova_dash::ui::MARGIN*2);
+    g.setColour (neova_dash::colour::mainText);
+    g.setFont (neova_dash::font::dashFont.withHeight (25.0f));
+
+    String stateMessage;
+
+    if (state == waitingForConnection)
+    {
+        stateMessage = "Please connect your HUB to your computer to proceed.";
+    }
+    else if (state == pause)
+    {
+        stateMessage = "Your HUB is paused.";
+    }
+
+    g.drawText (stateMessage, area, Justification::centred, true);
 }
 
 void DashBoardInterface::resized()
@@ -120,8 +149,16 @@ void DashBoardInterface::resized()
     header->setBounds (area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL, MARGIN));
 
     presetSelector->setBounds (area.removeFromBottom (10).withSizeKeepingCentre (area.getWidth()/6, 30));
+
     hubComponent->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight())
                                  .translated (0, -10));
+
+    if (state != connected)
+    {
+        hubComponent->setBounds (Rectangle<int> (area.getHeight(), area.getHeight())
+                                                        .withCentre ({getWidth()/2, getHeight()/3}));
+    }
+
     uploadButton->setBounds (area.withSize (jmax (100, area.getWidth()/7), area.getHeight()*6/10)
                                  .withSizeKeepingCentre (jmax (100, area.getWidth()/7), HEADER_HEIGHT));
 }
@@ -249,6 +286,32 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
     }
 }
 
+void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newState)
+{
+    if (state == newState) return;
+
+    state = newState;
+
+    if (state == connected)
+    {
+        gesturePanel->setVisible (true);
+        newGesturePanel->hidePanel();
+        uploadButton->setVisible (true);
+        presetSelector->setVisible (true);
+    }
+
+    else
+    {
+        gesturePanel->setVisible (false);
+        newGesturePanel->hidePanel();
+        uploadButton->setVisible (false);
+        presetSelector->setVisible (false);
+    }
+
+    resized();
+    repaint();
+}
+
 void DashBoardInterface::createAndShowAlertPanel (const String& title, const String& message,
                                                    const String& buttonText)
 {
@@ -280,8 +343,11 @@ void DashBoardInterface::alertPanelCallback (int modalResult, DashBoardInterface
 //==============================================================================
 void DashBoardInterface::update()
 {
-    hubComponent->update();
-    gesturePanel->update();
-    presetSelector->update();
-    header->update();
+    if (state == connected)
+    {
+        hubComponent->update();
+        gesturePanel->update();
+        presetSelector->update();
+        header->update();
+    }
 }
