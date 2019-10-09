@@ -13,8 +13,9 @@
 //==============================================================================
 // HubComponent
 
-HubComponent::HubComponent (HubConfiguration& config, NewGesturePanel& newGest, ApplicationCommandManager& manager)
-    : hubConfig (config), commandManager (manager), newGesturePanel (newGest)
+HubComponent::HubComponent (HubConfiguration& config, NewGesturePanel& newGest,
+							ApplicationCommandManager& manager, int & dashState)
+    : hubConfig (config), commandManager (manager), newGesturePanel (newGest), dashboardState (dashState)
 {
 	TRACE_IN;
 
@@ -109,6 +110,7 @@ void HubComponent::repaintLEDs()
 {
 	for (int i =0; i < leds.size(); i++)
 	{
+		leds[i]->forceOff = (dashboardState != 0);
 		leds[i]->repaint();
 	}
 }

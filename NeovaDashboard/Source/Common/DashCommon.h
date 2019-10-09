@@ -143,7 +143,7 @@ namespace neova_dash
 
     namespace midi
     {
-        enum SpecificCC
+        enum CCMessage
         {
             modWheel = 1,
             volume = 7,

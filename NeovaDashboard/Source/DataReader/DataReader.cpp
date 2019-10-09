@@ -76,7 +76,7 @@ bool DataReader::readData (String s)
         if (hubConfig.getRingIsCharging())
         {
             hubConfig.setRingIsCharging (false);
-            //commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
+            commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
         }
 
         return true;
@@ -94,7 +94,7 @@ bool DataReader::readData (String s)
         if (!hubConfig.getRingIsCharging())
         {
             hubConfig.setRingIsCharging (true);
-            //commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
+            commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
         }
 
         return true;

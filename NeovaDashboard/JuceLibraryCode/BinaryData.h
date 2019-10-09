@@ -8,6 +8,9 @@
 
 namespace DashData
 {
+    extern const char*   Dashiconv1_1_png;
+    const int            Dashiconv1_1_pngSize = 775692;
+
     extern const char*   DashboardHUBonlycropped_png;
     const int            DashboardHUBonlycropped_pngSize = 449919;
 
@@ -16,9 +19,6 @@ namespace DashData
 
     extern const char*   HUBBG_png;
     const int            HUBBG_pngSize = 1525275;
-
-    extern const char*   Logo_ENHANCIA_Round_png;
-    const int            Logo_ENHANCIA_Round_pngSize = 30589;
 
     extern const char*   upload_png;
     const int            upload_pngSize = 729;

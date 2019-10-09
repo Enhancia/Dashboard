@@ -92,7 +92,7 @@ private:
 
     bool commandKeyDown = ModifierKeys::currentModifiers.isCommandDown();
 
-    InterfaceState state = connected;
+    int state = int (connected);
 
     //==============================================================================
     Image backgroundImage = ImageFileFormat::loadFrom (DashData::HUBBG_png, DashData::HUBBG_pngSize);

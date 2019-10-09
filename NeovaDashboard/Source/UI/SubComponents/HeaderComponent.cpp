@@ -78,13 +78,14 @@ void HeaderComponent::createButton()
 
 void HeaderComponent::update()
 {
-    batteryComponent->repaintIfNeeded();
+    batteryComponent->repaintChargeState();
 }
 
 HeaderComponent::BatteryComponent::BatteryComponent (const float& batteryValRef, HubConfiguration& config)
         : batteryValueRef (batteryValRef), hubConfig (config)
 {
     startTimer (10000);
+    repaintIfNeeded();
 }
 
 HeaderComponent::BatteryComponent::~BatteryComponent()
@@ -102,10 +103,18 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
     g.drawText ("Ring Battery", getLocalBounds().withWidth (getWidth()*2/3), Justification::centred, true);
 
     // TODO : draw differently when ring charges (lastChargeState == true)
-    //g.setColour (lastChargeState ? Colours::yellow : neova_dash::colour::mainText);
+    //g.setColour (lastChargeState ? Colours::pink : neova_dash::colour::mainText);
     auto batteryArea = area.withLeft (getWidth()*2/3)
     					   .withSizeKeepingCentre (15, 8)
     					   .translated (0, 1);
+
+    if (lastChargeState)
+    {
+        drawLightningPath (g, batteryArea.withTop (getX())
+                                         .withBottom (batteryArea.getX())
+                                         .reduced (0, neova_dash::ui::MARGIN_SMALL)
+                                         .toFloat());
+    }
 
     g.drawRect (batteryArea, 1);
 
@@ -137,4 +146,32 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded()
         lastChargeState = hubConfig.getRingIsCharging();
         repaint();
     }
+}
+
+void HeaderComponent::BatteryComponent::repaintChargeState()
+{
+    if (hubConfig.getRingIsCharging() != lastChargeState)
+    {
+        lastChargeState = hubConfig.getRingIsCharging();
+        repaint();
+    }
+}
+
+
+void HeaderComponent::BatteryComponent::drawLightningPath (Graphics& g, Rectangle<float> area)
+{
+    Path lightning;
+
+    lightning.startNewSubPath (3.0f, 0.0f);
+    lightning.lineTo          (0.0f, 4.0f);
+    lightning.lineTo          (4.0f, 4.0f);
+    lightning.lineTo          (1.0f, 8.0f);
+    lightning.lineTo          (8.0f, 3.0f);
+    lightning.lineTo          (5.0f, 3.0f);
+    lightning.lineTo          (7.0f, 0.0f);
+    lightning.closeSubPath();
+
+    lightning.scaleToFit (area.getX(), area.getY(), area.getWidth(), area.getHeight(), true);
+
+    g.fillPath (lightning);
 }
