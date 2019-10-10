@@ -12,7 +12,7 @@
 
 HubConfiguration::HubConfiguration()
 {
-	//setDefaultConfig();
+	initialiseLastGestureConfigs();
 }
 HubConfiguration::~HubConfiguration()
 {
@@ -62,6 +62,7 @@ void HubConfiguration::setUint8Value (const int gestureNumber, const uint8DataId
 	}
 
 	*valToUpdatePtr = newUint8Value;
+	saveGestureConfig (getGestureData (gestureNumber));
 
 	if (uploadToHub)
 	{
@@ -89,6 +90,7 @@ void HubConfiguration::setFloatValue (const int gestureNumber, const floatDataId
 	}
 
 	*valToUpdatePtr = newFloatValue;
+	saveGestureConfig (getGestureData (gestureNumber));
 
 	if (uploadToHub)
 	{
@@ -103,10 +105,10 @@ void HubConfiguration::setDefaultGestureValues (const int gestureNumber, const n
 
 	setGestureData (presetNumber, gestureNumber,
 								  1,
-								  uint8 (type),
+								  uint8_t (type),
 								  0,
 								  127,
-								  (type == neova_dash::gesture::none) ? 0 : findAvailableUndefinedCC(),
+								  uint8_t ((type == neova_dash::gesture::none) ? 0 : findAvailableUndefinedCC()),
 								  neova_dash::gesture::ccMidi);
 
 	switch (type)
@@ -131,6 +133,7 @@ void HubConfiguration::setDefaultGestureValues (const int gestureNumber, const n
 			setGestureParameters (presetNumber, gestureNumber, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	}
 
+	saveGestureConfig (getGestureData (gestureNumber));
 	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
 }
 
@@ -139,13 +142,45 @@ void HubConfiguration::setDefaultGestureValues (const int gestureNumber, const n
 	setDefaultGestureValues (gestureNumber, type, selectedPreset);
 }
 
+void HubConfiguration::setSavedGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType type,
+																	   const int presetNumber)
+{
+	if (type == neova_dash::gesture::none || lastGestureConfig[type]->on == 0)
+	{
+		setDefaultGestureValues (gestureNumber, type, presetNumber);
+		return;
+	}
+
+	setGestureData (presetNumber, gestureNumber,
+								  1,
+								  uint8_t (type),
+								  lastGestureConfig[type]->midiLow,
+								  lastGestureConfig[type]->midiHigh,
+								  uint8_t (findAvailableUndefinedCC()),
+								  neova_dash::gesture::ccMidi);
+
+	setGestureParameters (presetNumber, gestureNumber, lastGestureConfig[type]->gestureParam0,
+													   lastGestureConfig[type]->gestureParam1,
+													   lastGestureConfig[type]->gestureParam2,
+													   lastGestureConfig[type]->gestureParam3,
+													   lastGestureConfig[type]->gestureParam4,
+													   lastGestureConfig[type]->gestureParam5);
+
+	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+}
+
+void HubConfiguration::setSavedGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType type)
+{
+	setSavedGestureValues (gestureNumber, type, selectedPreset);
+}
+
 void HubConfiguration::setPreset (const int gestureNumberToSelect)
 {
 	if (gestureNumberToSelect < 0 || gestureNumberToSelect > 4 || gestureNumberToSelect == selectedPreset) return;
 
 	selectedPreset = gestureNumberToSelect;
 	selectFirstExistingGesture();
-	config.active_preset = gestureNumberToSelect;
+	config.active_preset = uint8_t (gestureNumberToSelect);
 	
 	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);	
 }
@@ -156,7 +191,7 @@ void HubConfiguration::setPreset (const int gestureNumberToSelect, bool uploadTo
 
 	selectedPreset = gestureNumberToSelect;
 	selectFirstExistingGesture();
-	config.active_preset = gestureNumberToSelect;
+	config.active_preset = uint8_t (gestureNumberToSelect);
 
 	if (uploadToHub)
 	{
@@ -460,4 +495,24 @@ const int HubConfiguration::findAvailableUndefinedCC()
 	}
 
 	return ccArray.getLast();
+}
+
+void HubConfiguration::initialiseLastGestureConfigs()
+{
+	for (int gestType =0; gestType < neova_dash::gesture::numTypes; gestType++)
+	{
+		lastGestureConfig.add (new GestureData());
+
+		lastGestureConfig.getLast()->on = 0;
+		lastGestureConfig.getLast()->type = uint8_t (gestType);
+	}
+}
+
+void HubConfiguration::saveGestureConfig (const GestureData& gestureDataToSave)
+{
+	if (gestureDataToSave.type == neova_dash::gesture::none) return;
+
+	*(lastGestureConfig[gestureDataToSave.type]) = gestureDataToSave;
+
+	lastGestureConfig[gestureDataToSave.type]->on = 1;
 }

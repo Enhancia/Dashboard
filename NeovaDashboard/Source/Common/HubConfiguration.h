@@ -13,6 +13,8 @@
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "DashCommon.h"
 
+
+
 ApplicationCommandManager& getCommandManager();
 
 class HubConfiguration
@@ -33,8 +35,8 @@ public:
 		uint8_t midiLow = 0;
 		uint8_t midiHigh = 127;
 		uint8_t cc = 0;
-		uint8_t midiType = (type == neova_dash::gesture::vibrato || type == neova_dash::gesture::pitchBend)
-                              ? neova_dash::gesture::pitchMidi : neova_dash::gesture::ccMidi;
+		uint8_t midiType = uint8_t ((type == neova_dash::gesture::vibrato || type == neova_dash::gesture::pitchBend)
+                                    ? neova_dash::gesture::pitchMidi : neova_dash::gesture::ccMidi);
 
         float gestureParam0 = 0.0f;
         float gestureParam1 = 0.0f;
@@ -91,7 +93,6 @@ public:
 	~HubConfiguration();
 
     //==============================================================================
-
 	void setConfig(uint8_t * data);
 	
 	void getConfig(uint8_t * data, int buffer_size);
@@ -108,6 +109,9 @@ public:
 
     void setDefaultGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType, const int presetNumber);
     void setDefaultGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType);
+    
+    void setSavedGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType, const int presetNumber);
+    void setSavedGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType);
 
     void moveGestureToId (const int idToMoveFrom, const int idToMoveTo);
     void duplicateGesture (const int idToDuplicateFrom, const bool prioritizeHigherId = true);
@@ -158,6 +162,7 @@ private:
                                         uint8 newMidiType,
                                         bool uploadToHub = false);
 
+
     void setGestureParameters (int presetNum, int gestureNum, float value0,
                                                               float value1,
                                                               float value2 = 0.0f,
@@ -180,6 +185,11 @@ private:
 
     //==============================================================================
 	ConfigData config;
+
+    //==============================================================================
+    OwnedArray<GestureData> lastGestureConfig;
+    void initialiseLastGestureConfigs();
+    void saveGestureConfig (const GestureData& gestureDataToSave);
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HubConfiguration)

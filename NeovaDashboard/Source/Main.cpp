@@ -135,7 +135,9 @@ public:
 				hubConfig.setPreset(*(uint8_t*)(data + 12), false);
 
 				if (!dashInterface->hasKeyboardFocus(true)) dashInterface->grabKeyboardFocus();
+				//TODO dashInterface->notifyNewPreset();
 				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+
 				break;
 
 			case 0x06:

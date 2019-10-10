@@ -146,7 +146,7 @@ void NewGesturePanel::buttonClicked (Button* bttn)
 void NewGesturePanel::createNewGesture()
 {
     using namespace neova_dash::gesture;
-    hubConfig.setDefaultGestureValues (selectedGestureSlot, intToGestureType (selectedGestureType));
+    hubConfig.setSavedGestureValues (selectedGestureSlot, intToGestureType (selectedGestureType));
 
   	updateInterface();
 }
