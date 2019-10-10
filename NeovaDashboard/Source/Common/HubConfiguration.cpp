@@ -101,7 +101,13 @@ void HubConfiguration::setDefaultGestureValues (const int gestureNumber, const n
 {
 	using namespace neova_dash::gesture;
 
-	setGestureData (presetNumber, gestureNumber, 1, uint8 (type), 0, 127, 0, neova_dash::gesture::ccMidi);
+	setGestureData (presetNumber, gestureNumber,
+								  1,
+								  uint8 (type),
+								  0,
+								  127,
+								  (type == neova_dash::gesture::none) ? 0 : findAvailableUndefinedCC(),
+								  neova_dash::gesture::ccMidi);
 
 	switch (type)
 	{
@@ -431,4 +437,27 @@ void HubConfiguration::selectFirstExistingGesture()
             return;
         }
     }
+}
+
+const int HubConfiguration::findAvailableUndefinedCC()
+{
+	Array<int> ccArray (neova_dash::midi::undefinedCCs, sizeof(neova_dash::midi::undefinedCCs)/sizeof(int));
+
+	for (int undefinedCc : ccArray)
+	{
+		bool isCcUnused = true;
+		int gesture=0;
+
+		while (gesture++ < neova_dash::gesture::NUM_GEST && isCcUnused)
+		{
+			if (isGestureActive(gesture) && getGestureData (gesture).cc == undefinedCc)
+			{
+				isCcUnused = false;
+			}
+		}
+
+		if (isCcUnused) return undefinedCc;
+	}
+
+	return ccArray.getLast();
 }

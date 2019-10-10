@@ -35,8 +35,8 @@ public:
 private:
     //==============================================================================
     void createButtons();
-    void paintProductInformations (Graphics& g, Rectangle<int> area);
-    void paintFirmUpdateArea (Graphics& g, Rectangle<int> area);
+    void paintProductInformations (Graphics& g, juce::Rectangle<int> area);
+    void paintFirmUpdateArea (Graphics& g, juce::Rectangle<int> area);
 
     //==============================================================================
     juce::Rectangle<int> optionsArea;

@@ -168,6 +168,7 @@ private:
 
     int findClosestIdToDuplicate (int idToDuplicateFrom, bool prioritizeHigherId);
     bool isIdAvailable (const int idToCheck);
+    const int findAvailableUndefinedCC();
 
     //==============================================================================
 	ApplicationCommandManager& commandManager = getCommandManager();
