@@ -94,9 +94,14 @@ public:
 
     //==============================================================================
 	void setConfig(uint8_t * data);
-	
 	void getConfig(uint8_t * data, int buffer_size);
 
+    //==============================================================================
+    void flashHub();
+    bool wasConfigChangedSinceLastFlash();
+    void notifyConfigWasChanged();
+
+    //==============================================================================
     void setMidiChannel (const uint8 newMidiChannel, bool uploadToHub = true);
 
     void setUint8Value (const int gestureNumber, const uint8DataId dataId,
@@ -190,6 +195,7 @@ private:
     OwnedArray<GestureData> lastGestureConfig;
     void initialiseLastGestureConfigs();
     void saveGestureConfig (const GestureData& gestureDataToSave);
+    bool configWasChangedSinceLastFlash = false;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HubConfiguration)

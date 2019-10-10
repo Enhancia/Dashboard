@@ -23,7 +23,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     header = std::make_unique<HeaderComponent> (*optionsPanel, hubConfig, dataReader);
     addAndMakeVisible (*header);
 	
-    uploadButton = std::make_unique<UploadButton> (getCommandManager());
+    uploadButton = std::make_unique<UploadButton> (hubConfig, getCommandManager());
     addAndMakeVisible (*uploadButton);
 
     newGesturePanel = std::make_unique<NewGesturePanel> (hubConfig, getCommandManager());
@@ -103,7 +103,8 @@ void DashBoardInterface::paintShadows (Graphics& g)
     if (state == connected)
     {
         auto uploadShadowBounds = uploadButton->getBounds().reduced (neova_dash::ui::MARGIN)
-                                                           .withLeft (getX()-10);
+                                                           .withLeft (getX()-10)
+                                                           .withTrimmedRight (40);
         if (uploadButton->isDown()) uploadShadowBounds = uploadShadowBounds.withTrimmedRight (1);
 
         shadowPath.addRoundedRectangle (uploadShadowBounds.toFloat(), 8.0f);
@@ -160,8 +161,8 @@ void DashBoardInterface::resized()
                                                         .withCentre ({getWidth()/2, getHeight()*3/8}));
     }
 
-    uploadButton->setBounds (area.withSize (jmax (100, area.getWidth()/7), area.getHeight()*6/10)
-                                 .withSizeKeepingCentre (jmax (100, area.getWidth()/7), HEADER_HEIGHT));
+    uploadButton->setBounds (area.withSize (jmax (140, area.getWidth()/7 + 40), area.getHeight()*6/10)
+                                 .withSizeKeepingCentre (jmax (140, area.getWidth()/7 + 40), HEADER_HEIGHT));
 }
 
 //==============================================================================
@@ -237,7 +238,8 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
     commands.addArray ({
                             updateDashInterface,
                             updateInterfaceLEDs,
-                            updateBatteryDisplay
+                            updateBatteryDisplay,
+                            allowUserToFlashHub
                        });
 }
 
@@ -255,6 +257,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
             break;
         case updateBatteryDisplay:
             result.setInfo ("Update Battery Display", "Udpates Battery Display Inside The Header", "Interface", 0);
+            break;
+        case allowUserToFlashHub:
+            result.setInfo ("Update Upload Button", "Allows Upload Button To Be Clicked", "Interface", 0);
             break;
         default:
             break;
@@ -280,6 +285,10 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
 
         case updateInterfaceLEDs:
             hubComponent->repaintLEDs();
+            return true;
+
+        case allowUserToFlashHub:
+            uploadButton->setActive();
             return true;
 
         default:

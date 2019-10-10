@@ -32,6 +32,27 @@ void HubConfiguration::getConfig(uint8_t * data, int buffer_size)
 	}
 }
 
+void HubConfiguration::flashHub()
+{
+	configWasChangedSinceLastFlash = false;
+
+	commandManager.invokeDirectly (neova_dash::commands::flashHub, true);
+}
+
+bool HubConfiguration::wasConfigChangedSinceLastFlash()
+{
+	return configWasChangedSinceLastFlash;
+}
+
+void HubConfiguration::notifyConfigWasChanged()
+{
+	if (!configWasChangedSinceLastFlash)
+	{
+		configWasChangedSinceLastFlash = true;
+		commandManager.invokeDirectly (neova_dash::commands::allowUserToFlashHub, true);
+	}
+}	
+
 void HubConfiguration::setMidiChannel (const uint8 newMidiChannel, bool uploadToHub)
 {
 	config.midiChannel = newMidiChannel;
@@ -40,6 +61,8 @@ void HubConfiguration::setMidiChannel (const uint8 newMidiChannel, bool uploadTo
 	{
 		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
 	}
+
+	notifyConfigWasChanged();
 }
 
 void HubConfiguration::setUint8Value (const int gestureNumber, const uint8DataId dataId,
@@ -63,6 +86,7 @@ void HubConfiguration::setUint8Value (const int gestureNumber, const uint8DataId
 
 	*valToUpdatePtr = newUint8Value;
 	saveGestureConfig (getGestureData (gestureNumber));
+	notifyConfigWasChanged();
 
 	if (uploadToHub)
 	{
@@ -91,6 +115,7 @@ void HubConfiguration::setFloatValue (const int gestureNumber, const floatDataId
 
 	*valToUpdatePtr = newFloatValue;
 	saveGestureConfig (getGestureData (gestureNumber));
+	notifyConfigWasChanged();
 
 	if (uploadToHub)
 	{
@@ -134,6 +159,7 @@ void HubConfiguration::setDefaultGestureValues (const int gestureNumber, const n
 	}
 
 	saveGestureConfig (getGestureData (gestureNumber));
+	notifyConfigWasChanged();
 	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
 }
 
@@ -166,6 +192,7 @@ void HubConfiguration::setSavedGestureValues (const int gestureNumber, const neo
 													   lastGestureConfig[type]->gestureParam4,
 													   lastGestureConfig[type]->gestureParam5);
 
+	notifyConfigWasChanged();
 	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
 }
 
@@ -394,6 +421,7 @@ void HubConfiguration::duplicateGesture (const int idToDuplicateFrom, const bool
 
 	getGestureData (idToDuplicateTo) = getGestureData (idToDuplicateFrom);
 
+    notifyConfigWasChanged();
     commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
 }
 
@@ -411,7 +439,7 @@ void HubConfiguration::swapGestures (const int firstId, const int secondId)
     // Copies second gesture to first Id
     getGestureData (firstId) = secondGestureCopy;
 
-
+    notifyConfigWasChanged();
     commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
     commandManager.invokeDirectly (neova_dash::commands::updateInterfaceLEDs, true);
 }
