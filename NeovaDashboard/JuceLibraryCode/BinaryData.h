@@ -20,8 +20,20 @@ namespace DashData
     extern const char*   HUBBG_png;
     const int            HUBBG_pngSize = 1525275;
 
+    extern const char*   PITCHicon_png;
+    const int            PITCHicon_pngSize = 131992;
+
+    extern const char*   ROLLicon_png;
+    const int            ROLLicon_pngSize = 190624;
+
+    extern const char*   TILTicon_png;
+    const int            TILTicon_pngSize = 123397;
+
     extern const char*   upload_png;
     const int            upload_pngSize = 729;
+
+    extern const char*   VIBRATOicon_png;
+    const int            VIBRATOicon_pngSize = 155163;
 
     extern const char*   Ahmet_Altun__HalisGRBold_otf;
     const int            Ahmet_Altun__HalisGRBold_otfSize = 57952;
@@ -36,7 +48,7 @@ namespace DashData
     const int            NOOADemiSerifDEMO_ttfSize = 18432;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 9;
+    const int namedResourceListSize = 13;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

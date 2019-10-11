@@ -274,6 +274,13 @@ bool GesturePanel::keyPressed (const KeyPress &key)
         {
             removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
         }
+
+        #if JUCE_MAC
+        else if (key.getKeyCode() == KeyPress::backspaceKey && key.getModifiers().isCommandDown())
+        {
+            removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
+        }
+        #endif
     }
 
 	return false;

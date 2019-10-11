@@ -318,6 +318,9 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         gesturePanel->setVisible (false);
         newGesturePanel->hidePanel();
         uploadButton->setVisible (false);
+
+        if (state == waitingForConnection) uploadButton->setActive (false);
+        
         presetSelector->setVisible (false);
         hubComponent->setInterceptsMouseClicks (false, false);
         hubComponent->update();

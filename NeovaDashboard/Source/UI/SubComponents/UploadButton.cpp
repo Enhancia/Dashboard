@@ -10,12 +10,13 @@
 
 #include "UploadButton.h"
 
-UploadButton::UploadButton (HubConfiguration& config, ApplicationCommandManager& cm)
-	: Button ("Upload Button"), commandManager (cm), hubConfig (config)
+UploadButton::UploadButton (HubConfiguration& config, ApplicationCommandManager& cm, const bool shouldBeActive)
+	: Button ("Upload Button"), commandManager (cm), hubConfig (config), active (shouldBeActive)
 {
 	TRACE_IN;
 
-	setActive (false);
+	setInterceptsMouseClicks (active, false);
+	setAlpha (active ? 1.0f : 0.5f);
 }
 
 UploadButton::~UploadButton()
@@ -31,19 +32,21 @@ void UploadButton::timerCallback()
 {
 }
 
-void UploadButton::setActive()
-{
-	if (!active) setActive (true);
-}
-
 void UploadButton::setActive (const bool shouldBeActive)
 {
+	if (active == shouldBeActive) return;
+
 	active = shouldBeActive;
 
 	setInterceptsMouseClicks (active, false);
 	setAlpha (active ? 1.0f : 0.5f);
 
 	repaint();
+}
+
+bool UploadButton::isActive()
+{
+	return active;
 }
 
 void UploadButton::setInactiveAndShowUploadFeedback()

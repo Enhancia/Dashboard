@@ -22,7 +22,7 @@ class UploadButton : public Button,
 {
 public:
     //==============================================================================
-    UploadButton (HubConfiguration& config, ApplicationCommandManager& cm);
+    UploadButton (HubConfiguration& config, ApplicationCommandManager& cm, const bool shouldBeActive = false);
     ~UploadButton();
 
     //==============================================================================
@@ -32,8 +32,9 @@ public:
     void timerCallback() override;
 
     //==============================================================================
-    void setActive();
+    void setActive (const bool shouldBeActive = true);
     void setInactiveAndShowUploadFeedback();
+    bool isActive();
 
 private:
     //==============================================================================
@@ -41,9 +42,8 @@ private:
 	void clicked() override;
 
     //==============================================================================
-    bool active = false;
+    bool active;
     bool animating = false;
-    void setActive (const bool shouldBeActive);
 
 	//==============================================================================
     ApplicationCommandManager& commandManager;

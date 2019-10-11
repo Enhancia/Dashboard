@@ -120,6 +120,9 @@ public:
 			case 0x03:
 				DBG("config received\n");
 				hubConfig.setConfig(data + 12);
+
+				if (hubPowerState != POWER_OFF) hubConfig.notifyConfigWasChanged();
+
 				if (hubPowerState == POWER_OFF)
 				{
 					hubPowerState = POWER_ON;

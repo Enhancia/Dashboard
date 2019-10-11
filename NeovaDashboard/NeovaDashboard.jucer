@@ -12,7 +12,12 @@
         <FILE id="qLNiVo" name="Dashboard-HUB-only.png" compile="0" resource="1"
               file="Resources/Image/Dashboard-HUB-only.png"/>
         <FILE id="FAcwQc" name="HUB-BG.png" compile="0" resource="1" file="Resources/Image/HUB-BG.png"/>
+        <FILE id="x8nzZs" name="PITCH-icon.png" compile="0" resource="1" file="Resources/Image/PITCH-icon.png"/>
+        <FILE id="h2VBsQ" name="ROLL-icon.png" compile="0" resource="1" file="Resources/Image/ROLL-icon.png"/>
+        <FILE id="zkVlMd" name="TILT-icon.png" compile="0" resource="1" file="Resources/Image/TILT-icon.png"/>
         <FILE id="AFLFgq" name="upload.png" compile="0" resource="1" file="Resources/Image/upload.png"/>
+        <FILE id="xDDmnw" name="VIBRATO-icon.png" compile="0" resource="1"
+              file="Resources/Image/VIBRATO-icon.png"/>
       </GROUP>
       <GROUP id="{69E2F129-CC39-9739-6CD7-4A8AD088D7F7}" name="Font">
         <FILE id="yd7fqB" name="Ahmet Altun - HalisGR-Bold.otf" compile="0"

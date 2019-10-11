@@ -9,12 +9,14 @@
 */
 
 #pragma once
+#include "../../JuceLibraryCode/JuceHeader.h"
 
 namespace neova_dash
 {
 	namespace gesture
     {
         const int NUM_GEST = 4;
+        const int NUM_PRESETS = 4;
 
         enum GestureType
         {

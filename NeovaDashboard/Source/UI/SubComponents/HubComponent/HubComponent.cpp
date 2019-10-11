@@ -60,29 +60,7 @@ void HubComponent::paint (Graphics& g)
 void HubComponent::resized()
 {
 	using namespace neova_dash::ui;
-	/*
-	auto area = getLocalBounds().reduced (47, 62)
-								.withTop (238)
-								.translated (-1, 0);
-	
-	const int columnWidth = area.getWidth() / neova_dash::gesture::NUM_GEST;
 
-	for (int column = 0; column < neova_dash::gesture::NUM_GEST; column++)
-	{
-		auto columnArea = area.removeFromLeft (columnWidth);
-		int columnXMargin = MARGIN;
-
-		if (column == 0)                       columnArea.removeFromRight (columnXMargin);
-		else if (column == neova_dash::gesture::NUM_GEST - 1) columnArea.removeFromLeft (columnXMargin);
-		else                                   columnArea.reduce (columnXMargin*2/3 -2, 0);
-
-		if (column == 1 || column == 2) columnArea.translate (0, 22);
-		if (column == 2 || column == 3) columnArea.translate (3, 0);
-
-		buttons[column]->setBounds (columnArea);
-		leds[column]->setBounds (columnArea.withHeight (20).translated (0, -23));
-	}*/
-	
 	int hubSize = jmin (getHeight(), getWidth());
 	auto buttonArea = Rectangle<int> (hubSize*15/100, hubSize*15/100);
 
@@ -180,6 +158,7 @@ void HubComponent::handleHubButtonClick (const int buttonId)
 										 HubConfiguration::on,
 										 (hubConfig.getGestureData (buttonId).on == 0) ? 1 : 0);
 				
+				hubConfig.setSelectedGesture (buttonId);
 				commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
 			}
 			else

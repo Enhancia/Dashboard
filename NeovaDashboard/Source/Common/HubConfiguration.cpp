@@ -504,18 +504,23 @@ void HubConfiguration::selectFirstExistingGesture()
 
 const int HubConfiguration::findAvailableUndefinedCC()
 {
-	Array<int> ccArray (neova_dash::midi::undefinedCCs, sizeof(neova_dash::midi::undefinedCCs)/sizeof(int));
+	Array<int> ccArray (neova_dash::midi::undefinedCCs, sizeof(neova_dash::midi::undefinedCCs));
 
 	for (int undefinedCc : ccArray)
 	{
 		bool isCcUnused = true;
-		int gesture=0;
+		int preset = 0;
 
-		while (gesture++ < neova_dash::gesture::NUM_GEST && isCcUnused)
+		while (preset++ < neova_dash::gesture::NUM_PRESETS && isCcUnused)
 		{
-			if (isGestureActive(gesture) && getGestureData (gesture).cc == undefinedCc)
+			int gesture = 0;
+
+			while (gesture++ < neova_dash::gesture::NUM_GEST && isCcUnused)
 			{
-				isCcUnused = false;
+				if (isGestureActive (gesture, preset) && getGestureData (gesture, preset).cc == undefinedCc)
+				{
+					isCcUnused = false;
+				}
 			}
 		}
 
