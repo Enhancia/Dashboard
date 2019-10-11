@@ -131,6 +131,25 @@ HubComponent::HubMode HubComponent::getCurrentMode()
 	return mode;
 }
 
+void HubComponent::lockHubToPresetMode (const bool shouldLockHub)
+{
+	if (locked == shouldLockHub) return;
+
+	locked = shouldLockHub;
+
+	if (locked)
+	{
+		mode = presetSelection;
+		buttons[CTRL_ID]->setInterceptsMouseClicks (false, false);
+		buttons[CTRL_ID]->setState (Button::buttonDown);
+	}
+	else
+	{
+		mode = gestureMute;
+		buttons[CTRL_ID]->setState (Button::buttonNormal);
+		buttons[CTRL_ID]->setInterceptsMouseClicks (true, false);
+	}
+}
 
 bool HubComponent::getControlButtonDown()
 {

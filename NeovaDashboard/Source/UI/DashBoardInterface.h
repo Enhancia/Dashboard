@@ -37,9 +37,9 @@ public:
 
     enum PresetModeState
     {
-        normal =0,
-        presetMaster,
-        presetSlave
+        normalState =0,
+        presetState,
+        slaveState
     };
 
     //==============================================================================
@@ -68,7 +68,7 @@ public:
 
     //==============================================================================
     int getPresetModeState();
-    void setPresetSlaveMode (bool shouldBeInSlaveMode);
+    void setPresetModeState (const int newState);
     void hubChangedPreset();
 
     //==============================================================================
@@ -84,6 +84,10 @@ private:
     static void alertPanelCallback (int modalResult, DashBoardInterface* interface);
     void paintShadows (Graphics& g);
     void drawStateMessage (Graphics& g);
+
+    //==============================================================================
+    void setPresetStateToPresetMode();
+    void setPresetStateToNormalMode();
 
     //==============================================================================
     std::unique_ptr<HeaderComponent> header;
@@ -105,7 +109,7 @@ private:
     bool commandKeyDown = ModifierKeys::currentModifiers.isCommandDown();
 
     InterfaceState state = connected;
-    int presetModeState = int (normal);
+    int presetModeState = int (normalState);
 
     //==============================================================================
     Image backgroundImage = ImageFileFormat::loadFrom (DashData::HUBBG_png, DashData::HUBBG_pngSize);
