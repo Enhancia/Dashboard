@@ -13,8 +13,9 @@
 //==============================================================================
 // HubComponent
 
-HubComponent::HubComponent (HubConfiguration& config, NewGesturePanel& newGest, ApplicationCommandManager& manager)
-    : hubConfig (config), commandManager (manager), newGesturePanel (newGest)
+HubComponent::HubComponent (HubConfiguration& config, NewGesturePanel& newGest,
+                  			ApplicationCommandManager& manager, int& presetState)
+    : hubConfig (config), commandManager (manager), newGesturePanel (newGest), presetModeState (presetState)
 {
 	TRACE_IN;
 
@@ -27,7 +28,7 @@ HubComponent::HubComponent (HubConfiguration& config, NewGesturePanel& newGest, 
 		buttons.getLast()->addListener (this);
 		addAndMakeVisible (buttons.getLast());
 
-		leds.add (new GestureLED (i, hubConfig, mode));
+		leds.add (new GestureLED (i, hubConfig, presetModeState));
 		addAndMakeVisible (leds.getLast());
 	}
 
@@ -113,24 +114,6 @@ void HubComponent::repaintLEDs()
 	}
 }
 
-void HubComponent::switchHubMode()
-{
-	if (mode == presetSelection)
-	{
-		mode = gestureMute;
-		if (ctrlButtonDown) ctrlButtonDown = false;
-	}
-
-	else if (mode == gestureMute) mode = presetSelection;
-
-	repaintLEDs();
-}
-
-HubComponent::HubMode HubComponent::getCurrentMode()
-{
-	return mode;
-}
-
 void HubComponent::lockHubToPresetMode (const bool shouldLockHub)
 {
 	if (locked == shouldLockHub) return;
@@ -139,16 +122,42 @@ void HubComponent::lockHubToPresetMode (const bool shouldLockHub)
 
 	if (locked)
 	{
-		mode = presetSelection;
 		buttons[CTRL_ID]->setInterceptsMouseClicks (false, false);
 		buttons[CTRL_ID]->setState (Button::buttonDown);
 	}
 	else
 	{
-		mode = gestureMute;
 		buttons[CTRL_ID]->setState (Button::buttonNormal);
 		buttons[CTRL_ID]->setInterceptsMouseClicks (true, false);
 	}
+
+	repaintLEDs();
+}
+
+void HubComponent::setPresetStateToPresetMode (bool notifyChange)
+{
+    if (presetModeState == slaveState) return;
+
+    if (presetModeState != presetState)
+    {
+        presetModeState = int (presetState);
+        repaintLEDs();
+
+        if (notifyChange) getCommandManager().invokeDirectly (neova_dash::commands::updatePresetModeState, true);
+    }
+}
+
+void HubComponent::setPresetStateToNormalMode (bool notifyChange)
+{
+    if (presetModeState == slaveState) return;
+
+	if (presetModeState == presetState)
+    {
+        presetModeState = int (normalState);
+        repaintLEDs();
+
+        if (notifyChange) getCommandManager().invokeDirectly (neova_dash::commands::updatePresetModeState, true);
+    }
 }
 
 bool HubComponent::getControlButtonDown()
@@ -171,25 +180,31 @@ void HubComponent::buttonClicked (Button* bttn)
 
 void HubComponent::handleHubButtonClick (const int buttonId)
 {
-	if (buttonId == CTRL_ID) // Control button
+	if (buttonId == CTRL_ID && presetModeState != slaveState) // Control button
 	{
-		ctrlButtonDown = !ctrlButtonDown;
-		switchHubMode();
+		presetModeState == int (normalState) ? setPresetStateToPresetMode()
+					   						 : setPresetStateToNormalMode();
 	}
 
 	else // Bottom buttons -> action depending on the mode
 	{
-		if (mode == presetSelection)
+		if (presetModeState == presetState)
 		{
 			hubConfig.setPreset (buttonId);
-
-			// TO DELETE IF UPDATE LOGIC
 			currentPreset = buttonId;
-			if (!ModifierKeys::currentModifiers.isCommandDown()) switchHubMode();
+
+			if (!ModifierKeys::currentModifiers.isCommandDown()) setPresetStateToNormalMode();
 
 			commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
 		}
-		else if (mode == gestureMute)
+		else if (presetModeState == slaveState)
+		{
+			hubConfig.setPreset (buttonId);
+			currentPreset = buttonId;
+
+			commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
+		}
+		else if (presetModeState == normalState)
 		{
 			if (hubConfig.getGestureData (buttonId).type != neova_dash::gesture::none)
 			{
@@ -263,8 +278,8 @@ void HubComponent::HubButton::paintButton (Graphics& g, bool shouldDrawButtonAsH
 //==============================================================================
 // GestureLED
 
-HubComponent::GestureLED::GestureLED (const int ledNum, HubConfiguration& config, HubComponent::HubMode& hubMode)
-	: id (ledNum), hubConfig (config), mode (hubMode)
+HubComponent::GestureLED::GestureLED (const int ledNum, HubConfiguration& config, const int& presetState)
+	: id (ledNum), hubConfig (config), presetModeState (presetState)
 {
 }
 HubComponent::GestureLED::~GestureLED()
@@ -276,12 +291,12 @@ void HubComponent::GestureLED::paint (Graphics& g)
 									 float (jmin (getHeight(), getWidth()))).withCentre (getLocalBounds().getCentre()
 																			                             .toFloat());
 
-	if ((mode == HubComponent::gestureMute && hubConfig.getGestureData (id).type != int (neova_dash::gesture::none))
-		|| (mode == HubComponent::presetSelection && hubConfig.getSelectedPreset() == id))
+	if ((presetModeState == HubComponent::normalState && hubConfig.getGestureData (id).type != int (neova_dash::gesture::none))
+		|| (presetModeState != HubComponent::normalState && hubConfig.getSelectedPreset() == id))
 	{
 		Colour ledColour;
 
-		if (mode == HubComponent::presetSelection) ledColour = Colours::white;
+		if (presetModeState != HubComponent::normalState) ledColour = Colours::white;
 		else
 		{ 
 		 	ledColour = neova_dash::gesture::getHighlightColour

@@ -22,14 +22,16 @@ class HubComponent    : public Component,
                         private Button::Listener
 {
 public:
-    enum HubMode
+    enum PresetModeState
     {
-        gestureMute =0,
-        presetSelection
+        normalState =0,
+        presetState,
+        slaveState
     };
 
     //==============================================================================
-    HubComponent (HubConfiguration& data, NewGesturePanel& newGest, ApplicationCommandManager& manager);
+    HubComponent (HubConfiguration& data, NewGesturePanel& newGest,
+                  ApplicationCommandManager& manager, int& presetState);
     ~HubComponent();
 
     //==============================================================================
@@ -44,11 +46,10 @@ public:
     void update();
     void repaintLEDs();
 
-    //==========================================================================
-    void switchHubMode();
-    HubMode getCurrentMode();
-
+    //==============================================================================
     void lockHubToPresetMode (const bool shouldLockHub);
+    void setPresetStateToPresetMode (bool notifyChange = true);
+    void setPresetStateToNormalMode (bool notifyChange = true);
 
     //==========================================================================
     bool getControlButtonDown();
@@ -81,7 +82,7 @@ private:
     {
     public:
         //==========================================================================
-        GestureLED (const int ledNum, HubConfiguration& config, HubComponent::HubMode& hubMode);
+        GestureLED (const int ledNum, HubConfiguration& config, const int& presetState);
         ~GestureLED();
 
         //==========================================================================
@@ -91,7 +92,7 @@ private:
         //==========================================================================
         const int id;
         HubConfiguration& hubConfig;
-        HubComponent::HubMode& mode;
+        const int& presetModeState;
     
     private:
         //==========================================================================
@@ -100,7 +101,8 @@ private:
 
     //==============================================================================
     int currentPreset = 0;
-    HubMode mode = gestureMute;
+    int& presetModeState;
+
     bool ctrlButtonDown = false;
     bool locked = false;
     

@@ -33,7 +33,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
                                                    getCommandManager(), neova_dash::ui::FRAMERATE);
     addAndMakeVisible (*gesturePanel);
 
-    hubComponent = std::make_unique<HubComponent> (hubConfig, *newGesturePanel, getCommandManager());
+    hubComponent = std::make_unique<HubComponent> (hubConfig, *newGesturePanel,
+                                                   getCommandManager(), presetModeState);
     addAndMakeVisible (*hubComponent);
 
     presetSelector = std::make_unique<PresetSelectorComponent> (hubConfig, getCommandManager());
@@ -177,9 +178,9 @@ void DashBoardInterface::mouseEnter (const MouseEvent& event)
 {
     if ((event.eventComponent == presetSelector.get() ||
          event.eventComponent->getParentComponent() == presetSelector.get())
-        && hubComponent->getCurrentMode() == HubComponent::gestureMute)
+        && presetModeState == normalState)
     {
-        hubComponent->switchHubMode();
+        hubComponent->setPresetStateToPresetMode();
     }
 }
 
@@ -187,27 +188,27 @@ void DashBoardInterface::mouseExit (const MouseEvent& event)
 {
     if ((event.eventComponent == presetSelector.get() ||
          event.eventComponent->getParentComponent() == presetSelector.get())
-        && hubComponent->getCurrentMode() == HubComponent::presetSelection
+        && presetModeState == presetState
         && !commandKeyDown && !hubComponent->getControlButtonDown())
     {
-        hubComponent->switchHubMode();
+        hubComponent->setPresetStateToNormalMode();
     }
 }
 
 void DashBoardInterface::modifierKeysChanged (const ModifierKeys& modifiers)
 {
     if (modifiers.isCommandDown() && !commandKeyDown
-                                  && hubComponent->getCurrentMode() != HubComponent::presetSelection)
+                                  && presetModeState == normalState)
     {
-        hubComponent->switchHubMode();
+        hubComponent->setPresetStateToPresetMode();
     }
     else if (!modifiers.isCommandDown() && commandKeyDown
-                                        && hubComponent->getCurrentMode() == HubComponent::presetSelection
+                                        && presetModeState == presetState
                                         && !presetSelector->isMouseOver()
                                         && !presetSelector->getChildComponent (0)->isMouseOver()
                                         && !presetSelector->getChildComponent (1)->isMouseOver())
     {
-        hubComponent->switchHubMode();
+        hubComponent->setPresetStateToNormalMode();
     }
 
     commandKeyDown = modifiers.isCommandDown();
@@ -352,10 +353,7 @@ void DashBoardInterface::setPresetModeState (const PresetModeState newState)
     {
         if (presetModeState == int (presetState))
         {
-            if (hubComponent->getCurrentMode() == HubComponent::presetSelection)
-            {
-                hubComponent->switchHubMode();
-            }
+            hubComponent->setPresetStateToPresetMode (false);
         }
         else if (presetModeState == int (slaveState))
         {
@@ -377,24 +375,12 @@ void DashBoardInterface::setPresetModeState (const PresetModeState newState)
 
 void DashBoardInterface::setPresetStateToPresetMode()
 {
-    if (hubComponent->getCurrentMode() == HubComponent::presetSelection)
-    {
-        hubComponent->switchHubMode();
-        presetModeState = int (presetState);
-
-        getCommandManager().invokeDirectly (neova_dash::commands::updatePresetModeState, true);
-    }
+    hubComponent->setPresetStateToPresetMode();
 }
 
 void DashBoardInterface::setPresetStateToNormalMode()
 {
-    if (hubComponent->getCurrentMode() == HubComponent::presetSelection)
-    {
-        hubComponent->switchHubMode();
-        presetModeState = int (normalState);
-
-        getCommandManager().invokeDirectly (neova_dash::commands::updatePresetModeState, true);
-    }
+    hubComponent->setPresetStateToNormalMode();
 }
 
 void DashBoardInterface::createAndShowAlertPanel (const String& title, const String& message,
