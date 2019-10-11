@@ -68,7 +68,7 @@ public:
 
     //==============================================================================
     int getPresetModeState();
-    void setPresetModeState (const int newState);
+    void setPresetModeState (const PresetModeState newState);
     void hubChangedPreset();
 
     //==============================================================================

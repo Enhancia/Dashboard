@@ -133,7 +133,7 @@ public:
 			case 0x05:
 				DBG("preset_active_received\n");
 				hubConfig.setPreset(*(uint8_t*)(data + 12), false);
-				if (dashInterface->getPresetModeState() == dashInterface->presetMaster)
+				if (dashInterface->getPresetModeState() == DashBoardInterface::presetState)
 				{
 					dashInterface->hubChangedPreset();
 				}
@@ -183,17 +183,16 @@ public:
 				uint8_t state_received = *(uint8_t*)(data + 12);
 				if (state_received == 2)
 				{
-					dashInterface->setPresetModeState(dashInterface->presetSlave);
+					dashInterface->setPresetModeState(DashBoardInterface::slaveState);
 				}
 				else if (state_received == 0)
 				{
-					dashInterface->setPresetModeState(dashInterface->normal);
+					dashInterface->setPresetModeState(DashBoardInterface::normalState);
 				}
 				else
 				{
 					DBG("Should not be there");
 				}
-			default:
 				break;
 			}
 		}

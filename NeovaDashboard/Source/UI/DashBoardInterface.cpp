@@ -340,7 +340,7 @@ void DashBoardInterface::hubChangedPreset()
     }
 }
 
-void DashBoardInterface::setPresetModeState (const int newState)
+void DashBoardInterface::setPresetModeState (const PresetModeState newState)
 {
     if (presetModeState == int (newState)) return;
 
