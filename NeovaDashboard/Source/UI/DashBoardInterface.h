@@ -35,6 +35,13 @@ public:
         pause
     };
 
+    enum PresetModeState
+    {
+        normal =0,
+        presetMaster,
+        presetSlave
+    };
+
     //==============================================================================
     DashBoardInterface (HubConfiguration& data, DataReader& reader);
     ~DashBoardInterface();
@@ -58,6 +65,11 @@ public:
 
     //==============================================================================
     void setInterfaceStateAndUpdate (const InterfaceState newState);
+
+    //==============================================================================
+    int getPresetModeState();
+    void setPresetSlaveMode (bool shouldBeInSlaveMode);
+    void hubChangedPreset();
 
     //==============================================================================
     void update();
@@ -93,6 +105,7 @@ private:
     bool commandKeyDown = ModifierKeys::currentModifiers.isCommandDown();
 
     InterfaceState state = connected;
+    int presetModeState = int (normal);
 
     //==============================================================================
     Image backgroundImage = ImageFileFormat::loadFrom (DashData::HUBBG_png, DashData::HUBBG_pngSize);

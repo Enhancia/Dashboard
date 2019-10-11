@@ -312,6 +312,21 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
     repaint();
 }
 
+int DashBoardInterface::getPresetModeState()
+{
+    return presetModeState;
+}
+
+void DashBoardInterface::setPresetSlaveMode (bool shouldBeInSlaveMode)
+{
+
+}
+
+void DashBoardInterface::hubChangedPreset()
+{
+
+}
+
 void DashBoardInterface::createAndShowAlertPanel (const String& title, const String& message,
                                                    const String& buttonText)
 {

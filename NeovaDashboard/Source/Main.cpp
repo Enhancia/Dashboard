@@ -252,7 +252,8 @@ public:
                               flashHub,
                               upgradeHub,
                               upgradeRing,
-                              uploadConfigToHub
+                              uploadConfigToHub,
+                              updatePresetModeState
                            });
     }
 
@@ -275,6 +276,9 @@ public:
             case upgradeRing:
                 result.setInfo ("Upgrade Ring Firmware", "Updgrades the ring firmware to the most recent version",
                                                          "Firm Update", 0);
+            case updatePresetModeState:
+                result.setInfo ("Update Preset Mode State", "Updates Preset Mode To Fit Interface",
+                                                            "Hub State Set", 0);
                 break;
             default:
                 break;
