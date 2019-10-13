@@ -86,6 +86,7 @@ private:
     OwnedArray<Component> gestureSlots;
     std::unique_ptr<GestureSettingsComponent> gestureSettings;
 
+    /*
     Image vibratoImage = ImageFileFormat::loadFrom (DashData::VIBRATOicon_png,
                                                     DashData::VIBRATOicon_pngSize);
     Image pitchBendImage = ImageFileFormat::loadFrom (DashData::PITCHicon_png,
@@ -93,7 +94,7 @@ private:
     Image tiltImage = ImageFileFormat::loadFrom (DashData::TILTicon_png,
                                                  DashData::TILTicon_pngSize);
     Image rollImage = ImageFileFormat::loadFrom (DashData::ROLLicon_png,
-                                                 DashData::ROLLicon_pngSize);
+                                                 DashData::ROLLicon_pngSize);*/
 
     //==============================================================================
     int selectedGesture = 0;

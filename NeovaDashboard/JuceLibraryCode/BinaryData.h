@@ -21,19 +21,19 @@ namespace DashData
     const int            HUBBG_pngSize = 1525275;
 
     extern const char*   PITCHicon_png;
-    const int            PITCHicon_pngSize = 131992;
+    const int            PITCHicon_pngSize = 8766;
 
     extern const char*   ROLLicon_png;
-    const int            ROLLicon_pngSize = 190624;
+    const int            ROLLicon_pngSize = 11642;
 
     extern const char*   TILTicon_png;
-    const int            TILTicon_pngSize = 123397;
+    const int            TILTicon_pngSize = 7541;
 
     extern const char*   upload_png;
     const int            upload_pngSize = 729;
 
     extern const char*   VIBRATOicon_png;
-    const int            VIBRATOicon_pngSize = 155163;
+    const int            VIBRATOicon_pngSize = 9968;
 
     extern const char*   Ahmet_Altun__HalisGRBold_otf;
     const int            Ahmet_Altun__HalisGRBold_otfSize = 57952;

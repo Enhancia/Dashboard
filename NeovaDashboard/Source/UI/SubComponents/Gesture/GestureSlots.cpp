@@ -80,7 +80,7 @@ void GestureComponent::paint (Graphics& g)
                 stateArea, Justification::centred, true);
     
     // Gesture Image
-    drawGesturePath (g, area);
+    drawGesturePath (g, area.reduced (neova_dash::ui::MARGIN));
 
     // Highlight
     if (!selected && highlighted)
@@ -197,19 +197,18 @@ void GestureComponent::createButton()
 
 void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
 {
-    /*
     Image gestureImage;
 
     switch (type)
     {
-        case (neova_dash::gesture::vibrato):   gestureImage = neova_dash::gesture::vibratoImage; break;
-        case (neova_dash::gesture::pitchBend): gestureImage = neova_dash::gesture::pitchBendImage; break;
-        case (neova_dash::gesture::tilt):      gestureImage = neova_dash::gesture::tiltImage; break;
-        case (neova_dash::gesture::roll):      gestureImage = neova_dash::gesture::rollImage; break;
+        case (neova_dash::gesture::vibrato):   gestureImage = vibratoImage; break;
+        case (neova_dash::gesture::pitchBend): gestureImage = pitchBendImage; break;
+        case (neova_dash::gesture::tilt):      gestureImage = tiltImage; break;
+        case (neova_dash::gesture::roll):      gestureImage = rollImage; break;
         default: return;
     }
 
-    g.drawImage (gestureImage, area.toFloat(), RectanglePlacement::centred);*/
+    g.drawImage (gestureImage, area.toFloat(), RectanglePlacement::centred);
 }
 
 //==============================================================================
