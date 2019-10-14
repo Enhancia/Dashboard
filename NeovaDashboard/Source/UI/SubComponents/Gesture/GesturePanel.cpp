@@ -370,7 +370,7 @@ void GesturePanel::resizeSlotsAndTrimAreaAccordingly (juce::Rectangle<int>& area
     {
         gestureSlots[i]->setBounds (i < numRows ? column1.removeFromTop (slotHeight)
 														 .reduced (marginX, marginY)
-                                                : column2.removeFromBottom (slotHeight)
+                                                : column2.removeFromTop (slotHeight)
 														 .reduced (marginX, marginY));
     }
 }
