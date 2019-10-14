@@ -36,7 +36,7 @@ public:
     //==============================================================================
     Neova_DashBoard_Interface() {}
 
-    const String getApplicationName() override       { return "Neova Dashboard"; }
+    const String getApplicationName() override       { return "Dashboard - Neova"; }
     const String getApplicationVersion() override    { return ProjectInfo::versionString; }
     bool moreThanOneInstanceAllowed() override       { return false; }
 
