@@ -185,8 +185,7 @@ void HubComponent::handleHubButtonClick (const int buttonId)
 		presetModeState == int (normalState) ? setPresetStateToPresetMode()
 					   						 : setPresetStateToNormalMode();
 	}
-
-	else // Bottom buttons -> action depending on the mode
+	else if (buttonId != CTRL_ID) // Bottom buttons -> action depending on the mode
 	{
 		if (presetModeState == presetState)
 		{
