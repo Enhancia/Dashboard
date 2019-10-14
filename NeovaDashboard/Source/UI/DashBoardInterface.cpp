@@ -23,7 +23,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     header = std::make_unique<HeaderComponent> (*optionsPanel, hubConfig, dataReader);
     addAndMakeVisible (*header);
 	
-    uploadButton = std::make_unique<UploadButton> (getCommandManager());
+    uploadButton = std::make_unique<UploadButton> (hubConfig, getCommandManager());
     addAndMakeVisible (*uploadButton);
 
     newGesturePanel = std::make_unique<NewGesturePanel> (hubConfig, getCommandManager());
@@ -34,7 +34,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     addAndMakeVisible (*gesturePanel);
 
     hubComponent = std::make_unique<HubComponent> (hubConfig, *newGesturePanel,
-                                                   getCommandManager(), presetModeState);
+                                                   getCommandManager(), presetModeState, state);
     addAndMakeVisible (*hubComponent);
 
     presetSelector = std::make_unique<PresetSelectorComponent> (hubConfig, getCommandManager());
@@ -55,7 +55,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     int dashWidth = jmin (screenArea.getHeight()*63/60, // screenH * 9/10 * AspectRatio^-1 (= 7/6)
                           screenArea.getWidth()*3/4);
 
-    //dashWidth = 850; // TO DELETE
+    //dashWidth = 800; // TO DELETE
 
     setSize (dashWidth,
              dashWidth*6/7);
@@ -104,7 +104,8 @@ void DashBoardInterface::paintShadows (Graphics& g)
     if (state == connected)
     {
         auto uploadShadowBounds = uploadButton->getBounds().reduced (neova_dash::ui::MARGIN)
-                                                           .withLeft (getX()-10);
+                                                           .withLeft (getX()-10)
+                                                           .withTrimmedRight (40);
         if (uploadButton->isDown()) uploadShadowBounds = uploadShadowBounds.withTrimmedRight (1);
 
         shadowPath.addRoundedRectangle (uploadShadowBounds.toFloat(), 8.0f);
@@ -119,20 +120,21 @@ void DashBoardInterface::drawStateMessage (Graphics& g)
     auto area = getLocalBounds().withTop (hubComponent->getBounds().getBottom())
                                 .reduced (neova_dash::ui::MARGIN*2);
     g.setColour (neova_dash::colour::mainText);
-    g.setFont (neova_dash::font::dashFont.withHeight (25.0f));
+    g.setFont (neova_dash::font::dashFontLight.withHeight (35.0f));
 
     String stateMessage;
 
-    if (state == waitingForConnection)
+    if (state == int (waitingForConnection))
     {
-        stateMessage = "Please connect your HUB to your computer to proceed.";
+        stateMessage = "Welcome to NEOVA DASHBOARD"
+                       "\nPlease connect your HUB.";
     }
-    else if (state == pause)
+    else if (state == int (pause))
     {
-        stateMessage = "Your HUB is paused.";
+        stateMessage = "PAUSE";
     }
 
-    g.drawText (stateMessage, area, Justification::centred, true);
+    g.drawFittedText (stateMessage, area, Justification::centred, 2);
 }
 
 void DashBoardInterface::resized()
@@ -154,14 +156,14 @@ void DashBoardInterface::resized()
     hubComponent->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight())
                                  .translated (0, -10));
 
-    if (state != connected)
+    if (state == waitingForConnection)
     {
         hubComponent->setBounds (Rectangle<int> (area.getHeight(), area.getHeight())
-                                                        .withCentre ({getWidth()/2, getHeight()/3}));
+                                                        .withCentre ({getWidth()/2, getHeight()*3/8}));
     }
 
-    uploadButton->setBounds (area.withSize (jmax (100, area.getWidth()/7), area.getHeight()*6/10)
-                                 .withSizeKeepingCentre (jmax (100, area.getWidth()/7), HEADER_HEIGHT));
+    uploadButton->setBounds (area.withSize (jmax (140, area.getWidth()/7 + 40), area.getHeight()*6/10)
+                                 .withSizeKeepingCentre (jmax (140, area.getWidth()/7 + 40), HEADER_HEIGHT));
 }
 
 //==============================================================================
@@ -237,7 +239,8 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
     commands.addArray ({
                             updateDashInterface,
                             updateInterfaceLEDs,
-                            updateBatteryDisplay
+                            updateBatteryDisplay,
+                            allowUserToFlashHub
                        });
 }
 
@@ -255,6 +258,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
             break;
         case updateBatteryDisplay:
             result.setInfo ("Update Battery Display", "Udpates Battery Display Inside The Header", "Interface", 0);
+            break;
+        case allowUserToFlashHub:
+            result.setInfo ("Update Upload Button", "Allows Upload Button To Be Clicked", "Interface", 0);
             break;
         default:
             break;
@@ -282,6 +288,10 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             hubComponent->repaintLEDs();
             return true;
 
+        case allowUserToFlashHub:
+            uploadButton->setActive();
+            return true;
+
         default:
             return false;
     }
@@ -289,16 +299,19 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
 
 void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newState)
 {
-    if (state == newState) return;
+    if (state == int (newState)) return;
 
-    state = newState;
+    state = int (newState);
 
-    if (state == connected)
+    if (state == int (connected))
     {
         gesturePanel->setVisible (true);
         newGesturePanel->hidePanel();
         uploadButton->setVisible (true);
         presetSelector->setVisible (true);
+        hubComponent->setInterceptsMouseClicks (true, true);
+        hubComponent->update();
+        hubConfig.selectFirstExistingGesture();
     }
 
     else
@@ -306,7 +319,12 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         gesturePanel->setVisible (false);
         newGesturePanel->hidePanel();
         uploadButton->setVisible (false);
+
+        if (state == waitingForConnection) uploadButton->setActive (false);
+        
         presetSelector->setVisible (false);
+        hubComponent->setInterceptsMouseClicks (false, false);
+        hubComponent->update();
     }
 
     resized();

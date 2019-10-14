@@ -96,7 +96,6 @@ private:
 
     DraggableObject objectBeingDragged = none;
     Colour highlightColour;
-	NormalisableRange<float> midiRange = {0.f, 127.f};
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiRangeTuner)

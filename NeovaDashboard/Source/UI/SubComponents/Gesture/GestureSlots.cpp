@@ -80,7 +80,7 @@ void GestureComponent::paint (Graphics& g)
                 stateArea, Justification::centred, true);
     
     // Gesture Image
-    drawGesturePath (g, area);
+    drawGesturePath (g, area.reduced (area.getWidth()/6, area.getHeight()/6));
 
     // Highlight
     if (!selected && highlighted)
@@ -185,64 +185,30 @@ void GestureComponent::createButton()
     muteButton->onClick = [this] ()
     {
         hubConfig.setUint8Value (id, HubConfiguration::on, uint8 (muteButton->getToggleState() ? 0 : 1));
+
+        if (hubConfig.getSelectedGesture() != id)
+        {
+            hubConfig.setSelectedGesture (id);
+        }
+
         commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
     };
 }
 
 void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
 {
-    g.setColour (Colour (0xfff3f3f3));
+    Image gestureImage;
 
-    // Icon Fill
-    Path iconFill;
-
-    /*
-    if (type == Gesture::tilt) iconFill = PLUME::path::createPath (PLUME::path::handTilt);
-    else if (type == Gesture::roll) iconFill = PLUME::path::createPath (PLUME::path::handRoll);
-    else iconFill = PLUME::path::createPath (PLUME::path::handFingerDown);
-
-    auto areaFloat = (type == Gesture::tilt || type == Gesture::roll)
-                          ? area.reduced (area.getWidth()/8, area.getHeight()/4).toFloat()
-                          : area.reduced (area.getWidth()/4, area.getHeight()/8).toFloat();
-
-	iconFill.scaleToFit (areaFloat.getX(), areaFloat.getY(),
-                         areaFloat.getWidth(), areaFloat.getHeight(), true);
-
-    g.fillPath (iconFill);
-    */
-    // Icon stroke
-    /*
-    Path iconStroke;
-
-    if (gesture.type == Gesture::tilt)
+    switch (type)
     {
-        iconStroke = PLUME::path::createPath (PLUME::path::tiltArrow);
-        areaFloat = areaFloat.withTrimmedLeft (areaFloat.getWidth()*2/3)
-                             .withTrimmedBottom (areaFloat.getHeight()/2);
+        case (neova_dash::gesture::vibrato):   gestureImage = vibratoImage; break;
+        case (neova_dash::gesture::pitchBend): gestureImage = pitchBendImage; break;
+        case (neova_dash::gesture::tilt):      gestureImage = tiltImage; break;
+        case (neova_dash::gesture::roll):      gestureImage = rollImage; break;
+        default: return;
     }
-    else if (gesture.type == Gesture::roll)
-    {
-        iconStroke = PLUME::path::createPath (PLUME::path::rollArrow);
-        areaFloat = areaFloat.withTrimmedRight (areaFloat.getWidth()/2)
-                             .withTrimmedBottom (areaFloat.getHeight()/2);
-    }
-    else if (gesture.type == Gesture::pitchBend)
-    {
-        iconStroke = PLUME::path::createPath (PLUME::path::pitchBendArrow);
-        areaFloat = areaFloat.withTrimmedTop (areaFloat.getHeight()*2/3)
-                             .translated (areaFloat.getWidth()/12, 0);
-    }
-    else if (gesture.type == Gesture::vibrato)
-    {
-        iconStroke = PLUME::path::createPath (PLUME::path::vibratoRipple);
-        areaFloat = areaFloat.withTrimmedTop (areaFloat.getHeight()*2/3)
-                             .translated (areaFloat.getWidth()/12, 0);
-    }
-    else return;
 
-    iconStroke.scaleToFit (areaFloat.getX(), areaFloat.getY(),
-                           areaFloat.getWidth(), areaFloat.getHeight(), true);
-    g.strokePath (iconStroke, PathStrokeType (1.0f));*/
+    g.drawImage (gestureImage, area.toFloat(), RectanglePlacement::centred);
 }
 
 //==============================================================================

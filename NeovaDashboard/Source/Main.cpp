@@ -68,16 +68,16 @@ public:
 		memcpy(data + 8, &ctrl, sizeof(uint32_t));
 		dashPipe->sendString(data, 12);
     
-    dashInterface.reset (new DashBoardInterface (hubConfig, *dataReader));
-    mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get()));
-    dashInterface->grabKeyboardFocus();
+    	dashInterface.reset (new DashBoardInterface (hubConfig, *dataReader));
+    	mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get()));
+    	dashInterface->grabKeyboardFocus();
     
-    dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::waitingForConnection);
+    	dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::waitingForConnection);
 		DBG("POWER STATE : " + String(hubPowerState) + " \n");
     
-    commandManager.registerAllCommandsForTarget (this);
-    commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
-                                                        (mainWindow->getContentComponent()));
+    	commandManager.registerAllCommandsForTarget (this);
+    	commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
+    	                                                    (mainWindow->getContentComponent()));
     }
 
     void shutdown() override
@@ -120,6 +120,9 @@ public:
 			case 0x03:
 				DBG("config received\n");
 				hubConfig.setConfig(data + 12);
+
+				if (hubPowerState != POWER_OFF) hubConfig.notifyConfigWasChanged();
+
 				if (hubPowerState == POWER_OFF)
 				{
 					hubPowerState = POWER_ON;
@@ -144,7 +147,6 @@ public:
 				{
 					dashInterface->hubChangedPreset();
 				}
-
 				if (!dashInterface->hasKeyboardFocus(true))
 				{
 					dashInterface->grabKeyboardFocus();

@@ -25,17 +25,18 @@ namespace neova_dash
     	// Lists all possible commands with their associated id
     	enum commandIDs
     	{
-            // Backend commands
-    		flashHub              = 0x00000001, // Writes Temp Hub Config To Its Memory
-    		upgradeHub            = 0x00000002, // Upgrades Hub Firm
-    		upgradeRing           = 0x00000003, // Upgrades Ring Firm
-    		uploadConfigToHub     = 0x00000004, // Uploads config to HUB
-            updatePresetModeState = 0x00000005, // Updates the backend preset mode to fit the interface
+          // Backend commands
+    		  flashHub              = 0x00000001, // Writes Temp Hub Config To Its Memory
+    		  upgradeHub            = 0x00000002, // Upgrades Hub Firm
+    		  upgradeRing           = 0x00000003, // Upgrades Ring Firm
+    		  uploadConfigToHub     = 0x00000004, // Uploads config to HUB
+          updatePresetModeState = 0x00000005, // Updates the backend preset mode to fit the interface
 
-            // Frontend commands
-    		updateDashInterface   = 0x01000001, // Updates Dash interface to match the HUB data
-            updateInterfaceLEDs   = 0x01000002, // Updates the Hub lEDs in the Dash interface
-            updateBatteryDisplay  = 0x01000003  // Updates the battery display in the header
+          // Frontend commands
+    		  updateDashInterface  = 0x01000001, // Updates Dash interface to match the HUB data
+          updateInterfaceLEDs  = 0x01000002, // Updates the Hub lEDs in the Dash interface
+          updateBatteryDisplay = 0x01000003, // Updates the battery display in the header
+          allowUserToFlashHub  = 0x01000004  // Updates upload button after config was changed
     	};
     };
 
@@ -140,5 +141,23 @@ namespace neova_dash
     {
         extern const Colour getHighlightColour (const GestureType type, const bool active = true);
         extern const Colour getHighlightColour (const int typeInt, const bool active = true);
+    }
+
+    namespace midi
+    {
+        enum CCMessage
+        {
+            modWheel = 1,
+            volume = 7,
+            balance = 8,
+            pan = 9,
+            expression = 11
+        };
+
+        //extern String getCCString();
+
+        const uint8_t undefinedCCs[] = { /*3, 9, 14, 15, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31,
+                                         85, 86, 87, 89, 90,*/102, 103, 104, 105, 106, 107, 108, 109,
+                                         110, 111, 112, 113, 114, 115, 116, 117, 118, 119 };
     }
 };

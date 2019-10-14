@@ -107,8 +107,8 @@ private:
     DataReader& dataReader;
 
     bool commandKeyDown = ModifierKeys::currentModifiers.isCommandDown();
-
-    InterfaceState state = connected;
+    
+    int state = int (connected);
     int presetModeState = int (normalState);
 
     //==============================================================================

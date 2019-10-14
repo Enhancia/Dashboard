@@ -10,9 +10,13 @@
 
 #include "UploadButton.h"
 
-UploadButton::UploadButton (ApplicationCommandManager& cm) : Button ("Upload Button"), commandManager (cm)
+UploadButton::UploadButton (HubConfiguration& config, ApplicationCommandManager& cm, const bool shouldBeActive)
+	: Button ("Upload Button"), commandManager (cm), hubConfig (config), active (shouldBeActive)
 {
 	TRACE_IN;
+
+	setInterceptsMouseClicks (active, false);
+	setAlpha (active ? 1.0f : 0.5f);
 }
 
 UploadButton::~UploadButton()
@@ -24,20 +28,54 @@ void UploadButton::resized()
 {
 }
 
+void UploadButton::timerCallback()
+{
+}
+
+void UploadButton::setActive (const bool shouldBeActive)
+{
+	if (active == shouldBeActive) return;
+
+	active = shouldBeActive;
+
+	setInterceptsMouseClicks (active, false);
+	setAlpha (active ? 1.0f : 0.5f);
+
+	repaint();
+}
+
+bool UploadButton::isActive()
+{
+	return active;
+}
+
+void UploadButton::setInactiveAndShowUploadFeedback()
+{
+	setActive (false);
+}
+
 void UploadButton::paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
+	if (!active)
+	{
+		shouldDrawButtonAsHighlighted = false;
+		shouldDrawButtonAsDown = false;
+	}
+
 	g.setColour (shouldDrawButtonAsDown
 					 ? neova_dash::colour::uploadButtonBackground.darker (0.3f)
 				     : shouldDrawButtonAsHighlighted ? neova_dash::colour::uploadButtonBackground.brighter (0.07f)
 				     								 : neova_dash::colour::uploadButtonBackground);
 
-	auto buttonArea = getLocalBounds().reduced (neova_dash::ui::MARGIN);
+	auto buttonArea = getLocalBounds().withTrimmedRight (40)
+									  .reduced (neova_dash::ui::MARGIN);
+
 	if (shouldDrawButtonAsDown) buttonArea = buttonArea.withTrimmedRight (1);
 
 	// Background Fill
 	g.fillRoundedRectangle (buttonArea.withLeft (getX()-20).toFloat(), 8.0f);
 
-	auto textArea = getLocalBounds().withTrimmedRight (neova_dash::ui::MARGIN)
+	auto textArea = getLocalBounds().withTrimmedRight (neova_dash::ui::MARGIN + 40)
 									.reduced (neova_dash::ui::MARGIN, neova_dash::ui::MARGIN);
 
 	// Text Draw
@@ -56,5 +94,7 @@ void UploadButton::paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted,
 
 void UploadButton::clicked()
 {
-	commandManager.invokeDirectly (neova_dash::commands::flashHub, true);
+	hubConfig.flashHub();
+
+	setInactiveAndShowUploadFeedback();
 }

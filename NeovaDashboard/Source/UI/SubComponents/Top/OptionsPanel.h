@@ -35,14 +35,12 @@ public:
 private:
     //==============================================================================
     void createButtons();
-    void paintProductInformations (Graphics& g, Rectangle<int> area);
-    void paintFirmUpdateArea (Graphics& g, Rectangle<int> area);
+    void paintProductInformations (Graphics& g, juce::Rectangle<int> area);
+    void paintFirmUpdateArea (Graphics& g, juce::Rectangle<int> area);
 
     //==============================================================================
     juce::Rectangle<int> optionsArea;
     std::unique_ptr<DashShapeButton> closeButton;
-    Image logoImage = ImageFileFormat::loadFrom (DashData::Logo_ENHANCIA_Round_png,
-                                                 DashData::Logo_ENHANCIA_Round_pngSize);
     
     //==============================================================================
     HubConfiguration& hubConfig;

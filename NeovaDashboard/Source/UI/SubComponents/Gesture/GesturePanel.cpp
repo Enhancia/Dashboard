@@ -270,10 +270,17 @@ bool GesturePanel::keyPressed (const KeyPress &key)
 {
     if (hasSelectedGesture() && key.isValid())
     {
-        if (key.getKeyCode() == KeyPress::deleteKey || key.getKeyCode() == KeyPress::backspaceKey)
+        if (key.getKeyCode() == KeyPress::deleteKey)
         {
             removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
         }
+
+        #if JUCE_MAC
+        else if (key.getKeyCode() == KeyPress::backspaceKey && key.getModifiers().isCommandDown())
+        {
+            removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
+        }
+        #endif
     }
 
 	return false;
@@ -363,7 +370,7 @@ void GesturePanel::resizeSlotsAndTrimAreaAccordingly (juce::Rectangle<int>& area
     {
         gestureSlots[i]->setBounds (i < numRows ? column1.removeFromTop (slotHeight)
 														 .reduced (marginX, marginY)
-                                                : column2.removeFromBottom (slotHeight)
+                                                : column2.removeFromTop (slotHeight)
 														 .reduced (marginX, marginY));
     }
 }

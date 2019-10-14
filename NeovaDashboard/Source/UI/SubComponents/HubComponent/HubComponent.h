@@ -31,7 +31,7 @@ public:
 
     //==============================================================================
     HubComponent (HubConfiguration& data, NewGesturePanel& newGest,
-                  ApplicationCommandManager& manager, int& presetState);
+                  ApplicationCommandManager& manager, int& presetState, int& dashState);
     ~HubComponent();
 
     //==============================================================================
@@ -91,6 +91,8 @@ private:
 
         //==========================================================================
         const int id;
+        bool forceOff = false;
+
         HubConfiguration& hubConfig;
         const int& presetModeState;
     
@@ -109,6 +111,7 @@ private:
     HubConfiguration& hubConfig;
     ApplicationCommandManager& commandManager;
     NewGesturePanel& newGesturePanel;
+    int& dashboardState;
 
     //==============================================================================
     Image hubImage = ImageFileFormat::loadFrom (DashData::DashboardHUBonlycropped_png,

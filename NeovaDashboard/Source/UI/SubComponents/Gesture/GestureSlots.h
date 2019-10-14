@@ -58,10 +58,21 @@ private:
 
     std::unique_ptr<Label> gestureNameLabel;
     std::unique_ptr<DashShapeButton> muteButton;
-    
+
+    Image vibratoImage = ImageFileFormat::loadFrom (DashData::VIBRATOicon_png,
+                                                    DashData::VIBRATOicon_pngSize);
+    Image pitchBendImage = ImageFileFormat::loadFrom (DashData::PITCHicon_png,
+                                                      DashData::PITCHicon_pngSize);
+    Image tiltImage = ImageFileFormat::loadFrom (DashData::TILTicon_png,
+                                                 DashData::TILTicon_pngSize);
+    Image rollImage = ImageFileFormat::loadFrom (DashData::ROLLicon_png,
+                                                 DashData::ROLLicon_pngSize);
+
+    //==============================================================================
     bool on = bool (hubConfig.getGestureData (id).on);
     bool selected = false, highlighted = false, solo = false;
 
+    //==============================================================================
     const bool& dragMode;
     const int& draggedGesture;
     const int& draggedOverSlot;
@@ -96,6 +107,7 @@ private:
     //==============================================================================
     bool highlighted = false;
     
+    //==============================================================================
     HubConfiguration& hubConfig;
     const bool& dragMode;
     const int& draggedGesture;
