@@ -72,14 +72,14 @@ private:
         void drawGesturePath (Graphics& g, juce::Rectangle<int> area);
 
         //==============================================================================
-        Image vibratoImage = ImageFileFormat::loadFrom (DashData::VIBRATOicon_png,
+        /*Image vibratoImage = ImageFileFormat::loadFrom (DashData::VIBRATOicon_png,
                                                         DashData::VIBRATOicon_pngSize);
         Image pitchBendImage = ImageFileFormat::loadFrom (DashData::PITCHicon_png,
                                                           DashData::PITCHicon_pngSize);
         Image tiltImage = ImageFileFormat::loadFrom (DashData::TILTicon_png,
                                                      DashData::TILTicon_pngSize);
         Image rollImage = ImageFileFormat::loadFrom (DashData::ROLLicon_png,
-                                                     DashData::ROLLicon_pngSize);
+                                                     DashData::ROLLicon_pngSize);*/
 
         //==============================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GestureTypeSelector)

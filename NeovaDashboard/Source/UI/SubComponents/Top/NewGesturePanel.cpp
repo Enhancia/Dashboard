@@ -335,6 +335,15 @@ void NewGesturePanel::GestureTypeSelector::setHighlighted (bool shouldBeHighligh
 
 void NewGesturePanel::GestureTypeSelector::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
 {
+    // TO DELETE : just draws text
+    using namespace neova_dash::gesture;
+
+    g.setColour (Colour (0xfff3f3f3));
+
+    g.drawText (getTypeString(intToGestureType(gestureType), true), getLocalBounds(),
+               Justification::centred, true);
+
+  /*
     Image gestureImage;
 
     switch (gestureType)
@@ -346,5 +355,5 @@ void NewGesturePanel::GestureTypeSelector::drawGesturePath (Graphics& g, juce::R
         default: return;
     }
 
-    g.drawImage (gestureImage, area.toFloat(), RectanglePlacement::centred);
+    g.drawImage (gestureImage, area.toFloat(), RectanglePlacement::centred);*/
 }

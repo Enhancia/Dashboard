@@ -273,7 +273,7 @@ void HubComponent::GestureLED::paint (Graphics& g)
   
 	if (!forceOff &&
 		 ((presetModeState == HubComponent::normalState && hubConfig.getGestureData (id).type != int (neova_dash::gesture::none))
-		 || (presetModeState != HubComponent::normalState && hubConfig.getSelectedPreset() == id))
+		 || (presetModeState != HubComponent::normalState && hubConfig.getSelectedPreset() == id)))
 	{
 		Colour ledColour;
 

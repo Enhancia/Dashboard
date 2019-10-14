@@ -197,6 +197,7 @@ void GestureComponent::createButton()
 
 void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
 {
+    /*
     Image gestureImage;
 
     switch (type)
@@ -208,7 +209,7 @@ void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
         default: return;
     }
 
-    g.drawImage (gestureImage, area.toFloat(), RectanglePlacement::centred);
+    g.drawImage (gestureImage, area.toFloat(), RectanglePlacement::centred);*/
 }
 
 //==============================================================================
