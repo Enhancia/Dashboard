@@ -70,6 +70,7 @@ bool DataReader::readData (String s)
             floatData.set (i, (*data)[i].getFloatValue());
         }
 
+        floatData.set (neova_dash::data::tilt, -floatData[neova_dash::data::tilt]);
         DBG ("Data : " << data->joinIntoString (" "));
 
         // Notifies Ring is no longer in chargeMode
