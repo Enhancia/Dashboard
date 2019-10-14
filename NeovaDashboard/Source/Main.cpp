@@ -127,8 +127,15 @@ public:
 					//TODO => mettre interface en mode POWER_ON
                     dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
 				}
-				if (!dashInterface->hasKeyboardFocus (true)) dashInterface->grabKeyboardFocus();
-				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+				if (!dashInterface->hasKeyboardFocus (true))
+				{
+					dashInterface->grabKeyboardFocus();
+					dashInterface->update();
+				}
+				else
+				{
+					commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+				}
 				break;
 			case 0x05:
 				DBG("preset_active_received\n");
@@ -138,8 +145,15 @@ public:
 					dashInterface->hubChangedPreset();
 				}
 
-				if (!dashInterface->hasKeyboardFocus(true)) dashInterface->grabKeyboardFocus();
-				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+				if (!dashInterface->hasKeyboardFocus(true))
+				{
+					dashInterface->grabKeyboardFocus();
+					dashInterface->update();
+				}
+				else
+				{
+					commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+				}
 				break;
 
 			case 0x06:
