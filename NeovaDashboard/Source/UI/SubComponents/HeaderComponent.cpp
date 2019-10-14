@@ -162,13 +162,12 @@ void HeaderComponent::BatteryComponent::drawLightningPath (Graphics& g, Rectangl
 {
     Path lightning;
 
-    lightning.startNewSubPath (3.0f, 0.0f);
+    lightning.startNewSubPath (7.0f, 0.0f);
     lightning.lineTo          (0.0f, 4.0f);
     lightning.lineTo          (4.0f, 4.0f);
     lightning.lineTo          (1.0f, 8.0f);
     lightning.lineTo          (8.0f, 3.0f);
     lightning.lineTo          (5.0f, 3.0f);
-    lightning.lineTo          (7.0f, 0.0f);
     lightning.closeSubPath();
 
     lightning.scaleToFit (area.getX(), area.getY(), area.getWidth(), area.getHeight(), true);

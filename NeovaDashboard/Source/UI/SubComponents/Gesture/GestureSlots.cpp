@@ -80,7 +80,7 @@ void GestureComponent::paint (Graphics& g)
                 stateArea, Justification::centred, true);
     
     // Gesture Image
-    drawGesturePath (g, area.reduced (neova_dash::ui::MARGIN));
+    drawGesturePath (g, area.reduced (area.getWidth()/6, area.getHeight()/6));
 
     // Highlight
     if (!selected && highlighted)
