@@ -353,7 +353,7 @@ void DashBoardInterface::setPresetModeState (const PresetModeState newState)
     {
         if (presetModeState == int (presetState))
         {
-            hubComponent->setPresetStateToPresetMode (false);
+            hubComponent->setPresetStateToNormalMode (false);
         }
         else if (presetModeState == int (slaveState))
         {
