@@ -311,7 +311,8 @@ void HubComponent::GestureLED::paint (Graphics& g)
 		g.setColour (ledColour);
 		g.fillEllipse (Rectangle<float>(3.0f, 3.0f).withCentre (ledArea.getCentre()));
 
-		if (hubConfig.getGestureData (id).on != 0)
+		if ((presetModeState == HubComponent::normalState && hubConfig.getGestureData (id).on != 0)
+			|| (presetModeState != HubComponent::normalState && hubConfig.getSelectedPreset() == id))
 		{
 			g.setGradientFill (ledGrad);
 			g.fillEllipse (ledArea);
