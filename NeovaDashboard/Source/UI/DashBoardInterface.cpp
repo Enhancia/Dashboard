@@ -33,7 +33,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
                                                    getCommandManager(), neova_dash::ui::FRAMERATE);
     addAndMakeVisible (*gesturePanel);
 
-    hubComponent = std::make_unique<HubComponent> (hubConfig, *newGesturePanel, getCommandManager(), state);
+    hubComponent = std::make_unique<HubComponent> (hubConfig, *newGesturePanel,
+                                                   getCommandManager(), presetModeState, state);
     addAndMakeVisible (*hubComponent);
 
     presetSelector = std::make_unique<PresetSelectorComponent> (hubConfig, getCommandManager());
@@ -179,9 +180,9 @@ void DashBoardInterface::mouseEnter (const MouseEvent& event)
 {
     if ((event.eventComponent == presetSelector.get() ||
          event.eventComponent->getParentComponent() == presetSelector.get())
-        && hubComponent->getCurrentMode() == HubComponent::gestureMute)
+        && presetModeState == normalState)
     {
-        hubComponent->switchHubMode();
+        hubComponent->setPresetStateToPresetMode();
     }
 }
 
@@ -189,27 +190,27 @@ void DashBoardInterface::mouseExit (const MouseEvent& event)
 {
     if ((event.eventComponent == presetSelector.get() ||
          event.eventComponent->getParentComponent() == presetSelector.get())
-        && hubComponent->getCurrentMode() == HubComponent::presetSelection
+        && presetModeState == presetState
         && !commandKeyDown && !hubComponent->getControlButtonDown())
     {
-        hubComponent->switchHubMode();
+        hubComponent->setPresetStateToNormalMode();
     }
 }
 
 void DashBoardInterface::modifierKeysChanged (const ModifierKeys& modifiers)
 {
     if (modifiers.isCommandDown() && !commandKeyDown
-                                  && hubComponent->getCurrentMode() != HubComponent::presetSelection)
+                                  && presetModeState == normalState)
     {
-        hubComponent->switchHubMode();
+        hubComponent->setPresetStateToPresetMode();
     }
     else if (!modifiers.isCommandDown() && commandKeyDown
-                                        && hubComponent->getCurrentMode() == HubComponent::presetSelection
+                                        && presetModeState == presetState
                                         && !presetSelector->isMouseOver()
                                         && !presetSelector->getChildComponent (0)->isMouseOver()
                                         && !presetSelector->getChildComponent (1)->isMouseOver())
     {
-        hubComponent->switchHubMode();
+        hubComponent->setPresetStateToNormalMode();
     }
 
     commandKeyDown = modifiers.isCommandDown();
@@ -328,6 +329,76 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
 
     resized();
     repaint();
+}
+
+int DashBoardInterface::getPresetModeState()
+{
+    return presetModeState;
+}
+
+void DashBoardInterface::hubChangedPreset()
+{
+    if (presetModeState == int (presetState))
+    {
+        if (!commandKeyDown && !presetSelector->isMouseOver()
+                            && !presetSelector->getChildComponent (0)->isMouseOver()
+                            && !presetSelector->getChildComponent (1)->isMouseOver())
+        {
+            // Should go back to Normal mode and notify backend
+            setPresetStateToNormalMode();
+            update();
+        }
+    }
+    else 
+    {
+        /* Unexpected callback here...
+           This alert method should theoretically only happen when in
+           "preset" state..
+        */
+        jassertfalse;
+    }
+}
+
+void DashBoardInterface::setPresetModeState (const PresetModeState newState)
+{
+    if (presetModeState == int (newState)) return;
+
+    if (newState == int (slaveState))
+    {
+        hubComponent->lockHubToPresetMode (true);
+    }
+    else if (newState == int (normalState))
+    {
+        if (presetModeState == int (presetState))
+        {
+            hubComponent->setPresetStateToNormalMode (false);
+        }
+        else if (presetModeState == int (slaveState))
+        {
+            hubComponent->lockHubToPresetMode (false);
+        }
+    }
+    else if (newState == int (presetState))
+    {
+        /* No external object can set the interface to preset mode,
+           this change is only allowed internally, through the user's
+           actions within the interface, using setPresetStateToPresetMode().
+        */
+        jassertfalse;
+        return;
+    }
+
+    presetModeState = int (newState);
+}   
+
+void DashBoardInterface::setPresetStateToPresetMode()
+{
+    hubComponent->setPresetStateToPresetMode();
+}
+
+void DashBoardInterface::setPresetStateToNormalMode()
+{
+    hubComponent->setPresetStateToNormalMode();
 }
 
 void DashBoardInterface::createAndShowAlertPanel (const String& title, const String& message,

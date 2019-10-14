@@ -130,17 +130,32 @@ public:
 					//TODO => mettre interface en mode POWER_ON
                     dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
 				}
-				if (!dashInterface->hasKeyboardFocus (true)) dashInterface->grabKeyboardFocus();
-				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+				if (!dashInterface->hasKeyboardFocus (true))
+				{
+					dashInterface->grabKeyboardFocus();
+					dashInterface->update();
+				}
+				else
+				{
+					commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+				}
 				break;
 			case 0x05:
 				DBG("preset_active_received\n");
 				hubConfig.setPreset(*(uint8_t*)(data + 12), false);
-
-				if (!dashInterface->hasKeyboardFocus(true)) dashInterface->grabKeyboardFocus();
-				//TODO dashInterface->notifyNewPreset();
-				commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
-
+				if (dashInterface->getPresetModeState() == DashBoardInterface::presetState)
+				{
+					dashInterface->hubChangedPreset();
+				}
+				if (!dashInterface->hasKeyboardFocus(true))
+				{
+					dashInterface->grabKeyboardFocus();
+					dashInterface->update();
+				}
+				else
+				{
+					commandManager.invokeDirectly(neova_dash::commands::updateDashInterface, true);
+				}
 				break;
 
 			case 0x06:
@@ -179,7 +194,21 @@ public:
 					DBG("POWER STATE : " + String(hubPowerState) + " \n");
 				}
 				break;
-			default:
+			case 0x07 : 
+				DBG("preset_state_received\n");
+				uint8_t state_received = *(uint8_t*)(data + 12);
+				if (state_received == 2)
+				{
+					dashInterface->setPresetModeState(DashBoardInterface::slaveState);
+				}
+				else if (state_received == 0)
+				{
+					dashInterface->setPresetModeState(DashBoardInterface::normalState);
+				}
+				else
+				{
+					DBG("Should not be there");
+				}
 				break;
 			}
 		}
@@ -257,7 +286,8 @@ public:
                               flashHub,
                               upgradeHub,
                               upgradeRing,
-                              uploadConfigToHub
+                              uploadConfigToHub,
+                              updatePresetModeState
                            });
     }
 
@@ -280,6 +310,9 @@ public:
             case upgradeRing:
                 result.setInfo ("Upgrade Ring Firmware", "Updgrades the ring firmware to the most recent version",
                                                          "Firm Update", 0);
+            case updatePresetModeState:
+                result.setInfo ("Update Preset Mode State", "Updates Preset Mode To Fit Interface",
+                                                            "Hub State Set", 0);
                 break;
             default:
                 break;
@@ -313,6 +346,17 @@ public:
 				//launch_nrfutil();
                 return true;
 
+			case updatePresetModeState:
+			{
+				uint8_t newState = (uint8_t)dashInterface->getPresetModeState();
+				memcpy(data, "jeannine", sizeof("jeannine"));
+				ctrl = 0x07;
+				memcpy(data + 8, &ctrl, sizeof(uint32_t));
+				memcpy(data + 12, &newState, sizeof(uint8_t));
+				dashPipe->sendString(data, 12 + 1);
+			}
+				return true;
+
             case upgradeRing:
                 return true;
 
@@ -339,6 +383,7 @@ private:
 
 	uint8_t data[1024];
 	uint32_t ctrl = 0x03;
+
 };
 
 //==============================================================================
