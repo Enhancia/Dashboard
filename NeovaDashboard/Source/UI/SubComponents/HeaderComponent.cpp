@@ -78,7 +78,7 @@ void HeaderComponent::createButton()
 
 void HeaderComponent::update()
 {
-    batteryComponent->repaintChargeState();
+    batteryComponent->update();
 }
 
 void HeaderComponent::setBatteryVisible (bool shouldBeVisible)
@@ -102,7 +102,7 @@ HeaderComponent::BatteryComponent::BatteryComponent (const float& batteryValRef,
         : batteryValueRef (batteryValRef), hubConfig (config)
 {
     startTimer (30000);
-    repaintIfNeeded();
+    launchDelayedRepaint (3000);
 }
 
 HeaderComponent::BatteryComponent::~BatteryComponent()
@@ -116,39 +116,20 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
 
 	auto area = getLocalBounds().reduced(neova_dash::ui::MARGIN);
 
-    g.setFont (neova_dash::font::dashFont.withHeight (12.0f));
-    g.drawText ("Ring Battery", getLocalBounds().withWidth (getWidth()*2/3), Justification::centred, true);
+    g.setFont (neova_dash::font::dashFont.withHeight (13.0f));
+    g.drawText ("Ring :", area.removeFromLeft (area.getWidth()/2), Justification::centred, true);
 
-    // TODO : draw differently when ring charges (lastChargeState == true)
-    //g.setColour (lastChargeState ? Colours::pink : neova_dash::colour::mainText);
-    auto batteryArea = area.withLeft (getWidth()*2/3)
-    					   .withSizeKeepingCentre (15, 8)
-    					   .translated (0, 1);
-
-    if (lastChargeState)
-    {
-        drawLightningPath (g, batteryArea.withTop (getY())
-                                         .withBottom (batteryArea.getY())
-                                         .reduced (0, neova_dash::ui::MARGIN_SMALL)
-                                         .toFloat());
-    }
-
-    g.drawRect (batteryArea, 1);
-
-	g.drawRect (juce::Rectangle<int>(2, 4).withPosition ({batteryArea.getRight(), batteryArea.getY() + 2}), 1);
-
-	g.setColour ((lastBattery <= 0.2f) ? Colours::red
-                                       : (lastBattery == 1.0f) ? Colours::lime
-                                                               : neova_dash::colour::mainText);
-
-    g.fillRect (batteryArea.reduced (2)
-    					   .withRight (batteryArea.getX() + 2
-    					   				   + int ((batteryArea.getWidth() - 4) * lastBattery)));
+    auto batteryArea = area.removeFromLeft (area.getWidth()/2)
+                           .withSizeKeepingCentre (area.getWidth()/4, area.getHeight()*3/4);
+    drawBatteryPath (g, batteryArea.toFloat());
+    
+    drawConnectedPath (g, area.reduced (area.getWidth()/4, area.getHeight()/4)
+                                  .toFloat());
 }
 
 void HeaderComponent::BatteryComponent::timerCallback()
 {
-    DBG ("Header Timer tick");
+    DBG ("Header Timer tick, battery : " << lastBattery);
 
     if (!waitForRepaint) repaintIfNeeded();
 }
@@ -167,37 +148,123 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded()
     }
 }
 
-void HeaderComponent::BatteryComponent::repaintChargeState()
+void HeaderComponent::BatteryComponent::update()
 {
+    if (hubConfig.getRingIsConnected() != lastConnectionState)
+    {
+        lastConnectionState = hubConfig.getRingIsConnected();
+        repaint();
+    }
+
     if (hubConfig.getRingIsCharging() != lastChargeState)
     {
         lastChargeState = hubConfig.getRingIsCharging();
         repaint();
 
-        auto repaintBatteryLambda = [this] () {
-                                                  repaintIfNeeded();
-                                                  waitForRepaint = false;
-                                              };
-
-        waitForRepaint = true;
-        Timer::callAfterDelay (3000, repaintBatteryLambda);
+        launchDelayedRepaint (3000);
     }
 }
 
+void HeaderComponent::BatteryComponent::launchDelayedRepaint (const int delayMs)
+{
+    auto repaintBatteryLambda = [this] () {
+                                              repaintIfNeeded();
+                                              waitForRepaint = false;
+                                          };
 
-void HeaderComponent::BatteryComponent::drawLightningPath (Graphics& g, Rectangle<float> area)
+    waitForRepaint = true;
+    Timer::callAfterDelay (delayMs, repaintBatteryLambda);
+}
+
+void HeaderComponent::BatteryComponent::drawLightningPath (Path& path, Rectangle<float> area)
 {
     Path lightning;
 
     lightning.startNewSubPath (7.0f, 0.0f);
-    lightning.lineTo          (0.0f, 4.0f);
-    lightning.lineTo          (4.0f, 4.0f);
-    lightning.lineTo          (1.0f, 8.0f);
+    lightning.lineTo          (4.0f, 3.0f);
     lightning.lineTo          (8.0f, 3.0f);
-    lightning.lineTo          (5.0f, 3.0f);
+    lightning.lineTo          (3.0f, 8.0f);
+    lightning.lineTo          (4.0f, 5.0f);
+    lightning.lineTo          (0.0f, 5.0f);
+    lightning.lineTo          (3.0f, 0.0f);
     lightning.closeSubPath();
 
     lightning.scaleToFit (area.getX(), area.getY(), area.getWidth(), area.getHeight(), true);
 
-    g.fillPath (lightning);
+    path.addPath (lightning);
+}
+
+void HeaderComponent::BatteryComponent::drawBatteryPath (Graphics& g, Rectangle<float> area)
+{
+    Path batteryOut, batteryTop, batteryFill;
+
+    //batteryOut.addRectangle (area.reduced (1).withTrimmedTop (1)/*, 1.0f*/);
+    batteryTop.addRectangle (area.getX() + area.getWidth()*3/8, area.getY(),
+                                    area.getWidth()/4, 2.0f);
+
+    auto fillArea = area.withTop (area.getY() + 1
+                                              + (area.getHeight() - area.getY() - 1)*(1.0 - lastBattery))
+                        .reduced (3);
+    bool roundedTop = (lastBattery * area.getHeight() < 2.0f);
+
+    g.setColour (neova_dash::colour::mainText);
+    //g.strokePath (batteryOut, PathStrokeType (1.0f));
+    g.drawRect (area.toNearestIntEdges().reduced (1).withTrimmedTop (1), 1.0f);
+    g.fillPath (batteryTop);
+
+    if (lastConnectionState)
+    {
+        batteryFill.addRectangle (fillArea);
+
+        if (lastChargeState)
+        {
+            drawLightningPath (batteryFill, area.withTrimmedTop (2).reduced (3, 2));
+        }
+        batteryFill.setUsingNonZeroWinding (false);
+
+        g.setColour ((lastBattery <= 0.2f) ? Colours::red
+                                           : (lastBattery == 1.0f) ? Colour (0xff8090f0)
+                                                                   : neova_dash::colour::mainText);
+        g.fillPath (batteryFill);
+    }
+}
+
+void HeaderComponent::BatteryComponent::drawConnectedPath (Graphics& g, Rectangle<float> area)
+{
+    g.setColour (lastConnectionState ? neova_dash::colour::mainText
+                                     : neova_dash::colour::mainText.withAlpha (0.2f));
+    
+    g.drawArrow (Line<float> (area.getX() + area.getWidth()/4,
+                              area.getY() + area.getHeight()/6,
+                              area.getX() + area.getWidth()/4,
+                              area.getY() + area.getHeight()),
+                 1.5f, 7.0f, 5.0f);
+
+    g.drawArrow (Line<float> (area.getX() + area.getWidth()*3/4,
+                              area.getY() + area.getHeight(),
+                              area.getX() + area.getWidth()*3/4,
+                              area.getY() + area.getHeight()/6),
+                 1.5f, 7.0f, 5.0f);
+    
+
+    if (!lastConnectionState)
+    {
+        auto crossArea = area.withSizeKeepingCentre (jmin (area.getWidth(), area.getHeight(),
+                                              area.getWidth(), area.getHeight())/2,
+                                        jmin (area.getWidth(), area.getHeight(),
+                                              area.getWidth(), area.getHeight())/2)
+                             .withPosition ({area.getX(),
+                                             area.getY() + area.getHeight()/2});
+
+        g.setColour (Colours::red);
+        
+        g.drawLine (Line<float> (crossArea.getX(),
+                                 crossArea.getY(),
+                                 crossArea.getX() + crossArea.getWidth(),
+                                 crossArea.getY() + crossArea.getHeight()), 1.5f);
+        g.drawLine (Line<float> (crossArea.getX() + crossArea.getWidth(),
+                                 crossArea.getY(),
+                                 crossArea.getX(),
+                                 crossArea.getY() + crossArea.getHeight()), 1.5f);
+    }
 }

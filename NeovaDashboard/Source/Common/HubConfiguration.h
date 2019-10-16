@@ -154,6 +154,8 @@ public:
     //==============================================================================
     void setRingIsCharging (bool isCharging);
     bool getRingIsCharging();
+    void setRingIsConnected (bool isConnected);
+    bool getRingIsConnected();
 
 private:
     //==============================================================================
@@ -188,6 +190,7 @@ private:
 
     //==============================================================================
     bool ringIsCharging = false;
+    bool ringIsConnected = false;
 
     //==============================================================================
 	ConfigData config;

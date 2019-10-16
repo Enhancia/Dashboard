@@ -58,19 +58,24 @@ private:
         
         //==========================================================================
         void repaintIfNeeded();
-        void repaintChargeState();
+        void update();
 
 		//==========================================================================
 		const float& batteryValueRef;
 
 	private:
         //==========================================================================
-        void drawLightningPath (Graphics& g, Rectangle<float> area);
+        void launchDelayedRepaint (const int delayMs);
+        void drawLightningPath (Path& path, Rectangle<float> area);
+        void drawBatteryPath (Graphics& g, Rectangle<float> area);
+        void drawConnectedPath (Graphics& g, Rectangle<float> area);
+
         bool waitForRepaint = false;
 
         //==========================================================================
         HubConfiguration& hubConfig;
         bool lastChargeState = false;
+        bool lastConnectionState = false;
         float lastBattery = -1.0f;
 
 		//==========================================================================

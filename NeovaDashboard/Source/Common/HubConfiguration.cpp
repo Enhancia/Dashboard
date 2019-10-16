@@ -321,6 +321,16 @@ bool HubConfiguration::getRingIsCharging()
 	return ringIsCharging;
 }
 
+void HubConfiguration::setRingIsConnected (bool isConnected)
+{
+	ringIsConnected = isConnected;
+}
+
+bool HubConfiguration::getRingIsConnected()
+{
+	return ringIsConnected;
+}
+
 void HubConfiguration::setDefaultConfig()
 {
 	setGestureData       (0, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0, neova_dash::gesture::ccMidi);

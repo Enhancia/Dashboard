@@ -36,7 +36,8 @@
 class DataReader   : public Component,
                      private InterprocessConnection,
                      public ChangeBroadcaster,
-                     public ChangeListener
+                     public ChangeListener,
+                     public Timer
 {
 public:
     static constexpr int DATA_SIZE = 5;
@@ -48,6 +49,9 @@ public:
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
+
+    //==============================================================================
+    void timerCallback() override;
 
     //==============================================================================
     bool readData (String s);

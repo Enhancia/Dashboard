@@ -55,6 +55,18 @@ void DataReader::resized()
 }
 
 //==============================================================================
+void DataReader::timerCallback()
+{
+    if (hubConfig.getRingIsConnected())
+    {
+        hubConfig.setRingIsConnected (false);
+        commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
+    }
+
+    stopTimer();
+}
+
+//==============================================================================
 bool DataReader::readData (String s)
 {
 	auto strArr = StringArray::fromTokens(s, " ", String());
@@ -62,10 +74,16 @@ bool DataReader::readData (String s)
     // Checks for full lines
     if (strArr.size() == DATA_SIZE)
     {
-        // Notifies Ring is no longer in chargeMode
-        if (hubConfig.getRingIsCharging())
+        startTimer (3000);
+
+        if (!hubConfig.getRingIsConnected())
         {
-            DBG ("Ring use mode!!");
+            hubConfig.setRingIsConnected (true);
+            commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
+        }
+        // Notifies Ring is no longer in chargeMode
+        else if (hubConfig.getRingIsCharging())
+        {
             hubConfig.setRingIsCharging (false);
             commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
         }
@@ -87,10 +105,16 @@ bool DataReader::readData (String s)
     // If ring charges, battery data only
     if (strArr.size() == 1)
     {
-        // Notifies Ring is in ChargeMode
-        if (!hubConfig.getRingIsCharging())
+        startTimer (3000);
+
+        if (!hubConfig.getRingIsConnected())
         {
-            DBG ("Battery charge mode!!");
+            hubConfig.setRingIsConnected (true);
+            commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
+        }
+        // Notifies Ring is in ChargeMode
+        else if (!hubConfig.getRingIsCharging())
+        {
             hubConfig.setRingIsCharging (true);
             commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
         }
