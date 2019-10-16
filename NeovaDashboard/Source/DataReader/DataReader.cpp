@@ -71,7 +71,7 @@ bool DataReader::readData (String s)
         }
 
         floatData.set (neova_dash::data::tilt, -floatData[neova_dash::data::tilt]);
-        DBG ("Data : " << data->joinIntoString (" "));
+        //DBG ("Data : " << data->joinIntoString (" "));
 
         // Notifies Ring is no longer in chargeMode
         if (hubConfig.getRingIsCharging())
@@ -84,7 +84,7 @@ bool DataReader::readData (String s)
     }
 
     // If ring charges, battery data only
-    if (strArr.size() == 1 && strArr[0].containsOnly (".0123456789"))
+    if (strArr.size() == 1)
     {
         (*data).set (neova_dash::data::battery, strArr[0]);
         floatData.set (neova_dash::data::battery, strArr[0].getFloatValue());

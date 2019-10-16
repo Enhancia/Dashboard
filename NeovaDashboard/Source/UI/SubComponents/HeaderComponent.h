@@ -38,6 +38,7 @@ public:
 
     //==============================================================================
     void update();
+    void setBatteryVisible (bool shouldBeVisible);
 
 private:
 	class BatteryComponent : public Component,

@@ -51,7 +51,15 @@ void HubConfiguration::notifyConfigWasChanged()
 		configWasChangedSinceLastFlash = true;
 		commandManager.invokeDirectly (neova_dash::commands::allowUserToFlashHub, true);
 	}
-}	
+}
+
+void HubConfiguration::resetConfigWasChanged()
+{
+	if (configWasChangedSinceLastFlash)
+	{
+		configWasChangedSinceLastFlash = false;
+	}
+}
 
 void HubConfiguration::setMidiChannel (const uint8 newMidiChannel, bool uploadToHub)
 {

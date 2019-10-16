@@ -81,6 +81,23 @@ void HeaderComponent::update()
     batteryComponent->repaintChargeState();
 }
 
+void HeaderComponent::setBatteryVisible (bool shouldBeVisible)
+{
+    if (batteryComponent->isVisible() != shouldBeVisible)
+    {
+        batteryComponent->setVisible (shouldBeVisible);
+        
+        if (shouldBeVisible)
+        {
+            batteryComponent->startTimer (10000);
+        }
+        else
+        {
+            batteryComponent->stopTimer();
+        }
+    }
+}
+
 HeaderComponent::BatteryComponent::BatteryComponent (const float& batteryValRef, HubConfiguration& config)
         : batteryValueRef (batteryValRef), hubConfig (config)
 {
@@ -131,6 +148,8 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
 
 void HeaderComponent::BatteryComponent::timerCallback()
 {
+    DBG ("Header Timer tick");
+
     repaintIfNeeded();
 }
 

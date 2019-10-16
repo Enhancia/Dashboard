@@ -100,6 +100,7 @@ public:
     void flashHub();
     bool wasConfigChangedSinceLastFlash();
     void notifyConfigWasChanged();
+    void resetConfigWasChanged();
 
     //==============================================================================
     void setMidiChannel (const uint8 newMidiChannel, bool uploadToHub = true);
