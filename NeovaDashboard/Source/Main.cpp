@@ -72,7 +72,7 @@ public:
     	mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get()));
     	dashInterface->grabKeyboardFocus();
     
-    	dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::waitingForConnection);
+    	//dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::waitingForConnection);
 		DBG("POWER STATE : " + String(hubPowerState) + " \n");
     
     	commandManager.registerAllCommandsForTarget (this);

@@ -301,7 +301,9 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
 {
     if (state == int (newState)) return;
 
-    if (newState == connected)
+    state = int (newState);
+
+    if (state == int (connected))
     {
         gesturePanel->setVisible (true);
         gesturePanel->update();
@@ -320,7 +322,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         newGesturePanel->hidePanel();
         uploadButton->setVisible (false);
 
-        if (newState == waitingForConnection)
+        if (state == int (waitingForConnection))
         {
             uploadButton->setActive (false);
             hubConfig.resetConfigWasChanged();
@@ -332,7 +334,6 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         header->setBatteryVisible (false);
     }
 
-    state = int (newState);
     resized();
     repaint();
 }

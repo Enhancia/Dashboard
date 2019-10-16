@@ -86,10 +86,10 @@ void HeaderComponent::setBatteryVisible (bool shouldBeVisible)
     if (batteryComponent->isVisible() != shouldBeVisible)
     {
         batteryComponent->setVisible (shouldBeVisible);
-        
+
         if (shouldBeVisible)
         {
-            batteryComponent->startTimer (10000);
+            batteryComponent->startTimer (30000);
         }
         else
         {
@@ -101,7 +101,7 @@ void HeaderComponent::setBatteryVisible (bool shouldBeVisible)
 HeaderComponent::BatteryComponent::BatteryComponent (const float& batteryValRef, HubConfiguration& config)
         : batteryValueRef (batteryValRef), hubConfig (config)
 {
-    startTimer (10000);
+    startTimer (30000);
     repaintIfNeeded();
 }
 
@@ -150,7 +150,7 @@ void HeaderComponent::BatteryComponent::timerCallback()
 {
     DBG ("Header Timer tick");
 
-    repaintIfNeeded();
+    if (!waitForRepaint) repaintIfNeeded();
 }
 
 void HeaderComponent::BatteryComponent::repaintIfNeeded()
@@ -173,6 +173,14 @@ void HeaderComponent::BatteryComponent::repaintChargeState()
     {
         lastChargeState = hubConfig.getRingIsCharging();
         repaint();
+
+        auto repaintBatteryLambda = [this] () {
+                                                  repaintIfNeeded();
+                                                  waitForRepaint = false;
+                                              };
+
+        waitForRepaint = true;
+        Timer::callAfterDelay (3000, repaintBatteryLambda);
     }
 }
 

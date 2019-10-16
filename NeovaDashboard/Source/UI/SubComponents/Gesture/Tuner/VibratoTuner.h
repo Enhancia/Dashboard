@@ -73,11 +73,12 @@ private:
     //==============================================================================
     const float& value;
     float lastValue = -1.0f;
+    juce::Rectangle<int> tunerArea;
 
     const NormalisableRange<float> gestureRange;
     const float& intensity;
     const float maxIntensity;
-	float lastIntensity = -1.0f;
+    float lastIntensity = -1.0f;
     float smoothIntensity = intensity;
     float incrementalSmoothFactor = 1.0f;
 

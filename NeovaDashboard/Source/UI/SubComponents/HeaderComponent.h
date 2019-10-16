@@ -66,6 +66,7 @@ private:
 	private:
         //==========================================================================
         void drawLightningPath (Graphics& g, Rectangle<float> area);
+        bool waitForRepaint = false;
 
         //==========================================================================
         HubConfiguration& hubConfig;

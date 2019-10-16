@@ -131,7 +131,7 @@ void OneRangeTuner::updateDisplay()
 {
     if (getValueAngle() != previousCursorAngle)
     {
-        repaint();
+        repaint (sliderBounds);
     }
 }
 
@@ -413,7 +413,7 @@ void OneRangeTuner::mouseUp (const MouseEvent& e)
         rangeLabelMax->setVisible (false);
         objectBeingDragged = none;
         updateMouseCursor();
-        repaint();
+        repaint (sliderBounds);
     }
 }
 

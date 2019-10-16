@@ -62,6 +62,14 @@ bool DataReader::readData (String s)
     // Checks for full lines
     if (strArr.size() == DATA_SIZE)
     {
+        // Notifies Ring is no longer in chargeMode
+        if (hubConfig.getRingIsCharging())
+        {
+            DBG ("Ring use mode!!");
+            hubConfig.setRingIsCharging (false);
+            commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
+        }
+
         // Splits the string into 7 separate ones
         *data = strArr;
 
@@ -73,30 +81,24 @@ bool DataReader::readData (String s)
         floatData.set (neova_dash::data::tilt, -floatData[neova_dash::data::tilt]);
         //DBG ("Data : " << data->joinIntoString (" "));
 
-        // Notifies Ring is no longer in chargeMode
-        if (hubConfig.getRingIsCharging())
-        {
-            hubConfig.setRingIsCharging (false);
-            commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
-        }
-
         return true;
     }
 
     // If ring charges, battery data only
     if (strArr.size() == 1)
     {
-        (*data).set (neova_dash::data::battery, strArr[0]);
-        floatData.set (neova_dash::data::battery, strArr[0].getFloatValue());
-
-		DBG ("Battery : " << (*data) [neova_dash::data::battery]);
-
         // Notifies Ring is in ChargeMode
         if (!hubConfig.getRingIsCharging())
         {
+            DBG ("Battery charge mode!!");
             hubConfig.setRingIsCharging (true);
             commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
         }
+
+        (*data).set (neova_dash::data::battery, strArr[0]);
+        floatData.set (neova_dash::data::battery, strArr[0].getFloatValue());
+
+		//DBG ("Battery : " << (*data) [neova_dash::data::battery]);
 
         return true;
     }

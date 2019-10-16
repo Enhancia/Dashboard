@@ -142,7 +142,7 @@ void TwoRangeTuner::updateDisplay()
 {
     if (getValueAngle() != previousCursorAngle)
     {
-        repaint();
+        repaint (sliderBounds);
     }
 }
 
@@ -448,7 +448,7 @@ void TwoRangeTuner::handleSingleClick (const MouseEvent& e)
     }
 
     updateMouseCursor();
-    repaint();
+    repaint (sliderBounds);
 }
 
 void TwoRangeTuner::handleDoubleClick (const MouseEvent& e)
@@ -495,7 +495,7 @@ void TwoRangeTuner::mouseDrag (const MouseEvent& e)
         rightHighSlider->mouseDrag (e.getEventRelativeTo (rightHighSlider));
     }
 
-    repaint();
+    repaint (sliderBounds);
 }
 void TwoRangeTuner::mouseUp (const MouseEvent& e)
 {
@@ -543,7 +543,7 @@ void TwoRangeTuner::mouseUp (const MouseEvent& e)
         rangeLabelMaxRight->setVisible (false);
         objectBeingDragged = none;
         updateMouseCursor();
-        repaint();
+        repaint (sliderBounds);
     }
 }
 MouseCursor TwoRangeTuner::getMouseCursor()
