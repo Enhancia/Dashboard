@@ -236,6 +236,11 @@ void OneRangeTuner::labelTextChanged (Label* lbl)
     }
 }
 
+void OneRangeTuner::editorShown (Label*, TextEditor& ted)
+{
+    ted.setJustification (Justification::centred);
+}
+
 void OneRangeTuner::editorHidden (Label* lbl, TextEditor&)
 {
     lbl->setVisible (false);

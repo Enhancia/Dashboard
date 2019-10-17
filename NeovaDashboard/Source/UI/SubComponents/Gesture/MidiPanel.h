@@ -39,13 +39,14 @@ public:
     ~MidiRangeTuner();
 
     //==============================================================================
-    void paint(Graphics& g) override;
+    void paint (Graphics& g) override;
     void resized() override;
 
     //==============================================================================
-    void labelTextChanged(Label* lbl) override;
-    void editorHidden(Label* lbl, TextEditor& ted) override;
-    void sliderValueChanged(Slider* sldr) override;
+    void labelTextChanged (Label* lbl) override;
+    void editorShown (Label* lbl, TextEditor& ted) override;
+    void editorHidden (Label* lbl, TextEditor& ted) override;
+    void sliderValueChanged (Slider* sldr) override;
 
     //==============================================================================
     void mouseDown (const MouseEvent& e) override;
@@ -117,8 +118,9 @@ public:
     void resized() override;
 
     //==============================================================================
-    void labelTextChanged (Label* lbl);
-    void comboBoxChanged (ComboBox* box);
+    void labelTextChanged (Label* lbl) override;
+    void editorShown (Label* lbl, TextEditor& ted) override;
+    void comboBoxChanged (ComboBox* box) override;
     
     //==============================================================================
     void updateComponents();

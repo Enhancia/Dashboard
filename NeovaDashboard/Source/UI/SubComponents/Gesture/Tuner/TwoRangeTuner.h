@@ -53,6 +53,7 @@ public:
     
     //==============================================================================
     void labelTextChanged (Label* lbl) override;
+    void editorShown (Label* lbl, TextEditor& ted) override;
     void editorHidden (Label* lbl, TextEditor& ted) override;
     void sliderValueChanged (Slider* sldr) override;
     void buttonClicked (Button* bttn) override;

@@ -100,6 +100,11 @@ void MidiPanel::labelTextChanged (Label* lbl)
     }
 }
 
+void MidiPanel::editorShown (Label*, TextEditor& ted)
+{
+    ted.setJustification (Justification::centred);
+}
+
 void MidiPanel::comboBoxChanged (ComboBox* box)
 {
     if (box == midiTypeBox)
@@ -288,6 +293,11 @@ void MidiRangeTuner::labelTextChanged (Label* lbl)
             rangeLabelMax->setVisible (false);
         }
     }
+}
+
+void MidiRangeTuner::editorShown (Label*, TextEditor& ted)
+{
+    ted.setJustification (Justification::centred);
 }
 
 void MidiRangeTuner::editorHidden (Label* lbl, TextEditor&)

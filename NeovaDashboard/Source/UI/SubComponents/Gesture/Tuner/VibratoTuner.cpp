@@ -170,6 +170,10 @@ void VibratoTuner::labelTextChanged (Label* lbl)
 	updateLabelBounds (lbl);
 }
 
+void VibratoTuner::editorShown (Label*, TextEditor& ted)
+{
+    ted.setJustification (Justification::centred);
+}
 
 void VibratoTuner::editorHidden (Label* lbl, TextEditor&)
 {
@@ -271,6 +275,7 @@ void VibratoTuner::createSliders()
     gainSlider->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
     gainSlider->setColour (Slider::rotarySliderFillColourId, tunerColour);
     gainSlider->setColour (Slider::rotarySliderOutlineColourId, neova_dash::colour::tunerSliderBackground);
+    gainSlider->setScrollWheelEnabled (false);
     gainSlider->setRange (double (parameterMaxGain.getStart()), double (parameterMaxGain.getEnd()), 1.0);
     gainSlider->setValue (double (getGain()));
     gainSlider->addListener (this);
@@ -281,7 +286,7 @@ void VibratoTuner::createSliders()
     thresholdSlider->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
     thresholdSlider->setColour (Slider::backgroundColourId, neova_dash::colour::tunerSliderBackground);
     thresholdSlider->setColour (Slider::trackColourId, tunerColour);
-    //setThresholdSliderColour();
+    thresholdSlider->setScrollWheelEnabled (false);
     thresholdSlider->setRange (double (parameterMaxThreshold.getStart()),
 							   double (parameterMaxThreshold.getEnd()), 1.0);
     thresholdSlider->setValue (double (getThreshold()));

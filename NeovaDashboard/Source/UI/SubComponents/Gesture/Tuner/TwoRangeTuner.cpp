@@ -239,6 +239,11 @@ void TwoRangeTuner::labelTextChanged (Label* lbl)
     }
 }
 
+void TwoRangeTuner::editorShown (Label*, TextEditor& ted)
+{
+    ted.setJustification (Justification::centred);
+}
+
 void TwoRangeTuner::editorHidden (Label* lbl, TextEditor&)
 {
     lbl->setVisible (false);
