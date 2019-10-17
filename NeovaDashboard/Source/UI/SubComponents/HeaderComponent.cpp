@@ -123,6 +123,17 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
                            .withSizeKeepingCentre (12, area.getHeight()*3/4);
     drawBatteryPath (g, batteryArea.toFloat());
     
+    if (lastConnectionState)
+    {
+        g.setFont (neova_dash::font::dashFontLight.withHeight (11.0f));
+
+        g.drawText (String (int (lastBattery*100)) + String ("%"),
+                    batteryArea.withSizeKeepingCentre (area.getWidth(), batteryArea.getHeight())
+                               .withBottom (getHeight())
+                               .withTop (batteryArea.getBottom()),
+                    Justification::centred);
+    }
+
     drawConnectedPath (g, area.reduced (area.getWidth()/4, area.getHeight()/4)
                                   .toFloat());
 }
@@ -222,7 +233,7 @@ void HeaderComponent::BatteryComponent::drawBatteryPath (Graphics& g, Rectangle<
         }
         batteryFill.setUsingNonZeroWinding (false);
 
-        g.setColour ((lastBattery <= 0.2f) ? Colours::red
+        g.setColour ((lastBattery <= 0.1f) ? Colours::red
                                            : (lastBattery == 1.0f) ? Colour (0xff8090f0)
                                                                    : neova_dash::colour::mainText);
         g.fillPath (batteryFill);

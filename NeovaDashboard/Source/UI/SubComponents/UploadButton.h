@@ -42,8 +42,16 @@ private:
 	void clicked() override;
 
     //==============================================================================
+    void startAnimating();
+    void stopAnimating();
+    void drawUploadFeedback (Graphics& g, juce::Rectangle<int> area);
+
+
+    //==============================================================================
     bool active;
     bool animating = false;
+    int animationCounter = 0;
+    const int ANIM_MAX = 25;
 
 	//==============================================================================
     ApplicationCommandManager& commandManager;

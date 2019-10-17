@@ -16,7 +16,6 @@ UploadButton::UploadButton (HubConfiguration& config, ApplicationCommandManager&
 	TRACE_IN;
 
 	setInterceptsMouseClicks (active, false);
-	setAlpha (active ? 1.0f : 0.5f);
 }
 
 UploadButton::~UploadButton()
@@ -30,16 +29,27 @@ void UploadButton::resized()
 
 void UploadButton::timerCallback()
 {
+	repaint (getLocalBounds().removeFromRight (40));
+
+	if (animationCounter < ANIM_MAX)
+	{
+		animationCounter++;
+	}
+	else
+	{
+		stopAnimating();
+	}
 }
 
 void UploadButton::setActive (const bool shouldBeActive)
 {
 	if (active == shouldBeActive) return;
 
+	if (animating) stopAnimating();
+
 	active = shouldBeActive;
 
 	setInterceptsMouseClicks (active, false);
-	setAlpha (active ? 1.0f : 0.5f);
 
 	repaint();
 }
@@ -52,6 +62,7 @@ bool UploadButton::isActive()
 void UploadButton::setInactiveAndShowUploadFeedback()
 {
 	setActive (false);
+	startAnimating();
 }
 
 void UploadButton::paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
@@ -60,6 +71,8 @@ void UploadButton::paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted,
 	{
 		shouldDrawButtonAsHighlighted = false;
 		shouldDrawButtonAsDown = false;
+
+		g.beginTransparencyLayer (0.5f);
 	}
 
 	g.setColour (shouldDrawButtonAsDown
@@ -90,6 +103,13 @@ void UploadButton::paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted,
                            textArea.getWidth(), textArea.getHeight(), true);
 
   	g.fillPath (uploadPath);
+
+  	if (!active) g.endTransparencyLayer();
+
+  	if (animating)
+  	{
+  		drawUploadFeedback (g, getLocalBounds().removeFromRight (40));
+  	}
 }
 
 void UploadButton::clicked()
@@ -97,4 +117,29 @@ void UploadButton::clicked()
 	hubConfig.flashHub();
 
 	setInactiveAndShowUploadFeedback();
+}
+
+void UploadButton::startAnimating()
+{
+	animating = true;
+	animationCounter = 0;
+	startTimerHz (30);
+}
+
+void UploadButton::stopAnimating()
+{
+	animating = false;
+	stopTimer();
+}
+
+void UploadButton::drawUploadFeedback (Graphics& g, juce::Rectangle<int> area)
+{
+	const float animationProgress = animationCounter/float (ANIM_MAX);
+	const float alpha = animationProgress < 0.5f ? 1.0f
+												 : 1.0f - std::pow (animationProgress*2 - 1.0f, 2.0f);
+
+	g.setColour (neova_dash::colour::mainText.withAlpha (alpha));
+
+	g.setFont (neova_dash::font::dashFontLight.withHeight (11.0f));
+	g.drawFittedText ("Uploaded!", area, Justification::centred, 1);
 }
