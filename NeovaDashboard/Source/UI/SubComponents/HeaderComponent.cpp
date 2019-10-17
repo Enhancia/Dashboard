@@ -120,7 +120,7 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
     g.drawText ("Ring :", area.removeFromLeft (area.getWidth()/2), Justification::centred, true);
 
     auto batteryArea = area.removeFromLeft (area.getWidth()/2)
-                           .withSizeKeepingCentre (area.getWidth()/4, area.getHeight()*3/4);
+                           .withSizeKeepingCentre (12, area.getHeight()*3/4);
     drawBatteryPath (g, batteryArea.toFloat());
     
     drawConnectedPath (g, area.reduced (area.getWidth()/4, area.getHeight()/4)
@@ -253,8 +253,8 @@ void HeaderComponent::BatteryComponent::drawConnectedPath (Graphics& g, Rectangl
                                               area.getWidth(), area.getHeight())/2,
                                         jmin (area.getWidth(), area.getHeight(),
                                               area.getWidth(), area.getHeight())/2)
-                             .withPosition ({area.getX(),
-                                             area.getY() + area.getHeight()/2});
+                             .withX (area.getX())
+                             .withBottomY (area.getY() + area.getHeight());
 
         g.setColour (Colours::red);
         

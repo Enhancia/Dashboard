@@ -55,7 +55,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     int dashWidth = jmin (screenArea.getHeight()*63/60, // screenH * 9/10 * AspectRatio^-1 (= 7/6)
                           screenArea.getWidth()*3/4);
 
-    //dashWidth = 800; // TO DELETE
+    dashWidth = 800; // TO DELETE
 
     setSize (dashWidth,
              dashWidth*6/7);

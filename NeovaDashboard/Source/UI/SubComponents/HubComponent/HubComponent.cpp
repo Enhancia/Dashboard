@@ -160,55 +160,58 @@ void HubComponent::buttonClicked (Button* bttn)
 
 void HubComponent::handleHubButtonClick (const int buttonId)
 {
-	if (buttonId == CTRL_ID && presetModeState != slaveState) // Control button
+	if (dashboardState == 0)
 	{
-		presetModeState == int (normalState) ? setPresetStateToPresetMode()
-					   						 : setPresetStateToNormalMode();
-	}
-	else if (buttonId != CTRL_ID) // Bottom buttons -> action depending on the mode
-	{
-		if (presetModeState == presetState)
+		if (buttonId == CTRL_ID && presetModeState != slaveState) // Control button
 		{
-			hubConfig.setPreset (buttonId);
-			currentPreset = buttonId;
-
-			if (!ModifierKeys::currentModifiers.isCommandDown()) setPresetStateToNormalMode();
-
-			commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
+			presetModeState == int (normalState) ? setPresetStateToPresetMode()
+						   						 : setPresetStateToNormalMode();
 		}
-		else if (presetModeState == slaveState)
+		else if (buttonId != CTRL_ID) // Bottom buttons -> action depending on the mode
 		{
-			hubConfig.setPreset (buttonId);
-			currentPreset = buttonId;
-
-			commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
-		}
-		else if (presetModeState == normalState)
-		{
-			if (hubConfig.getGestureData (buttonId).type != neova_dash::gesture::none)
+			if (presetModeState == presetState)
 			{
-				hubConfig.setUint8Value (buttonId,
-										 HubConfiguration::on,
-										 (hubConfig.getGestureData (buttonId).on == 0) ? 1 : 0);
-				
-				hubConfig.setSelectedGesture (buttonId);
+				hubConfig.setPreset (buttonId);
+				currentPreset = buttonId;
+
+				if (!ModifierKeys::currentModifiers.isCommandDown()) setPresetStateToNormalMode();
+
 				commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
 			}
-			else
+			else if (presetModeState == slaveState)
 			{
-				if (!newGesturePanel.isVisible())
+				hubConfig.setPreset (buttonId);
+				currentPreset = buttonId;
+
+				commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
+			}
+			else if (presetModeState == normalState)
+			{
+				if (hubConfig.getGestureData (buttonId).type != neova_dash::gesture::none)
 				{
-					newGesturePanel.showPanelForGestureID (buttonId);
+					hubConfig.setUint8Value (buttonId,
+											 HubConfiguration::on,
+											 (hubConfig.getGestureData (buttonId).on == 0) ? 1 : 0);
+					
+					hubConfig.setSelectedGesture (buttonId);
+					commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
 				}
-				else 
+				else
 				{
-					if (newGesturePanel.getLastSelectedSlot() == buttonId)
+					if (!newGesturePanel.isVisible())
 					{
-						newGesturePanel.hidePanel();
-					}
-					else
-					{ 
 						newGesturePanel.showPanelForGestureID (buttonId);
+					}
+					else 
+					{
+						if (newGesturePanel.getLastSelectedSlot() == buttonId)
+						{
+							newGesturePanel.hidePanel();
+						}
+						else
+						{ 
+							newGesturePanel.showPanelForGestureID (buttonId);
+						}
 					}
 				}
 			}
