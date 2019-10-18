@@ -123,16 +123,17 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
                            .withSizeKeepingCentre (12, area.getHeight()*3/4);
     drawBatteryPath (g, batteryArea.toFloat());
     
+    /* TO TEST : battery percentage display
     if (lastConnectionState)
     {
         g.setFont (neova_dash::font::dashFontLight.withHeight (11.0f));
-
+        
         g.drawText (String (int (lastBattery*100)) + String ("%"),
                     batteryArea.withSizeKeepingCentre (area.getWidth(), batteryArea.getHeight())
                                .withBottom (getHeight())
                                .withTop (batteryArea.getBottom()),
                     Justification::centred);
-    }
+    }*/
 
     drawConnectedPath (g, area.reduced (area.getWidth()/4, area.getHeight()/4)
                                   .toFloat());
