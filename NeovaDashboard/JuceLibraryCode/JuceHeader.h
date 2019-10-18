@@ -40,7 +40,7 @@ namespace ProjectInfo
 {
     const char* const  projectName    = "NeovaDashboard";
     const char* const  companyName    = "";
-    const char* const  versionString  = "0.3";
-    const int          versionNumber  = 0x300;
+    const char* const  versionString  = "0.3.1";
+    const int          versionNumber  = 0x301;
 }
 #endif

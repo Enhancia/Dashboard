@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="SIAvrc" name="NeovaDashboard" projectType="guiapp" jucerVersion="5.4.4"
-              binaryDataNamespace="DashData" version="0.3">
+              binaryDataNamespace="DashData" version="0.3.1">
   <MAINGROUP id="KvQWjZ" name="NeovaDashboard">
     <GROUP id="{20075F30-04A5-410B-6952-3C63688FBF54}" name="Resources">
       <GROUP id="{E0259D2D-3961-75D2-D343-36D8C845436E}" name="Image">
@@ -153,8 +153,10 @@
     <XCODE_MAC targetFolder="Builds/MacOSX" extraFrameworks="SystemConfiguration"
                smallIcon="X40b2q" bigIcon="X40b2q">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" headerPath="/Users/macbook/Documents/Dev Dashboard/Dashboard_Interface/NeovaDashboard/Source"/>
-        <CONFIGURATION isDebug="0" name="Release" headerPath="/Users/macbook/Documents/Dev Dashboard/Dashboard_Interface/NeovaDashboard/Source"/>
+        <CONFIGURATION isDebug="1" name="Debug" headerPath="/Users/macbook/Documents/Dev Dashboard/Dashboard_Interface/NeovaDashboard/Source"
+                       targetName="Dashboard - Neova"/>
+        <CONFIGURATION isDebug="0" name="Release" headerPath="/Users/macbook/Documents/Dev Dashboard/Dashboard_Interface/NeovaDashboard/Source"
+                       targetName="Dashboard - Neova"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_opengl" path="../../juce"/>
