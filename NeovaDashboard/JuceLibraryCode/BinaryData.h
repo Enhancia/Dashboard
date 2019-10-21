@@ -11,6 +11,9 @@ namespace DashData
     extern const char*   Dashiconv1_1_png;
     const int            Dashiconv1_1_pngSize = 775692;
 
+    extern const char*   Dashiconv1_2_png;
+    const int            Dashiconv1_2_pngSize = 802182;
+
     extern const char*   DashboardHUBonlycropped_png;
     const int            DashboardHUBonlycropped_pngSize = 449919;
 
@@ -48,7 +51,7 @@ namespace DashData
     const int            NOOADemiSerifDEMO_ttfSize = 18432;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 13;
+    const int namedResourceListSize = 14;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

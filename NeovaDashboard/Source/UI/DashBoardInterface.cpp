@@ -281,7 +281,7 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
 			return true;
 			
         case updateBatteryDisplay:
-            header->update();
+            if (state == int (connected)) header->update();
             return true;
 
         case updateInterfaceLEDs:
@@ -326,12 +326,12 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         {
             uploadButton->setActive (false);
             hubConfig.resetConfigWasChanged();
+            header->setBatteryVisible (false);
         }
         
         presetSelector->setVisible (false);
         hubComponent->setInterceptsMouseClicks (false, false);
         hubComponent->update();
-        header->setBatteryVisible (false);
     }
 
     resized();
