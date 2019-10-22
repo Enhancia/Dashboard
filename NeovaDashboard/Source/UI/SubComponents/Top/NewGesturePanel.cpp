@@ -205,16 +205,16 @@ const int NewGesturePanel::getLastSelectedSlot()
 
 void NewGesturePanel::setVisible (bool shouldBeVisible)
 {
-	 Component::setVisible (shouldBeVisible);
+	  Component::setVisible (shouldBeVisible);
 }
 
 void NewGesturePanel::selectGestureType (const GestureTypeSelector* gestureTypeToSelect)
 {
-	 selectedGestureType = gestureTypeToSelect->gestureType;
+	  selectedGestureType = gestureTypeToSelect->gestureType;
 }
 void NewGesturePanel::unselectGestureType()
 {
-	 selectedGestureType = -1;
+	  selectedGestureType = -1;
 }
 
 //==============================================================================
@@ -343,7 +343,7 @@ void NewGesturePanel::GestureTypeSelector::drawGesturePath (Graphics& g, juce::R
     g.drawText (getTypeString(intToGestureType(gestureType), true), getLocalBounds(),
                Justification::centred, true);
 
-  /*
+    /*
     Image gestureImage;
 
     switch (gestureType)

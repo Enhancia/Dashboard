@@ -39,7 +39,7 @@ private:
     void createAndAddCloseButton (const String& buttonText);
 
     //==============================================================================
-    Rectangle<int> panelArea;
+    juce::Rectangle<int> panelArea;
     bool showButton = false;
 
     //==============================================================================

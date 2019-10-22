@@ -81,7 +81,7 @@ public:
 
 private:
     //==============================================================================
-    static void alertPanelCallback (int modalResult, DashBoardInterface* interface);
+    static void alertPanelCallback (int modalResult, DashBoardInterface* interf);
     void paintShadows (Graphics& g);
     void drawStateMessage (Graphics& g);
 

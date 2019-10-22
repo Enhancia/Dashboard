@@ -67,7 +67,13 @@ void OptionsPanel::paint (Graphics& g)
     g.drawHorizontalLine (area.getY(), float (optionsArea.getX() + neova_dash::ui::MARGIN*7),
                                        float (optionsArea.getRight() - neova_dash::ui::MARGIN*7));
 
-    paintFirmUpdateArea (g, area.removeFromTop (area.getHeight()).reduced (neova_dash::ui::MARGIN));
+    paintFirmUpdateArea (g, area.removeFromTop (area.getHeight()/2));
+
+    g.setFont (neova_dash::font::dashFont.withHeight (15.0f));
+    g.drawText ("Contact Enhancia :", area.withTrimmedRight (area.getWidth()/2)
+                        .reduced (neova_dash::ui::MARGIN),
+                    Justification::centred);
+    
 }
 
 void OptionsPanel::resized()
@@ -89,8 +95,19 @@ void OptionsPanel::resized()
     area.removeFromTop (area.getHeight()/2);
     area.reduce (neova_dash::ui::MARGIN, neova_dash::ui::MARGIN);
 
-    updateFirmwareButton->setBounds (area.withTrimmedRight (area.getWidth()*2/3)
-                                         .withSizeKeepingCentre (100, 35));
+    auto firmArea = area.removeFromTop (area.getHeight()/2)
+                        .withTrimmedLeft (area.getWidth()/2);
+
+    int buttonW = jmin (90, area.getWidth()/4 - neova_dash::ui::MARGIN_SMALL*2);
+
+    updateFirmwareButton->setBounds (firmArea.withTrimmedLeft (firmArea.getWidth()/2)
+                                             .withSizeKeepingCentre (buttonW, 30));
+
+    auto contactArea = area.withTrimmedLeft (area.getWidth()/2);
+
+    contactButton->setBounds (contactArea.removeFromLeft (contactArea.getWidth()/2)
+                                         .withSizeKeepingCentre (buttonW, 30));
+    sendReportButton->setBounds (contactArea.withSizeKeepingCentre (buttonW, 30));
 }
 
 //==============================================================================
@@ -105,6 +122,47 @@ void OptionsPanel::buttonClicked (Button* bttn)
     {
         commandManager.invokeDirectly (neova_dash::commands::upgradeHub, true);
         commandManager.invokeDirectly (neova_dash::commands::upgradeRing, true);
+    }
+
+    else if (bttn == sendReportButton.get())
+    {
+        if (auto* dashLogger = dynamic_cast<FileLogger*> (Logger::getCurrentLogger()))
+        {
+            String fullLog = dashLogger->getLogFile().loadFileAsString().removeCharacters ("\n");
+            
+            /* Only keeps the last 3 entries of the log: the one that had an issue, 
+               the one used to send the report, and one more to cover cases where the plugin
+               has to be checked (For instance the plugin check when launching Ableton..)
+               If too long, keeps the 6000 last characters.. */
+            int startIndex = jmax (fullLog.upToLastOccurrenceOf("Neova Dashboard Log", false, false)
+                                          .upToLastOccurrenceOf("Neova Dashboard Log", false, false)
+                                          .lastIndexOf("Neova Dashboard Log"),
+                                   fullLog.length() - 6000);
+      
+          #if JUCE_WINDOWS                    
+            String mail_str ("mailto:damien.leboulaire@enhancia.co"
+                             "?Subject=[Neova Dashboard Report]"
+                             "&cc=alex.levacher@enhancia.co"
+                             "&body=" + fullLog.substring (startIndex));
+            LPCSTR mail_lpc = mail_str.toUTF8();
+
+            ShellExecute (NULL, "open", mail_lpc,
+                          "", "", SW_SHOWNORMAL);
+
+          #elif JUCE_MAC                    
+            String mail_str ("open mailto:damien.leboulaire@enhancia.co"
+                             "?Subject=\"[Neova Dashboard Report]\""
+                             "\\&cc=alex.levacher@enhancia.co"
+                             "\\&body=\"" + fullLog.substring (startIndex) + "\"");
+        
+            system (mail_str.toUTF8());
+          #endif
+        }
+    }
+
+    else if (bttn == contactButton.get())
+    {
+        URL ("https://www.enhancia.co/contact").launchInDefaultBrowser();
     }
 }
 
@@ -141,9 +199,19 @@ void OptionsPanel::createButtons()
     updateFirmwareButton = std::make_unique <TextButton> ("Update Firmware");
     addAndMakeVisible (*updateFirmwareButton);
     updateFirmwareButton->addListener (this);
+
+    //Contact button
+    contactButton = std::make_unique <TextButton> ("Contact Us");
+    addAndMakeVisible (*contactButton);
+    contactButton->addListener (this);
+
+    //Send Report button
+    sendReportButton = std::make_unique <TextButton> ("Send Report");
+    addAndMakeVisible (*sendReportButton);
+    sendReportButton->addListener (this);
 }
 
-void OptionsPanel::paintProductInformations (Graphics& g, Rectangle<int> area)
+void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> area)
 {
   	using namespace neova_dash::ui;
 
@@ -182,11 +250,17 @@ void OptionsPanel::paintProductInformations (Graphics& g, Rectangle<int> area)
   		        dashTextArea, Justification::topLeft);
 }
 
-void OptionsPanel::paintFirmUpdateArea (Graphics& g, Rectangle<int> area)
+void OptionsPanel::paintFirmUpdateArea (Graphics& g, juce::Rectangle<int> area)
 {
     g.setColour (neova_dash::colour::subText);
-    g.setFont (neova_dash::font::dashFont.withHeight (12));
+    g.setFont (neova_dash::font::dashFont.withHeight (15));
+
     g.drawText ("Current firmware version : ",
-                area.withTrimmedLeft (area.getWidth()/3),
-                Justification::centredLeft);
+                area.removeFromLeft (area.getWidth()/2),
+                Justification::centred);
+
+    g.setFont (neova_dash::font::dashFont.withHeight (12));
+    g.drawFittedText (/*hubConfig.getFirmwareVersionString()*/ "HUB  : \nRING : ",
+                      area.removeFromLeft (area.getWidth()/2),
+                      Justification::centred, 2);
 }

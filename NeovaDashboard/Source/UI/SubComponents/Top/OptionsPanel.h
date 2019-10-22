@@ -15,6 +15,13 @@
 #include "../../../Common/HubConfiguration.h"
 #include "../DashShapeButton.h"
 
+#if JUCE_WINDOWS
+#include <windows.h>
+#include <ShellAPI.h>
+#elif JUCE_MAC
+#include <stdlib.h>
+#endif
+
 class OptionsPanel    : public Component,
                         private Button::Listener
 {
@@ -46,6 +53,8 @@ private:
     HubConfiguration& hubConfig;
     ApplicationCommandManager& commandManager;
     std::unique_ptr<TextButton> updateFirmwareButton;
+    std::unique_ptr<TextButton> sendReportButton;
+    std::unique_ptr<TextButton> contactButton;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OptionsPanel)

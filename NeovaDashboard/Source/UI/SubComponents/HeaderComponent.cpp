@@ -188,7 +188,7 @@ void HeaderComponent::BatteryComponent::launchDelayedRepaint (const int delayMs)
     Timer::callAfterDelay (delayMs, repaintBatteryLambda);
 }
 
-void HeaderComponent::BatteryComponent::drawLightningPath (Path& path, Rectangle<float> area)
+void HeaderComponent::BatteryComponent::drawLightningPath (Path& path, juce::Rectangle<float> area)
 {
     Path lightning;
 
@@ -206,7 +206,7 @@ void HeaderComponent::BatteryComponent::drawLightningPath (Path& path, Rectangle
     path.addPath (lightning);
 }
 
-void HeaderComponent::BatteryComponent::drawBatteryPath (Graphics& g, Rectangle<float> area)
+void HeaderComponent::BatteryComponent::drawBatteryPath (Graphics& g, juce::Rectangle<float> area)
 {
     Path batteryOut, batteryTop, batteryFill;
 
@@ -241,7 +241,7 @@ void HeaderComponent::BatteryComponent::drawBatteryPath (Graphics& g, Rectangle<
     }
 }
 
-void HeaderComponent::BatteryComponent::drawConnectedPath (Graphics& g, Rectangle<float> area)
+void HeaderComponent::BatteryComponent::drawConnectedPath (Graphics& g, juce::Rectangle<float> area)
 {
     g.setColour (lastConnectionState ? neova_dash::colour::mainText
                                      : neova_dash::colour::mainText.withAlpha (0.2f));
