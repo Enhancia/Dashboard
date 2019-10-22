@@ -217,6 +217,7 @@ void HubConfiguration::setPreset (const int gestureNumberToSelect)
 	selectFirstExistingGesture();
 	config.active_preset = uint8_t (gestureNumberToSelect);
 	
+    notifyConfigWasChanged();
 	commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);	
 }
 
@@ -230,6 +231,7 @@ void HubConfiguration::setPreset (const int gestureNumberToSelect, bool uploadTo
 
 	if (uploadToHub)
 	{
+    	notifyConfigWasChanged();
 		commandManager.invokeDirectly(neova_dash::commands::uploadConfigToHub, true);
 	}
 }

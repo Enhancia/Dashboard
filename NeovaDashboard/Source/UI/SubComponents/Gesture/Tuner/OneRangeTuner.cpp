@@ -663,6 +663,12 @@ void OneRangeTuner::drawTunerSliderBackground (Graphics& g)
                                  sliderCentre.y + arcRadius * std::sin (angle - MathConstants<float>::halfPi));
 
         g.setColour (fill.withAlpha (0.6f));
+        /*g.setGradientFill (ColourGradient (fill.withAlpha (0.9f),
+                                           thumbPoint,
+                                           Colour (0),
+                                           thumbPoint.translated (12.0f, 0),
+                                           true));*/
+
         g.fillEllipse (juce::Rectangle<float> (25.0f, 25.0f).withCentre (thumbPoint));
     }
 }
@@ -673,7 +679,7 @@ void OneRangeTuner::updateLabelBounds (Label* labelToUpdate)
 
     if (labelToUpdate == rangeLabelMin)
     {
-        auto radius = sliderRadius - 20;
+        auto radius = sliderRadius + 15;
         auto angle = getThumbAngleRadians (lowThumb);
 
         rangeLabelMin->setCentrePosition (sliderCentre.x + radius * std::cos (angle - MathConstants<float>::halfPi),

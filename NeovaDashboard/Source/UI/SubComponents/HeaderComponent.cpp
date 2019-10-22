@@ -141,9 +141,9 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
 
 void HeaderComponent::BatteryComponent::timerCallback()
 {
-    DBG ("Header Timer tick, battery : " << lastBattery);
-
     if (!waitForRepaint) repaintIfNeeded();
+    
+    DBG ("Header Timer tick, battery : " << lastBattery);
 }
 
 void HeaderComponent::BatteryComponent::repaintIfNeeded()

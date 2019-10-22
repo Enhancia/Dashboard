@@ -909,28 +909,28 @@ void TwoRangeTuner::updateLabelBounds (Label* labelToUpdate)
 {
     if (labelToUpdate == nullptr) return;
 
-    int radius;
-    float angle;
+    float radius;
+    double angle;
 
     if (labelToUpdate == rangeLabelMinLeft)
     {
-        radius = int (sliderRadius) - 20;
-        angle = float (getThumbAngleRadians (leftLowThumb));
+        radius = sliderRadius + 15;
+        angle = getThumbAngleRadians (leftLowThumb);
     }
     else if (labelToUpdate == rangeLabelMaxLeft)
     {
-        radius = int (sliderRadius) + 15;
-        angle = float (getThumbAngleRadians (leftHighThumb));
+        radius = sliderRadius + 15;
+        angle = getThumbAngleRadians (leftHighThumb);
     }
     else if (labelToUpdate == rangeLabelMinRight)
     {
-        radius = int (sliderRadius) - 20;
+        radius = sliderRadius + 15;
         angle = getThumbAngleRadians (rightLowThumb);
     }
     else if (labelToUpdate == rangeLabelMaxRight)
     {
-        radius = int (sliderRadius) + 15;
-        angle = float (getThumbAngleRadians (rightHighThumb));
+        radius = sliderRadius + 15;
+        angle = getThumbAngleRadians (rightHighThumb);
     }
     
     labelToUpdate->setCentrePosition (sliderCentre.x + int (radius * std::cos (angle - MathConstants<float>::halfPi)),
