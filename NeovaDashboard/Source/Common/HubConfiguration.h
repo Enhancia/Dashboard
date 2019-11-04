@@ -21,7 +21,7 @@ class HubConfiguration
 {
 public:
     //==============================================================================
-	static constexpr int CONFIGSIZE = 516;
+	static constexpr int CONFIGSIZE = 520;
 	
 	struct GestureData // values for each gesture
     {
@@ -57,6 +57,9 @@ public:
     struct ConfigData
     {
 		uint16_t align_to_word; //to align the size of ConfigData to a multiple of word
+
+		uint16_t hub_firmware_version; ////8 MSB => Major version / 8 => LSB Minor version. ex : 0x0001 = v0.1
+		uint16_t ring_firmware_version;
 
 		uint8_t active_preset = 0; //Ne sert à rien pour l'instant juste pour s'aligner au buffer du zub
 		uint8_t midiChannel = 0;
