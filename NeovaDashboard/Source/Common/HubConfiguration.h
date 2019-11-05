@@ -106,7 +106,6 @@ public:
     void resetConfigWasChanged();
 
     //==============================================================================
-    void setMidiChannel (const uint8 newMidiChannel, bool uploadToHub = true);
 
     void setUint8Value (const int gestureNumber, const uint8DataId dataId,
                                                  const uint8 newUint8Value,
@@ -148,11 +147,14 @@ public:
     const int getSelectedGesture();
 
     //==============================================================================
+    void setMidiChannel (const uint8 newMidiChannel, bool uploadToHub = true);
+    int getMidiChannel();
+
+    //==============================================================================
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber, const int presetNumber);
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber);
 
-    //const String getHubFirm();
-    //const String getRingFirm();
+    const String getFirmwareVersionString();
 
     //==============================================================================
     void setRingIsCharging (bool isCharging);

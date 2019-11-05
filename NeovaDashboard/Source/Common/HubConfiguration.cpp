@@ -73,6 +73,11 @@ void HubConfiguration::setMidiChannel (const uint8 newMidiChannel, bool uploadTo
 	notifyConfigWasChanged();
 }
 
+int HubConfiguration::getMidiChannel()
+{
+	return config.midiChannel;
+}
+
 void HubConfiguration::setUint8Value (const int gestureNumber, const uint8DataId dataId,
 													           const uint8 newUint8Value,
 													           bool uploadToHub)
@@ -311,6 +316,14 @@ void HubConfiguration::setSelectedGesture (const int gestureToSelect)
 const int HubConfiguration::getSelectedGesture()
 {
 	return selectedGesture;
+}
+
+const String HubConfiguration::getFirmwareVersionString()
+{
+	return String ("HUB  : ") +
+		   String (config.hub_firmware_version >> 2 & 0x0011) + "." + String (config.hub_firmware_version & 0x0011) +
+	       String ("\nRING : ") +
+	       String (config.ring_firmware_version >> 2 & 0x0011) + "." + String (config.ring_firmware_version & 0x0011);
 }
 
 void HubConfiguration::setRingIsCharging (bool isCharging)

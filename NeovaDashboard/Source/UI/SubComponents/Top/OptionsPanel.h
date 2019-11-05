@@ -23,7 +23,8 @@
 #endif
 
 class OptionsPanel    : public Component,
-                        private Button::Listener
+                        private Button::Listener,
+                        private ComboBox::Listener
 {
 public:
     //==============================================================================
@@ -36,18 +37,21 @@ public:
     
     //==============================================================================
     void buttonClicked (Button* bttn) override;
+    void comboBoxChanged (ComboBox* box) override;
     void mouseUp (const MouseEvent& event) override;
     void visibilityChanged() override;
 
 private:
     //==============================================================================
     void createButtons();
+    void createMidiBox();
     void paintProductInformations (Graphics& g, juce::Rectangle<int> area);
     void paintFirmUpdateArea (Graphics& g, juce::Rectangle<int> area);
 
     //==============================================================================
     juce::Rectangle<int> optionsArea;
     std::unique_ptr<DashShapeButton> closeButton;
+    std::unique_ptr<ComboBox> midiChannelBox;
     
     //==============================================================================
     HubConfiguration& hubConfig;
