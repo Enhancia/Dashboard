@@ -56,7 +56,9 @@ void MidiPanel::resized()
 {
     using namespace neova_dash::ui;
 
-	auto area = getLocalBounds().reduced (MARGIN);
+	auto area = getLocalBounds().reduced (MARGIN, 0)
+                                .withTrimmedBottom (MARGIN)
+                                .withTrimmedTop (MARGIN_SMALL);
 	area.removeFromLeft (area.getWidth()/3);
 
     auto typeArea = area.removeFromTop (getHeight()/2);
@@ -483,7 +485,7 @@ void MidiRangeTuner::updateDisplay()
     {
         lastValue = rescaledMidiValue;
         
-        repaint (lowSlider->getBounds().withY (lowSlider->getBounds().getCentreY() - 13)
+        repaint (lowSlider->getBounds().withY (lowSlider->getBounds().getCentreY() + 5)
                                        .withHeight (8));
     }
 }
@@ -588,13 +590,13 @@ void MidiRangeTuner::setLabelBounds (Label& labelToResize)
     {
         rangeLabelMin->setCentrePosition (jmin (jmax ((int) getThumbX (lowThumb), rangeLabelMin->getWidth()/2),
                                                 getWidth() - rangeLabelMin->getWidth()/2),
-                                          lowSlider->getBounds().getCentreY() + 16);
+                                          lowSlider->getBounds().getCentreY() - 16);
     }
     else if (&labelToResize == rangeLabelMax)
     {
         rangeLabelMax->setCentrePosition (jmin (jmax ((int) getThumbX (highThumb), rangeLabelMax->getWidth()/2),
                                                 getWidth() - rangeLabelMax->getWidth()/2),
-                                          highSlider->getBounds().getCentreY() + 16);
+                                          highSlider->getBounds().getCentreY() - 16);
     }
 }
 
@@ -670,11 +672,11 @@ void MidiRangeTuner::drawCursor (Graphics& g)
     Path cursorPath;
     float cursorX = 11.5f + (lowSlider->getWidth() - 23.0f) * (lastValue / maxMidiFloat);
 
-    Point<float> cursorPoint = {cursorX, lowSlider->getBounds().getCentreY() - 9.0f};
+    Point<float> cursorPoint = {cursorX, lowSlider->getBounds().getCentreY() + 9.0f};
 
-    cursorPath.addTriangle ({cursorPoint.x - 3.0f, cursorPoint.y - 3.0f},
-                            {cursorPoint.x + 3.0f, cursorPoint.y - 3.0f},
-                            {cursorPoint.x       , cursorPoint.y + 3.0f});
+    cursorPath.addTriangle ({cursorPoint.x - 3.0f, cursorPoint.y + 3.0f},
+                            {cursorPoint.x + 3.0f, cursorPoint.y + 3.0f},
+                            {cursorPoint.x       , cursorPoint.y - 3.0f});
 
     g.setColour (highlightColour);
     g.fillPath (cursorPath);

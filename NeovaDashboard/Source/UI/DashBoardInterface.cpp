@@ -48,14 +48,14 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     optionsPanel->setAlwaysOnTop (true);
 
     // Sets settings
-    Rectangle<int> screenArea  = Desktop::getInstance().getDisplays()
+    juce::Rectangle<int> screenArea  = Desktop::getInstance().getDisplays()
                                                        .getMainDisplay()
                                                        .userArea;
 
     int dashWidth = jmin (screenArea.getHeight()*63/60, // screenH * 9/10 * AspectRatio^-1 (= 7/6)
                           screenArea.getWidth()*3/4);
 
-    //dashWidth = 800; // TO DELETE
+    //dashWidth = 600; // TO DELETE
 
     setSize (dashWidth,
              dashWidth*6/7);
@@ -158,7 +158,7 @@ void DashBoardInterface::resized()
 
     if (state == waitingForConnection)
     {
-        hubComponent->setBounds (Rectangle<int> (area.getHeight(), area.getHeight())
+        hubComponent->setBounds (juce::Rectangle<int> (area.getHeight(), area.getHeight())
                                                         .withCentre ({getWidth()/2, getHeight()*3/8}));
     }
 
@@ -281,7 +281,7 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
 			return true;
 			
         case updateBatteryDisplay:
-            header->update();
+            if (state == int (connected)) header->update();
             return true;
 
         case updateInterfaceLEDs:
@@ -314,6 +314,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         hubComponent->update();
         hubConfig.selectFirstExistingGesture();
         header->setBatteryVisible (true);
+        optionsPanel->setMidiBoxActive (true);
     }
 
     else
@@ -326,12 +327,13 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         {
             uploadButton->setActive (false);
             hubConfig.resetConfigWasChanged();
+            header->setBatteryVisible (false);
         }
         
         presetSelector->setVisible (false);
         hubComponent->setInterceptsMouseClicks (false, false);
         hubComponent->update();
-        header->setBatteryVisible (false);
+        optionsPanel->setMidiBoxActive (false);
     }
 
     resized();
@@ -431,9 +433,9 @@ void DashBoardInterface::closePendingAlertPanel()
     alertPanel.reset (nullptr);
 }
 
-void DashBoardInterface::alertPanelCallback (int modalResult, DashBoardInterface* interface)
+void DashBoardInterface::alertPanelCallback (int modalResult, DashBoardInterface* interf)
 {
-    interface->closePendingAlertPanel();
+    interf->closePendingAlertPanel();
 }
 
 //==============================================================================
@@ -445,5 +447,6 @@ void DashBoardInterface::update()
         gesturePanel->update();
         presetSelector->update();
         header->update();
+        optionsPanel->update();
     }
 }
