@@ -321,9 +321,9 @@ const int HubConfiguration::getSelectedGesture()
 const String HubConfiguration::getFirmwareVersionString()
 {
 	return String ("HUB  : ") +
-		   String (config.hub_firmware_version >> 2 & 0x0011) + "." + String (config.hub_firmware_version & 0x0011) +
+		   String ((config.hub_firmware_version & 0xFF00) >> 2) + "." + String (config.hub_firmware_version & 0x00FF) +
 	       String ("\nRING : ") +
-	       String (config.ring_firmware_version >> 2 & 0x0011) + "." + String (config.ring_firmware_version & 0x0011);
+	       String ((config.ring_firmware_version & 0xFF00) >> 2) + "." + String (config.ring_firmware_version & 0x00FF);
 }
 
 void HubConfiguration::setRingIsCharging (bool isCharging)
