@@ -314,6 +314,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         hubComponent->update();
         hubConfig.selectFirstExistingGesture();
         header->setBatteryVisible (true);
+        optionsPanel->setMidiBoxActive (true);
     }
 
     else
@@ -332,6 +333,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         presetSelector->setVisible (false);
         hubComponent->setInterceptsMouseClicks (false, false);
         hubComponent->update();
+        optionsPanel->setMidiBoxActive (false);
     }
 
     resized();
@@ -445,5 +447,6 @@ void DashBoardInterface::update()
         gesturePanel->update();
         presetSelector->update();
         header->update();
+        optionsPanel->update();
     }
 }

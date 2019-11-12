@@ -200,6 +200,19 @@ void OptionsPanel::visibilityChanged()
 {
 }
 
+void OptionsPanel::update()
+{
+    midiChannelBox->setSelectedId (hubConfig.getMidiChannel()+1);
+
+    repaint();
+}
+
+void OptionsPanel::setMidiBoxActive (bool shouldBeActive)
+{
+    midiChannelBox->setInterceptsMouseClicks (shouldBeActive, false);
+    midiChannelBox->setAlpha (shouldBeActive ? 1.0f : 0.6f);
+}
+
 void OptionsPanel::createButtons()
 {
 	  // Close button

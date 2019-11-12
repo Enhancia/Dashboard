@@ -41,6 +41,10 @@ public:
     void mouseUp (const MouseEvent& event) override;
     void visibilityChanged() override;
 
+    //==============================================================================
+    void update();
+    void setMidiBoxActive (bool shouldBeActive);
+
 private:
     //==============================================================================
     void createButtons();

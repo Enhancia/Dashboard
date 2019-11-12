@@ -63,7 +63,7 @@ void HubConfiguration::resetConfigWasChanged()
 
 void HubConfiguration::setMidiChannel (const uint8 newMidiChannel, bool uploadToHub)
 {
-	config.midiChannel = newMidiChannel;
+	config.midiChannel = (uint8_t) newMidiChannel;
 
 	if (uploadToHub)
 	{
