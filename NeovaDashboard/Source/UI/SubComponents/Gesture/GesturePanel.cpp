@@ -491,7 +491,8 @@ void GesturePanel::removeGestureAndGestureComponent (int gestureId)
 
     if (gestureId == hubConfig.getSelectedGesture())
     {
-        //unselectCurrentGesture();
+        if (dragMode) endDragMode();
+
         hubConfig.selectFirstExistingGesture();
         gestureSettings.reset (new GestureSettingsComponent (hubConfig.getSelectedGesture(),
                                                              hubConfig, commandManager, dataReader));
@@ -501,7 +502,6 @@ void GesturePanel::removeGestureAndGestureComponent (int gestureId)
 
     commandManager.invokeDirectly (neova_dash::commands::updateInterfaceLEDs, true);
     updateGestureSlots();
-	//gestureSlots[hubConfig.getSelectedGesture()]->repaint();
 
     if (!isTimerRunning()) startTimerHz (freq);
     update();
