@@ -51,6 +51,7 @@ private:
     void createMidiBox();
     void paintProductInformations (Graphics& g, juce::Rectangle<int> area);
     void paintFirmUpdateArea (Graphics& g, juce::Rectangle<int> area);
+    void paintLegalAndRegulatoryArea (Graphics& g, juce::Rectangle<int> area);
 
     //==============================================================================
     juce::Rectangle<int> optionsArea;
@@ -60,7 +61,7 @@ private:
     //==============================================================================
     HubConfiguration& hubConfig;
     ApplicationCommandManager& commandManager;
-    std::unique_ptr<TextButton> updateFirmwareButton;
+    std::unique_ptr<TextButton> upgradeButton;
     std::unique_ptr<TextButton> sendReportButton;
     std::unique_ptr<TextButton> contactButton;
     

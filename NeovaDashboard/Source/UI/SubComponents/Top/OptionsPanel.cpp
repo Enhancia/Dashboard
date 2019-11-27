@@ -61,11 +61,20 @@ void OptionsPanel::paint (Graphics& g)
 
     auto area = optionsArea.reduced (neova_dash::ui::MARGIN*2);
 
-    paintProductInformations (g, area.removeFromTop (area.getHeight()/2)
+    paintProductInformations (g, area.removeFromTop (area.getHeight()/3)
     										                    .reduced (neova_dash::ui::MARGIN));
 
+    paintLegalAndRegulatoryArea (g, area.removeFromBottom (area.getHeight()/3)
+                                            .reduced (neova_dash::ui::MARGIN*3,
+                                                      neova_dash::ui::MARGIN));
+
+    area.reduce (neova_dash::ui::MARGIN, neova_dash::ui::MARGIN);
+    
     g.setColour (neova_dash::colour::subText);
     g.drawHorizontalLine (area.getY(), float (optionsArea.getX() + neova_dash::ui::MARGIN*7),
+                                       float (optionsArea.getRight() - neova_dash::ui::MARGIN*7));
+
+    g.drawHorizontalLine (area.getBottom(), float (optionsArea.getX() + neova_dash::ui::MARGIN*7),
                                        float (optionsArea.getRight() - neova_dash::ui::MARGIN*7));
 
     g.setFont (neova_dash::font::dashFont.withHeight (15.0f));
@@ -87,7 +96,7 @@ void OptionsPanel::resized()
 {
     using namespace neova_dash::ui;
     
-    optionsArea = getBounds().reduced (getWidth()/5, getHeight()/4);
+    optionsArea = getBounds().reduced (getWidth()/5, getHeight()/5);
 
     #if JUCE_WINDOWS
     closeButton->setBounds (juce::Rectangle<int> (25, 25).withRightX (optionsArea.getRight() - MARGIN_SMALL)
@@ -99,7 +108,9 @@ void OptionsPanel::resized()
     #endif
 
     auto area = optionsArea.reduced (neova_dash::ui::MARGIN*2);
-    area.removeFromTop (area.getHeight()/2);
+    area.removeFromTop (area.getHeight()/3);
+    area.removeFromBottom (area.getHeight()/3);
+
     area.reduce (neova_dash::ui::MARGIN, neova_dash::ui::MARGIN);
 
     int buttonW = jmin (90, area.getWidth()/4 - neova_dash::ui::MARGIN_SMALL*2);
@@ -114,7 +125,7 @@ void OptionsPanel::resized()
                         .withTrimmedLeft (area.getWidth()/2);
 
 
-    updateFirmwareButton->setBounds (firmArea.withTrimmedLeft (firmArea.getWidth()/2)
+    upgradeButton->setBounds (firmArea.withTrimmedLeft (firmArea.getWidth()/2)
                                              .withSizeKeepingCentre (buttonW, 30));
 
     auto contactArea = area.withTrimmedLeft (area.getWidth()/2);
@@ -132,7 +143,7 @@ void OptionsPanel::buttonClicked (Button* bttn)
         setVisible (false);
     }
 
-    else if (bttn == updateFirmwareButton.get())
+    else if (bttn == upgradeButton.get())
     {
         commandManager.invokeDirectly (neova_dash::commands::upgradeHub, true);
         commandManager.invokeDirectly (neova_dash::commands::upgradeRing, true);
@@ -231,12 +242,12 @@ void OptionsPanel::createButtons()
 	  closeButton->addListener (this);
 
     //Update Firm button
-    updateFirmwareButton = std::make_unique <TextButton> ("Update Firmware");
-    addAndMakeVisible (*updateFirmwareButton);
-    updateFirmwareButton->addListener (this);
+    upgradeButton = std::make_unique <TextButton> ("Upgrade");
+    addAndMakeVisible (*upgradeButton);
+    upgradeButton->addListener (this);
 
     //Contact button
-    contactButton = std::make_unique <TextButton> ("Contact Us");
+    contactButton = std::make_unique <TextButton> ("Contact");
     addAndMakeVisible (*contactButton);
     contactButton->addListener (this);
 
@@ -319,4 +330,28 @@ void OptionsPanel::paintFirmUpdateArea (Graphics& g, juce::Rectangle<int> area)
     g.drawFittedText (hubConfig.getFirmwareVersionString(),
                       area.removeFromLeft (area.getWidth()/2),
                       Justification::centred, 2);
+}
+
+void OptionsPanel::paintLegalAndRegulatoryArea (Graphics& g, juce::Rectangle<int> area)
+{
+    g.setColour (neova_dash::colour::subText);
+    g.setFont (neova_dash::font::dashFont.withHeight (13));
+
+    g.drawText ("LEGAL AND REGULATORY : ", area,
+                Justification::centredTop);
+
+    g.setFont (neova_dash::font::dashFont.withHeight (13));
+    g.drawFittedText ("\n\n\nRING :\n\n"
+                      "FCC ID :    2AUJX-R1\n"
+                      "IC :        25446-R1\n"
+                      "HVIN :      NEOVA-R1",
+                      area.removeFromLeft (area.getWidth()/2),
+                      Justification::centred, 8);
+
+    g.drawFittedText ("\n\n\nHUB :\n\n"
+                      "FCC ID :    2AUJX-H1\n"
+                      "IC :        25446-H1\n"
+                      "HVIN :      NEOVA-H1",
+                      area,
+                      Justification::centred, 8);
 }
