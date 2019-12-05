@@ -43,12 +43,12 @@ public:
 
     //==============================================================================
     void update();
-    void setMidiBoxActive (bool shouldBeActive);
+    //void setMidiBoxActive (bool shouldBeActive);
 
 private:
     //==============================================================================
     void createButtons();
-    void createMidiBox();
+    //void createMidiBox();
     void paintProductInformations (Graphics& g, juce::Rectangle<int> area);
     void paintFirmUpdateArea (Graphics& g, juce::Rectangle<int> area);
     void paintLegalAndRegulatoryArea (Graphics& g, juce::Rectangle<int> area);

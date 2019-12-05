@@ -28,7 +28,7 @@ public:
         GestureData() = default;
         GestureData (GestureData& other);
 
-		uint16_t align_to_word; //to align the size of GestureData to a multiple of word
+		uint8_t align_to_word; //to align the size of GestureData to a multiple of word
 
 		uint8_t on = 1;
 		uint8_t type = neova_dash::gesture::none;
@@ -48,6 +48,10 @@ public:
 
     struct PresetData
     {
+        uint16_t align_to_word;
+
+        uint16_t midiChannels = 1;
+
     	GestureData gestureData0;
     	GestureData gestureData1;
     	GestureData gestureData2;
@@ -128,7 +132,7 @@ public:
     
     //==============================================================================
     void setPreset (const int gestureNumberToSelect);
-	void setPreset(const int gestureNumberToSelect, bool uploadToHub);
+	void setPreset (const int gestureNumberToSelect, bool uploadToHub);
     const int getSelectedPreset();
 
     PresetData& getPresetData (const int presetNumber);
@@ -147,8 +151,9 @@ public:
     const int getSelectedGesture();
 
     //==============================================================================
-    void setMidiChannel (const uint8 newMidiChannel, bool uploadToHub = true);
-    int getMidiChannel();
+    void setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool uploadToHub = true);
+    void toggleMidiChannel (const int channelNumber, bool uploadToHub = true);
+    int getMidiChannels();
 
     //==============================================================================
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber, const int presetNumber);

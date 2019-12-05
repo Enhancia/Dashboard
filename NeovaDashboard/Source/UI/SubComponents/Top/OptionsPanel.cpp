@@ -17,7 +17,7 @@ OptionsPanel::OptionsPanel (HubConfiguration& config, ApplicationCommandManager&
     TRACE_IN;
 
     createButtons();
-    createMidiBox();
+    //createMidiBox();
 }
 
 OptionsPanel::~OptionsPanel()
@@ -76,12 +76,12 @@ void OptionsPanel::paint (Graphics& g)
 
     g.drawHorizontalLine (area.getBottom(), float (optionsArea.getX() + neova_dash::ui::MARGIN*7),
                                        float (optionsArea.getRight() - neova_dash::ui::MARGIN*7));
-
+    /*
     g.setFont (neova_dash::font::dashFont.withHeight (15.0f));
     g.drawText ("MIDI Channel :", area.removeFromTop (area.getHeight()/3)
                                       .withTrimmedRight (area.getWidth()/2)
                                       .reduced (neova_dash::ui::MARGIN),
-                                  Justification::centred);
+                                  Justification::centred);*/
 
     paintFirmUpdateArea (g, area.removeFromTop (area.getHeight()/2));
 
@@ -96,7 +96,7 @@ void OptionsPanel::resized()
 {
     using namespace neova_dash::ui;
     
-    optionsArea = getBounds().reduced (getWidth()/5, getHeight()/5);
+    optionsArea = getBounds().reduced (getWidth()/5, getHeight()/4);
 
     #if JUCE_WINDOWS
     closeButton->setBounds (juce::Rectangle<int> (25, 25).withRightX (optionsArea.getRight() - MARGIN_SMALL)
@@ -115,11 +115,12 @@ void OptionsPanel::resized()
 
     int buttonW = jmin (90, area.getWidth()/4 - neova_dash::ui::MARGIN_SMALL*2);
 
+/*
     auto midiChannelArea = area.removeFromTop (area.getHeight()/3)
                                .withTrimmedLeft (area.getWidth()/2);
 
     midiChannelBox->setBounds (midiChannelArea.removeFromLeft (midiChannelArea.getWidth()/2)
-                                              .withSizeKeepingCentre (buttonW, 30));
+                                              .withSizeKeepingCentre (buttonW, 30));*/
 
     auto firmArea = area.removeFromTop (area.getHeight()/2)
                         .withTrimmedLeft (area.getWidth()/2);
@@ -193,10 +194,12 @@ void OptionsPanel::buttonClicked (Button* bttn)
 
 void OptionsPanel::comboBoxChanged (ComboBox* box)
 {
+    /*
     if (box == midiChannelBox.get())
     {
         hubConfig.setMidiChannel (midiChannelBox->getSelectedId() - 1);
     }
+    */
 }
 
 void OptionsPanel::mouseUp (const MouseEvent& event)
@@ -213,16 +216,15 @@ void OptionsPanel::visibilityChanged()
 
 void OptionsPanel::update()
 {
-    midiChannelBox->setSelectedId (hubConfig.getMidiChannel()+1);
-
-    repaint();
 }
 
+/*
 void OptionsPanel::setMidiBoxActive (bool shouldBeActive)
 {
     midiChannelBox->setInterceptsMouseClicks (shouldBeActive, false);
     midiChannelBox->setAlpha (shouldBeActive ? 1.0f : 0.6f);
 }
+*/
 
 void OptionsPanel::createButtons()
 {
@@ -257,6 +259,7 @@ void OptionsPanel::createButtons()
     sendReportButton->addListener (this);
 }
 
+/*
 void OptionsPanel::createMidiBox()
 {
     midiChannelBox = std::make_unique <ComboBox> ("Midi Channel Box");
@@ -267,7 +270,7 @@ void OptionsPanel::createMidiBox()
         midiChannelBox->addItem (String (chan+1), chan+1);
     }
 
-    midiChannelBox->setSelectedId (hubConfig.getMidiChannel()+1);
+    //midiChannelBox->setSelectedId (hubConfig.getMidiChannel()+1);
 
     // ComboBox look
     midiChannelBox->setJustificationType (Justification::centred);
@@ -276,7 +279,7 @@ void OptionsPanel::createMidiBox()
     midiChannelBox->setColour (ComboBox::arrowColourId, neova_dash::colour::subText);
 
     midiChannelBox->addListener (this);
-}
+}*/
 
 void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> area)
 {

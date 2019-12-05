@@ -17,6 +17,7 @@
 #include "SubComponents/Top/NewGesturePanel.h"
 #include "SubComponents/HeaderComponent.h"
 #include "SubComponents/HubComponent/HubComponent.h"
+#include "SubComponents/MidiChannelComponent/MidiChannelComponent.h"
 #include "SubComponents/UploadButton.h"
 #include "SubComponents/HubComponent/PresetSelectorComponent.h"
 #include "SubComponents/Top/DashAlertPanel.h"
@@ -92,6 +93,7 @@ private:
     //==============================================================================
     std::unique_ptr<HeaderComponent> header;
     std::unique_ptr<HubComponent> hubComponent;
+    std::unique_ptr<MidiChannelComponent> midiChannelComponent;
     std::unique_ptr<GesturePanel> gesturePanel;
     std::unique_ptr<NewGesturePanel> newGesturePanel;
     std::unique_ptr<UploadButton> uploadButton;
