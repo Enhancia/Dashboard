@@ -338,7 +338,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         }
         
         presetSelector->setVisible (false);
-        midiChannelComponent->setVisible (false);
+        //midiChannelComponent->setVisible (false);
         hubComponent->setInterceptsMouseClicks (false, false);
         hubComponent->update();
         //optionsPanel->setMidiBoxActive (false);

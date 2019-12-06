@@ -65,11 +65,11 @@ void HubConfiguration::setMidiChannel (const int channelNumber, bool shouldChann
 {
 	if (shouldChannelBeOn)
 	{
-		getPresetData().midiChannels |= 1 << channelNumber;
+		getPresetData().midiChannels |= (1 << channelNumber);
 	}
 	else
 	{
-		getPresetData().midiChannels &= 0 << channelNumber;
+		getPresetData().midiChannels &= ~(1 << channelNumber);
 	}
 
 	if (uploadToHub)
@@ -82,7 +82,7 @@ void HubConfiguration::setMidiChannel (const int channelNumber, bool shouldChann
 
 void HubConfiguration::toggleMidiChannel (const int channelNumber, bool uploadToHub)
 {
-	getPresetData().midiChannels ^= 1 << channelNumber;
+	getPresetData().midiChannels ^= (1 << channelNumber);
 
 	if (uploadToHub)
 	{

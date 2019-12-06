@@ -115,13 +115,6 @@ void OptionsPanel::resized()
 
     int buttonW = jmin (90, area.getWidth()/4 - neova_dash::ui::MARGIN_SMALL*2);
 
-/*
-    auto midiChannelArea = area.removeFromTop (area.getHeight()/3)
-                               .withTrimmedLeft (area.getWidth()/2);
-
-    midiChannelBox->setBounds (midiChannelArea.removeFromLeft (midiChannelArea.getWidth()/2)
-                                              .withSizeKeepingCentre (buttonW, 30));*/
-
     auto firmArea = area.removeFromTop (area.getHeight()/2)
                         .withTrimmedLeft (area.getWidth()/2);
 
@@ -192,16 +185,6 @@ void OptionsPanel::buttonClicked (Button* bttn)
     }
 }
 
-void OptionsPanel::comboBoxChanged (ComboBox* box)
-{
-    /*
-    if (box == midiChannelBox.get())
-    {
-        hubConfig.setMidiChannel (midiChannelBox->getSelectedId() - 1);
-    }
-    */
-}
-
 void OptionsPanel::mouseUp (const MouseEvent& event)
 {
     if (!optionsArea.contains (event.getPosition()))
@@ -217,14 +200,6 @@ void OptionsPanel::visibilityChanged()
 void OptionsPanel::update()
 {
 }
-
-/*
-void OptionsPanel::setMidiBoxActive (bool shouldBeActive)
-{
-    midiChannelBox->setInterceptsMouseClicks (shouldBeActive, false);
-    midiChannelBox->setAlpha (shouldBeActive ? 1.0f : 0.6f);
-}
-*/
 
 void OptionsPanel::createButtons()
 {
@@ -258,28 +233,6 @@ void OptionsPanel::createButtons()
     addAndMakeVisible (*sendReportButton);
     sendReportButton->addListener (this);
 }
-
-/*
-void OptionsPanel::createMidiBox()
-{
-    midiChannelBox = std::make_unique <ComboBox> ("Midi Channel Box");
-    addAndMakeVisible (*midiChannelBox);
-
-    for (int chan=0; chan < 16; chan++)
-    {
-        midiChannelBox->addItem (String (chan+1), chan+1);
-    }
-
-    //midiChannelBox->setSelectedId (hubConfig.getMidiChannel()+1);
-
-    // ComboBox look
-    midiChannelBox->setJustificationType (Justification::centred);
-    midiChannelBox->setColour (ComboBox::outlineColourId, neova_dash::colour::subText);
-    midiChannelBox->setColour (ComboBox::textColourId, neova_dash::colour::mainText);
-    midiChannelBox->setColour (ComboBox::arrowColourId, neova_dash::colour::subText);
-
-    midiChannelBox->addListener (this);
-}*/
 
 void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> area)
 {

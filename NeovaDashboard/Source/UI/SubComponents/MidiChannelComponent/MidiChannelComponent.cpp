@@ -67,7 +67,7 @@ void MidiChannelComponent::update()
 
 	for (int channel =0; channel < 16; channel++)
 	{
-		if (midiChannels & (1 << channel) == 1)
+		if ((midiChannels & (1 << channel)) != 0)
 		{
 			selectChannelFifo (channel);
 		}
@@ -80,13 +80,15 @@ void MidiChannelComponent::update()
 
 void MidiChannelComponent::initializeButtons()
 {
+	uint16_t midiChannels = hubConfig.getMidiChannels();
+	
 	for (int channel =0; channel < 16; channel++)
 	{
 		buttons.add (new ChannelButton (String ("channelButton") + String (channel), channel));
 		addAndMakeVisible (buttons.getLast());
 		buttons.getLast()->addListener (this);
 
-		if (hubConfig.getMidiChannels() & (1 << channel) == 1)
+		if ((midiChannels & (1 << channel)) != 0)
 		{
 			selectChannelFifo (channel);
 		}
