@@ -93,6 +93,7 @@ void HubConfiguration::setUint8Value (const int gestureNumber, const uint8DataId
 		case midiHigh: valToUpdatePtr = &gesture.midiHigh; break;
 		case cc:       valToUpdatePtr = &gesture.cc;       break;
 		case midiType: valToUpdatePtr = &gesture.midiType; break;
+		//case reverse:  valToUpdatePtr = &gesture.reverse; break;
 
 		default: return;
 	}

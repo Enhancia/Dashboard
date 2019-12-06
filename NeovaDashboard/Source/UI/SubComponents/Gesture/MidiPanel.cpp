@@ -15,6 +15,7 @@ MidiPanel::MidiPanel (HubConfiguration& config, DataReader& reader, const int ge
 {
     createComboBox();
     createLabels();
+    createButton();
 
     addAndMakeVisible (midiRangeTuner = new MidiRangeTuner (config, dataReader, gestId));
 
@@ -29,6 +30,7 @@ MidiPanel::~MidiPanel()
     midiTypeBox = nullptr;
     ccLabel = nullptr;
     midiRangeTuner = nullptr;
+    reverseButton = nullptr;
 }
 
 //==============================================================================
@@ -66,9 +68,11 @@ void MidiPanel::resized()
     								.withSizeKeepingCentre (area.getWidth()*4/10, 20));
     ccLabel->setBounds (typeArea.withSizeKeepingCentre (area.getWidth()/4, 20));
 
-    auto rangeArea = area.withTrimmedBottom (MARGIN);
+    auto rangeArea = area.withTrimmedBottom (MARGIN).withTrimmedRight (MARGIN);
 
-    midiRangeTuner->setBounds (rangeArea.withSizeKeepingCentre (area.getWidth()*3/4 - 2*MARGIN, 40));
+    reverseButton->setBounds (rangeArea.removeFromRight (18 + MARGIN)
+                                       .withSizeKeepingCentre (18, 18));
+    midiRangeTuner->setBounds (rangeArea.withSizeKeepingCentre (rangeArea.getWidth() - 2*MARGIN, 40));
 }
 
 //==============================================================================
@@ -120,9 +124,23 @@ void MidiPanel::comboBoxChanged (ComboBox* box)
     }
 }
 
+void MidiPanel::buttonClicked (Button* bttn)
+{
+    if (bttn == reverseButton.get())
+    {
+        hubConfig.setUint8Value (id, HubConfiguration::reverse,
+                                 reverseButton->getToggleState() ? 1 : 0);
+    }
+}
+
 void MidiPanel::updateComponents()
 {
     ccLabel->setText (String (hubConfig.getGestureData (id).cc), dontSendNotification);
+
+    //reverseButton->setToggleState (hubConfig.hubConfig.getGestureData (id).reversed); TODO
+    reverseButton->setColour (TextButton::buttonOnColourId,
+                              neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (id).type,
+                                                                       hubConfig.isGestureActive (id)));
     midiRangeTuner->updateHighlightColour();
 }
 
@@ -180,6 +198,23 @@ void MidiPanel::createLabels()
     ccLabel->addListener (this);
 }
 
+void MidiPanel::createButton()
+{
+    reverseButton = std::make_unique<TextButton> ("Reverse Button");
+    addAndMakeVisible (*reverseButton);
+
+    reverseButton->setButtonText ("R");
+    reverseButton->setColour (TextButton::buttonColourId, neova_dash::colour::tunerSliderBackground);
+    reverseButton->setColour (TextButton::buttonOnColourId,
+                              neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (id).type,
+                                                                       hubConfig.isGestureActive (id)));
+    reverseButton->setColour (TextButton::textColourOnId , neova_dash::colour::mainText);
+    reverseButton->setColour (TextButton::textColourOffId , neova_dash::colour::mainText);
+    reverseButton->setToggleState (false, dontSendNotification); // TO CHANGE
+    reverseButton->setClickingTogglesState (true);
+    reverseButton->addListener (this);
+}
+
 void MidiPanel::setComponentsVisibility()
 {
     bool shouldGrayOutBox =   (hubConfig.getGestureData (id).type == neova_dash::gesture::vibrato ||
@@ -192,17 +227,18 @@ void MidiPanel::setComponentsVisibility()
     midiTypeBox->setAlpha (shouldGrayOutBox ? 0.3f : 1.0f);
     midiTypeBox->setInterceptsMouseClicks (!shouldGrayOutBox, false);
 
+    /*
+    midiRangeTuner->setRangeLow (shouldGrayOutTuner ? 0.0f
+                                                    : float (hubConfig.getGestureData (id).midiLow));
+    midiRangeTuner->setRangeHigh (shouldGrayOutTuner ? 127.0f
+                                                     : float (hubConfig.getGestureData (id).midiHigh));*/
+
     midiRangeTuner->setAlpha (shouldGrayOutTuner ? 0.3f : 1.0f);
     midiRangeTuner->setInterceptsMouseClicks (!shouldGrayOutTuner, false);
     midiRangeTuner->setEnabled (!shouldGrayOutTuner);
     
-    /* TODO AFTER RANGE 0 - 127 MidiRangeTuner
-    midiRangeTuner->setRangeLow (shouldGrayOutTuner ? 0.0f
-                                                    : float (hubConfig.getGestureData (id).midiLow));
-    midiRangeTuner->setRangeHigh (shouldGrayOutTuner ? 127.0f
-                                                     : float (hubConfig.getGestureData (id).midiHigh));
-    
-    */
+    reverseButton->setAlpha (shouldGrayOutTuner ? 0.3f : 1.0f);
+    reverseButton->setInterceptsMouseClicks (!shouldGrayOutTuner, false);
 
     ccLabel->setEditable (midiTypeBox->getSelectedId() == neova_dash::gesture::ccMidi + 1, false, false);
     ccLabel->setVisible (midiTypeBox->getSelectedId() == neova_dash::gesture::ccMidi + 1);
@@ -514,6 +550,7 @@ void MidiRangeTuner::updateComponents()
         rangeLabelMax->setText (String (int (getRangeHigh())), dontSendNotification);
     }
 
+    //reverseButton->setToggleState (true); TO CHANGE
     updateHighlightColour();
 }
 

@@ -78,7 +78,8 @@ public:
     	midiLow,
     	midiHigh,
     	cc,
-        midiType
+        midiType,
+        reverse
     };
 
     enum floatDataId
@@ -106,7 +107,6 @@ public:
     void resetConfigWasChanged();
 
     //==============================================================================
-
     void setUint8Value (const int gestureNumber, const uint8DataId dataId,
                                                  const uint8 newUint8Value,
                                                  bool uploadToHub = true);
