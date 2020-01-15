@@ -38,7 +38,7 @@ namespace neova_dash
         };
 
         // gesture max range values
-        const float VIBRATO_RANGE_MAX  = 500.0f;
+        const float VIBRATO_RANGE_MAX  = 100.0f;
         const float VIBRATO_THRESH_MAX = 500.0f;
         
         const float PITCHBEND_MIN = -180.0f;
