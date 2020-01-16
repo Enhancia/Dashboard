@@ -332,8 +332,8 @@ const String HubConfiguration::getFirmwareVersionString()
 		ringFirm = "-";
 	}
 
-	String hubFirm = String ((config.ring_firmware_version & 0xFF00) >> 2)
-	       						+ "." + String (config.ring_firmware_version & 0x00FF);
+	String hubFirm = String ((config.hub_firmware_version & 0xFF00) >> 2)
+	       						+ "." + String (config.hub_firmware_version & 0x00FF);
 
 
 	return String ("HUB  : ") + hubFirm +
