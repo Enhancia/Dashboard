@@ -35,6 +35,8 @@ public:
     void setActive (const bool shouldBeActive = true);
     void setInactiveAndShowUploadFeedback();
     bool isActive();
+    
+    void update();
 
 private:
     //==============================================================================

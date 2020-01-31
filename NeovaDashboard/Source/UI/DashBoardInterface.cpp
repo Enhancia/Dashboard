@@ -448,5 +448,6 @@ void DashBoardInterface::update()
         presetSelector->update();
         header->update();
         optionsPanel->update();
+        uploadButton->update();
     }
 }
