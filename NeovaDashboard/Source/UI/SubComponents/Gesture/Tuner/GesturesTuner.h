@@ -38,12 +38,15 @@ public:
 
     void drawValueCursor (Graphics& g) override
     {
-        if (/*tiltValue > && tiltValue < */ true)
+        if (tiltValue < 140.0f && tiltValue > -140.0f)
         {
             TwoRangeTuner::drawValueCursor (g);
         }
-
-        else { DBG ("Blocked PB paint"); }
+        else
+        {
+            TwoRangeTuner::drawValueCursor (g);
+            DBG ("Blocked PitchBend paint");
+        }
     }
 
 private:
@@ -120,12 +123,16 @@ public:
 
     void drawValueCursor (Graphics& g) override
     {
-        if (/*tiltValue > && tiltValue <*/ true)
+        if (tiltValue < 140.0f && tiltValue > -140.0f)
         {
             OneRangeTuner::drawValueCursor (g);
         }
 
-        else { DBG ("Blocked Roll paint"); }
+        else
+        {
+            OneRangeTuner::drawValueCursor (g);
+            DBG ("Blocked Roll paint");
+        }
     }
 
 private:
