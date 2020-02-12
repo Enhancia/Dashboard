@@ -47,7 +47,7 @@
 
 #define JUCE_USE_DARK_SPLASH_SCREEN 1
 
-#define JUCE_PROJUCER_VERSION 0x50405
+#define JUCE_PROJUCER_VERSION 0x50407
 
 //==============================================================================
 #define JUCE_MODULE_AVAILABLE_juce_audio_basics          1
@@ -223,7 +223,7 @@
 // juce_gui_basics flags:
 
 #ifndef    JUCE_ENABLE_REPAINT_DEBUGGING
- //#define JUCE_ENABLE_REPAINT_DEBUGGING 0
+ #define   JUCE_ENABLE_REPAINT_DEBUGGING 1
 #endif
 
 #ifndef    JUCE_USE_XRANDR
