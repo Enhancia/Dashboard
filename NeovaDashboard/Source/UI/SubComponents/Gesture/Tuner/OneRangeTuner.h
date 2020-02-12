@@ -69,7 +69,6 @@ public:
     //==============================================================================
     void setStyle (TunerStyle newStyle);
     void setAngles (float startAngle, float endAngle);
-    virtual void drawValueCursor (Graphics& g);
 
     //==============================================================================
     const int id;
@@ -100,6 +99,7 @@ private:
     void updateLabelBounds (Label* labelToUpdate);
 
     float getValueAngle();
+    void drawValueCursor (Graphics& g);
     void drawLineFromSliderCentre (Graphics&, float angleRadian);
     void drawThumbsAndToleranceLines (Graphics& g);
     

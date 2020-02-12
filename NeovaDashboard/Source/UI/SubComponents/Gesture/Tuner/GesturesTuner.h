@@ -36,19 +36,6 @@ public:
     ~PitchBendTuner()
     {}
 
-    void drawValueCursor (Graphics& g) override
-    {
-        if (tiltValue < 140.0f && tiltValue > -140.0f)
-        {
-            TwoRangeTuner::drawValueCursor (g);
-        }
-        else
-        {
-            //TwoRangeTuner::drawValueCursor (g);
-            DBG ("Blocked PitchBend paint | Tilt Value : " << tiltValue);
-        }
-    }
-
 private:
     const float& tiltValue;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PitchBendTuner)
@@ -70,16 +57,6 @@ public:
     
     ~TiltTuner()
     {}
-
-    void drawValueCursor (Graphics& g) override
-    {
-        if (true /*rollValue < 140.0f && rollValue > -140.0f*/)
-        {
-            OneRangeTuner::drawValueCursor (g);
-        }
-
-        else { DBG ("Blocked Tilt paint | Roll Value : " << rollValue); }
-    }
 
 private:
     const float& rollValue;
@@ -120,20 +97,6 @@ public:
     
     ~RollTuner()
     {}
-
-    void drawValueCursor (Graphics& g) override
-    {
-        if (tiltValue < 140.0f && tiltValue > -140.0f)
-        {
-            OneRangeTuner::drawValueCursor (g);
-        }
-
-        else
-        {
-            //OneRangeTuner::drawValueCursor (g);
-            DBG ("Blocked Roll paint");
-        }
-    }
 
 private:
     const float& tiltValue;
