@@ -473,7 +473,6 @@ void MidiRangeTuner::updateDisplay()
                          : dataReader.getFloatValueReference (neova_dash::data::tilt); // default: tilt value
 
     const bool valueIsInRange = !isValueOutOfGestureRange (type, value);
-    DBG ("Value is in Range?? " << (valueIsInRange ? "YES" : "NO"));
     
     const int rescaledMidiValue = computeMidiValue (type, value, gestureData.midiLow,
                                                                  gestureData.midiHigh,
