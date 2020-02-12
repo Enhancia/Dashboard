@@ -945,11 +945,16 @@ float TwoRangeTuner::getValueAngle()
 
     if (gestureRange.getRange().getLength() > 0)
     {
-        if (convertedValue < parameterMax.getStart())    convertedValue = parameterMax.getStart();
-        else if (convertedValue > parameterMax.getEnd()) convertedValue = parameterMax.getEnd();
-
-        cursorAngle = startAngle + (convertedValue - parameterMax.getStart()) * (endAngle - startAngle)
+        // Cursor stays at same angle if value out of range.
+        if (convertedValue < parameterMax.getStart() || convertedValue > parameterMax.getEnd())
+        {
+            cursorAngle = previousCursorAngle;
+        }
+        else
+        {
+            cursorAngle = startAngle + (convertedValue - parameterMax.getStart()) * (endAngle - startAngle)
                                         / parameterMax.getLength();
+        }
     }
     else
     {
