@@ -360,7 +360,8 @@ void DashBoardInterface::hubChangedPreset()
     }
     else 
     {
-        /* Unexpected callback here...
+        /* 
+           Unexpected callback here...
            This alert method should theoretically only happen when in
            "preset" state..
         */
