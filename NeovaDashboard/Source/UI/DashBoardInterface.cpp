@@ -422,7 +422,7 @@ void DashBoardInterface::createAndShowAlertPanel (const String& title, const Str
     alertPanel->setLookAndFeel (&dashBoardLookAndFeel);
     alertPanel->setBounds (getLocalBounds());
 
-    if (!buttonText.isEmpty()) alertPanel->addButton (buttonText, 0, KeyPress (KeyPress::escapeKey));
+    //if (!buttonText.isEmpty()) alertPanel->addButton (buttonText, 0, KeyPress (KeyPress::escapeKey));
 
     //alertPanel->setOpaque (false);
     alertPanel->enterModalState (true, ModalCallbackFunction::forComponent (alertPanelCallback, this), false);
