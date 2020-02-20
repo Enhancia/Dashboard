@@ -340,6 +340,16 @@ const String HubConfiguration::getFirmwareVersionString()
 	       String ("\nRING : ") + ringFirm;
 }
 
+uint16_t HubConfiguration::getHubFirmwareVersionUint16()
+{
+	return config.hub_firmware_version;
+}
+
+uint16_t HubConfiguration::getRingFirmwareVersionUint16()
+{
+	return config.ring_firmware_version;
+}
+
 void HubConfiguration::setRingIsCharging (bool isCharging)
 {
 	ringIsCharging = isCharging;

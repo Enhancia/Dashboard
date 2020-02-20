@@ -33,6 +33,12 @@
       </GROUP>
     </GROUP>
     <GROUP id="{D6F09228-5F31-FBA3-77A9-E4EDF3219389}" name="Source">
+      <GROUP id="{070581BE-75F7-2121-AB9B-7858417FB991}" name="UpgradeHandler">
+        <FILE id="Bw30Na" name="upgradeHandler.cpp" compile="1" resource="0"
+              file="Source/UpgradeHandler/upgradeHandler.cpp"/>
+        <FILE id="sX9jSa" name="upgradeHandler.h" compile="0" resource="0"
+              file="Source/UpgradeHandler/upgradeHandler.h"/>
+      </GROUP>
       <GROUP id="{F1A202D6-9B60-4E7E-8087-5D8D2D86697D}" name="DataReader">
         <FILE id="LxyiW7" name="dashPipe.cpp" compile="1" resource="0" file="Source/DataReader/dashPipe.cpp"/>
         <FILE id="NnGjmL" name="dashPipe.h" compile="0" resource="0" file="Source/DataReader/dashPipe.h"/>

@@ -1,0 +1,306 @@
+/*
+ ==============================================================================
+ 
+ This file was auto-generated!
+ 
+ ==============================================================================
+ */
+
+#include "upgradeHandler.h"
+
+//==============================================================================
+UpgradeHandler::UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config) : pipe (dashPipe), hubConfig(config) {}
+UpgradeHandler::~UpgradeHandler() {}
+
+//==============================================================================
+void UpgradeHandler::timerCallback()
+{
+	//TODO cacaARefaireCarBlockProcess 
+	set_upgradeCommandReceived(false);
+	setUpgradeState(err_waitingForUpgradeFirmTimeOut);
+	AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Device took too long time to respond please unplug the hub and retry", "oh pinaise !", nullptr);
+	stopTimer();
+}
+
+//==============================================================================
+void UpgradeHandler::set_upgradeCommandReceived(bool st)
+{
+	upgradeCommandReceived = st;
+}
+
+bool UpgradeHandler::get_upgradeCommandReceived()
+{
+	return upgradeCommandReceived;
+}
+
+void UpgradeHandler::setHubReleaseVersion(uint16_t version)
+{
+	hubReleaseVersion = version;
+}
+
+uint16_t UpgradeHandler::getHubReleaseVersion()
+{
+	return hubReleaseVersion;
+}
+
+void UpgradeHandler::setRingReleaseVersion(uint16_t version)
+{
+	ringReleaseVersion = version;
+}
+
+uint16_t UpgradeHandler::getRingReleaseVersion()
+{
+	return ringReleaseVersion;
+}
+
+void UpgradeHandler::setUpgradeState(uint16_t state)
+{
+	upgradeState = state;
+}
+
+uint16_t UpgradeHandler::getUpgradeState()
+{
+	return upgradeState;
+}
+
+
+
+//==============================================================================
+VOID CALLBACK UpgradeHandler::childProcessExitCallback(PVOID lpParameter, BOOLEAN TimerOrWaitFired)
+{
+	UpgradeHandler* context = reinterpret_cast<UpgradeHandler*>(lpParameter);
+	context->closeNrfutil();
+}
+
+void UpgradeHandler::createChildOutputHandlers()
+{
+    SECURITY_ATTRIBUTES sa;
+    sa.nLength = sizeof(sa);
+    sa.lpSecurityDescriptor = NULL;
+    sa.bInheritHandle = TRUE;
+
+	String out_f = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childOutFileName;
+	String err_f = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childErrFileName;
+
+    childOut = CreateFile(_T(out_f.getCharPointer()),
+        FILE_GENERIC_READ | FILE_GENERIC_WRITE,
+        FILE_SHARE_WRITE | FILE_SHARE_READ,
+        &sa,
+        CREATE_ALWAYS,
+        FILE_ATTRIBUTE_HIDDEN,
+        NULL);
+
+    childErr= CreateFile(_T(err_f.getCharPointer()),
+        FILE_GENERIC_READ | FILE_GENERIC_WRITE,
+        FILE_SHARE_WRITE | FILE_SHARE_READ,
+        &sa,
+        CREATE_ALWAYS,
+        FILE_ATTRIBUTE_HIDDEN,
+        NULL);
+}
+
+void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, String portCOM)
+{
+	stopTimer();
+
+	//handlers on stdOut & stderr
+	createChildOutputHandlers();
+	
+	uint8_t minor;
+	uint8_t major;
+
+	auto nrfutilPath = File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + nrfutilRelativePath;
+	String commandLine;
+	if (FirmType == upgradeFirmRing)
+	{
+		minor = getRingReleaseVersion() & 0xFF;
+		major = (getRingReleaseVersion()>>8) & 0xFF;
+		
+		auto releasePath = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + releaseRelativePath + "ring_" + String(major) + "." + String(minor) + ".zip";
+		commandLine = upgradeRingCommandLine + releasePath + " -p " + portCOM;
+	}
+	else if (FirmType == upgradeFirmHub)
+	{
+		minor = getHubReleaseVersion() & 0xFF;
+		major = (getHubReleaseVersion() >> 8) & 0xFF;
+		auto releasePath = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + releaseRelativePath + "hub_" + String(major) + "." + String(minor) + ".zip";
+		commandLine = upgradeHubCommandLine + releasePath + " -p " + portCOM;
+	}
+
+	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
+	ZeroMemory(&si, sizeof(STARTUPINFO));
+	si.cb = sizeof(STARTUPINFO);
+	si.dwFlags |= STARTF_USESTDHANDLES;
+	si.hStdInput = NULL;
+	si.hStdError = childErr;
+	si.hStdOutput = childOut;
+
+
+	// Start the child process. 
+	if (!CreateProcess((LPCSTR)nrfutilPath.getCharPointer(),   // No module name (use command line)
+		(LPSTR)commandLine.toStdString().c_str(),     // Command line (LPSTR)commandLine.toWideCharPointer()
+		NULL,           // Process handle not inheritable
+		NULL,           // Thread handle not inheritable
+		TRUE,          // Set handle inheritance to FALSE
+		CREATE_NO_WINDOW,              // No creation flags CREATE_NO_WINDOW
+		NULL,           // Use parent's environment block
+		NULL,           // Use parent's starting directory 
+		&si,            // Pointer to STARTUPINFO structure
+		&pi)           // Pointer to PROCESS_INFORMATION structure
+		)
+	{
+		Logger::writeToLog("CreateProcess failed (%d).\n" + String(GetLastError()));
+		setUpgradeState(err_upgradeLaunchFailed);
+		return;
+	}
+
+
+	// Wait asynchronously until child process exits
+	if (pi.hProcess)
+	{
+		setUpgradeState(upgradeInProgress);
+		HANDLE hNewHandle;
+		RegisterWaitForSingleObject(&hNewHandle, pi.hProcess, (WAITORTIMERCALLBACK)UpgradeHandler::childProcessExitCallback, reinterpret_cast<void*>(this), INFINITE, WT_EXECUTEONLYONCE);
+	}
+}
+
+void UpgradeHandler::closeNrfutil()
+{
+	File out_f = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childOutFileName;
+	File err_f = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childErrFileName;
+
+	int ouf_size = out_f.loadFileAsString().length();
+	int err_size = err_f.loadFileAsString().length();
+	if (ouf_size > 0)
+	{
+		DBG(out_f.loadFileAsString());
+		setUpgradeState(upgradeSuccessfull);
+	}
+	else
+	{
+		DBG(err_f.loadFileAsString());
+		setUpgradeState(err_upgradefailed);
+	}
+
+	// Close process and thread handles. 
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+}
+
+void UpgradeHandler::checkReleasesVersion()
+{
+	setUpgradeState(checkingReleases);
+	
+	auto releasePath = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + releaseRelativePath;
+	File f(releasePath);
+	Array<File> hubFiles = f.findChildFiles(3, false, "hub*");
+	if (hubFiles.size() == 0)
+	{
+		setHubReleaseVersion(0);
+		//TODO cacaARefaireCarBlockProcess 
+		AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Already up to date", "Ah cool", nullptr);
+	}
+	else if (hubFiles.size() == 1)
+	{
+		String name = hubFiles.getFirst().getFileNameWithoutExtension();
+		uint8_t minor = name.getTrailingIntValue();
+		uint8_t major = name.trimCharactersAtEnd("." + String(minor)).getTrailingIntValue();
+		uint16_t version = ((uint16_t)major << 8) | minor;
+		setHubReleaseVersion(version);
+
+		if (version <= hubConfig.getHubFirmwareVersionUint16())
+		{
+			AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Already up to date", "Ah cool", nullptr);
+		}
+		else
+		{
+			AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Update " + String(major) + "." + String(minor) + " available", "Ah cool", nullptr);
+		}
+	}
+	else
+	{
+		DBG("Should not be there");
+		setUpgradeState(err_unknow);
+	}
+
+	Array<File> ringFiles = f.findChildFiles(3, false, "ring*");
+	if (ringFiles.size() == 0)
+	{
+		setRingReleaseVersion(0);
+		//TODO cacaARefaireCarBlockProcess 
+		AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Already up to date", "Ah cool", nullptr);
+	}
+	else if (ringFiles.size() == 1)
+	{
+		String name = ringFiles.getFirst().getFileNameWithoutExtension();
+		uint8_t minor = name.getTrailingIntValue();
+		uint8_t major = name.trimCharactersAtEnd("." + String(minor)).getTrailingIntValue();
+		uint16_t version = ((uint16_t)major << 8) | minor;
+		setRingReleaseVersion(version);
+
+		if (version <= hubConfig.getRingFirmwareVersionUint16())
+		{
+			//TODO cacaARefaireCarBlockProcess
+			AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Already up to date", "Ah cool", nullptr);
+		}
+		else
+		{
+			//TODO cacaARefaireCarBlockProcess
+			AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Update " + String(major) + "." + String(minor) + " available", "Ah cool", nullptr);
+		}
+	}
+	else
+	{
+		DBG("Should not be there");
+		setUpgradeState(err_unknow);
+	}
+}
+
+void UpgradeHandler::launchUpgradeProcedure()
+{
+	//todo
+	//checkVersion 
+	checkReleasesVersion();
+	//sendCommand to open versionUpgradeWindow => versionUpgradeWindow will call startRingUpgrade() || startHubUpgrade()
+
+	//startRingUpgrade();
+}
+
+void UpgradeHandler::startRingUpgrade()
+{
+	//check if ring is connected
+	if (!hubConfig.getRingIsConnected())
+	{
+		//TODO cacaARefaireCarBlockProcess 
+		AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Ring is not connected", "capich je suis con", nullptr);
+		setUpgradeState(err_ringIsNotConnected);
+	}
+	else
+	{
+		//ask Hub for changing Mode (connectivity firm) 
+		uint8_t data[4];
+		memcpy(data, "ring", sizeof("ring"));
+		pipe.sendString(data, 4);
+		//start Timer to track Timeout
+		startTimer(60000);
+		//set upgradeCommandReceived. Main will check it when connectivity firm will appear before calling launchNrfutil
+		set_upgradeCommandReceived(true);
+		setUpgradeState(waitingForUpgradeFirm);
+	}
+}
+
+void UpgradeHandler::startHubUpgrade()
+{
+	//ask Hub for changing Mode (bootloader)
+	uint8_t data[4];
+	memcpy(data, "upgr", sizeof("upgr"));
+	pipe.sendString(data, 4);
+	//start Timer to track Timeout
+	startTimer(60000);
+	//set upgradeCommandReceived. Main will check it when bootloader firm will appear before calling launchNrfutil
+	set_upgradeCommandReceived(true);
+	setUpgradeState(waitingForUpgradeFirm);
+}
+//==============================================================================
+
+

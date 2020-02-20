@@ -13,12 +13,8 @@
 #include "Common/DashCommon.h"
 #include "DataReader/DataReader.h"
 #include "DataReader/dashPipe.h"
+#include "UpgradeHandler/upgradeHandler.h"
 
-#if JUCE_WINDOWS
-    #include <windows.h>
-    #include <stdio.h>
-    #include <tchar.h>
-#endif //JUCE_WINDOWS
 
 //==============================================================================
 class Neova_DashBoard_Interface  :	public JUCEApplication,
@@ -62,6 +58,8 @@ public:
 		dashPipe = std::make_unique<DashPipe>();
 		dashPipe->addChangeListener(this);
 
+		upgradeHandler = std::make_unique<UpgradeHandler>(*dashPipe, hubConfig);
+
 		/* For testing */
 		memcpy(data, "jeannine", sizeof("jeannine"));
 		ctrl = 0x01;
@@ -78,6 +76,10 @@ public:
     	commandManager.registerAllCommandsForTarget (this);
     	commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
     	                                                    (mainWindow->getContentComponent()));
+
+
+		
+
     }
 
     void shutdown() override
@@ -92,8 +94,9 @@ public:
         dataReader->connectionLost();
         dashPipe->removeChangeListener(this);
         dashPipe->connectionLost();
-		    dataReader = nullptr;
-		    dashPipe = nullptr;
+		dataReader = nullptr;
+		dashPipe = nullptr;
+		upgradeHandler = nullptr;
     }
 
     //==============================================================================
@@ -196,6 +199,7 @@ public:
 				}
 				break;
 			case 0x07 : 
+			{
 				DBG("preset_state_received\n");
 				uint8_t state_received = *(uint8_t*)(data + 12);
 				if (state_received == 2)
@@ -212,44 +216,29 @@ public:
 				}
 				break;
 			}
+			case 0xFF:
+				DBG("upgrade firm appeared\n");
+				uint8_t type_of_firm = *(uint8_t*)(data + 12);
+				if (type_of_firm == UpgradeHandler::upgradeFirmHub && upgradeHandler->get_upgradeCommandReceived())
+				{
+					DBG("hub upgrade firm connected\n");
+					upgradeHandler->set_upgradeCommandReceived(false);
+					upgradeHandler->launchNrfutil(UpgradeHandler::upgradeFirmHub, "COM" + String(*(uint8_t*)(data + 13)));
+				}
+				else if (type_of_firm == UpgradeHandler::upgradeFirmRing && upgradeHandler->get_upgradeCommandReceived())
+				{
+					DBG("ring upgrade firm connected\n");
+					upgradeHandler->set_upgradeCommandReceived(false);
+					upgradeHandler->launchNrfutil(UpgradeHandler::upgradeFirmRing, "COM" + String(*(uint8_t*)(data + 13)));
+				}
+				else
+				{
+					DBG("Should not be there");
+				}
+				break;
+			}
 		}
 	}
-
-#if JUCE_WINDOWS
-	void launch_nrfutil()
-	{
-		STARTUPINFO si;
-		PROCESS_INFORMATION pi;
-
-		ZeroMemory(&si, sizeof(si));
-		si.cb = sizeof(si);
-		ZeroMemory(&pi, sizeof(pi));
-
-
-		// Start the child process. 
-		if (!CreateProcess((LPCSTR)"nrfutil.exe",   // No module name (use command line)
-			"" ,        // Command line
-			NULL,           // Process handle not inheritable
-			NULL,           // Thread handle not inheritable
-			FALSE,          // Set handle inheritance to FALSE
-			CREATE_NO_WINDOW,              // No creation flags
-			NULL,           // Use parent's environment block
-			NULL,           // Use parent's starting directory 
-			&si,            // Pointer to STARTUPINFO structure
-			&pi)           // Pointer to PROCESS_INFORMATION structure
-			)
-		{
-			Logger::writeToLog("CreateProcess failed (%d).\n" + String(GetLastError()));
-			return;
-		}
-
-		// Wait until child process exits.
-		WaitForSingleObject(pi.hProcess, INFINITE);
-		// Close process and thread handles. 
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-	}
-#endif //JUCE_WINDOWS
 
     //==============================================================================
     class MainWindow    : public DocumentWindow
@@ -335,7 +324,6 @@ public:
 				dashPipe->sendString(data, 12);
 				return true;
             case uploadConfigToHub:
-
 				hubConfig.getConfig(data+12, sizeof(data)-12);
 				memcpy(data, "jeannine", sizeof("jeannine"));
 				ctrl = 0x03;
@@ -344,9 +332,8 @@ public:
 				return true;
 
             case upgradeHub:
-				//launch_nrfutil();
+				upgradeHandler->launchUpgradeProcedure();
                 return true;
-
 			case updatePresetModeState:
 			{
 				uint8_t newState = (uint8_t)dashInterface->getPresetModeState();
@@ -379,12 +366,12 @@ private:
 
 	uint8_t hubPowerState = POWER_OFF;
 
-
     ScopedPointer<FileLogger> dashboardLogger;
 
 	uint8_t data[1024];
 	uint32_t ctrl = 0x03;
 
+	std::unique_ptr<UpgradeHandler> upgradeHandler;
 };
 
 //==============================================================================

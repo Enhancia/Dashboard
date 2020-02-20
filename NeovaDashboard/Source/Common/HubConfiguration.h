@@ -155,6 +155,8 @@ public:
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber);
 
     const String getFirmwareVersionString();
+    uint16_t getHubFirmwareVersionUint16();
+    uint16_t getRingFirmwareVersionUint16();
 
     //==============================================================================
     void setRingIsCharging (bool isCharging);
