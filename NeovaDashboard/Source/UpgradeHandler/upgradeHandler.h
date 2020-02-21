@@ -31,7 +31,8 @@ public:
     enum UpgradeFirm
     {
         upgradeFirmHub = 0,
-        upgradeFirmRing = 1
+        upgradeFirmRing = 1,
+        err_two_hub = 10
     };
 
     enum UpgradeState

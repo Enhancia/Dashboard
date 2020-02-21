@@ -60,7 +60,7 @@ public:
 
 		upgradeHandler = std::make_unique<UpgradeHandler>(*dashPipe, hubConfig);
 
-		/* For testing */
+		/* Test if hub is already connected */
 		memcpy(data, "jeannine", sizeof("jeannine"));
 		ctrl = 0x01;
 		memcpy(data + 8, &ctrl, sizeof(uint32_t));
@@ -230,6 +230,12 @@ public:
 					DBG("ring upgrade firm connected\n");
 					upgradeHandler->set_upgradeCommandReceived(false);
 					upgradeHandler->launchNrfutil(UpgradeHandler::upgradeFirmRing, "COM" + String(*(uint8_t*)(data + 13)));
+				}
+				else if (type_of_firm == UpgradeHandler::err_two_hub)
+				{
+					DBG("two hub connected\n");
+					//TODO sale, à refaire car bloque le process
+					AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Two hubs detected, the 2nd one will not be recognize (disconnect all the hubs & reconnect the 2nd to use it)", "Sorry, Thanks", nullptr);
 				}
 				else
 				{
