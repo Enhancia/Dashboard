@@ -13,8 +13,12 @@
 #include "Common/DashCommon.h"
 #include "DataReader/DataReader.h"
 #include "DataReader/dashPipe.h"
-#include "UpgradeHandler/upgradeHandler.h"
 
+#if JUCE_WINDOWS
+    #include "UpgradeHandler/upgradeHandler_Win.h"
+#elif JUCE_MAC
+    #include "UpgradeHandler/upgradeHandler_MacOS.h"
+#endif //JUCE_WINDOWS
 
 //==============================================================================
 class Neova_DashBoard_Interface  :	public JUCEApplication,
@@ -59,7 +63,8 @@ public:
 		dashPipe->addChangeListener(this);
 
 		upgradeHandler = std::make_unique<UpgradeHandler>(*dashPipe, hubConfig);
-
+        
+        
 		/* Test if hub is already connected */
 		memcpy(data, "jeannine", sizeof("jeannine"));
 		ctrl = 0x01;
@@ -110,7 +115,7 @@ public:
     }
 
 	//==============================================================================
-	void changeListenerCallback(ChangeBroadcaster* source)
+	void changeListenerCallback(ChangeBroadcaster* source) override
 	{
 		if (source == dashPipe.get())
 		{
@@ -219,17 +224,18 @@ public:
 			case 0xFF:
 				DBG("upgrade firm appeared\n");
 				uint8_t type_of_firm = *(uint8_t*)(data + 12);
-				if (type_of_firm == UpgradeHandler::upgradeFirmHub && upgradeHandler->get_upgradeCommandReceived())
+				
+                if (type_of_firm == UpgradeHandler::upgradeFirmHub && upgradeHandler->get_upgradeCommandReceived())
 				{
 					DBG("hub upgrade firm connected\n");
 					upgradeHandler->set_upgradeCommandReceived(false);
-					upgradeHandler->launchNrfutil(UpgradeHandler::upgradeFirmHub, "COM" + String(*(uint8_t*)(data + 13)));
+					upgradeHandler->launchNrfutil(UpgradeHandler::upgradeFirmHub, data + 13);
 				}
 				else if (type_of_firm == UpgradeHandler::upgradeFirmRing && upgradeHandler->get_upgradeCommandReceived())
 				{
 					DBG("ring upgrade firm connected\n");
 					upgradeHandler->set_upgradeCommandReceived(false);
-					upgradeHandler->launchNrfutil(UpgradeHandler::upgradeFirmRing, "COM" + String(*(uint8_t*)(data + 13)));
+					upgradeHandler->launchNrfutil(UpgradeHandler::upgradeFirmRing, data + 13);
 				}
 				else if (type_of_firm == UpgradeHandler::err_two_hub)
 				{
@@ -338,7 +344,8 @@ public:
 				return true;
 
             case upgradeHub:
-				upgradeHandler->launchUpgradeProcedure();
+                //commented for testing on MacOS
+                upgradeHandler->launchUpgradeProcedure();
                 return true;
 			case updatePresetModeState:
 			{
