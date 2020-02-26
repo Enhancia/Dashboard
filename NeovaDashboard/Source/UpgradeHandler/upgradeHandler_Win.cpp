@@ -113,7 +113,7 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * numCOM)
 
 	auto nrfutilPath = File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + nrfutilRelativePath;
 	String commandLine;
-    String portCOM = "COM" + String(*(numCOM*));
+    String portCOM = "COM" + String(*(uint8_t*)numCOM);
 	
     if (FirmType == upgradeFirmRing)
 	{
@@ -284,7 +284,7 @@ void UpgradeHandler::launchUpgradeProcedure()
 	checkReleasesVersion();
 	//sendCommand to open versionUpgradeWindow => versionUpgradeWindow will call startRingUpgrade() || startHubUpgrade()
 
-	//startRingUpgrade();
+	startHubUpgrade();
 }
 
 

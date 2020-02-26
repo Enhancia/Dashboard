@@ -344,7 +344,6 @@ public:
 				return true;
 
             case upgradeHub:
-                //commented for testing on MacOS
                 upgradeHandler->launchUpgradeProcedure();
                 return true;
 			case updatePresetModeState:
