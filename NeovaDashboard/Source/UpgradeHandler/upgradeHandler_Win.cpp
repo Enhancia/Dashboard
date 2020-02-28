@@ -18,9 +18,11 @@ UpgradeHandler::~UpgradeHandler() {}
 //==============================================================================
 void UpgradeHandler::timerCallback()
 {
-	//TODO cacaARefaireCarBlockProcess 
+	
 	set_upgradeCommandReceived(false);
 	setUpgradeState(err_waitingForUpgradeFirmTimeOut);
+
+	//TODO cacaARefaireCarBlockProcess 
 	AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Device took too long time to respond please unplug the hub and retry", "oh pinaise !", nullptr);
 	stopTimer();
 }
@@ -175,6 +177,7 @@ void UpgradeHandler::closeNrfutil()
 
 	int ouf_size = out_f.loadFileAsString().length();
 	int err_size = err_f.loadFileAsString().length();
+	
 	if (ouf_size > 0)
 	{
 		DBG(out_f.loadFileAsString());
@@ -230,10 +233,12 @@ void UpgradeHandler::checkReleasesVersion()
 
 		if (version <= hubConfig.getHubFirmwareVersionUint16())
 		{
+			//TODO cacaARefaireCarBlockProcess 
 			AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Already up to date", "Ah cool", nullptr);
 		}
 		else
 		{
+			//TODO cacaARefaireCarBlockProcess 
 			AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Update " + String(major) + "." + String(minor) + " available", "Ah cool", nullptr);
 		}
 	}
@@ -279,9 +284,9 @@ void UpgradeHandler::checkReleasesVersion()
 
 void UpgradeHandler::launchUpgradeProcedure()
 {
-	//todo
 	//checkVersion 
 	checkReleasesVersion();
+	//TODO Alex
 	//sendCommand to open versionUpgradeWindow => versionUpgradeWindow will call startRingUpgrade() || startHubUpgrade()
 
 	startHubUpgrade();
