@@ -59,6 +59,14 @@ bool UploadButton::isActive()
 	return active;
 }
 
+void UploadButton::update()
+{
+    if (!active && hubConfig.wasConfigChangedSinceLastFlash())
+    {
+        setActive();
+    }
+}
+
 void UploadButton::setInactiveAndShowUploadFeedback()
 {
 	setActive (false);
