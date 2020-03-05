@@ -37,14 +37,12 @@ GestureComponent::~GestureComponent()
 
 void GestureComponent::paint (Graphics& g)
 {
-    Path roundedRectangleBackground;
-    roundedRectangleBackground.addRoundedRectangle (getLocalBounds().toFloat(), 10.0f);
 
     // BackGround + Header Fill
     g.setColour (neova_dash::colour::gestureBackground.brighter (0.1f));
-    g.fillPath (roundedRectangleBackground);
+    g.fillRoundedRectangle (getLocalBounds().toFloat(), 10.0f);
 
-		/*
+	/*
     g.saveState();
     g.reduceClipRegion (0, 0, getWidth(), 30);
     g.setColour (neova_dash::colour::gestureHeader);
@@ -52,6 +50,11 @@ void GestureComponent::paint (Graphics& g)
     g.restoreState();*/
 
 	// Gesture Image
+    Path roundedRectangleBackground;
+    roundedRectangleBackground.addRoundedRectangle (selected ? getLocalBounds().toFloat().reduced (1.0f)
+                                                             : getLocalBounds().toFloat(),
+                                                    10.0f);
+
     g.saveState();
     g.reduceClipRegion (roundedRectangleBackground);
 	drawGesturePath (g, getLocalBounds());
