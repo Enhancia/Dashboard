@@ -33,6 +33,10 @@
       </GROUP>
     </GROUP>
     <GROUP id="{D6F09228-5F31-FBA3-77A9-E4EDF3219389}" name="Source">
+      <GROUP id="{30636704-2446-6D92-2245-FF735547EB35}" name="DashUpdater">
+        <FILE id="FdSVTo" name="DashUpdater.cpp" compile="1" resource="0" file="Source/DashUpdater/DashUpdater.cpp"/>
+        <FILE id="p4h4am" name="DashUpdater.h" compile="0" resource="0" file="Source/DashUpdater/DashUpdater.h"/>
+      </GROUP>
       <GROUP id="{F1A202D6-9B60-4E7E-8087-5D8D2D86697D}" name="DataReader">
         <FILE id="LxyiW7" name="dashPipe.cpp" compile="1" resource="0" file="Source/DataReader/dashPipe.cpp"/>
         <FILE id="NnGjmL" name="dashPipe.h" compile="0" resource="0" file="Source/DataReader/dashPipe.h"/>
