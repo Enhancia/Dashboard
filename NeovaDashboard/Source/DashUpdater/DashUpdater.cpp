@@ -126,12 +126,40 @@ File DashUpdater::getDownloadedFile()
     return File();
 }
 
+void DashUpdater::launchInstaller()
+{
+    if (wasSuccessful())
+    {
+        #if JUCE_WINDOWS
+
+        if (!getDownloadedFile().startAsProcess())
+        {
+            getDownloadedFile().revealToUser();
+        }
+
+        #elif JUCE_MAC
+
+        if (getDownloadedFile().startAsProcess())
+        {
+            auto dashDisk = File("/Volumes").findChildFiles(1, false, "Dashboard*");
+       
+            if (!dashDisk.isEmpty()) dashDisk[0].getChildFile ("Dashboard_Installer.pkg")
+                                                .startAsProcess();
+        }
+		else
+		{
+			getDownloadedFile().revealToUser();
+		}
+        #endif
+    }
+}
+
 void DashUpdater::initializeFileToDownloadString()
 {
     #if JUCE_WINDOWS
-	fileToDownloadString = "Dashboard-Neova.Setup.msi";
+	fileToDownloadString = "Dashboard-Neova-Setup.msi";
     #elif JUCE_MAC
-    fileToDownloadString = "Dashboard-Neova.Setup.dmg";
+    fileToDownloadString = "Dashboard-Neova-Setup.dmg";
     #endif
 }
 

@@ -50,7 +50,6 @@ private:
     void createLabels();
     void createButtons();
 	void updateComponentsForSpecificStep (downloadProgress downloadStep);
-    void launchInstaller();
 
     //==============================================================================
     juce::Rectangle<int> panelArea;

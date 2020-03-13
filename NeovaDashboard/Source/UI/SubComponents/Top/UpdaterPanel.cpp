@@ -112,7 +112,7 @@ void UpdaterPanel::buttonClicked (Button* bttn)
 			case downloadFinished:
 				if (updater.wasSuccessful())
 				{
-					launchInstaller();
+					updater.launchInstaller();
 				}
 				closeAndResetPanel();
 				break;
@@ -210,16 +210,5 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 				break;
 			default:
 				break;
-	}
-}
-
-void UpdaterPanel::launchInstaller()
-{
-	if (updater.wasSuccessful())
-	{
-		if (!updater.getDownloadedFile().startAsProcess())
-		{
-			updater.getDownloadedFile().revealToUser();
-		}
 	}
 }
