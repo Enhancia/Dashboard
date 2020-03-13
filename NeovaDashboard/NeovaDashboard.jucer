@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="SIAvrc" name="NeovaDashboard" projectType="guiapp" jucerVersion="5.4.7"
-              binaryDataNamespace="DashData" version="0.3.3">
+              binaryDataNamespace="DashData" version="0.3.2">
   <MAINGROUP id="KvQWjZ" name="NeovaDashboard">
     <GROUP id="{20075F30-04A5-410B-6952-3C63688FBF54}" name="Resources">
       <GROUP id="{E0259D2D-3961-75D2-D343-36D8C845436E}" name="Image">
@@ -114,6 +114,9 @@
             <FILE id="AXpBRF" name="OptionsPanel.cpp" compile="1" resource="0"
                   file="Source/UI/SubComponents/Top/OptionsPanel.cpp"/>
             <FILE id="PkWn9H" name="OptionsPanel.h" compile="0" resource="0" file="Source/UI/SubComponents/Top/OptionsPanel.h"/>
+            <FILE id="OQx9jU" name="UpdaterPanel.cpp" compile="1" resource="0"
+                  file="Source/UI/SubComponents/Top/UpdaterPanel.cpp"/>
+            <FILE id="L3fwo9" name="UpdaterPanel.h" compile="0" resource="0" file="Source/UI/SubComponents/Top/UpdaterPanel.h"/>
           </GROUP>
           <FILE id="rI5ar0" name="DashShapeButton.cpp" compile="1" resource="0"
                 file="Source/UI/SubComponents/DashShapeButton.cpp"/>
