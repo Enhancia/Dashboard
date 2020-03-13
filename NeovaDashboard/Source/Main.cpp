@@ -13,6 +13,7 @@
 #include "Common/DashCommon.h"
 #include "DataReader/DataReader.h"
 #include "DataReader/dashPipe.h"
+#include "DashUpdater/DashUpdater.h"
 
 #if JUCE_WINDOWS
     #include <windows.h>
@@ -62,13 +63,15 @@ public:
 		dashPipe = std::make_unique<DashPipe>();
 		dashPipe->addChangeListener(this);
 
+		updater = std::make_unique<DashUpdater>();
+
 		/* For testing */
 		memcpy(data, "jeannine", sizeof("jeannine"));
 		ctrl = 0x01;
 		memcpy(data + 8, &ctrl, sizeof(uint32_t));
 		dashPipe->sendString(data, 12);
     
-    	dashInterface.reset (new DashBoardInterface (hubConfig, *dataReader));
+    	dashInterface.reset (new DashBoardInterface (hubConfig, *dataReader, *updater));
     	mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get()));
     	dashInterface->grabKeyboardFocus();
     
@@ -92,8 +95,9 @@ public:
         dataReader->connectionLost();
         dashPipe->removeChangeListener(this);
         dashPipe->connectionLost();
-		    dataReader = nullptr;
-		    dashPipe = nullptr;
+		dataReader = nullptr;
+		dashPipe = nullptr;
+		updater = nullptr;
     }
 
     //==============================================================================
@@ -371,16 +375,19 @@ public:
     std::unique_ptr<DashBoardInterface> dashInterface;
 
 private:
+    //==============================================================================
     std::unique_ptr<MainWindow> mainWindow;
     HubConfiguration hubConfig;
 
 	std::unique_ptr<DataReader> dataReader;
 	std::unique_ptr<DashPipe> dashPipe;
 
-	uint8_t hubPowerState = POWER_OFF;
-
+	std::unique_ptr<DashUpdater> updater;
 
     ScopedPointer<FileLogger> dashboardLogger;
+
+    //==============================================================================
+	uint8_t hubPowerState = POWER_OFF;
 
 	uint8_t data[1024];
 	uint32_t ctrl = 0x03;
