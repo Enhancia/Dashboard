@@ -381,8 +381,8 @@ void NewGesturePanel::GestureTypeSelector::drawGesturePath (Graphics& g, juce::R
                                          area.toFloat().getY()},
                                         false);
 
-    gesturePathGradient.addColour (0.3, Colour (0));
-    gesturePathGradient.addColour (0.7, Colour (0));
+    gesturePathGradient.addColour (0.3, getHighlightColour (gestureType, false).withAlpha (0.0f));
+    gesturePathGradient.addColour (0.7, getHighlightColour (gestureType, false).withAlpha (0.0f));
 
     Path pathClip;
     pathClip.addRoundedRectangle (area.toFloat(), 10.0f);

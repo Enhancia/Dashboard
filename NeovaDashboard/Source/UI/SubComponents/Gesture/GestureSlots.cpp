@@ -261,8 +261,8 @@ void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
                                          area.toFloat().getY()},
                                         false);
 
-    gesturePathGradient.addColour (0.35, Colour (0));
-    gesturePathGradient.addColour (0.65, Colour (0));
+    gesturePathGradient.addColour (0.35, neova_dash::gesture::getHighlightColour (type, false).withAlpha (0.0f));
+    gesturePathGradient.addColour (0.65, neova_dash::gesture::getHighlightColour (type, false).withAlpha (0.0f));
 
     g.setGradientFill (gesturePathGradient);
 	g.strokePath (gesturePath, PathStrokeType (2.0f));
