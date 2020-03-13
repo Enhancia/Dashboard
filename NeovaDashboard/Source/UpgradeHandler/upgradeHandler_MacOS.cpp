@@ -27,7 +27,7 @@ void UpgradeHandler::timerCallback()
 	//TODO cacaARefaireCarBlockProcess 
 	set_upgradeCommandReceived(false);
 	setUpgradeState(err_waitingForUpgradeFirmTimeOut);
-	AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Device took too long time to respond please unplug the hub and retry", "oh pinaise !", nullptr);
+	AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Device took too long time to respond please unplug the hub and retry", "Ok", nullptr);
 	stopTimer();
 }
 
@@ -216,11 +216,11 @@ void UpgradeHandler::closeNrfutil()
     //TODO cacaARefaire
     if (getUpgradeState()>=0)
     {
-        AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Upgrade successfull", "Ah cool", nullptr);
+        AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Upgrade successfull", "Ok", nullptr);
     }
     else
     {
-        AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Upgrade failed", "Zut", nullptr);
+        AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Upgrade failed", "Ok", nullptr);
     }
 }
 
@@ -237,7 +237,7 @@ void UpgradeHandler::checkReleasesVersion()
     {
         setHubReleaseVersion(0);
         //TODO cacaARefaire
-        AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Already up to date", "Ah cool", nullptr);
+        AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Already up to date", "Ok", nullptr);
     }
     else if (hubFiles.size() == 1)
     {
@@ -250,11 +250,11 @@ void UpgradeHandler::checkReleasesVersion()
         //TODO cacaARefaire
         if (version <= hubConfig.getHubFirmwareVersionUint16())
         {
-            AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Already up to date", "Ah cool", nullptr);
+            AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Already up to date", "Ok", nullptr);
         }
         else
         {
-            AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Update " + String(major) + "." + String(minor) + " available", "Ah cool", nullptr);
+            AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Update " + String(major) + "." + String(minor) + " available", "Ok", nullptr);
         }
     }
     else
@@ -268,7 +268,7 @@ void UpgradeHandler::checkReleasesVersion()
     {
         setRingReleaseVersion(0);
         //TODO cacaARefaireCarBlockProcess
-        AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Already up to date", "Ah cool", nullptr);
+        AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Already up to date", "Ok", nullptr);
     }
     else if (ringFiles.size() == 1)
     {
@@ -282,11 +282,11 @@ void UpgradeHandler::checkReleasesVersion()
         if (version <= hubConfig.getRingFirmwareVersionUint16())
         {
             
-            AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Already up to date", "Ah cool", nullptr);
+            AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Already up to date", "Ok", nullptr);
         }
         else
         {
-            AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Update " + String(major) + "." + String(minor) + " available", "Ah cool", nullptr);
+            AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Update " + String(major) + "." + String(minor) + " available", "Ok", nullptr);
         }
     }
     else
@@ -314,7 +314,7 @@ void UpgradeHandler::startRingUpgrade()
 	if (!hubConfig.getRingIsConnected())
 	{
 		//TODO cacaARefaire
-		AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Ring is not connected", "capich je suis con", nullptr);
+		AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Ring is not connected", "Ok", nullptr);
 		setUpgradeState(err_ringIsNotConnected);
 	}
 	else
