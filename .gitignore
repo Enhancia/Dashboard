@@ -1,5 +1,3 @@
-Dashboard_interface/Builds/
-Dashboard_interface/JuceLibraryCode/
+NeovaDashBoard/Builds/
+NeovaDashBoard/JuceLibraryCode/
 Doxygen/
-*.jucer
-
