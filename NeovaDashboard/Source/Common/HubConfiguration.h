@@ -21,14 +21,14 @@ class HubConfiguration
 {
 public:
     //==============================================================================
-	static constexpr int CONFIGSIZE = 520;
+	static constexpr int CONFIGSIZE = 536;
 	
 	struct GestureData // values for each gesture
     {
         GestureData() = default;
         GestureData (GestureData& other);
 
-		uint8_t align_to_word; //to align the size of GestureData to a multiple of word
+		uint16_t align_to_word; //to align the size of GestureData to a multiple of word
 
 		uint8_t on = 1;
 		uint8_t type = neova_dash::gesture::none;
