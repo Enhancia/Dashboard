@@ -30,6 +30,15 @@ namespace neova_dash
             none
         };
 
+        enum CurveType
+        {
+            linear,
+            log,
+            exp,
+            pow2,
+            pow3
+        };
+
         enum MidiType
         {
             pitchMidi =0,
