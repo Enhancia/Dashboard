@@ -76,6 +76,7 @@ private:
 	void updateComponentsForSpecificState (UpgradeState upgradeStateToUpdateTo);
 	void updateComponentsForSpecificState (int upgradeStateToUpdateTo);
 	void updateComponentsForError (UpgradeState upgradeStateToUpdateTo);
+	String getFormattedVersionString (uint16_t version);
 
     //==============================================================================
     juce::Rectangle<int> panelArea;

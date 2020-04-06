@@ -227,7 +227,7 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 					bodyTextString = String ("HUB : ");
 					if (hubAvailable)
 					{
-						bodyTextString += "Upgrade Available (v" + String (upgradeHandler.getHubReleaseVersion()) + ")";
+						bodyTextString += "Upgrade Available (v" + getFormattedVersionString (upgradeHandler.getHubReleaseVersion()) + ")";
 					}
 					else
 					{
@@ -238,7 +238,7 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 
 					if (ringAvailable)
 					{
-						bodyTextString += "Upgrade Available : (v" + String (upgradeHandler.getRingReleaseVersion()) + ")";
+						bodyTextString += "Upgrade Available : (v" + getFormattedVersionString (upgradeHandler.getRingReleaseVersion()) + ")";
 					}
 					else
 					{
@@ -322,4 +322,12 @@ void FirmUpgradePanel::updateComponentsForError (UpgradeState upgradeStateToUpda
 
 			break;
 	}	
+}
+
+String FirmUpgradePanel::getFormattedVersionString (uint16_t version)
+{
+	uint8_t minor = uint8_t (version & 0xff);
+	uint8_t major = uint8_t (version >> 8 & 0xff);
+
+	return String (major) + "." + String (minor); 
 }
