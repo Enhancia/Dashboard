@@ -58,8 +58,9 @@ public:
     };
     
     //==============================================================================
-    UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config);
+    UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config, ApplicationCommandManager& cmdManager);
     ~UpgradeHandler();
+
     //==============================================================================
     void timerCallback() override;
 
@@ -116,6 +117,7 @@ private:
     //==============================================================================
     DashPipe& dPipe;
     HubConfiguration& hubConfig;
+    ApplicationCommandManager& commandManager;
     
     static UpgradeHandler * instanceUp;
     //==============================================================================

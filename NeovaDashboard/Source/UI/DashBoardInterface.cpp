@@ -9,7 +9,7 @@
 #include "DashBoardInterface.h"
 
 //==============================================================================
-DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& reader)
+DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& reader, UpgradeHandler& upgradeHandler)
     : hubConfig (data), dataReader (reader)
 {
     TRACE_IN;
@@ -19,6 +19,9 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     // Creates Components
     optionsPanel = std::make_unique<OptionsPanel> (hubConfig, getCommandManager());
     addAndMakeVisible (*optionsPanel);
+
+    firmUpgradePanel = std::make_unique<FirmUpgradePanel> (hubConfig, upgradeHandler);
+    addAndMakeVisible (*firmUpgradePanel);
 
     header = std::make_unique<HeaderComponent> (*optionsPanel, hubConfig, dataReader);
     addAndMakeVisible (*header);
@@ -46,6 +49,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     newGesturePanel->setAlwaysOnTop (true);
     optionsPanel->setVisible (false);
     optionsPanel->setAlwaysOnTop (true);
+    firmUpgradePanel->setVisible (false);
+    firmUpgradePanel->setAlwaysOnTop (true);
 
     // Sets settings
     juce::Rectangle<int> screenArea  = Desktop::getInstance().getDisplays()
@@ -143,6 +148,7 @@ void DashBoardInterface::resized()
 
     auto area = getLocalBounds();
     optionsPanel->setBounds (area);
+    firmUpgradePanel->setBounds (area);
 
 	auto gPanelArea = area.removeFromBottom (area.getHeight() / 2 - 5);
 
@@ -240,7 +246,8 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
                             updateDashInterface,
                             updateInterfaceLEDs,
                             updateBatteryDisplay,
-                            allowUserToFlashHub
+                            allowUserToFlashHub,
+                            openFirmUpgradePanel
                        });
 }
 
@@ -262,6 +269,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
         case allowUserToFlashHub:
             result.setInfo ("Update Upload Button", "Allows Upload Button To Be Clicked", "Interface", 0);
             break;
+        case openFirmUpgradePanel:
+            result.setInfo ("Open Firm Upgrade Panel", "Opens Panel To Start Firm Upgrade Procedure", "Interface", 0);
+			break;
         default:
             break;
     }
@@ -290,6 +300,10 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
 
         case allowUserToFlashHub:
             uploadButton->setActive();
+            return true;
+
+        case openFirmUpgradePanel:
+            firmUpgradePanel->setAndOpenPanel();
             return true;
 
         default:

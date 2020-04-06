@@ -62,7 +62,7 @@ public:
 		dashPipe = std::make_unique<DashPipe>();
 		dashPipe->addChangeListener(this);
 
-		upgradeHandler = std::make_unique<UpgradeHandler>(*dashPipe, hubConfig);
+		upgradeHandler = std::make_unique<UpgradeHandler>(*dashPipe, hubConfig, commandManager);
         
         
 		/* Test if hub is already connected */
@@ -71,7 +71,7 @@ public:
 		memcpy(data + 8, &ctrl, sizeof(uint32_t));
 		dashPipe->sendString(data, 12);
     
-    	dashInterface.reset (new DashBoardInterface (hubConfig, *dataReader));
+    	dashInterface.reset (new DashBoardInterface (hubConfig, *dataReader, *upgradeHandler));
     	mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get()));
     	dashInterface->grabKeyboardFocus();
     

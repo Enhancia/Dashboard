@@ -113,6 +113,10 @@
                   file="Source/UI/SubComponents/Top/DashAlertPanel.cpp"/>
             <FILE id="Ko72q9" name="DashAlertPanel.h" compile="0" resource="0"
                   file="Source/UI/SubComponents/Top/DashAlertPanel.h"/>
+            <FILE id="NRSdU5" name="FirmUpgradePanel.cpp" compile="1" resource="0"
+                  file="Source/UI/SubComponents/Top/FirmUpgradePanel.cpp"/>
+            <FILE id="Uf4mYp" name="FirmUpgradePanel.h" compile="0" resource="0"
+                  file="Source/UI/SubComponents/Top/FirmUpgradePanel.h"/>
             <FILE id="GDtFN3" name="NewGesturePanel.cpp" compile="1" resource="0"
                   file="Source/UI/SubComponents/Top/NewGesturePanel.cpp"/>
             <FILE id="Oa4T5u" name="NewGesturePanel.h" compile="0" resource="0"

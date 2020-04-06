@@ -36,7 +36,8 @@ namespace neova_dash
             updateDashInterface  = 0x01000001, // Updates Dash interface to match the HUB data
             updateInterfaceLEDs  = 0x01000002, // Updates the Hub lEDs in the Dash interface
             updateBatteryDisplay = 0x01000003, // Updates the battery display in the header
-            allowUserToFlashHub  = 0x01000004  // Updates upload button after config was changed
+            allowUserToFlashHub  = 0x01000004, // Updates upload button after config was changed
+            openFirmUpgradePanel = 0x01000005  // Launches the firm upgrade panel
     	};
     };
 

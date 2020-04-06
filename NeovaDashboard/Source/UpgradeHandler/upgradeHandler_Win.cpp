@@ -12,7 +12,8 @@
 
 #include "upgradeHandler_Win.h"
 //==============================================================================
-UpgradeHandler::UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config) : dPipe (dashPipe), hubConfig(config) {}
+UpgradeHandler::UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config, ApplicationCommandManager& manager)
+	: dPipe (dashPipe), hubConfig(config), commandManager (manager) {}
 UpgradeHandler::~UpgradeHandler() {}
 
 //==============================================================================
@@ -23,7 +24,7 @@ void UpgradeHandler::timerCallback()
 	setUpgradeState(err_waitingForUpgradeFirmTimeOut);
 
 	//TODO cacaARefaireCarBlockProcess 
-	AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Device took too long time to respond please unplug the hub and retry", "Ok", nullptr);
+	//AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Device took too long time to respond please unplug the hub and retry", "Ok", nullptr);
 	stopTimer();
 }
 
@@ -221,7 +222,7 @@ void UpgradeHandler::checkReleasesVersion()
 	{
 		setHubReleaseVersion(0);
 		//TODO cacaARefaireCarBlockProcess 
-		AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Already up to date", "Ok", nullptr);
+		//AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Already up to date", "Ok", nullptr);
 	}
 	else if (hubFiles.size() == 1)
 	{
@@ -234,12 +235,12 @@ void UpgradeHandler::checkReleasesVersion()
 		if (version <= hubConfig.getHubFirmwareVersionUint16())
 		{
 			//TODO cacaARefaireCarBlockProcess 
-			AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Already up to date", "Ok", nullptr);
+			//AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Already up to date", "Ok", nullptr);
 		}
 		else
 		{
 			//TODO cacaARefaireCarBlockProcess 
-			AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Update " + String(major) + "." + String(minor) + " available", "Ok", nullptr);
+			//AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Update " + String(major) + "." + String(minor) + " available", "Ok", nullptr);
 		}
 	}
 	else
@@ -253,7 +254,7 @@ void UpgradeHandler::checkReleasesVersion()
 	{
 		setRingReleaseVersion(0);
 		//TODO cacaARefaireCarBlockProcess 
-		AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Already up to date", "Ok", nullptr);
+		//AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Already up to date", "Ok", nullptr);
 	}
 	else if (ringFiles.size() == 1)
 	{
@@ -266,12 +267,12 @@ void UpgradeHandler::checkReleasesVersion()
 		if (version <= hubConfig.getRingFirmwareVersionUint16())
 		{
 			//TODO cacaARefaireCarBlockProcess
-			AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Already up to date", "Ok", nullptr);
+			//AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Already up to date", "Ok", nullptr);
 		}
 		else
 		{
 			//TODO cacaARefaireCarBlockProcess
-			AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Update " + String(major) + "." + String(minor) + " available", "Ok", nullptr);
+			//AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Update " + String(major) + "." + String(minor) + " available", "Ok", nullptr);
 		}
 	}
 	else
@@ -288,8 +289,9 @@ void UpgradeHandler::launchUpgradeProcedure()
 	checkReleasesVersion();
 	//TODO Alex
 	//sendCommand to open versionUpgradeWindow => versionUpgradeWindow will call startRingUpgrade() || startHubUpgrade()
+	commandManager.invokeDirectly (neova_dash::commands::openFirmUpgradePanel, true);
 
-	startHubUpgrade();
+	//startHubUpgrade();
 }
 
 
@@ -299,7 +301,7 @@ void UpgradeHandler::startRingUpgrade()
 	if (!hubConfig.getRingIsConnected())
 	{
 		//TODO cacaARefaireCarBlockProcess 
-		AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Ring is not connected", "Ok", nullptr);
+		//AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Ring is not connected", "Ok", nullptr);
 		setUpgradeState(err_ringIsNotConnected);
 	}
 	else
@@ -310,7 +312,7 @@ void UpgradeHandler::startRingUpgrade()
 		dPipe.sendString(data, 4);
 		
         //start Timer to track Timeout
-		startTimer(60000);
+		startTimer(300000);
 		
         //set upgradeCommandReceived. Main will check it when connectivity firm will appear before calling launchNrfutil
 		set_upgradeCommandReceived(true);
@@ -326,7 +328,7 @@ void UpgradeHandler::startHubUpgrade()
 	dPipe.sendString(data, 4);
 	
     //start Timer to track Timeout
-	startTimer(60000);
+	startTimer(300000);
 	
     //set upgradeCommandReceived. Main will check it when bootloader firm will appear before calling launchNrfutil
 	set_upgradeCommandReceived(true);

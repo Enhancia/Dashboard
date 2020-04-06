@@ -301,7 +301,8 @@ void UpgradeHandler::launchUpgradeProcedure()
     checkReleasesVersion();
     
     //TODO sendCommand to open versionUpgradeWindow => versionUpgradeWindow will call startRingUpgrade() || startHubUpgrade()
-    
+    commandManager.invokeDirectly (neova_dash::commands::openFirmUpgradePanel, true);
+
     //TODO à enlever qd versionUpgradeWindow sera implémentée
     //Test
     startRingUpgrade();
