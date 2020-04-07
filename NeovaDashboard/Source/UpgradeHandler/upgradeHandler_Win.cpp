@@ -200,6 +200,7 @@ void UpgradeHandler::closeNrfutil()
 	CloseHandle(pi.hThread);
     
     //TODO cacaARefaire
+    /*
     if (getUpgradeState()>=0)
     {
         AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Upgrade successfull", "Ok", nullptr);
@@ -207,7 +208,7 @@ void UpgradeHandler::closeNrfutil()
     else
     {
         AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Upgrade failed", "Ok", nullptr);
-    }
+    }*/
 }
 
 
@@ -312,7 +313,7 @@ void UpgradeHandler::startRingUpgrade()
 		dPipe.sendString(data, 4);
 		
         //start Timer to track Timeout
-		startTimer(300000);
+		startTimer(60000);
 		
         //set upgradeCommandReceived. Main will check it when connectivity firm will appear before calling launchNrfutil
 		set_upgradeCommandReceived(true);
@@ -328,7 +329,7 @@ void UpgradeHandler::startHubUpgrade()
 	dPipe.sendString(data, 4);
 	
     //start Timer to track Timeout
-	startTimer(300000);
+	startTimer(60000);
 	
     //set upgradeCommandReceived. Main will check it when bootloader firm will appear before calling launchNrfutil
 	set_upgradeCommandReceived(true);

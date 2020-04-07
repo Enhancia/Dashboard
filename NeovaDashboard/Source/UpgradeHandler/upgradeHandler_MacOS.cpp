@@ -15,7 +15,8 @@
 UpgradeHandler * UpgradeHandler::instanceUp = nullptr;
 
 //==============================================================================
-UpgradeHandler::UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config) : dPipe (dashPipe), hubConfig(config)
+UpgradeHandler::UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config, ApplicationCommandManager& manager)
+    : dPipe (dashPipe), hubConfig(config), commandManager (manager)
 {
     instanceUp = this;
 }
