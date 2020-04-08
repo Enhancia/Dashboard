@@ -81,10 +81,6 @@ public:
     	commandManager.registerAllCommandsForTarget (this);
     	commandManager.registerAllCommandsForTarget (dynamic_cast <ApplicationCommandTarget*>
     	                                                    (mainWindow->getContentComponent()));
-
-
-		
-
     }
 
     void shutdown() override
@@ -136,6 +132,7 @@ public:
 					hubPowerState = POWER_ON;
 					DBG("POWER STATE : " + String(hubPowerState) + " \n");
 					//TODO => mettre interface en mode POWER_ON
+					hubConfig.setHubIsConnected (true);
                     dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
 				}
 				if (!dashInterface->hasKeyboardFocus (true))
@@ -187,10 +184,12 @@ public:
 
 					if (hubPowerState == POWER_ON)
 					{
+						hubConfig.setHubIsConnected (true);
 						dashInterface->setInterfaceStateAndUpdate(DashBoardInterface::connected);
 					}
 					else if (hubPowerState == POWER_OFF)
 					{
+						hubConfig.setHubIsConnected (false);
 						dashInterface->setInterfaceStateAndUpdate(DashBoardInterface::waitingForConnection);
 					}
 					else

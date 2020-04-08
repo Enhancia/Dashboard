@@ -27,9 +27,10 @@ void FirmUpgradePanel::paint (Graphics& g)
     using namespace neova_dash::colour;
     
     // options panel area
-    g.setColour (topPanelBackground.withAlpha (0.85f));
+    g.setColour (topPanelBackground);
     g.fillRoundedRectangle (panelArea.toFloat(), 10.0f);
     
+    /*
     // options panel outline
     auto gradOut = ColourGradient::horizontal (Colour (0x10ffffff),
                                                0.0f, 
@@ -38,14 +39,15 @@ void FirmUpgradePanel::paint (Graphics& g)
     gradOut.addColour (0.5, Colour (0x50ffffff));
 
     g.setGradientFill (gradOut);
-    g.drawRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f, 1.0f);
+    g.drawRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f, 1.0f);*/
 }
 
 void FirmUpgradePanel::resized()
 {
 	using namespace neova_dash::ui;
 
-    panelArea = getLocalBounds().withSizeKeepingCentre (getLocalBounds().getWidth()/3, getLocalBounds().getHeight()/3);
+    //panelArea = getLocalBounds().withSizeKeepingCentre (getLocalBounds().getWidth()/3, getLocalBounds().getHeight()/3);
+    panelArea = getLocalBounds().withSizeKeepingCentre (getLocalBounds().getWidth()*3/5, getLocalBounds().getHeight()*3/5);
     
     // Close Button
     #if JUCE_WINDOWS
@@ -61,21 +63,20 @@ void FirmUpgradePanel::resized()
 
     titleLabel->setBounds (area.removeFromTop (area.getHeight()/5));
 
-    auto buttonArea = area.removeFromBottom (area.getHeight()/5);
-
+    auto buttonArea = area.removeFromBottom (jmin (area.getHeight()/5, 40));
     okButton->setBounds (buttonArea.withSizeKeepingCentre (okButton->getBestWidthForHeight (buttonArea.getHeight()),
                                      						buttonArea.getHeight()));
 
     hubUpgradeButton->setBounds (buttonArea.removeFromLeft (buttonArea.getWidth()/2)
                                 	 .withSizeKeepingCentre
-                                    (area.getWidth()/2 - neova_dash::ui::MARGIN*2,
+                                    (area.getWidth()/3,
                                      buttonArea.getHeight()));
 
     ringUpgradeButton->setBounds (buttonArea.withSizeKeepingCentre
-                                    (area.getWidth()/2 - neova_dash::ui::MARGIN,
+                                    (area.getWidth()/3,
                                      buttonArea.getHeight()));
 
-    bodyText->setBounds (area.reduced (neova_dash::ui::MARGIN));
+    bodyText->setBounds (area.reduced (area.getWidth()/4, neova_dash::ui::MARGIN));
 }
 
 void FirmUpgradePanel::timerCallback()
@@ -134,11 +135,12 @@ void FirmUpgradePanel::createLabels()
 {
     titleLabel.reset (new Label ("Title Label", ""));
     addAndMakeVisible (*titleLabel);
+    titleLabel->setFont (neova_dash::font::dashFontBold.withHeight (25.0f));
     titleLabel->setJustificationType (Justification::centred);
 
     bodyText.reset (new Label ("Body Text", ""));
     addAndMakeVisible (*bodyText);
-    bodyText->setJustificationType (Justification::centred);
+    bodyText->setJustificationType (Justification::centredLeft);
 }
 
 void FirmUpgradePanel::createButtons()
@@ -213,6 +215,7 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 		okButton->setVisible (false);
 		hubUpgradeButton->setVisible (false);
 		ringUpgradeButton->setVisible (false);
+    	bodyText->setJustificationType (Justification::centredLeft);
 
 		switch (upgradeStateToUpdateTo)
 		{
@@ -223,30 +226,42 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 					if (!hubAvailable && !ringAvailable) okButton->setVisible (true);
 
 					titleLabel->setText ("Firmware Update", dontSendNotification);
+    				bodyText->setJustificationType (Justification::centred);
 
-					bodyTextString = String ("HUB : ");
-					if (hubAvailable)
+					if (!hubConfig.getHubIsConnected())
 					{
-						bodyTextString += "Upgrade Available (v" + getFormattedVersionString (upgradeHandler.getHubReleaseVersion()) + ")";
+						bodyTextString = "No HUB currently connected to the computer.\n\nPlease connect a HUB and retry.";
 					}
+
+					else if (!hubAvailable && !ringAvailable)
+					{
+						bodyTextString = "Your HUB and Ring are up to date!";
+					}
+
 					else
 					{
-						bodyTextString += "Up to date";
-					}
-					
-					bodyTextString += String ("\n\nRing : ");
+						bodyTextString = String ("HUB : ");
 
-					if (ringAvailable)
-					{
-						bodyTextString += "Upgrade Available : (v" + getFormattedVersionString (upgradeHandler.getRingReleaseVersion()) + ")";
+						if (hubAvailable)
+						{
+							bodyTextString += "Upgrade Available (v" + getFormattedVersionString (upgradeHandler.getHubReleaseVersion()) + ")";
+						}
+						else
+						{
+							bodyTextString += "Up to date";
+						}
+						
+						bodyTextString += String ("\n\n\nRing : ");
+
+						if (ringAvailable)
+						{
+							bodyTextString += "Upgrade Available : (v" + getFormattedVersionString (upgradeHandler.getRingReleaseVersion()) + ")";
+						}
+						else
+						{
+							bodyTextString += "Up to date";
+						}
 					}
-					else
-					{
-						bodyTextString += "Up to date";
-					}
-					
-					// TODO add string
-					
 					bodyText->setText (bodyTextString,
 						               dontSendNotification);
 					break;
@@ -254,20 +269,20 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 				case waitingForUpgradeFirm:
 
 					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
-					bodyText->setText ("Step 1 : Waiting for Device Setup...", dontSendNotification);
+					bodyText->setText ("Step 1 : Waiting for Device Setup...\n\n ", dontSendNotification);
 					break;
 
 				case upgradeFirmConnected:
 
 					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
-					bodyText->setText ("Step 1 : OK\n\n", dontSendNotification);
+					bodyText->setText ("Step 1 : Waiting for Device Setup - OK\n\n ", dontSendNotification);
 
 					break;
 
 				case upgradeInProgress:
 
 					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
-					bodyText->setText ("Step 1 : OK\n\nStep 2 : Upgrading Firmware...", dontSendNotification);
+					bodyText->setText ("Step 1 : Waiting for Device Setup - OK\n\nStep 2 : Upgrading Firmware...", dontSendNotification);
 
 					break;
 
@@ -297,27 +312,27 @@ void FirmUpgradePanel::updateComponentsForError (UpgradeState upgradeStateToUpda
 	switch (upgradeStateToUpdateTo)
 	{
 		case err_ringIsNotConnected:
-			bodyText->setText ("Your ring is disconnected.\nPlease connect your ring and retry.",
+			bodyText->setText ("Your ring is disconnected.\n\nPlease connect your ring and retry.",
 				               dontSendNotification);
 			break;
 
 		case err_waitingForUpgradeFirmTimeOut:
-			bodyText->setText ("Device took too long to respond.\nPlease unplug the HUB and retry.",
+			bodyText->setText ("Device took too long to respond.\n\nPlease unplug the HUB and retry.",
 				               dontSendNotification);
 			break;
 
 		case err_upgradeLaunchFailed:
-			bodyText->setText ("Upgrade process failed to launch properly.\nPlease try again later.",
+			bodyText->setText ("Upgrade process failed to launch properly.\n\nPlease try again later.",
 				               dontSendNotification);
 			break;
 
 		case err_upgradefailed:
-			bodyText->setText ("Upgrade failed to install properly.\nPlease try again later.",
+			bodyText->setText ("Upgrade failed to install.\n\nPlease try again later.",
 				               dontSendNotification);
 			break;
 
 		default: // error unknown
-			bodyText->setText ("An unexpected error occured. Please try again later.",
+			bodyText->setText ("An unexpected error occured.\n\nPlease try again later.",
 				               dontSendNotification);
 
 			break;

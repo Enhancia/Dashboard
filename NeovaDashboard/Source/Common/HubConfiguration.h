@@ -159,6 +159,8 @@ public:
     uint16_t getRingFirmwareVersionUint16();
 
     //==============================================================================
+    void setHubIsConnected (bool isConnected);
+    bool getHubIsConnected();
     void setRingIsCharging (bool isCharging);
     bool getRingIsCharging();
     void setRingIsConnected (bool isConnected);
@@ -196,6 +198,7 @@ private:
     int selectedGesture = -1;
 
     //==============================================================================
+    bool hubIsConnected = false;
     bool ringIsCharging = false;
     bool ringIsConnected = false;
 
