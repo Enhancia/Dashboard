@@ -329,6 +329,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         hubConfig.selectFirstExistingGesture();
         header->setBatteryVisible (true);
         optionsPanel->setMidiBoxActive (true);
+        optionsPanel->update();
     }
 
     else
