@@ -330,6 +330,12 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         header->setBatteryVisible (true);
         optionsPanel->setMidiBoxActive (true);
         optionsPanel->update();
+
+        // TODO replace with update if step 3
+        if (firmUpgradePanel->isVisible())
+        {
+            firmUpgradePanel->updateAfterHubConnection();
+        }
     }
 
     else

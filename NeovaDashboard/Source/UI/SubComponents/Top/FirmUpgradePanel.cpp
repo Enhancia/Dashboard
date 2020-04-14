@@ -82,12 +82,36 @@ void FirmUpgradePanel::resized()
 void FirmUpgradePanel::timerCallback()
 {
 	DBG ("Upgrade timer : state " + String (int (currentState)) + " - Internal " + String (upgradeHandler.getUpgradeState()));
+	if (upgradeHandler.getUpgradeState() == int (checkingReleases) && currentState == preInstallationWarning) return;
 
-	if (upgradeHandler.getUpgradeState() != int (currentState))
+	// Standart case, the timer is checking backend state and updates interface accordingly
+	if (currentState != waitingForHubReconnect)
 	{
-		updateComponentsForSpecificState (upgradeHandler.getUpgradeState());
+		if (upgradeHandler.getUpgradeState() != int (currentState))
+		{
+			if (upgradeHandler.getUpgradeState() != UpgradeHandler::upgradeSuccessfull)
+			{
+				if (currentState < 0) stopTimer(); // Error: terminates the upgrade process
 
-		if (currentState == upgradeSuccessfull || currentState < 0) stopTimer();
+				updateComponentsForSpecificState (upgradeHandler.getUpgradeState());
+			}
+			else
+			{
+				jassert (currentState == upgradeInProgress);
+
+				stopTimer();
+				updateComponentsForSpecificState (waitingForHubReconnect);
+
+				startTimer (30000);
+			}
+		}
+	}
+	else // While waiting for the hub, the timer acts as a timeout in case hub doesnt reconnect
+	{
+		DBG ("HUB didn't reconnect");
+
+		stopTimer();
+		updateComponentsForSpecificState (err_unknow);
 	}
 }
 
@@ -101,24 +125,39 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 
 	else if (bttn == okButton.get())
 	{
-		closeAndResetPanel();
+		if (currentState == preInstallationWarning)
+		{
+			jassert (currentUpgrade != none);
+			if (upgradeHandler.getUpgradeState() != int (checkingReleases))
+				updateComponentsForSpecificState (upgradeHandler.getUpgradeState());
+
+			if      (currentUpgrade == hub)	 upgradeHandler.startHubUpgrade();
+			else if (currentUpgrade == ring) upgradeHandler.startRingUpgrade();
+
+			startTimer (1000);
+		}
+		else
+		{
+			closeAndResetPanel();
+		}
 	}
 
 	else if (bttn == hubUpgradeButton.get())
 	{
-		upgradeHandler.startHubUpgrade();
-		startTimer (1000);
+		currentUpgrade = hub;
+		updateComponentsForSpecificState (preInstallationWarning);
 	}
 
 	else if (bttn == ringUpgradeButton.get())
 	{
-		upgradeHandler.startRingUpgrade();
-		startTimer (1000);
+		currentUpgrade = ring;
+		updateComponentsForSpecificState (preInstallationWarning);
 	}
 }
 
 void FirmUpgradePanel::setAndOpenPanel()
 {
+	currentUpgrade = none;
 	updateComponentsForSpecificState (checkingReleases);
 	setVisible (true);
 }
@@ -128,8 +167,24 @@ void FirmUpgradePanel::closeAndResetPanel()
 	if (isTimerRunning ()) stopTimer();
 
 	setVisible (false);
+	currentUpgrade = none;
 	updateComponentsForSpecificState (checkingReleases);
 }
+
+void FirmUpgradePanel::updateAfterHubConnection()
+{
+	if (currentState == waitingForHubReconnect)
+	{
+		stopTimer();
+		updateComponentsForSpecificState (upgradeSuccessfull);
+	}
+	else
+	{
+		// Shouldn't be here, hub should not reconnect during install unless we are waiting for it
+		jassertfalse;
+	}
+}
+
 
 void FirmUpgradePanel::createLabels()
 {
@@ -189,11 +244,13 @@ void FirmUpgradePanel::updateComponentsForSpecificState (int upgradeStateToUpdat
 		case (int (err_unknow))                       : updateComponentsForError (err_unknow);                       break;
 
 		// States
-		case (int (checkingReleases))      : updateComponentsForSpecificState (checkingReleases);      break;
-		case (int (waitingForUpgradeFirm)) : updateComponentsForSpecificState (waitingForUpgradeFirm); break;
-		case (int (upgradeFirmConnected))  : updateComponentsForSpecificState (upgradeFirmConnected);  break;
-		case (int (upgradeInProgress))     : updateComponentsForSpecificState (upgradeInProgress);     break;
-		case (int (upgradeSuccessfull))    : updateComponentsForSpecificState (upgradeSuccessfull);    break;
+		case (int (checkingReleases))       : updateComponentsForSpecificState (checkingReleases);       break;
+		case (int (waitingForUpgradeFirm))  : updateComponentsForSpecificState (waitingForUpgradeFirm);  break;
+		case (int (upgradeFirmConnected))   : updateComponentsForSpecificState (upgradeFirmConnected);   break;
+		case (int (upgradeInProgress))      : updateComponentsForSpecificState (upgradeInProgress);      break;
+		case (int (upgradeSuccessfull))     : updateComponentsForSpecificState (upgradeSuccessfull);     break;
+		case (int (preInstallationWarning)) : updateComponentsForSpecificState (preInstallationWarning); break;
+		case (int (waitingForHubReconnect)) : updateComponentsForSpecificState (waitingForHubReconnect); break;
 	}
 }
 
@@ -221,6 +278,7 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 		{
 				case checkingReleases:
 					closeButton->setVisible (true);
+    				okButton->setButtonText ("Ok");
 					hubUpgradeButton->setVisible (hubAvailable);
 					ringUpgradeButton->setVisible (ringAvailable);
 					if (!hubAvailable && !ringAvailable) okButton->setVisible (true);
@@ -269,30 +327,50 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 				case waitingForUpgradeFirm:
 
 					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
-					bodyText->setText ("Step 1 : Waiting for Device Setup...\n\n ", dontSendNotification);
+					bodyText->setText ("Step 1 : Waiting for Device Setup...\n\n \n\n ", dontSendNotification);
 					break;
 
 				case upgradeFirmConnected:
 
 					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
-					bodyText->setText ("Step 1 : Waiting for Device Setup - OK\n\n ", dontSendNotification);
+					bodyText->setText ("Step 1 : Waiting for Device Setup - OK\n\n  \n\n ", dontSendNotification);
 
 					break;
 
 				case upgradeInProgress:
 
 					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
-					bodyText->setText ("Step 1 : Waiting for Device Setup - OK\n\nStep 2 : Upgrading Firmware...", dontSendNotification);
+					bodyText->setText ("Step 1 : Waiting for Device Setup - OK\n\nStep 2 : Upgrading Firmware... \n\n ", dontSendNotification);
+					break;
 
+				case waitingForHubReconnect:
+
+					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
+					bodyText->setText ("Step 1 : Waiting for Device Setup - OK\n\nStep 2 : Upgrading Firmware - OK\n\n"
+									   "Step 3 : Waiting for Device Reboot...", dontSendNotification);
 					break;
 
 				case upgradeSuccessfull:
 					closeButton->setVisible (true);
+    				okButton->setButtonText ("Ok");
 					okButton->setVisible (true);
+    				bodyText->setJustificationType (Justification::centred);
 
 					titleLabel->setText ("Upgrade Finished", dontSendNotification);
 					bodyText->setText ("Succesfully Upgraded Firmware!", dontSendNotification);
 					break;
+
+				case preInstallationWarning:
+					closeButton->setVisible (true);
+    				okButton->setButtonText ("Start");
+					okButton->setVisible (true);
+
+					titleLabel->setText ("Warning", dontSendNotification);
+					bodyText->setText ("Please make sure your hub is connected with your ring charging on top.\n\n"
+									   "Make sure you ring is connected and has some battery. Do not disconnect your HUB during the process.\n\n"
+									   "Please note that it may take a several minutes to complete.", dontSendNotification);
+					break;
+
 				default:
 					break;
 		}
@@ -331,10 +409,12 @@ void FirmUpgradePanel::updateComponentsForError (UpgradeState upgradeStateToUpda
 				               dontSendNotification);
 			break;
 
-		default: // error unknown
+		case err_unknow:
 			bodyText->setText ("An unexpected error occured.\n\nPlease try again later.",
 				               dontSendNotification);
+			break;
 
+		default:
 			break;
 	}	
 }

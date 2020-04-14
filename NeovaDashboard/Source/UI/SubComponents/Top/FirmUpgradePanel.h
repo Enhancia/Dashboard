@@ -41,10 +41,16 @@ public:
         waitingForUpgradeFirm = 1,
         upgradeFirmConnected = 2,
         upgradeInProgress = 3,
-        upgradeSuccessfull = 4
+        upgradeSuccessfull = 4,
+
+        //Warning Panel before download
+        preInstallationWarning,
+
+        //Wainting for hub to reconnect after install success
+        waitingForHubReconnect
     };
 
-	enum firmUpgradeType
+	enum FirmUpgradeType
 	{
 		hub =0,
 		ring,
@@ -68,6 +74,7 @@ public:
     //==============================================================================
     void setAndOpenPanel();
     void closeAndResetPanel();
+    void updateAfterHubConnection();
 
 private:
     //==============================================================================
@@ -91,6 +98,7 @@ private:
     UpgradeHandler& upgradeHandler;
     HubConfiguration& hubConfig;
     UpgradeState currentState = checkingReleases; // Follows upgradeHandler upgradeState enum
+    FirmUpgradeType currentUpgrade = none; // Follows upgradeHandler upgradeState enum
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FirmUpgradePanel)
 };
