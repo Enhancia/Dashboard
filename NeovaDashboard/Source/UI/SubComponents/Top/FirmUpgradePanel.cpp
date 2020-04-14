@@ -385,7 +385,9 @@ void FirmUpgradePanel::updateComponentsForError (UpgradeState upgradeStateToUpda
 	okButton->setVisible (true);
 	ringUpgradeButton->setVisible (false);
 	hubUpgradeButton->setVisible (false);
+    bodyText->setJustificationType (Justification::centred);
 	titleLabel->setText ("Error", dontSendNotification);
+    okButton->setButtonText ("Close");
 
 	switch (upgradeStateToUpdateTo)
 	{
