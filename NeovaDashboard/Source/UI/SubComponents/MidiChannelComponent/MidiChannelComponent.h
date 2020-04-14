@@ -63,6 +63,7 @@ private:
     //==========================================================================
     void selectChannelFifo (const int channelToSelect);
     void selectChannelLifo (const int channelToSelect);
+    void selectChannelCapped (const int channelToSelect);
     void unselectChannel (const int channelNumber);
     
     //==========================================================================

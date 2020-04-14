@@ -321,6 +321,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         hubComponent->update();
         hubConfig.selectFirstExistingGesture();
         header->setBatteryVisible (true);
+        midiChannelComponent->setVisible (true);
         //optionsPanel->setMidiBoxActive (true);
     }
 
@@ -329,6 +330,8 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         gesturePanel->setVisible (false);
         newGesturePanel->hidePanel();
         uploadButton->setVisible (false);
+        midiChannelComponent->setVisible (false);
+
 
         if (state == int (waitingForConnection))
         {
@@ -456,5 +459,6 @@ void DashBoardInterface::update()
         presetSelector->update();
         header->update();
         optionsPanel->update();
+        midiChannelComponent->update();
     }
 }

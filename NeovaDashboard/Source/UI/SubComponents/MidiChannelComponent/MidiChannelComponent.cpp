@@ -56,7 +56,7 @@ void MidiChannelComponent::buttonClicked (Button* bttn)
 		}
 		else
 		{
-			selectChannelFifo (channelButton->channel);
+			selectChannelLifo (channelButton->channel);
 		}
 	}
 }
@@ -69,7 +69,7 @@ void MidiChannelComponent::update()
 	{
 		if ((midiChannels & (1 << channel)) != 0)
 		{
-			selectChannelFifo (channel);
+			selectChannelLifo (channel);
 		}
 		else
 		{
@@ -90,7 +90,7 @@ void MidiChannelComponent::initializeButtons()
 
 		if ((midiChannels & (1 << channel)) != 0)
 		{
-			selectChannelFifo (channel);
+			selectChannelLifo (channel);
 		}
 	}
 }
@@ -119,6 +119,17 @@ void MidiChannelComponent::selectChannelLifo (const int channelToSelect)
 	{
 		unselectChannel (selectedButtons.getLast()->channel);
 	}
+
+	selectedButtons.add (buttons[channelToSelect]);
+	buttons[channelToSelect]->setToggleState (true, dontSendNotification);
+	hubConfig.setMidiChannel (channelToSelect, true);
+}
+
+void MidiChannelComponent::selectChannelCapped (const int channelToSelect)
+{
+	if (buttons[channelToSelect]->getToggleState() || channelToSelect < 0
+												   || channelToSelect > 15
+												   || selectedButtons.size() == MAX_CHANNELS) return;
 
 	selectedButtons.add (buttons[channelToSelect]);
 	buttons[channelToSelect]->setToggleState (true, dontSendNotification);
