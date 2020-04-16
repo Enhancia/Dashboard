@@ -61,9 +61,16 @@ void HubConfiguration::resetConfigWasChanged()
 	}
 }
 
-void HubConfiguration::setMidiChannel (const uint8 newMidiChannel, bool uploadToHub)
+void HubConfiguration::setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool uploadToHub)
 {
-	config.midiChannel = (uint8_t) newMidiChannel;
+	if (shouldChannelBeOn)
+	{
+		getPresetData().midiChannels |= (1 << channelNumber);
+	}
+	else
+	{
+		getPresetData().midiChannels &= ~(1 << channelNumber);
+	}
 
 	if (uploadToHub)
 	{
@@ -73,9 +80,21 @@ void HubConfiguration::setMidiChannel (const uint8 newMidiChannel, bool uploadTo
 	notifyConfigWasChanged();
 }
 
-int HubConfiguration::getMidiChannel()
+void HubConfiguration::toggleMidiChannel (const int channelNumber, bool uploadToHub)
 {
-	return config.midiChannel;
+	getPresetData().midiChannels ^= (1 << channelNumber);
+
+	if (uploadToHub)
+	{
+		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+	}
+
+	notifyConfigWasChanged();
+}
+
+int HubConfiguration::getMidiChannels()
+{
+	return getPresetData().midiChannels;
 }
 
 void HubConfiguration::setUint8Value (const int gestureNumber, const uint8DataId dataId,

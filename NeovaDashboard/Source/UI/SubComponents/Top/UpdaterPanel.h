@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    OptionsPanel.h
-    Created: 18 Sep 2019 1:59:02pm
-    Author:  Enhancia Dev
+    UpdaterPanel.h
+    Created: 12 Mar 2020 4:36:00pm
+    Author:  aleva
 
   ==============================================================================
 */
@@ -12,55 +12,58 @@
 
 #include "../../../../JuceLibraryCode/JuceHeader.h"
 #include "../../../Common/DashCommon.h"
-#include "../../../Common/HubConfiguration.h"
 #include "../DashShapeButton.h"
+#include "../../../DashUpdater/DashUpdater.h"
 
-#if JUCE_WINDOWS
-#include <windows.h>
-#include <ShellAPI.h>
-#elif JUCE_MAC
-#include <stdlib.h>
-#endif
-
-class OptionsPanel    : public Component,
+class UpdaterPanel    : public Component,
+						public Timer,
                         private Button::Listener
 {
 public:
     //==============================================================================
-    explicit OptionsPanel (HubConfiguration& config, ApplicationCommandManager& manager);
-    ~OptionsPanel();
+	enum downloadProgress
+	{
+		downloadAvailable = 0,
+		inProgress,
+		downloadFinished
+	};
+
+    //==============================================================================
+    UpdaterPanel (DashUpdater& updtr, float& updateProgress);
+    ~UpdaterPanel();
 
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
-    
+
+    //==============================================================================
+    void timerCallback() override;
+
     //==============================================================================
     void buttonClicked (Button* bttn) override;
-    void mouseUp (const MouseEvent& event) override;
-    void visibilityChanged() override;
 
     //==============================================================================
-    void update();
-
+    void closeAndResetPanel();
+    
 private:
     //==============================================================================
+    void createLabels();
     void createButtons();
-    void paintProductInformations (Graphics& g, juce::Rectangle<int> area);
-    void paintFirmUpdateArea (Graphics& g, juce::Rectangle<int> area);
-    void paintLegalAndRegulatoryArea (Graphics& g, juce::Rectangle<int> area);
+	void updateComponentsForSpecificStep (downloadProgress downloadStep);
 
     //==============================================================================
-    juce::Rectangle<int> optionsArea;
+    juce::Rectangle<int> panelArea;
+    std::unique_ptr<Label> bodyText;
+    std::unique_ptr<Label> titleLabel;
     std::unique_ptr<DashShapeButton> closeButton;
-    std::unique_ptr<ComboBox> midiChannelBox;
-    
+    std::unique_ptr<TextButton> bottomButton;
+
     //==============================================================================
-    HubConfiguration& hubConfig;
-    ApplicationCommandManager& commandManager;
-    std::unique_ptr<TextButton> upgradeButton;
-    std::unique_ptr<TextButton> sendReportButton;
-    std::unique_ptr<TextButton> contactButton;
-    
+    downloadProgress currentProgress = downloadAvailable;
+
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OptionsPanel)
+    DashUpdater& updater;
+    float& progress;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UpdaterPanel)
 };

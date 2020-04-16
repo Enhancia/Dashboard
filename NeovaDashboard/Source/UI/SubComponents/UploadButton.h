@@ -64,6 +64,8 @@ public:
         \brief Getter for the active attribute.
     */
     bool isActive();
+    
+    void update();
 
 private:
     //==============================================================================
