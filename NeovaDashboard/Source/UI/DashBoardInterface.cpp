@@ -9,8 +9,8 @@
 #include "DashBoardInterface.h"
 
 //==============================================================================
-DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& reader)
-    : hubConfig (data), dataReader (reader)
+DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& reader, DashUpdater& updtr)
+    : hubConfig (data), dataReader (reader), updater (updtr)
 {
     TRACE_IN;
 
@@ -19,6 +19,9 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     // Creates Components
     optionsPanel = std::make_unique<OptionsPanel> (hubConfig, getCommandManager());
     addAndMakeVisible (*optionsPanel);
+
+    updaterPanel = std::make_unique<UpdaterPanel> (updater, updater.getDownloadProgressReference());
+    addAndMakeVisible (*updaterPanel);
 
     header = std::make_unique<HeaderComponent> (*optionsPanel, hubConfig, dataReader);
     addAndMakeVisible (*header);
@@ -49,6 +52,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     newGesturePanel->setAlwaysOnTop (true);
     optionsPanel->setVisible (false);
     optionsPanel->setAlwaysOnTop (true);
+    updaterPanel->setAlwaysOnTop (true);
+    updaterPanel->setVisible (updater.hasNewAvailableVersion());
 
     // Sets settings
     juce::Rectangle<int> screenArea  = Desktop::getInstance().getDisplays()
@@ -146,6 +151,7 @@ void DashBoardInterface::resized()
 
     auto area = getLocalBounds();
     optionsPanel->setBounds (area);
+    updaterPanel->setBounds (area);
 
 	auto gPanelArea = area.removeFromBottom (area.getHeight() / 2 - 35);
 
@@ -371,7 +377,8 @@ void DashBoardInterface::hubChangedPreset()
     }
     else 
     {
-        /* Unexpected callback here...
+        /* 
+           Unexpected callback here...
            This alert method should theoretically only happen when in
            "preset" state..
         */
@@ -460,5 +467,6 @@ void DashBoardInterface::update()
         header->update();
         optionsPanel->update();
         midiChannelComponent->update();
+        uploadButton->update();
     }
 }

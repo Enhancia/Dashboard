@@ -343,7 +343,7 @@ const String HubConfiguration::getFirmwareVersionString()
 
 	if (ringIsConnected)
 	{
-		ringFirm = String ((config.ring_firmware_version & 0xFF00) >> 2)
+		ringFirm = String ((config.ring_firmware_version & 0xFF00) >> 8)
 	       				+ "." + String (config.ring_firmware_version & 0x00FF);
 	}
 	else
@@ -351,7 +351,7 @@ const String HubConfiguration::getFirmwareVersionString()
 		ringFirm = "-";
 	}
 
-	String hubFirm = String ((config.hub_firmware_version & 0xFF00) >> 2)
+	String hubFirm = String ((config.hub_firmware_version & 0xFF00) >> 8)
 	       						+ "." + String (config.hub_firmware_version & 0x00FF);
 
 

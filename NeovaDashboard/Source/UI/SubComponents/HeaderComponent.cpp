@@ -148,7 +148,8 @@ void HeaderComponent::BatteryComponent::timerCallback()
 
 void HeaderComponent::BatteryComponent::repaintIfNeeded()
 {
-    const float battery = jmax (jmin (neova_dash::data::convertRawBatteryToPercentage (batteryValueRef),
+    const float battery = jmax (jmin (neova_dash::data::convertRawBatteryToPercentage (batteryValueRef,
+																					   hubConfig.getRingIsCharging()),
                                       1.0f),
                                 0.0f);
 
@@ -214,9 +215,9 @@ void HeaderComponent::BatteryComponent::drawBatteryPath (Graphics& g, juce::Rect
     batteryTop.addRectangle (area.getX() + area.getWidth()*3/8, area.getY(),
                                     area.getWidth()/4, 2.0f);
 
-    auto fillArea = area.withTop (area.getY() + 1
-                                              + (area.getHeight() - area.getY() - 1)*(1.0 - lastBattery))
-                        .reduced (3);
+    auto fillArea = area.withHeight (int ((area.toFloat().getHeight() - 7.0f)*(lastBattery)))
+                        .withBottomY (area.getBottom()-3)
+                        .reduced (3, 0);
     bool roundedTop = (lastBattery * area.getHeight() < 2.0f);
 
     g.setColour (neova_dash::colour::mainText);
@@ -235,8 +236,13 @@ void HeaderComponent::BatteryComponent::drawBatteryPath (Graphics& g, juce::Rect
         batteryFill.setUsingNonZeroWinding (false);
 
         g.setColour ((lastBattery <= 0.1f) ? Colours::red
-                                           : (lastBattery == 1.0f) ? Colour (0xff8090f0)
-                                                                   : neova_dash::colour::mainText);
+                                           : (lastBattery <= 0.2f)
+                                                ? Colours::orange
+                                                : (lastBattery <= 0.3f)
+                                                    ? Colours::yellow
+                                                    : (lastBattery == 1.0f)
+                                                        ? Colour (0xff8090f0)
+                                                        : neova_dash::colour::mainText);
         g.fillPath (batteryFill);
     }
 }

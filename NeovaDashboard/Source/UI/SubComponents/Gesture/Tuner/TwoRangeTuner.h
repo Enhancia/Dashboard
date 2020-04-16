@@ -45,7 +45,6 @@ public:
     
     void updateComponents() override;
     void updateComponents (DraggableObject thumbThatShouldUpdate);
-
     void updateDisplay() override;
 
     void setColour (const Colour newColour) override;

@@ -14,7 +14,7 @@ VibratoTuner::VibratoTuner (HubConfiguration& config, const float& val,
 	                                                  NormalisableRange<float> gestRange, const int gestureId,
 					                                  const float& vibratoIntensity, float maxIntens,
     				                                  const Range<float> gainMax, const Range<float> threshMax)
-    : Tuner ("",  neova_dash::gesture::getHighlightColour (gestureId, config.isGestureActive (gestureId))),
+    : Tuner ("%",  neova_dash::gesture::getHighlightColour (gestureId, config.isGestureActive (gestureId))),
       hubConfig (config),
       value (val), gestureRange (gestRange), id (gestureId),
       intensity (vibratoIntensity), maxIntensity (maxIntens),
@@ -100,7 +100,7 @@ void VibratoTuner::updateComponents()
         // Sets label text
         if (!(thresholdLabel->isBeingEdited()))
 		{
-		    thresholdLabel->setText (String (int (getThreshold())) + valueUnit, dontSendNotification);
+		    thresholdLabel->setText (String (int (getThreshold())), dontSendNotification);
 		}
     }
 }
@@ -131,7 +131,7 @@ void VibratoTuner::labelTextChanged (Label* lbl)
 		// checks that the string is numbers only
 	    if (lbl->getText().containsOnly ("-0123456789"+valueUnit) == false)
 	    {
-	        lbl->setText (String (int (getGain())), dontSendNotification);
+	        lbl->setText (String (int (getGain())) + valueUnit, dontSendNotification);
 	        return;
 	    }
 
@@ -149,7 +149,7 @@ void VibratoTuner::labelTextChanged (Label* lbl)
 	else if (lbl == thresholdLabel)
 	{ 
 		// checks that the string is numbers only
-	    if (lbl->getText().containsOnly ("-0123456789"+valueUnit) == false)
+	    if (lbl->getText().containsOnly ("-0123456789") == false)
 	    {
 	        lbl->setText (String (int (getThreshold())), dontSendNotification);
 	        return;
@@ -162,7 +162,7 @@ void VibratoTuner::labelTextChanged (Label* lbl)
 	    else if (val > parameterMaxThreshold.getEnd()) val = parameterMaxThreshold.getEnd();
 	    
 	    setThreshold (val);
-	    lbl->setText (String (val) + valueUnit, dontSendNotification);
+	    lbl->setText (String (val), dontSendNotification);
 		thresholdSlider->setValue (val, dontSendNotification);
 		//setThresholdSliderColour();
 	}
@@ -185,7 +185,7 @@ void VibratoTuner::sliderValueChanged (Slider* sldr)
 	if (sldr == gainSlider)
 	{
 		updateLabelBounds (gainLabel);
-		gainLabel->setText (String (int (gainSlider->getValue())), dontSendNotification);
+		gainLabel->setText (String (int (gainSlider->getValue())) + valueUnit, dontSendNotification);
 	}
 	else if (sldr == thresholdSlider)
 	{    
@@ -276,7 +276,7 @@ void VibratoTuner::createSliders()
     gainSlider->setColour (Slider::rotarySliderFillColourId, tunerColour);
     gainSlider->setColour (Slider::rotarySliderOutlineColourId, neova_dash::colour::tunerSliderBackground);
     gainSlider->setScrollWheelEnabled (false);
-    gainSlider->setRange (double (parameterMaxGain.getStart()), double (parameterMaxGain.getEnd()), 1.0);
+    gainSlider->setRange (double (parameterMaxGain.getStart()), double (parameterMaxGain.getEnd()), 0.01);
     gainSlider->setValue (double (getGain()));
     gainSlider->addListener (this);
     gainSlider->addMouseListener (this, false);
@@ -299,7 +299,7 @@ void VibratoTuner::createLabels()
     addAndMakeVisible (gainLabel = new Label ("Gain Label",
     	 									  TRANS (String(int(getGain())) + valueUnit)));
     addAndMakeVisible (thresholdLabel = new Label ("Threshold Label",
-    									           TRANS (String(int(getThreshold())) + valueUnit)));
+    									           TRANS (String(int(getThreshold())))));
 
     auto setLabelSettings = [this] (Label& label)
     {

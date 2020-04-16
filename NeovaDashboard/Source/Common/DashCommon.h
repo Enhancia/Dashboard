@@ -48,7 +48,7 @@ namespace neova_dash
         const int HEADER_HEIGHT    = 55;
 
         // Gesture tuner display ranges
-        const float VIBRATO_DISPLAY_MAX  = 500.0f;
+        const float VIBRATO_DISPLAY_MAX  = 100.0f;
         const float VIBRATO_THRESH_DISPLAY_MAX = 100.0f;
     
         const float PITCHBEND_DISPLAY_MIN = -90.0f;
@@ -112,12 +112,27 @@ namespace neova_dash
             numDatas
         };
 
-        static float convertRawBatteryToPercentage (float rawBatteryValue)
+        static float convertRawBatteryToPercentage (float rawBatteryValue, bool isCharging)
         {
-            if (rawBatteryValue <= 3.0f)      return 0.0f;
-            else if (rawBatteryValue >= 4.2f) return 1.0f;
+            if (rawBatteryValue < 3.46f && !isCharging) return 0.0f;
+            else if (rawBatteryValue > 4.12 && isCharging) return 1.0f;
 
-            else return (rawBatteryValue - 3.0f)/(4.2f - 3.0f);
+            Array<float> batteryTiers ( {3.52f, 3.58f, 3.61f, 3.64f, 3.69f,
+                                          3.76f, 3.84f, 3.92f, 4.01f, 4.12f});
+
+            float battery = isCharging ? 0.0f : 0.1f;
+
+            for (float batteryTier : batteryTiers)
+            {
+                if (rawBatteryValue > batteryTier)
+                {
+                    battery += 0.1f;
+                }
+
+                else return battery;
+            }
+
+            return 1.0f;
         }
     }
 

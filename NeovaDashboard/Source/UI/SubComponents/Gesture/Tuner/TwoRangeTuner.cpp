@@ -356,7 +356,7 @@ void TwoRangeTuner::sliderValueChanged (Slider* sldr)
 
 void TwoRangeTuner::buttonClicked (Button* bttn)
 {
-    if (bttn == minLeftAngleButton)
+    if (bttn == maxLeftAngleButton)
     {
         if (/*gestureRange.convertFrom0to1 (value)*/ value > getRangeRightLow())
         {
@@ -368,7 +368,7 @@ void TwoRangeTuner::buttonClicked (Button* bttn)
         }
         setRangeLeftLow (float (leftLowSlider->getValue()));
     }
-    else if (bttn == maxLeftAngleButton)
+    else if (bttn == minLeftAngleButton)
     {
         leftHighSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
         setRangeLeftHigh (float (leftHighSlider->getValue()));
@@ -945,11 +945,16 @@ float TwoRangeTuner::getValueAngle()
 
     if (gestureRange.getRange().getLength() > 0)
     {
-        if (convertedValue < parameterMax.getStart())    convertedValue = parameterMax.getStart();
-        else if (convertedValue > parameterMax.getEnd()) convertedValue = parameterMax.getEnd();
-
-        cursorAngle = startAngle + (convertedValue - parameterMax.getStart()) * (endAngle - startAngle)
+        // Cursor stays at same angle if value out of range.
+        if (convertedValue < parameterMax.getStart() || convertedValue > parameterMax.getEnd())
+        {
+            cursorAngle = previousCursorAngle;
+        }
+        else
+        {
+            cursorAngle = startAngle + (convertedValue - parameterMax.getStart()) * (endAngle - startAngle)
                                         / parameterMax.getLength();
+        }
     }
     else
     {
