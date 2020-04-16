@@ -40,6 +40,9 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
                                                    getCommandManager(), presetModeState, state);
     addAndMakeVisible (*hubComponent);
 
+    midiChannelComponent = std::make_unique<MidiChannelComponent> (hubConfig);
+    addAndMakeVisible (*midiChannelComponent);
+
     presetSelector = std::make_unique<PresetSelectorComponent> (hubConfig, getCommandManager());
     addAndMakeVisible (*presetSelector);
     presetSelector->addMouseListener (this, true);
@@ -150,13 +153,16 @@ void DashBoardInterface::resized()
     optionsPanel->setBounds (area);
     updaterPanel->setBounds (area);
 
-	auto gPanelArea = area.removeFromBottom (area.getHeight() / 2 - 5);
+	auto gPanelArea = area.removeFromBottom (area.getHeight() / 2 - 35);
 
     gesturePanel->setBounds (gPanelArea.reduced (0, MARGIN));
     newGesturePanel->setBounds (gPanelArea);
 
     header->setBounds (area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL, MARGIN));
 
+    midiChannelComponent->setBounds (area.removeFromBottom (15)
+                                         .withTrimmedTop (20)
+                                         .withSizeKeepingCentre (area.getWidth()/2, 25));
     presetSelector->setBounds (area.removeFromBottom (10).withSizeKeepingCentre (area.getWidth()/6, 30));
 
     hubComponent->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight())
@@ -316,11 +322,13 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         newGesturePanel->hidePanel();
         uploadButton->setVisible (true);
         presetSelector->setVisible (true);
+        midiChannelComponent->setVisible (true);
         hubComponent->setInterceptsMouseClicks (true, true);
         hubComponent->update();
         hubConfig.selectFirstExistingGesture();
         header->setBatteryVisible (true);
-        optionsPanel->setMidiBoxActive (true);
+        midiChannelComponent->setVisible (true);
+        //optionsPanel->setMidiBoxActive (true);
     }
 
     else
@@ -328,6 +336,8 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         gesturePanel->setVisible (false);
         newGesturePanel->hidePanel();
         uploadButton->setVisible (false);
+        midiChannelComponent->setVisible (false);
+
 
         if (state == int (waitingForConnection))
         {
@@ -337,9 +347,10 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         }
         
         presetSelector->setVisible (false);
+        //midiChannelComponent->setVisible (false);
         hubComponent->setInterceptsMouseClicks (false, false);
         hubComponent->update();
-        optionsPanel->setMidiBoxActive (false);
+        //optionsPanel->setMidiBoxActive (false);
     }
 
     resized();
@@ -455,6 +466,7 @@ void DashBoardInterface::update()
         presetSelector->update();
         header->update();
         optionsPanel->update();
+        midiChannelComponent->update();
         uploadButton->update();
     }
 }

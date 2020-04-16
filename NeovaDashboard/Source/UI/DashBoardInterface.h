@@ -19,6 +19,7 @@
 #include "SubComponents/Top/UpdaterPanel.h"
 #include "SubComponents/HeaderComponent.h"
 #include "SubComponents/HubComponent/HubComponent.h"
+#include "SubComponents/MidiChannelComponent/MidiChannelComponent.h"
 #include "SubComponents/UploadButton.h"
 #include "SubComponents/HubComponent/PresetSelectorComponent.h"
 #include "SubComponents/Top/DashAlertPanel.h"
@@ -225,6 +226,7 @@ private:
     std::unique_ptr<PresetSelectorComponent> presetSelector; /**< \brief Interface's preset selector component. */
     std::unique_ptr<OptionsPanel> optionsPanel; /**< \brief Interface's option menu. */
     std::unique_ptr<UpdaterPanel> updaterPanel; /**< \brief Interface's update menu. */
+    std::unique_ptr<MidiChannelComponent> midiChannelComponent; /**< \brief Interface's MIDI channel selector */
     std::unique_ptr<DashAlertPanel> alertPanel; /**< \brief Interface's modal alert panel. */
 
     DashBoardLookAndFeel dashBoardLookAndFeel; /**< \brief Interface's look and feel. */

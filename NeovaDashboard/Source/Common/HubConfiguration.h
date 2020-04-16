@@ -21,7 +21,7 @@ class HubConfiguration
 {
 public:
     //==============================================================================
-	static constexpr int CONFIGSIZE = 520;
+	static constexpr int CONFIGSIZE = 536;
 	
 	struct GestureData // values for each gesture
     {
@@ -48,6 +48,10 @@ public:
 
     struct PresetData
     {
+        uint16_t align_to_word;
+
+        uint16_t midiChannels = 1;
+
     	GestureData gestureData0;
     	GestureData gestureData1;
     	GestureData gestureData2;
@@ -128,7 +132,7 @@ public:
     
     //==============================================================================
     void setPreset (const int gestureNumberToSelect);
-	void setPreset(const int gestureNumberToSelect, bool uploadToHub);
+	void setPreset (const int gestureNumberToSelect, bool uploadToHub);
     const int getSelectedPreset();
 
     PresetData& getPresetData (const int presetNumber);
@@ -147,8 +151,9 @@ public:
     const int getSelectedGesture();
 
     //==============================================================================
-    void setMidiChannel (const uint8 newMidiChannel, bool uploadToHub = true);
-    int getMidiChannel();
+    void setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool uploadToHub = true);
+    void toggleMidiChannel (const int channelNumber, bool uploadToHub = true);
+    int getMidiChannels();
 
     //==============================================================================
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber, const int presetNumber);

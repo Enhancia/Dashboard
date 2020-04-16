@@ -102,6 +102,12 @@
             <FILE id="XWegKq" name="PresetSelectorComponent.h" compile="0" resource="0"
                   file="Source/UI/SubComponents/HubComponent/PresetSelectorComponent.h"/>
           </GROUP>
+          <GROUP id="{C3C9C5C6-A208-BD22-0C60-7A9873D9B26E}" name="MidiChannelComponent">
+            <FILE id="PXpWyp" name="MidiChannelComponent.cpp" compile="1" resource="0"
+                  file="Source/UI/SubComponents/MidiChannelComponent/MidiChannelComponent.cpp"/>
+            <FILE id="B2ziqL" name="MidiChannelComponent.h" compile="0" resource="0"
+                  file="Source/UI/SubComponents/MidiChannelComponent/MidiChannelComponent.h"/>
+          </GROUP>
           <GROUP id="{51129B3F-9778-3EB2-0AEC-193428E77A11}" name="Top">
             <FILE id="BzMjm3" name="DashAlertPanel.cpp" compile="1" resource="0"
                   file="Source/UI/SubComponents/Top/DashAlertPanel.cpp"/>
