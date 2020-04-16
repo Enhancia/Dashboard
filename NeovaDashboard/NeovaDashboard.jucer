@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="SIAvrc" name="NeovaDashboard" projectType="guiapp" jucerVersion="5.4.7"
-              binaryDataNamespace="DashData" version="0.3.4">
+              binaryDataNamespace="DashData" version="0.3.6">
   <MAINGROUP id="KvQWjZ" name="NeovaDashboard">
     <GROUP id="{20075F30-04A5-410B-6952-3C63688FBF54}" name="Resources">
       <GROUP id="{E0259D2D-3961-75D2-D343-36D8C845436E}" name="Image">
@@ -33,6 +33,10 @@
       </GROUP>
     </GROUP>
     <GROUP id="{D6F09228-5F31-FBA3-77A9-E4EDF3219389}" name="Source">
+      <GROUP id="{8C5D7843-1C2F-2498-BE6F-CEA708B574B8}" name="DashUpdater">
+        <FILE id="Wp0z1w" name="DashUpdater.cpp" compile="1" resource="0" file="Source/DashUpdater/DashUpdater.cpp"/>
+        <FILE id="rzjyXq" name="DashUpdater.h" compile="0" resource="0" file="Source/DashUpdater/DashUpdater.h"/>
+      </GROUP>
       <GROUP id="{070581BE-75F7-2121-AB9B-7858417FB991}" name="UpgradeHandler">
         <FILE id="zzFpYT" name="upgradeHandler_MacOS.cpp" compile="1" resource="0"
               file="Source/UpgradeHandler/upgradeHandler_MacOS.cpp"/>
@@ -108,6 +112,12 @@
             <FILE id="XWegKq" name="PresetSelectorComponent.h" compile="0" resource="0"
                   file="Source/UI/SubComponents/HubComponent/PresetSelectorComponent.h"/>
           </GROUP>
+          <GROUP id="{C3C9C5C6-A208-BD22-0C60-7A9873D9B26E}" name="MidiChannelComponent">
+            <FILE id="SlPkck" name="MidiChannelComponent.cpp" compile="1" resource="0"
+                  file="Source/UI/SubComponents/MidiChannelComponent/MidiChannelComponent.cpp"/>
+            <FILE id="I5qM8S" name="MidiChannelComponent.h" compile="0" resource="0"
+                  file="Source/UI/SubComponents/MidiChannelComponent/MidiChannelComponent.h"/>
+          </GROUP>
           <GROUP id="{51129B3F-9778-3EB2-0AEC-193428E77A11}" name="Top">
             <FILE id="BzMjm3" name="DashAlertPanel.cpp" compile="1" resource="0"
                   file="Source/UI/SubComponents/Top/DashAlertPanel.cpp"/>
@@ -124,6 +134,9 @@
             <FILE id="AXpBRF" name="OptionsPanel.cpp" compile="1" resource="0"
                   file="Source/UI/SubComponents/Top/OptionsPanel.cpp"/>
             <FILE id="PkWn9H" name="OptionsPanel.h" compile="0" resource="0" file="Source/UI/SubComponents/Top/OptionsPanel.h"/>
+            <FILE id="IK0PrZ" name="UpdaterPanel.cpp" compile="1" resource="0"
+                  file="Source/UI/SubComponents/Top/UpdaterPanel.cpp"/>
+            <FILE id="xgyoyL" name="UpdaterPanel.h" compile="0" resource="0" file="Source/UI/SubComponents/Top/UpdaterPanel.h"/>
           </GROUP>
           <FILE id="rI5ar0" name="DashShapeButton.cpp" compile="1" resource="0"
                 file="Source/UI/SubComponents/DashShapeButton.cpp"/>

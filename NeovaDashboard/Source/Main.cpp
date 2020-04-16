@@ -380,7 +380,6 @@ private:
 	std::unique_ptr<DataReader> dataReader;
 	std::unique_ptr<DashPipe> dashPipe;
 
-	uint8_t hubPowerState = POWER_OFF;
 	std::unique_ptr<DashUpdater> updater;
 
     ScopedPointer<FileLogger> dashboardLogger;
