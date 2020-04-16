@@ -16,9 +16,9 @@
 #include "DashUpdater/DashUpdater.h"
 
 #if JUCE_WINDOWS
-    #include <windows.h>
-    #include <stdio.h>
-    #include <tchar.h>
+    #include "UpgradeHandler/upgradeHandler_Win.h"
+#elif JUCE_MAC
+    #include "UpgradeHandler/upgradeHandler_MacOS.h"
 #endif //JUCE_WINDOWS
 
 //==============================================================================
@@ -63,15 +63,18 @@ public:
 		dashPipe = std::make_unique<DashPipe>();
 		dashPipe->addChangeListener(this);
 
+		upgradeHandler = std::make_unique<UpgradeHandler>(*dashPipe, hubConfig, commandManager);
 		updater = std::make_unique<DashUpdater>();
 
+		/* Test if hub is already connected */
 		/* For testing */
 		memcpy(data, "jeannine", sizeof("jeannine"));
 		ctrl = 0x01;
 		memcpy(data + 8, &ctrl, sizeof(uint32_t));
 		dashPipe->sendString(data, 12);
     
-    	dashInterface.reset (new DashBoardInterface (hubConfig, *dataReader, *updater));
+    	dashInterface.reset (new DashBoardInterface (hubConfig, *dataReader, *updater, *upgradeHandler));
+
     	mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get()));
     	dashInterface->grabKeyboardFocus();
     
@@ -97,6 +100,7 @@ public:
         dashPipe->connectionLost();
 		dataReader = nullptr;
 		dashPipe = nullptr;
+		upgradeHandler = nullptr;
 		updater = nullptr;
     }
 
@@ -111,7 +115,7 @@ public:
     }
 
 	//==============================================================================
-	void changeListenerCallback(ChangeBroadcaster* source)
+	void changeListenerCallback(ChangeBroadcaster* source) override
 	{
 		if (source == dashPipe.get())
 		{
@@ -132,6 +136,7 @@ public:
 					hubPowerState = POWER_ON;
 					DBG("POWER STATE : " + String(hubPowerState) + " \n");
 					//TODO => mettre interface en mode POWER_ON
+					hubConfig.setHubIsConnected (true);
                     dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
 				}
 				if (!dashInterface->hasKeyboardFocus (true))
@@ -183,10 +188,12 @@ public:
 
 					if (hubPowerState == POWER_ON)
 					{
+						hubConfig.setHubIsConnected (true);
 						dashInterface->setInterfaceStateAndUpdate(DashBoardInterface::connected);
 					}
 					else if (hubPowerState == POWER_OFF)
 					{
+						hubConfig.setHubIsConnected (false);
 						dashInterface->setInterfaceStateAndUpdate(DashBoardInterface::waitingForConnection);
 					}
 					else
@@ -200,6 +207,7 @@ public:
 				}
 				break;
 			case 0x07 : 
+			{
 				DBG("preset_state_received\n");
 				uint8_t state_received = *(uint8_t*)(data + 12);
 				if (state_received == 2)
@@ -216,44 +224,36 @@ public:
 				}
 				break;
 			}
+			case 0xFF:
+				DBG("upgrade firm appeared\n");
+				uint8_t type_of_firm = *(uint8_t*)(data + 12);
+				
+                if (type_of_firm == UpgradeHandler::upgradeFirmHub && upgradeHandler->get_upgradeCommandReceived())
+				{
+					DBG("hub upgrade firm connected\n");
+					upgradeHandler->set_upgradeCommandReceived(false);
+					upgradeHandler->launchNrfutil(UpgradeHandler::upgradeFirmHub, data + 13);
+				}
+				else if (type_of_firm == UpgradeHandler::upgradeFirmRing && upgradeHandler->get_upgradeCommandReceived())
+				{
+					DBG("ring upgrade firm connected\n");
+					upgradeHandler->set_upgradeCommandReceived(false);
+					upgradeHandler->launchNrfutil(UpgradeHandler::upgradeFirmRing, data + 13);
+				}
+				else if (type_of_firm == UpgradeHandler::err_two_hub)
+				{
+					DBG("two hub connected\n");
+					//TODO sale, à refaire car bloque le process
+					AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Two hubs detected, the 2nd one will not be recognize (disconnect all the hubs & reconnect the 2nd to use it)", "Sorry, Thanks", nullptr);
+				}
+				else
+				{
+					DBG("Should not be there");
+				}
+				break;
+			}
 		}
 	}
-
-#if JUCE_WINDOWS
-	void launch_nrfutil()
-	{
-		STARTUPINFO si;
-		PROCESS_INFORMATION pi;
-
-		ZeroMemory(&si, sizeof(si));
-		si.cb = sizeof(si);
-		ZeroMemory(&pi, sizeof(pi));
-
-
-		// Start the child process. 
-		if (!CreateProcess((LPCSTR)"nrfutil.exe",   // No module name (use command line)
-			"" ,        // Command line
-			NULL,           // Process handle not inheritable
-			NULL,           // Thread handle not inheritable
-			FALSE,          // Set handle inheritance to FALSE
-			CREATE_NO_WINDOW,              // No creation flags
-			NULL,           // Use parent's environment block
-			NULL,           // Use parent's starting directory 
-			&si,            // Pointer to STARTUPINFO structure
-			&pi)           // Pointer to PROCESS_INFORMATION structure
-			)
-		{
-			Logger::writeToLog("CreateProcess failed (%d).\n" + String(GetLastError()));
-			return;
-		}
-
-		// Wait until child process exits.
-		WaitForSingleObject(pi.hProcess, INFINITE);
-		// Close process and thread handles. 
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-	}
-#endif //JUCE_WINDOWS
 
     //==============================================================================
     class MainWindow    : public DocumentWindow
@@ -339,7 +339,6 @@ public:
 				dashPipe->sendString(data, 12);
 				return true;
             case uploadConfigToHub:
-
 				hubConfig.getConfig(data+12, sizeof(data)-12);
 				memcpy(data, "jeannine", sizeof("jeannine"));
 				ctrl = 0x03;
@@ -348,9 +347,8 @@ public:
 				return true;
 
             case upgradeHub:
-				//launch_nrfutil();
+                upgradeHandler->launchUpgradeProcedure();
                 return true;
-
 			case updatePresetModeState:
 			{
 				uint8_t newState = (uint8_t)dashInterface->getPresetModeState();
@@ -382,6 +380,7 @@ private:
 	std::unique_ptr<DataReader> dataReader;
 	std::unique_ptr<DashPipe> dashPipe;
 
+	uint8_t hubPowerState = POWER_OFF;
 	std::unique_ptr<DashUpdater> updater;
 
     ScopedPointer<FileLogger> dashboardLogger;
@@ -392,6 +391,7 @@ private:
 	uint8_t data[1024];
 	uint32_t ctrl = 0x03;
 
+	std::unique_ptr<UpgradeHandler> upgradeHandler;
 };
 
 //==============================================================================

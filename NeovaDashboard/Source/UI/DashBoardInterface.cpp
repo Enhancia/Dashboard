@@ -9,7 +9,7 @@
 #include "DashBoardInterface.h"
 
 //==============================================================================
-DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& reader, DashUpdater& updtr)
+DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& reader, DashUpdater& updtr, UpgradeHandler& upgradeHandler)
     : hubConfig (data), dataReader (reader), updater (updtr)
 {
     TRACE_IN;
@@ -19,6 +19,9 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     // Creates Components
     optionsPanel = std::make_unique<OptionsPanel> (hubConfig, getCommandManager());
     addAndMakeVisible (*optionsPanel);
+
+    firmUpgradePanel = std::make_unique<FirmUpgradePanel> (hubConfig, upgradeHandler);
+    addAndMakeVisible (*firmUpgradePanel);
 
     updaterPanel = std::make_unique<UpdaterPanel> (updater, updater.getDownloadProgressReference());
     addAndMakeVisible (*updaterPanel);
@@ -52,6 +55,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     newGesturePanel->setAlwaysOnTop (true);
     optionsPanel->setVisible (false);
     optionsPanel->setAlwaysOnTop (true);
+    firmUpgradePanel->setVisible (false);
+    firmUpgradePanel->setAlwaysOnTop (true);
     updaterPanel->setAlwaysOnTop (true);
     updaterPanel->setVisible (updater.hasNewAvailableVersion());
 
@@ -151,6 +156,7 @@ void DashBoardInterface::resized()
 
     auto area = getLocalBounds();
     optionsPanel->setBounds (area);
+    firmUpgradePanel->setBounds (area);
     updaterPanel->setBounds (area);
 
 	auto gPanelArea = area.removeFromBottom (area.getHeight() / 2 - 35);
@@ -252,7 +258,8 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
                             updateDashInterface,
                             updateInterfaceLEDs,
                             updateBatteryDisplay,
-                            allowUserToFlashHub
+                            allowUserToFlashHub,
+                            openFirmUpgradePanel
                        });
 }
 
@@ -274,6 +281,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
         case allowUserToFlashHub:
             result.setInfo ("Update Upload Button", "Allows Upload Button To Be Clicked", "Interface", 0);
             break;
+        case openFirmUpgradePanel:
+            result.setInfo ("Open Firm Upgrade Panel", "Opens Panel To Start Firm Upgrade Procedure", "Interface", 0);
+			break;
         default:
             break;
     }
@@ -304,6 +314,10 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             uploadButton->setActive();
             return true;
 
+        case openFirmUpgradePanel:
+            firmUpgradePanel->setAndOpenPanel();
+            return true;
+
         default:
             return false;
     }
@@ -327,8 +341,15 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         hubComponent->update();
         hubConfig.selectFirstExistingGesture();
         header->setBatteryVisible (true);
+        optionsPanel->update();
+
+        // TODO replace with update if step 3
+        if (firmUpgradePanel->isVisible())
+        {
+            firmUpgradePanel->updateAfterHubConnection();
+        }
+        
         midiChannelComponent->setVisible (true);
-        //optionsPanel->setMidiBoxActive (true);
     }
 
     else

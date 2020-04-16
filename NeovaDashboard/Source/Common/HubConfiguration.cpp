@@ -339,24 +339,33 @@ const int HubConfiguration::getSelectedGesture()
 
 const String HubConfiguration::getFirmwareVersionString()
 {
-	String ringFirm;
+	String ringFirm = "-";
+	String hubFirm = "-";
 
-	if (ringIsConnected)
+	if (ringIsConnected && hubIsConnected)
 	{
 		ringFirm = String ((config.ring_firmware_version & 0xFF00) >> 8)
 	       				+ "." + String (config.ring_firmware_version & 0x00FF);
 	}
-	else
-	{ 
-		ringFirm = "-";
+
+	if (hubIsConnected)
+	{
+		hubFirm = String ((config.hub_firmware_version & 0xFF00) >> 8)
+		       			+ "." + String (config.hub_firmware_version & 0x00FF);
 	}
-
-	String hubFirm = String ((config.hub_firmware_version & 0xFF00) >> 8)
-	       						+ "." + String (config.hub_firmware_version & 0x00FF);
-
 
 	return String ("HUB  : ") + hubFirm +
 	       String ("\nRING : ") + ringFirm;
+}
+
+uint16_t HubConfiguration::getHubFirmwareVersionUint16()
+{
+	return config.hub_firmware_version;
+}
+
+uint16_t HubConfiguration::getRingFirmwareVersionUint16()
+{
+	return config.ring_firmware_version;
 }
 
 void HubConfiguration::setRingIsCharging (bool isCharging)
@@ -367,6 +376,16 @@ void HubConfiguration::setRingIsCharging (bool isCharging)
 bool HubConfiguration::getRingIsCharging()
 {
 	return ringIsCharging;
+}
+
+void HubConfiguration::setHubIsConnected (bool isConnected)
+{
+	hubIsConnected = isConnected;
+}
+
+bool HubConfiguration::getHubIsConnected()
+{
+	return hubIsConnected;
 }
 
 void HubConfiguration::setRingIsConnected (bool isConnected)
