@@ -129,7 +129,7 @@ void MidiPanel::buttonClicked (Button* bttn)
     if (bttn == reverseButton.get())
     {
         hubConfig.setUint8Value (id, HubConfiguration::reverse,
-                                 reverseButton->getToggleState() ? 1 : 0);
+                                     reverseButton->getToggleState() ? 1 : 0);
     }
 }
 

@@ -28,8 +28,8 @@ public:
         GestureData() = default;
         GestureData (GestureData& other);
 
-		uint16_t align_to_word; //to align the size of GestureData to a multiple of word
-
+        uint8_t typeFunc = 0;
+        uint8_t reverse = 1;
 		uint8_t on = 1;
 		uint8_t type = neova_dash::gesture::none;
 		uint8_t midiLow = 0;
