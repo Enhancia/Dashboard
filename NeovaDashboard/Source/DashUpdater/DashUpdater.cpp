@@ -99,6 +99,12 @@ void DashUpdater::startDownloadProcess()
     #endif
     
     //if (downloadedFile.exists()) downloadedFile.deleteRecursively();
+    if (!downloadedFile.hasWriteAccess())
+    {
+        state = downloadFinished;
+        return;
+    }
+
     downloadedFile.createDirectory();
 
     downloadedFile = downloadedFile.getNonexistentChildFile(fileToDownloadString.upToFirstOccurrenceOf (".", false, true),
