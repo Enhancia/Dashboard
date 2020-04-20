@@ -12,8 +12,8 @@
 
 DashUpdater::DashUpdater() : currentVersion (JUCEApplication::getInstance()->getApplicationVersion())
 {
-    initializeFileToDownloadString();
     checkForNewAvailableVersion();
+    //initializeFileToDownloadString();
 }
 
 DashUpdater::~DashUpdater()
@@ -86,10 +86,23 @@ void DashUpdater::startDownloadProcess()
 
     state = inProgress;
     downloadProgress = 0.0f;
+    
+    #if JUCE_WINDOWS
+    downloadedFile = File::getSpecialLocation (File::globalApplicationsDirectory).getChildFile ("Enhancia")
+                                                                                 .getChildFile ("Installers")
+                                                                                 .getChildFile ("Dashboard");
+    #elif JUCE_MAC
+    downloadedFile = File::getSpecialLocation (File::userApplicationDataDirectory).getChildFile ("Application Support")
+                                                                                 .getChildFile ("Enhancia")
+                                                                                 .getChildFile ("Installers")
+                                                                                 .getChildFile ("Dashboard");
+    #endif
+    
+    //if (downloadedFile.exists()) downloadedFile.deleteRecursively();
+    downloadedFile.createDirectory();
 
-    downloadedFile = File::getSpecialLocation (File::userHomeDirectory).getChildFile ("Downloads")
-                                                                       .getNonexistentChildFile(fileToDownloadString.upToFirstOccurrenceOf (".", false, true),
-                                                                                                fileToDownloadString.fromFirstOccurrenceOf (".", true, true));
+    downloadedFile = downloadedFile.getNonexistentChildFile(fileToDownloadString.upToFirstOccurrenceOf (".", false, true),
+                                                            fileToDownloadString.fromFirstOccurrenceOf (".", true, true));
     
     downloadTask.reset (assetURL.downloadToFile (downloadedFile, "\r\nAccept: application/octet-stream\r\n", this));
 }
@@ -184,6 +197,14 @@ var DashUpdater::fetchRepoJSON()
 
 bool DashUpdater::fetchFileURL (DynamicObject& jsonRef)
 {
+    String fileExtension;
+
+    #if JUCE_MAC
+    fileExtension = "dmg";
+    #elif JUCE_WINDOWS
+    fileExtension = "msi";
+    #endif
+
     // Getting assets
     auto* assets = jsonRef.getProperty ("assets").getArray();
 
@@ -192,8 +213,9 @@ bool DashUpdater::fetchFileURL (DynamicObject& jsonRef)
         // Finding url for the File to download
         for (auto asset : *assets)
         {
-            if (asset.getProperty ("name", var()).toString() == fileToDownloadString)
+            if (asset.getProperty ("name", var()).toString().endsWith (fileExtension))
             {
+                fileToDownloadString = asset.getProperty ("name", var()).toString();
                 fileToDownloadURL = asset.getProperty ("url", var()).toString();
                 fileSize = asset.getProperty ("size", var(0));
 
