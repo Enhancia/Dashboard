@@ -88,9 +88,9 @@ void DashUpdater::startDownloadProcess()
     downloadProgress = 0.0f;
     
     #if JUCE_WINDOWS
-    downloadedFile = File::getSpecialLocation (File::globalApplicationsDirectory).getChildFile ("Enhancia")
-                                                                                 .getChildFile ("Installers")
-                                                                                 .getChildFile ("Dashboard");
+    downloadedFile = File::getSpecialLocation (File::userApplicationDataDirectory ).getChildFile ("Enhancia")
+                                                                                   .getChildFile ("NeovaDashboard")
+                                                                                   .getChildFile ("Installer");
     #elif JUCE_MAC
     downloadedFile = File::getSpecialLocation (File::userApplicationDataDirectory).getChildFile ("Application Support")
                                                                                  .getChildFile ("Enhancia")
@@ -98,13 +98,7 @@ void DashUpdater::startDownloadProcess()
                                                                                  .getChildFile ("Dashboard");
     #endif
     
-    //if (downloadedFile.exists()) downloadedFile.deleteRecursively();
-    if (!downloadedFile.hasWriteAccess())
-    {
-        state = downloadFinished;
-        return;
-    }
-
+    if (downloadedFile.exists()) downloadedFile.deleteRecursively();
     downloadedFile.createDirectory();
 
     downloadedFile = downloadedFile.getNonexistentChildFile(fileToDownloadString.upToFirstOccurrenceOf (".", false, true),
