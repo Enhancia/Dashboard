@@ -70,8 +70,13 @@ void MidiPanel::resized()
 
     auto rangeArea = area.withTrimmedBottom (MARGIN).withTrimmedRight (MARGIN);
 
-    reverseButton->setBounds (rangeArea.removeFromRight (18 + MARGIN)
-                                       .withSizeKeepingCentre (18, 18));
+    if (hubConfig.getGestureData (id).type != neova_dash::gesture::vibrato &&
+        hubConfig.getGestureData (id).type != neova_dash::gesture::pitchBend)
+    {
+        reverseButton->setBounds (rangeArea.removeFromRight (18 + MARGIN)
+                                           .withSizeKeepingCentre (18, 18));
+    }
+
     midiRangeTuner->setBounds (rangeArea.withSizeKeepingCentre (rangeArea.getWidth() - 2*MARGIN, 40));
 }
 
@@ -508,7 +513,8 @@ void MidiRangeTuner::updateDisplay()
                          :(type == tilt) ? dataReader.getFloatValueReference (neova_dash::data::tilt)
                          : dataReader.getFloatValueReference (neova_dash::data::tilt); // default: tilt value
 
-    const int rescaledMidiValue = computeMidiValue (type, value, gestureData.midiLow,
+    const int rescaledMidiValue = computeMidiValue (type, value, gestureData.reverse,
+                                                                 gestureData.midiLow,
                                                                  gestureData.midiHigh,
                                                                  gestureData.gestureParam0,
                                                                  gestureData.gestureParam1,

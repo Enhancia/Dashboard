@@ -70,6 +70,7 @@ namespace neova_dash
 
         extern int computeMidiValue (int type, float value, int rangeLow,
                                                             int rangeHigh,
+                                                            int reverse,
                                                             float parameter0,
 		 													float parameter1,
 		 													float parameter2 = 0.0f,
