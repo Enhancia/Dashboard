@@ -215,7 +215,7 @@ void MidiPanel::createButton()
                                                                        hubConfig.isGestureActive (id)));
     reverseButton->setColour (TextButton::textColourOnId , neova_dash::colour::mainText);
     reverseButton->setColour (TextButton::textColourOffId , neova_dash::colour::mainText);
-    reverseButton->setToggleState (false, dontSendNotification); // TO CHANGE
+    reverseButton->setToggleState (hubConfig.getGestureData (id).reverse != 0, dontSendNotification);
     reverseButton->setClickingTogglesState (true);
     reverseButton->addListener (this);
 }
