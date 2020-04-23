@@ -192,7 +192,7 @@ void GesturePanel::mouseDrag (const MouseEvent& event)
             {
                 if (auto* otherGesture = dynamic_cast<GestureComponent*> (componentUnderMouse))
                 {
-					if (otherGesture->id != draggedGestureComponentId)
+					if (otherGesture->id != draggedOverSlotId && otherGesture->id != draggedGestureComponentId)
 					{
 						draggedOverSlotId = otherGesture->id;
 						otherGesture->repaint();
@@ -200,8 +200,11 @@ void GesturePanel::mouseDrag (const MouseEvent& event)
 				}
                 else if (auto* emptySlot = dynamic_cast<EmptyGestureSlotComponent*> (componentUnderMouse))
                 {
-                    draggedOverSlotId = emptySlot->id;
-					emptySlot->repaint();
+                    if (emptySlot->id != draggedOverSlotId)
+                    {
+                        draggedOverSlotId = emptySlot->id;
+    					emptySlot->repaint();
+                    }
                 }
 				else
 				{

@@ -502,7 +502,7 @@ void MidiRangeTuner::updateDisplay()
 {
     using namespace neova_dash::gesture;
 
-    HubConfiguration::GestureData gestureData (hubConfig.getGestureData (id));
+    HubConfiguration::GestureData& gestureData = hubConfig.getGestureData (id);
     const int type = gestureData.type;
 
     if (type == none || !isEnabled()) return;
@@ -513,9 +513,11 @@ void MidiRangeTuner::updateDisplay()
                          :(type == tilt) ? dataReader.getFloatValueReference (neova_dash::data::tilt)
                          : dataReader.getFloatValueReference (neova_dash::data::tilt); // default: tilt value
 
-    const int rescaledMidiValue = computeMidiValue (type, value, gestureData.reverse,
-                                                                 gestureData.midiLow,
+    const bool valueIsInRange = !isValueOutOfGestureRange (type, value);
+    
+    const int rescaledMidiValue = computeMidiValue (type, value, gestureData.midiLow,
                                                                  gestureData.midiHigh,
+                                                                 gestureData.reverse,
                                                                  gestureData.gestureParam0,
                                                                  gestureData.gestureParam1,
                                                                  gestureData.gestureParam2,
@@ -523,7 +525,7 @@ void MidiRangeTuner::updateDisplay()
                                                                  gestureData.gestureParam4,
                                                                  gestureData.gestureParam5);
 
-    if (rescaledMidiValue != lastValue)
+    if (valueIsInRange && rescaledMidiValue != lastValue)
     {
         lastValue = rescaledMidiValue;
         

@@ -21,7 +21,7 @@ class HubConfiguration
 {
 public:
     //==============================================================================
-	static constexpr int CONFIGSIZE = 520;
+	static constexpr int CONFIGSIZE = 536;
 	
 	struct GestureData // values for each gesture
     {
@@ -29,7 +29,7 @@ public:
         GestureData (GestureData& other);
 
         uint8_t typeFunc = 0;
-        uint8_t reverse = 1;
+        uint8_t reverse = 0;
 		uint8_t on = 1;
 		uint8_t type = neova_dash::gesture::none;
 		uint8_t midiLow = 0;
@@ -48,6 +48,10 @@ public:
 
     struct PresetData
     {
+        uint16_t align_to_word;
+
+        uint16_t midiChannels = 1;
+
     	GestureData gestureData0;
     	GestureData gestureData1;
     	GestureData gestureData2;
@@ -73,13 +77,14 @@ public:
     //==============================================================================
     enum uint8DataId
     {
-    	on = 0,
+    	typeFunc =0,
+        reverse,
+        on,
     	type,
     	midiLow,
     	midiHigh,
     	cc,
         midiType,
-        reverse
     };
 
     enum floatDataId
@@ -128,7 +133,7 @@ public:
     
     //==============================================================================
     void setPreset (const int gestureNumberToSelect);
-	void setPreset(const int gestureNumberToSelect, bool uploadToHub);
+	void setPreset (const int gestureNumberToSelect, bool uploadToHub);
     const int getSelectedPreset();
 
     PresetData& getPresetData (const int presetNumber);
@@ -147,16 +152,21 @@ public:
     const int getSelectedGesture();
 
     //==============================================================================
-    void setMidiChannel (const uint8 newMidiChannel, bool uploadToHub = true);
-    int getMidiChannel();
+    void setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool uploadToHub = true);
+    void toggleMidiChannel (const int channelNumber, bool uploadToHub = true);
+    int getMidiChannels();
 
     //==============================================================================
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber, const int presetNumber);
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber);
 
     const String getFirmwareVersionString();
+    uint16_t getHubFirmwareVersionUint16();
+    uint16_t getRingFirmwareVersionUint16();
 
     //==============================================================================
+    void setHubIsConnected (bool isConnected);
+    bool getHubIsConnected();
     void setRingIsCharging (bool isCharging);
     bool getRingIsCharging();
     void setRingIsConnected (bool isConnected);
@@ -194,6 +204,7 @@ private:
     int selectedGesture = -1;
 
     //==============================================================================
+    bool hubIsConnected = false;
     bool ringIsCharging = false;
     bool ringIsConnected = false;
 

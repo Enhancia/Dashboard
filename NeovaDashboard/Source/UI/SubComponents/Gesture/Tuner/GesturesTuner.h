@@ -29,13 +29,15 @@ public:
         :   TwoRangeTuner (config, gestureId, reader.getFloatValueReference (neova_dash::data::roll), 
         				   NormalisableRange<float> (neova_dash::gesture::PITCHBEND_MIN, neova_dash::gesture::PITCHBEND_MAX),
 			               Range<float> (neova_dash::ui::PITCHBEND_DISPLAY_MIN, neova_dash::ui::PITCHBEND_DISPLAY_MAX),
-                           String (CharPointer_UTF8 ("\xc2\xb0")))
+                           String (CharPointer_UTF8 ("\xc2\xb0"))),
+            tiltValue (reader.getFloatValueReference (neova_dash::data::tilt))
     {}
     
     ~PitchBendTuner()
     {}
 
 private:
+    const float& tiltValue;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PitchBendTuner)
 };
 
@@ -48,13 +50,16 @@ public:
         :   OneRangeTuner (config, gestureId, reader.getFloatValueReference (neova_dash::data::tilt), 
         				   NormalisableRange<float> (neova_dash::gesture::TILT_MIN, neova_dash::gesture::TILT_MAX),
 			               Range<float> (neova_dash::ui::TILT_DISPLAY_MIN, neova_dash::ui::TILT_DISPLAY_MAX),
-                           String (CharPointer_UTF8 ("\xc2\xb0")), OneRangeTuner::tilt)
+                           String (CharPointer_UTF8 ("\xc2\xb0")), OneRangeTuner::tilt),
+
+            rollValue (reader.getFloatValueReference (neova_dash::data::roll))
     {}
     
     ~TiltTuner()
     {}
 
 private:
+    const float& rollValue;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TiltTuner)
 };
 
@@ -86,12 +91,14 @@ public:
         :   OneRangeTuner (config, gestureId, reader.getFloatValueReference (neova_dash::data::roll), 
         				   NormalisableRange<float> (neova_dash::gesture::ROLL_MIN, neova_dash::gesture::ROLL_MAX),
 			               Range<float> (neova_dash::ui::ROLL_DISPLAY_MIN, neova_dash::ui::ROLL_DISPLAY_MAX),
-                           String (CharPointer_UTF8 ("\xc2\xb0")), OneRangeTuner::roll)
+                           String (CharPointer_UTF8 ("\xc2\xb0")), OneRangeTuner::roll),
+            tiltValue (reader.getFloatValueReference (neova_dash::data::tilt))
     {}
     
     ~RollTuner()
     {}
 
 private:
+    const float& tiltValue;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RollTuner)
 };

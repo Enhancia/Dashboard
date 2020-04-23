@@ -23,8 +23,7 @@
 #endif
 
 class OptionsPanel    : public Component,
-                        private Button::Listener,
-                        private ComboBox::Listener
+                        private Button::Listener
 {
 public:
     //==============================================================================
@@ -37,18 +36,15 @@ public:
     
     //==============================================================================
     void buttonClicked (Button* bttn) override;
-    void comboBoxChanged (ComboBox* box) override;
     void mouseUp (const MouseEvent& event) override;
     void visibilityChanged() override;
 
     //==============================================================================
     void update();
-    void setMidiBoxActive (bool shouldBeActive);
 
 private:
     //==============================================================================
     void createButtons();
-    void createMidiBox();
     void paintProductInformations (Graphics& g, juce::Rectangle<int> area);
     void paintFirmUpdateArea (Graphics& g, juce::Rectangle<int> area);
     void paintLegalAndRegulatoryArea (Graphics& g, juce::Rectangle<int> area);

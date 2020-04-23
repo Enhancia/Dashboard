@@ -78,6 +78,32 @@ namespace gesture
 		return mapInt (midiVal, 0, 127, rangeLow, rangeHigh);
 	}
 
+	bool isValueOutOfGestureRange (int type, float value)
+	{
+		if (type == int (vibrato))
+		{
+			return (value < 0.0f || value > VIBRATO_RANGE_MAX);
+		}
+		if (type == int (pitchBend))
+		{
+			return (value < -90.0f || value > 90.0f);
+		}
+		if (type == int (tilt))
+		{
+			return (value < -90.0f || value > 90.0f);
+		}
+		if (type == int (roll))
+		{
+			return (value < -90.0f || value > 90.0f);
+		}
+		if (type == int (wave))
+		{
+			return (value < -90.0f || value > 90.0f);
+		}
+
+		return true; // default
+	}
+
 	int map (float val, float minVal, float maxVal, int minNew, int maxNew)
 	{
 	    if (minVal == maxVal && val == minVal) return minNew;
