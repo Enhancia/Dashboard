@@ -107,7 +107,8 @@ private:
 
 class MidiPanel    : public Component,
                      private Label::Listener,
-                     private ComboBox::Listener
+                     private ComboBox::Listener,
+                     private Button::Listener
 {
 public:
     MidiPanel (HubConfiguration& config, DataReader& reader, const int gestId);
@@ -121,6 +122,7 @@ public:
     void labelTextChanged (Label* lbl) override;
     void editorShown (Label* lbl, TextEditor& ted) override;
     void comboBoxChanged (ComboBox* box) override;
+    void buttonClicked (Button* bttn) override;
     
     //==============================================================================
     void updateComponents();
@@ -135,6 +137,7 @@ private:
     //==============================================================================
     void createComboBox();
     void createLabels();
+    void createButton();
     void setComponentsVisibility();
     
     //==============================================================================
@@ -143,6 +146,7 @@ private:
     ScopedPointer<Label> rangeLabelMin;
     ScopedPointer<Label> rangeLabelMax;
     ScopedPointer<MidiRangeTuner> midiRangeTuner;
+    std::unique_ptr<TextButton> reverseButton;
 
     //==============================================================================
     HubConfiguration& hubConfig;

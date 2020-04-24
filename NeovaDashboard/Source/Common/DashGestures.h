@@ -30,6 +30,15 @@ namespace neova_dash
             none
         };
 
+        enum CurveType
+        {
+            linear,
+            log,
+            exp,
+            pow2,
+            pow3
+        };
+
         enum MidiType
         {
             pitchMidi =0,
@@ -57,6 +66,7 @@ namespace neova_dash
 
         extern int computeMidiValue (int type, float value, int rangeLow,
                                                             int rangeHigh,
+                                                            int reverse,
                                                             float parameter0,
 		 													float parameter1,
 		 													float parameter2 = 0.0f,
