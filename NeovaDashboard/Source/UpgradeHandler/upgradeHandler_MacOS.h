@@ -105,7 +105,7 @@ private:
     int out_pipe[2], err_pipe[2];
     String childOutFileName = "nrfutilOut.txt";
     String childErrFileName = "nrfutilErr.txt";
-    String nrfutilRelativePath = "/Application Support/Enhancia/FirmwareReleases/nrfutil_5.1.0";
+    String nrfutilRelativePath = "/Application Support/Enhancia/nrfutil_5.1.0";
     String releaseRelativePath = "/Application Support/Enhancia/FirmwareReleases/";
     String logsRelativePath = "/Logs/Enhancia/NeovaDashboard/Logs/";
     char const * upgradeHubCommandLine[3] = {"dfu", "usb-serial", "-pkg"};

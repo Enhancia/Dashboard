@@ -88,7 +88,7 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * portCOM)
     
     String portPath = String(CharPointer_UTF8((char *)(portCOM+1)), *(uint8_t *) portCOM);
     
-    auto nrfutilPath = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + nrfutilRelativePath;
+    auto nrfutilPath = File::getSpecialLocation(File::commonApplicationDataDirectory).getFullPathName() + nrfutilRelativePath;
 
     uint8_t minor;
     uint8_t major;
