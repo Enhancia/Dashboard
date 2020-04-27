@@ -90,7 +90,11 @@ private:
     String latestVersionRing = "";
     File currentRingFile;
 
+    #if JUCE_WINDOWS
     String releaseRelativeLocation = "\\Enhancia\\NeovaDashboard\\Releases\\";
+    #elif JUCE_MAC
+    String releaseRelativeLocation = "/Application Support/Enhancia/FirmwareReleases/";
+    #else
 
     //==============================================================================
     bool availableRing = false;
