@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="SIAvrc" name="NeovaDashboard" projectType="guiapp" jucerVersion="5.4.7"
-              binaryDataNamespace="DashData" version="0.3.4">
+              binaryDataNamespace="DashData" version="0.3.7">
   <MAINGROUP id="KvQWjZ" name="NeovaDashboard">
     <GROUP id="{20075F30-04A5-410B-6952-3C63688FBF54}" name="Resources">
       <GROUP id="{E0259D2D-3961-75D2-D343-36D8C845436E}" name="Image">
@@ -36,6 +36,10 @@
       <GROUP id="{8C5D7843-1C2F-2498-BE6F-CEA708B574B8}" name="DashUpdater">
         <FILE id="Wp0z1w" name="DashUpdater.cpp" compile="1" resource="0" file="Source/DashUpdater/DashUpdater.cpp"/>
         <FILE id="rzjyXq" name="DashUpdater.h" compile="0" resource="0" file="Source/DashUpdater/DashUpdater.h"/>
+        <FILE id="TeVpNn" name="FirmDownloader.cpp" compile="1" resource="0"
+              file="Source/DashUpdater/FirmDownloader.cpp"/>
+        <FILE id="AVomPY" name="FirmDownloader.h" compile="0" resource="0"
+              file="Source/DashUpdater/FirmDownloader.h"/>
       </GROUP>
       <GROUP id="{070581BE-75F7-2121-AB9B-7858417FB991}" name="UpgradeHandler">
         <FILE id="zzFpYT" name="upgradeHandler_MacOS.cpp" compile="1" resource="0"
