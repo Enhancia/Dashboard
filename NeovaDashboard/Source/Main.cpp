@@ -14,6 +14,7 @@
 #include "DataReader/DataReader.h"
 #include "DataReader/dashPipe.h"
 #include "DashUpdater/DashUpdater.h"
+#include "DashUpdater/FirmDownloader.h"
 
 #if JUCE_WINDOWS
     #include "UpgradeHandler/upgradeHandler_Win.h"
@@ -65,6 +66,7 @@ public:
 
 		upgradeHandler = std::make_unique<UpgradeHandler>(*dashPipe, hubConfig, commandManager);
 		updater = std::make_unique<DashUpdater>();
+		firmDownloader = std::make_unique<FirmDownloader>();
 
 		/* Test if hub is already connected */
 		/* For testing */
@@ -381,6 +383,7 @@ private:
 	std::unique_ptr<DashPipe> dashPipe;
 
 	std::unique_ptr<DashUpdater> updater;
+	std::unique_ptr<FirmDownloader> firmDownloader;
 
     ScopedPointer<FileLogger> dashboardLogger;
 
