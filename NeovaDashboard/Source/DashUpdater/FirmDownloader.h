@@ -18,7 +18,8 @@
  
     \brief  Manages checking for updates and downloading the newest installer.
 */
-class FirmDownloader : public URL::DownloadTask::Listener
+class FirmDownloader : public URL::DownloadTask::Listener,
+					   public Timer
 {
 public:
     //==============================================================================
@@ -46,6 +47,8 @@ public:
     void progress (URL::DownloadTask* task,
                    int64 bytesDownloaded,
                    int64 totalLength ) override;
+
+    void timerCallback() override;
 
 	//==============================================================================
 	void startDownloadProcess();

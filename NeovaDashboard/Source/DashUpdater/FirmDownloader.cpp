@@ -103,8 +103,7 @@ void FirmDownloader::finished (URL::DownloadTask* task, bool success)
 
 	if (device == hub)
 	{
-		device = ring;
-		downloadForDevice (device);
+		startTimer (400);
 	}
 }
 
@@ -116,6 +115,16 @@ void FirmDownloader::progress (URL::DownloadTask* task,
                             << float (totalLength)/1000 << " Ko\n");
 
     if (totalLength != 0) downloadProgress = float (bytesDownloaded)/totalLength;
+}
+
+void FirmDownloader::timerCallback()
+{
+	if (device == hub && state == downloadFinished)
+	{
+		stopTimer();
+		device = ring;
+		downloadForDevice (device);
+	}
 }
 
 void FirmDownloader::startDownloadProcess()
@@ -135,6 +144,8 @@ void FirmDownloader::startDownloadProcess()
 
 void FirmDownloader::downloadForDevice (deviceFirmware& deviceToDownloadFor)
 {
+    state = inProgress;
+
 	String fileToDownloadString;
 	URL fileToDownloadURL;
 
