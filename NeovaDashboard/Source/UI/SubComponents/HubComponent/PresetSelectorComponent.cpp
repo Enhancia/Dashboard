@@ -26,7 +26,7 @@ void PresetSelectorComponent::paint (Graphics& g)
     g.setColour (neova_dash::colour::mainText);
     g.setFont (neova_dash::font::dashFont.withHeight (15.0f));
 
-    g.drawText (String ("Slot " + String (hubConfig.getSelectedPreset() + 1)),
+    g.drawText (String ("Bank " + String (hubConfig.getSelectedPreset() + 1)),
     			getLocalBounds().withSizeKeepingCentre (getWidth()/2, getHeight()),
     			Justification::centred);
 }
