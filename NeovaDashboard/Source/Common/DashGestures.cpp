@@ -17,6 +17,7 @@ namespace gesture
 {
 	int computeMidiValue (int type, float value, int rangeLow,
 												 int rangeHigh,
+												 int reverse,
 												 float parameter0,
 		 										 float parameter1,
 		 										 float parameter2,
@@ -27,6 +28,7 @@ namespace gesture
 		if (type == numTypes) return 0;
 
 		int midiVal = 0;
+		bool reversed = reverse != 0;
 
 		if (type == int (vibrato))
 		{
@@ -59,10 +61,14 @@ namespace gesture
 		else if (type == int (tilt))
 		{
 			midiVal = map (value, parameter0, parameter1, 0, 127);
+
+			if (reversed) midiVal = 127 - midiVal;
 		}
 		else if (type == int (roll))
 		{
 			midiVal = map (value, parameter0, parameter1, 0, 127);
+			
+			if (reversed) midiVal = 127 - midiVal;
 		}
 		else if (type == int (wave))
 		{
