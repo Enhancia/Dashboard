@@ -179,6 +179,6 @@ namespace neova_dash
 
     namespace auth
     {
-        const String MACHINE_TOKEN ("1ebaae86812185390234259e630e73b92c38da4a"); //std::getenv ("MACHINE_ENHANCIA_OAUTH");
+        const String MACHINE_TOKEN ("50327c582d22471d2427faed42c9928dcd8b0e98 "); //std::getenv ("MACHINE_ENHANCIA_OAUTH");
     }
 };
