@@ -137,6 +137,11 @@ namespace neova_dash
         }
     }
 
+    namespace compatibility
+    {
+        const COMPATIBLE_FIRM = 0;
+    }
+
     namespace font
     {
         enum DashFontId
