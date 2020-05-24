@@ -139,7 +139,9 @@ public:
 					DBG("POWER STATE : " + String(hubPowerState) + " \n");
 					//TODO => mettre interface en mode POWER_ON
 					hubConfig.setHubIsConnected (true);
-                    dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
+
+					if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
+					else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
 				}
 				if (!dashInterface->hasKeyboardFocus (true))
 				{
@@ -191,7 +193,8 @@ public:
 					if (hubPowerState == POWER_ON)
 					{
 						hubConfig.setHubIsConnected (true);
-						dashInterface->setInterfaceStateAndUpdate(DashBoardInterface::connected);
+						if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
+						else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
 					}
 					else if (hubPowerState == POWER_OFF)
 					{

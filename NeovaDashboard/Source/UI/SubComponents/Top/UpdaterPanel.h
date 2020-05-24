@@ -43,6 +43,7 @@ public:
     void buttonClicked (Button* bttn) override;
 
     //==============================================================================
+    void resetAndOpenPanel();
     void closeAndResetPanel();
     
 private:

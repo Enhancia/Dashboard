@@ -146,6 +146,15 @@ void DashBoardInterface::drawStateMessage (Graphics& g)
     {
         stateMessage = "PAUSE";
     }
+    else if (state == int (incompatible))
+    {
+        g.setFont (neova_dash::font::dashFontLight.withHeight (30.0f));
+
+        stateMessage = "Your Neova is not compatible with "
+                       "this version of the Dashboard.\n\n"
+                       "Please update Neova and the Dahboard "
+                       "to their latest versions.";
+    }
 
     g.drawFittedText (stateMessage, area, Justification::centred, 2);
 }
@@ -360,7 +369,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         midiChannelComponent->setVisible (false);
 
 
-        if (state == int (waitingForConnection))
+        if (state != int (pause))
         {
             uploadButton->setActive (false);
             hubConfig.resetConfigWasChanged();
@@ -376,6 +385,18 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
 
     resized();
     repaint();
+
+    if (state == incompatible)
+    {
+        if (hubConfig.getHubIsCompatibleInt() > 0)
+        {
+            // Open updater panel with specific message
+        }
+        else if (hubConfig.getHubIsCompatibleInt() < 0)
+        {
+            // Open Firm upgrade alert
+        }
+    }
 }
 
 int DashBoardInterface::getPresetModeState()

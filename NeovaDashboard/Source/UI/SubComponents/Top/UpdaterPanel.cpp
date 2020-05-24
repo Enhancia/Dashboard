@@ -121,13 +121,23 @@ void UpdaterPanel::buttonClicked (Button* bttn)
 		}
 	}
 }
+void UpdaterPanel::resetAndOpenPanel()
+{
+	if (isTimerRunning ()) stopTimer();
+	updateComponentsForSpecificStep (downloadAvailable);
+
+	setVisible (false);
+}
 
 void UpdaterPanel::closeAndResetPanel()
 {
-	if (isTimerRunning ()) stopTimer();
+	if (currentProgress != inProgress)
+	{
+		if (isTimerRunning ()) stopTimer();
 
-	setVisible (false);
-	updateComponentsForSpecificStep (downloadAvailable);
+		setVisible (false);
+		updateComponentsForSpecificStep (downloadAvailable);
+	}
 }
 
 void UpdaterPanel::createLabels()

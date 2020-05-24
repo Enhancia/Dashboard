@@ -49,7 +49,8 @@ public:
     {
         connected =0,         /**< \brief HUB is connected and sends data. */
         waitingForConnection, /**< \brief No HUB is connected. */
-        pause                 /**< \brief HUB is connected but paused. */
+        pause,                /**< \brief HUB is connected but paused. */
+        incompatible          /**< \brief HUB is connected but not compatible with dash. */
     };
 
     /**
