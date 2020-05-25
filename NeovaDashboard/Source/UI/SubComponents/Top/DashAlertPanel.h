@@ -12,6 +12,7 @@
 
 #include "../../../../JuceLibraryCode/JuceHeader.h"
 #include "../../../Common/DashCommon.h"
+#include "../DashShapeButton.h"
 
 //==============================================================================
 /*
@@ -21,7 +22,16 @@ class DashAlertPanel    : public Component,
 {
 public:
     //==============================================================================
+    enum SpecificReturnValue
+    {
+        outdatedFirmware = 1,
+        noUploadQuitting
+    };
+
+    //==============================================================================
     DashAlertPanel (const String& title, const String& message,
+                                         int returnValue = 0,
+                                         const bool hasCloseButton = true,
                                          const String& buttonText = String());
     ~DashAlertPanel();
 
@@ -36,7 +46,7 @@ private:
     //==============================================================================
     void createAndAddTextEditor (const String& textToSet);
     void createAndAddLabel (const String& textToSet);
-    void createAndAddCloseButton (const String& buttonText);
+    void createAndAddButtons (const String& buttonText, const bool addCloseButton = true);
 
     //==============================================================================
     juce::Rectangle<int> panelArea;
@@ -45,7 +55,10 @@ private:
     //==============================================================================
     std::unique_ptr<Label> bodyText;
     std::unique_ptr<Label> titleLabel;
-    std::unique_ptr<TextButton> closeButton;
+    std::unique_ptr<TextButton> okButton;
+    std::unique_ptr<DashShapeButton> closeButton;
+
+    int modalReturnValue = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DashAlertPanel)
 };

@@ -140,7 +140,6 @@ void OptionsPanel::buttonClicked (Button* bttn)
     else if (bttn == upgradeButton.get())
     {
         commandManager.invokeDirectly (neova_dash::commands::upgradeHub, true);
-        commandManager.invokeDirectly (neova_dash::commands::upgradeRing, true);
     }
 
     else if (bttn == sendReportButton.get())
@@ -199,6 +198,18 @@ void OptionsPanel::visibilityChanged()
 
 void OptionsPanel::update()
 {
+    if (!hubConfig.getHubIsConnected() || hubConfig.getHubIsCompatibleInt() > 0)
+    {
+        upgradeButton->setInterceptsMouseClicks (false, false);
+        upgradeButton->setOpaque (false);
+        upgradeButton->setAlpha (0.5f);
+    }
+    else
+    {
+        upgradeButton->setInterceptsMouseClicks (true, false);
+        upgradeButton->setAlpha (1.0f);
+        upgradeButton->setOpaque (true);
+    }
 }
 
 void OptionsPanel::createButtons()

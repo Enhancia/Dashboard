@@ -172,6 +172,9 @@ public:
     void setRingIsConnected (bool isConnected);
     bool getRingIsConnected();
 
+    bool getHubIsCompatible();
+    int getHubIsCompatibleInt();
+
 private:
     //==============================================================================
     void setDefaultConfig(); // TEST PURPOSE!! Maybe TO DELETE since the dashboard should match the hub anyways..
@@ -208,6 +211,8 @@ private:
     bool ringIsCharging = false;
     bool ringIsConnected = false;
 
+    int hubIsCompatible = 0;
+
     //==============================================================================
 	ConfigData config;
 
@@ -216,6 +221,9 @@ private:
     void initialiseLastGestureConfigs();
     void saveGestureConfig (const GestureData& gestureDataToSave);
     bool configWasChangedSinceLastFlash = false;
+
+    //==============================================================================
+    void checkHUBCompatibility();
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HubConfiguration)

@@ -382,6 +382,11 @@ bool HubConfiguration::getRingIsCharging()
 void HubConfiguration::setHubIsConnected (bool isConnected)
 {
 	hubIsConnected = isConnected;
+
+	if (isConnected)
+	{
+		checkHUBCompatibility();
+	}
 }
 
 bool HubConfiguration::getHubIsConnected()
@@ -397,6 +402,16 @@ void HubConfiguration::setRingIsConnected (bool isConnected)
 bool HubConfiguration::getRingIsConnected()
 {
 	return ringIsConnected;
+}
+
+bool HubConfiguration::getHubIsCompatible()
+{
+	return hubIsCompatible == 0;
+}
+
+int HubConfiguration::getHubIsCompatibleInt()
+{
+	return hubIsCompatible;
 }
 
 void HubConfiguration::setDefaultConfig()
@@ -634,4 +649,25 @@ void HubConfiguration::saveGestureConfig (const GestureData& gestureDataToSave)
 	*(lastGestureConfig[gestureDataToSave.type]) = gestureDataToSave;
 
 	lastGestureConfig[gestureDataToSave.type]->on = 1;
+}
+
+void HubConfiguration::checkHUBCompatibility()
+{
+	jassert (hubIsConnected);
+
+	const int hubMajor = (config.hub_firmware_version & 0xFF00) >> 8;
+	const int ringMajor = ringIsConnected ? (config.ring_firmware_version & 0xFF00) >> 8 : hubMajor;
+
+	if (neova_dash::compatibility::COMPATIBLE_FIRM == hubMajor && ringMajor == hubMajor)
+	{
+		hubIsCompatible = 0;
+	}
+
+	else if (hubMajor > neova_dash::compatibility::COMPATIBLE_FIRM ||
+			 ringMajor > neova_dash::compatibility::COMPATIBLE_FIRM)
+	{
+		hubIsCompatible = 1;
+	}
+
+	else hubIsCompatible = -1;
 }

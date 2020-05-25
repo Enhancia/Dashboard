@@ -42,6 +42,7 @@ public:
                    int64 totalLength ) override;
 
 	//==============================================================================
+    void checkForNewAvailableVersion();
 	void startDownloadProcess();
     bool hasNewAvailableVersion();
 
@@ -57,7 +58,6 @@ public:
     
 private:
     //==============================================================================
-    void checkForNewAvailableVersion();
     void initializeFileToDownloadString();
     var fetchRepoJSON();
     bool fetchFileURL (DynamicObject& jsonRef);
