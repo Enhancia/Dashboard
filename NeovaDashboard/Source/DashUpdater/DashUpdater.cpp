@@ -181,7 +181,7 @@ var DashUpdater::fetchRepoJSON()
     // Creating input stream to get file link
     int status;
     std::unique_ptr<InputStream> urlInStream (REPO_URL.createInputStream (false, nullptr, nullptr,
-                                                                         "Authorization: Bearer " + AUTH_TOKEN,
+                                                                         "Authorization: token " + AUTH_TOKEN,
                                                                          1000, nullptr, &status));
 
     if (urlInStream == nullptr || status != 200)

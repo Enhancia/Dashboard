@@ -158,7 +158,9 @@ public:
         \param buttonText Text button. Provide an empty String to create no button instead.
     */
     void createAndShowAlertPanel (const String& title, const String& message,
-                                                       const String& buttonText = String());
+                                                       const String& buttonText = String(),
+                                                       const bool hasCloseButton = true,
+                                                       int returnValue = 0);
 
     /** 
         \brief  Modal alert panel destructor.
@@ -175,10 +177,19 @@ private:
         Callback method upon clicking the button or closing the panel.
         Will properly end the modal loop and delete the component.
 
-        \param modalResult   Result from the modal loop. Unused.
+        \param modalResult   Result from the modal loop.
         \param interf        Pointer to the interface.
     */
     static void alertPanelCallback (int modalResult, DashBoardInterface* interf);
+
+    /** 
+        \brief  Modal alert panel action.
+
+        Executes a panel-specific action depending on the modal result from the DashAlertPanel.
+
+        \param panelReturnValue Result from the modal loop.
+    */
+    void executePanelAction (const int panelReturnValue);
 
     /** 
         \brief  Helper method to paint simplified shadows under main components.

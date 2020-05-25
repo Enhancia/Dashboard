@@ -139,7 +139,7 @@ namespace neova_dash
 
     namespace compatibility
     {
-        const int COMPATIBLE_FIRM = 0;
+        const int COMPATIBLE_FIRM = 89;
     }
 
     namespace font

@@ -655,8 +655,8 @@ void HubConfiguration::checkHUBCompatibility()
 {
 	jassert (hubIsConnected);
 
-	const int ringMajor = (config.ring_firmware_version & 0xFF00) >> 8;
 	const int hubMajor = (config.hub_firmware_version & 0xFF00) >> 8;
+	const int ringMajor = ringIsConnected ? (config.ring_firmware_version & 0xFF00) >> 8 : hubMajor;
 
 	if (neova_dash::compatibility::COMPATIBLE_FIRM == hubMajor && ringMajor == hubMajor)
 	{

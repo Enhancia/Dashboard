@@ -324,6 +324,11 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             return true;
 
         case openFirmUpgradePanel:
+            if (!optionsPanel->isVisible())
+            {
+                optionsPanel->setVisible (true);
+            }
+            
             firmUpgradePanel->setAndOpenPanel();
             return true;
 
@@ -338,6 +343,9 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
 
     state = int (newState);
 
+    optionsPanel->update();
+    hubComponent->update();
+
     if (state == int (connected))
     {
         gesturePanel->setVisible (true);
@@ -347,10 +355,8 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         presetSelector->setVisible (true);
         midiChannelComponent->setVisible (true);
         hubComponent->setInterceptsMouseClicks (true, true);
-        hubComponent->update();
         hubConfig.selectFirstExistingGesture();
         header->setBatteryVisible (true);
-        optionsPanel->update();
 
         // TODO replace with update if step 3
         if (firmUpgradePanel->isVisible())
@@ -368,7 +374,6 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         uploadButton->setVisible (false);
         midiChannelComponent->setVisible (false);
 
-
         if (state != int (pause))
         {
             uploadButton->setActive (false);
@@ -379,7 +384,6 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         presetSelector->setVisible (false);
         //midiChannelComponent->setVisible (false);
         hubComponent->setInterceptsMouseClicks (false, false);
-        hubComponent->update();
         //optionsPanel->setMidiBoxActive (false);
     }
 
@@ -390,11 +394,19 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
     {
         if (hubConfig.getHubIsCompatibleInt() > 0)
         {
-            // Open updater panel with specific message
+            updaterPanel->resetAndOpenPanel (true);
         }
         else if (hubConfig.getHubIsCompatibleInt() < 0)
         {
             // Open Firm upgrade alert
+            if (!updaterPanel->isVisible())
+            {
+                createAndShowAlertPanel ("You Neova firmware is outdated!", "Please upgrade your Neova firmware "
+                                                                            " to use it with this Dashboard Version.",
+                                                                            "Upgrade Firmware",
+                                                                            true,
+                                                                            DashAlertPanel::outdatedFirmware);
+            }
         }
     }
 }
@@ -471,9 +483,10 @@ void DashBoardInterface::setPresetStateToNormalMode()
 }
 
 void DashBoardInterface::createAndShowAlertPanel (const String& title, const String& message,
-                                                   const String& buttonText)
+                                                   const String& buttonText, const bool hasCloseButton,
+                                                   int returnValue)
 {
-    alertPanel.reset (new DashAlertPanel (title, message, buttonText));
+    alertPanel.reset (new DashAlertPanel (title, message, returnValue, hasCloseButton, buttonText));
     addAndMakeVisible (*alertPanel);
 
     alertPanel->setVisible (true);
@@ -496,6 +509,21 @@ void DashBoardInterface::closePendingAlertPanel()
 void DashBoardInterface::alertPanelCallback (int modalResult, DashBoardInterface* interf)
 {
     interf->closePendingAlertPanel();
+    interf->executePanelAction (modalResult);
+}
+
+void DashBoardInterface::executePanelAction (const int panelReturnValue)
+{
+    switch (panelReturnValue)
+    {
+        case DashAlertPanel::outdatedFirmware:
+            getCommandManager().invokeDirectly (neova_dash::commands::upgradeHub, true);
+            break;
+        case DashAlertPanel::noUploadQuitting: //TODO
+            break;
+        default: // modalResult 0 or unknown
+            break;
+    }
 }
 
 //==============================================================================
