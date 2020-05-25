@@ -25,7 +25,8 @@ public:
 	{
 		downloadAvailable = 0,
 		inProgress,
-		downloadFinished
+		downloadFinished,
+        updateRequired
 	};
 
     //==============================================================================
@@ -43,6 +44,7 @@ public:
     void buttonClicked (Button* bttn) override;
 
     //==============================================================================
+    void resetAndOpenPanel (bool updateIsRequired = false);
     void closeAndResetPanel();
     
 private:

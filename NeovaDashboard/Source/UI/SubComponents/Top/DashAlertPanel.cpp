@@ -12,11 +12,15 @@
 
 //==============================================================================
 DashAlertPanel::DashAlertPanel (const String& title, const String& message,
+                                                     int returnValue,
+                                                     const bool hasCloseButton,
                                                      const String& buttonText)
 {
+    modalReturnValue = returnValue;
+
     createAndAddTextEditor (message);
     createAndAddLabel (title);
-    createAndAddCloseButton (buttonText);
+    createAndAddButtons (buttonText, hasCloseButton);
 }
 
 DashAlertPanel::~DashAlertPanel()
@@ -54,11 +58,20 @@ void DashAlertPanel::resized()
     {
         int buttonHeight = area.getHeight()/5;
 
-        closeButton->setBounds (area.removeFromBottom (buttonHeight)
+        okButton->setBounds (area.removeFromBottom (buttonHeight)
                                     .withSizeKeepingCentre
-                                        (closeButton->getBestWidthForHeight (buttonHeight),
+                                        (okButton->getBestWidthForHeight (buttonHeight),
                                          buttonHeight));
     }
+
+    #if JUCE_WINDOWS
+    closeButton->setBounds (juce::Rectangle<int> (25, 25).withRightX (panelArea.getRight() - neova_dash::ui::MARGIN_SMALL)
+                                                                     .withY (panelArea.getY() + neova_dash::ui::MARGIN_SMALL));
+    #elif JUCE_MAC
+    closeButton->setBounds (juce::Rectangle<int> (25, 25).withPosition (panelArea.getTopLeft()
+                                                                                   .translated (neova_dash::ui::MARGIN_SMALL,
+                                                                                                neova_dash::ui::MARGIN_SMALL)));
+    #endif
 
     bodyText->setBounds (area.reduced (neova_dash::ui::MARGIN));
 }
@@ -68,6 +81,11 @@ void DashAlertPanel::buttonClicked (Button* bttn)
     if (bttn == closeButton.get())
     {
         exitModalState (0);
+    }
+
+    if (bttn == okButton.get())
+    {
+        exitModalState (modalReturnValue);
     }
 }
 
@@ -87,13 +105,30 @@ void DashAlertPanel::createAndAddTextEditor (const String& textToSet)
     bodyText->setJustificationType (Justification::centred);
 }
 
-void DashAlertPanel::createAndAddCloseButton (const String& buttonText)
+void DashAlertPanel::createAndAddButtons (const String& buttonText, const bool addCloseButton)
 {
     if (!buttonText.isEmpty()) showButton = true;
 
-    closeButton.reset (new TextButton ("Close Button"));
+    okButton.reset (new TextButton ("Close Button"));
+    addAndMakeVisible (*okButton);
+
+    okButton->setButtonText (buttonText);
+    okButton->addListener (this);
+
+    // Close button
+    closeButton = std::make_unique <DashShapeButton> ("Close Options Button",
+                                                       Colour(0),
+                                                       neova_dash::colour::mainText);
     addAndMakeVisible (*closeButton);
 
-    closeButton->setButtonText (buttonText);
+    Path p;
+    p.startNewSubPath (0, 0);
+    p.lineTo (3*neova_dash::ui::MARGIN, 3*neova_dash::ui::MARGIN);
+    p.startNewSubPath (0, 3*neova_dash::ui::MARGIN);
+    p.lineTo (3*neova_dash::ui::MARGIN, 0);
+
+    closeButton->setShape (p, false, true, false);
     closeButton->addListener (this);
+
+    closeButton->setVisible (addCloseButton);
 }

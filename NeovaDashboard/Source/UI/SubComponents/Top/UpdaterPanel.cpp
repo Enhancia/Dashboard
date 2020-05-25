@@ -105,6 +105,13 @@ void UpdaterPanel::buttonClicked (Button* bttn)
 				startTimerHz (2);
 				updater.startDownloadProcess();
 				break;
+
+			case updateRequired:
+				updateComponentsForSpecificStep (inProgress);
+				startTimerHz (2);
+				updater.startDownloadProcess();
+				break;
+
 			case inProgress:
 				/* Uh, hitting this should not be possible, since the button should not be visible during the download... */
 				jassertfalse;
@@ -121,13 +128,26 @@ void UpdaterPanel::buttonClicked (Button* bttn)
 		}
 	}
 }
+void UpdaterPanel::resetAndOpenPanel (bool updateIsRequired)
+{
+	if (currentProgress != inProgress)
+	{
+		if (isTimerRunning ()) stopTimer();
+		updateComponentsForSpecificStep (updateIsRequired ? updateRequired : downloadAvailable);
+
+		setVisible (true);
+	}
+}
 
 void UpdaterPanel::closeAndResetPanel()
 {
-	if (isTimerRunning ()) stopTimer();
+	if (currentProgress != inProgress)
+	{
+		if (isTimerRunning ()) stopTimer();
 
-	setVisible (false);
-	updateComponentsForSpecificStep (downloadAvailable);
+		setVisible (false);
+		updateComponentsForSpecificStep (downloadAvailable);
+	}
 }
 
 void UpdaterPanel::createLabels()
@@ -182,6 +202,27 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 				bodyText->setText ("Current : " + JUCEApplication::getInstance()->getApplicationVersion()
 												+ "\n\nNew : " + updater.getLatestVersionString(),
 					               dontSendNotification);
+				break;
+
+
+			case updateRequired:
+				closeButton->setVisible (true);
+				bottomButton->setVisible (updater.hasNewAvailableVersion());
+				bottomButton->setButtonText ("Download");
+
+				titleLabel->setText ("Your Dashboard needs to be updated to be compatible with Neova!", dontSendNotification);
+				
+				if (updater.hasNewAvailableVersion())
+				{
+					bodyText->setText ("Current : " + JUCEApplication::getInstance()->getApplicationVersion()
+													+ "\n\nNew : " + updater.getLatestVersionString(),
+						               dontSendNotification);
+				}
+				else
+				{
+					bodyText->setText ("No new version was found. Make sure you have an internet connection and try again.",
+						               dontSendNotification);
+				}
 				break;
 
 			case inProgress:

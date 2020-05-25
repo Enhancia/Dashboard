@@ -80,9 +80,8 @@ void DashUpdater::startDownloadProcess()
         return;
     }
 
-    URL assetURL (fileToDownloadURL + "?access_token=" + AUTH_TOKEN);
+    URL assetURL (fileToDownloadURL);
     DBG ("Attempting to download file : " << assetURL.getFileName());
-    jassert (assetURL.isWellFormed());
 
     state = inProgress;
     downloadProgress = 0.0f;
@@ -104,7 +103,8 @@ void DashUpdater::startDownloadProcess()
     downloadedFile = downloadedFile.getNonexistentChildFile(fileToDownloadString.upToFirstOccurrenceOf (".", false, true),
                                                             fileToDownloadString.fromFirstOccurrenceOf (".", true, true));
     
-    downloadTask.reset (assetURL.downloadToFile (downloadedFile, "\r\nAccept: application/octet-stream\r\n", this));
+    //downloadTask.reset (assetURL.downloadToFile (downloadedFile, "\r\nAccept: application/octet-stream\r\n", this));
+    downloadTask.reset (GitAssetDownloader::downloadAsset (fileToDownloadURL, downloadedFile, this));
 }
 
 bool DashUpdater::hasNewAvailableVersion()
@@ -181,7 +181,7 @@ var DashUpdater::fetchRepoJSON()
     // Creating input stream to get file link
     int status;
     std::unique_ptr<InputStream> urlInStream (REPO_URL.createInputStream (false, nullptr, nullptr,
-                                                                         "Authorization: Bearer " + AUTH_TOKEN,
+                                                                         "Authorization: token " + neova_dash::auth::MACHINE_TOKEN,
                                                                          1000, nullptr, &status));
 
     if (urlInStream == nullptr || status != 200)

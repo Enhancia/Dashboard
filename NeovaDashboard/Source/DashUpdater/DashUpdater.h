@@ -12,6 +12,7 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "../Common/DashCommon.h"
+#include "GitAssetDownloader.h"
 
 /**
     \class  DashUpdater DashUpdater.h
@@ -41,6 +42,7 @@ public:
                    int64 totalLength ) override;
 
 	//==============================================================================
+    void checkForNewAvailableVersion();
 	void startDownloadProcess();
     bool hasNewAvailableVersion();
 
@@ -56,7 +58,6 @@ public:
     
 private:
     //==============================================================================
-    void checkForNewAvailableVersion();
     void initializeFileToDownloadString();
     var fetchRepoJSON();
     bool fetchFileURL (DynamicObject& jsonRef);

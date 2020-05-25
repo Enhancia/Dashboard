@@ -173,16 +173,14 @@ void FirmDownloader::downloadForDevice (deviceFirmware& deviceToDownloadFor)
 		    return;
 		}
 	}
-
-	URL assetURL (fileToDownloadURL.toString (false) + "?access_token=" + AUTH_TOKEN);
-	DBG ("Attempting to download file : " << assetURL.getFileName());
-	jassert (assetURL.isWellFormed());
+	DBG ("Attempting to download file : " << fileToDownloadURL.getFileName());
 
     state = inProgress;
     downloadProgress = 0.0f;
 
     downloadedFile = downloadFolder.getNonexistentChildFile (fileToDownloadString, "");
-    downloadTask.reset (assetURL.downloadToFile (downloadedFile, "\r\nAccept: application/octet-stream\r\n", this));
+    //downloadTask.reset (assetURL.downloadToFile (downloadedFile, "\r\nAccept: application/octet-stream\r\n", this));
+    downloadTask.reset (GitAssetDownloader::downloadAsset (fileToDownloadURL, downloadedFile, this));
 }
 
 bool FirmDownloader::hasNewAvailableVersion()
@@ -215,7 +213,7 @@ var FirmDownloader::fetchRepoJSON()
     // Creating input stream to get file link
     int status;
     std::unique_ptr<InputStream> urlInStream (REPO_URL.createInputStream (false, nullptr, nullptr,
-                                                                         "Authorization: Bearer " + AUTH_TOKEN,
+                                                                         "Authorization: token " + neova_dash::auth::MACHINE_TOKEN,
                                                                          1000, nullptr, &status));
 
     if (urlInStream == nullptr || status != 200)
