@@ -12,6 +12,7 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "../Common/DashCommon.h"
+#include "GitAssetDownloader.h"
 
 /**
     \class  FirmDownloader FirmDownloader.h
