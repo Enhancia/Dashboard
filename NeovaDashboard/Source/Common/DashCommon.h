@@ -181,4 +181,9 @@ namespace neova_dash
                                          85, 86, 87, 89, 90,*/102, 103, 104, 105, 106, 107, 108, 109,
                                          110, 111, 112, 113, 114, 115, 116, 117, 118, 119 };
     }
+
+    namespace auth
+    {
+        const String MACHINE_TOKEN ("50327c582d22471d2427faed42c9928dcd8b0e98 "); //std::getenv ("MACHINE_ENHANCIA_OAUTH");
+    }
 };

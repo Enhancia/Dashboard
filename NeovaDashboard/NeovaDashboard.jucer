@@ -40,6 +40,10 @@
               file="Source/DashUpdater/FirmDownloader.cpp"/>
         <FILE id="AVomPY" name="FirmDownloader.h" compile="0" resource="0"
               file="Source/DashUpdater/FirmDownloader.h"/>
+        <FILE id="fw4Iaf" name="GitAssetDownloader.cpp" compile="1" resource="0"
+              file="Source/DashUpdater/GitAssetDownloader.cpp"/>
+        <FILE id="gNPOlY" name="GitAssetDownloader.h" compile="0" resource="0"
+              file="Source/DashUpdater/GitAssetDownloader.h"/>
       </GROUP>
       <GROUP id="{070581BE-75F7-2121-AB9B-7858417FB991}" name="UpgradeHandler">
         <FILE id="zzFpYT" name="upgradeHandler_MacOS.cpp" compile="1" resource="0"
