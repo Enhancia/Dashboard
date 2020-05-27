@@ -153,6 +153,7 @@ public:
 
     //==============================================================================
     void setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool uploadToHub = true);
+    void setMidiChannelExclusive (const int channelNumber, bool uploadToHub = true);
     void toggleMidiChannel (const int channelNumber, bool uploadToHub = true);
     int getMidiChannels();
 

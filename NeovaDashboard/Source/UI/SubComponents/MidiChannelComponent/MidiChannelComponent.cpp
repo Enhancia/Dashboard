@@ -17,167 +17,84 @@
 MidiChannelComponent::MidiChannelComponent (HubConfiguration& data)
 	: hubConfig (data)
 {
-	initializeButtons();
+	createComboBox();
 }
 
 MidiChannelComponent::~MidiChannelComponent()
 {
+	midiChannelBox.removeListener (this);
 }
 
 void MidiChannelComponent::paint (Graphics& g)
 {
 	g.setFont (neova_dash::font::dashFont.withHeight (15.0f));
-	g.setColour (Colour (0xffffffff));
+	g.setColour (neova_dash::colour::mainText);
 
-	g.drawText ("MIDI Channels :", getLocalBounds ().removeFromLeft (90), Justification::centred);
+	//g.drawRect (getLocalBounds());
+	g.drawText ("MIDI Channel :", getLocalBounds().withRight (midiChannelBox.getX()), Justification::centred);
 }
 
 void MidiChannelComponent::resized()
 {
 	auto area = getLocalBounds();
-	area.removeFromLeft (90 + 2*neova_dash::ui::MARGIN);
 
-	const int buttonW = area.getWidth()/buttons.size();
-
-	for (auto button : buttons)
-	{
-		button->setBounds (area.removeFromLeft (buttonW)
-							   .reduced (0, neova_dash::ui::MARGIN_SMALL));
-	}
+	midiChannelBox.setBounds (area.removeFromRight (getWidth()/3));
 }
 
-void MidiChannelComponent::buttonClicked (Button* bttn)
+void MidiChannelComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 {
-	if (auto* channelButton = dynamic_cast<ChannelButton*> (bttn))
+	if (auto* comboBoxThatHasChanged = &midiChannelBox)
 	{
-		if (channelButton->getToggleState())
-		{
-			unselectChannel (channelButton->channel);
-		}
-		else
-		{
-			selectChannelLifo (channelButton->channel);
-		}
+		hubConfig.setMidiChannelExclusive (midiChannelBox.getSelectedId() - 1);
 	}
 }
 
 void MidiChannelComponent::update()
 {
 	uint16_t midiChannels = hubConfig.getMidiChannels();
+	double channelToSet = std::log2 (midiChannels);
 
-	for (int channel =0; channel < 16; channel++)
+	// Check for legacy HUBs with multiple channels (-> multiple bytes at 1), and wrong channel values in general
+	if (channelToSet != static_cast<int>(channelToSet) || channelToSet < 0 || channelToSet > 15)
 	{
-		if ((midiChannels & (1 << channel)) != 0)
-		{
-			selectChannelLifo (channel);
-		}
-		else
-		{
-			unselectChannel (channel);
-		}
+		setHUBToFirstActiveChannelOrChannel1();
 	}
+	else
+	{
+		midiChannelBox.setSelectedId (int (channelToSet) + 1);
+	}
+
 }
 
-void MidiChannelComponent::initializeButtons()
+void MidiChannelComponent::createComboBox()
+{
+	addAndMakeVisible (midiChannelBox);
+
+	for (int channel=1; channel<=16; channel++)
+	{
+		midiChannelBox.addItem (String (channel), channel);
+	}
+
+	midiChannelBox.setJustificationType (Justification::centred);
+	midiChannelBox.addListener (this);
+
+	update();
+}
+
+void MidiChannelComponent::setHUBToFirstActiveChannelOrChannel1()
 {
 	uint16_t midiChannels = hubConfig.getMidiChannels();
-	
-	for (int channel =0; channel < 16; channel++)
-	{
-		buttons.add (new ChannelButton (String ("channelButton") + String (channel), channel));
-		addAndMakeVisible (buttons.getLast());
-		buttons.getLast()->addListener (this);
 
-		if ((midiChannels & (1 << channel)) != 0)
+	for (int channel = 0; channel<16; channel++)
+	{
+		if (midiChannels << channel & 1 == 1)
 		{
-			selectChannelLifo (channel);
+			hubConfig.setMidiChannelExclusive (channel);
+			midiChannelBox.setSelectedId (channel + 1);
+			return;
 		}
 	}
-}
 
-void MidiChannelComponent::selectChannelFifo (const int channelToSelect)
-{
-	if (buttons[channelToSelect]->getToggleState() || channelToSelect < 0
-												   || channelToSelect > 15 ) return;
-
-	if (selectedButtons.size() == MAX_CHANNELS)
-	{
-		unselectChannel (selectedButtons.getLast()->channel);
-	}
-
-	selectedButtons.insert (0, buttons[channelToSelect]);
-	buttons[channelToSelect]->setToggleState (true, dontSendNotification);
-	hubConfig.setMidiChannel (channelToSelect, true);
-}
-
-void MidiChannelComponent::selectChannelLifo (const int channelToSelect)
-{
-	if (buttons[channelToSelect]->getToggleState() || channelToSelect < 0
-												   || channelToSelect > 15 ) return;
-
-	if (selectedButtons.size() == MAX_CHANNELS)
-	{
-		unselectChannel (selectedButtons.getLast()->channel);
-	}
-
-	selectedButtons.add (buttons[channelToSelect]);
-	buttons[channelToSelect]->setToggleState (true, dontSendNotification);
-	hubConfig.setMidiChannel (channelToSelect, true);
-}
-
-void MidiChannelComponent::selectChannelCapped (const int channelToSelect)
-{
-	if (buttons[channelToSelect]->getToggleState() || channelToSelect < 0
-												   || channelToSelect > 15
-												   || selectedButtons.size() == MAX_CHANNELS) return;
-
-	selectedButtons.add (buttons[channelToSelect]);
-	buttons[channelToSelect]->setToggleState (true, dontSendNotification);
-	hubConfig.setMidiChannel (channelToSelect, true);
-}
-
-void MidiChannelComponent::unselectChannel (const int channelToSelect)
-{ 
-	auto* buttonToUnselect = buttons[channelToSelect];
-	int idInSelectedArray = selectedButtons.indexOf(buttonToUnselect);
-
-	if (idInSelectedArray != -1)
-	{
-		selectedButtons.remove (idInSelectedArray);
-		buttonToUnselect->setToggleState (false, dontSendNotification);
-		hubConfig.setMidiChannel (channelToSelect, false);
-	}
-	else { DBG ("Channel wasn't selected to begin with..... "); }
-}
-
-//==============================================================================
-MidiChannelComponent::ChannelButton::ChannelButton (const String& name, const int channelNumber)
-	: Button (name), channel (channelNumber)
-{
-	//setClickingTogglesState (true);
-}
-
-MidiChannelComponent::ChannelButton::~ChannelButton()
-{
-}
-
-void MidiChannelComponent::ChannelButton::paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted,
-																	bool shouldDrawButtonAsDown)
-{
-	if (shouldDrawButtonAsHighlighted)
-	{
-		g.setColour (Colour (0x30ffffff));
-		g.fillRoundedRectangle (getLocalBounds().toFloat(), 2.0f);
-	}
-
-	if (getToggleState())
-	{
-		g.setColour (Colour (0xd0ffffff));
-		g.fillRect (getLocalBounds().removeFromBottom (2));
-	}
-	
-	g.setColour (Colour (getToggleState() ? 0xd0ffffff : 0x40ffffff));
-
-	g.setFont (neova_dash::font::dashFont.withHeight (13.0f));
-	g.drawText (String (channel+1), getLocalBounds(), Justification::centred, false);
+	hubConfig.setMidiChannelExclusive (0);
+	midiChannelBox.setSelectedId (1);
 }

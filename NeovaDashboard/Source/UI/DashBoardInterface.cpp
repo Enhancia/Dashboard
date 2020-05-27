@@ -175,10 +175,12 @@ void DashBoardInterface::resized()
 
     header->setBounds (area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL, MARGIN));
 
-    midiChannelComponent->setBounds (area.removeFromBottom (15)
-                                         .withTrimmedTop (20)
-                                         .withSizeKeepingCentre (area.getWidth()/2, 25));
-    presetSelector->setBounds (area.removeFromBottom (10).withSizeKeepingCentre (area.getWidth()/6, 30));
+    auto presetAndMidiArea = area.removeFromBottom (15);
+
+    presetSelector->setBounds (presetAndMidiArea.withSizeKeepingCentre (area.getWidth()/6, 30));
+    midiChannelComponent->setBounds (presetAndMidiArea.withLeft (presetSelector->getRight())
+                                                      .withRight (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/16)
+                                                      .reduced (4*MARGIN, 0));
 
     hubComponent->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight())
                                  .translated (0, -10));

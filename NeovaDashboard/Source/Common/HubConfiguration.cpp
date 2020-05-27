@@ -80,6 +80,18 @@ void HubConfiguration::setMidiChannel (const int channelNumber, bool shouldChann
 	notifyConfigWasChanged();
 }
 
+void HubConfiguration::setMidiChannelExclusive (const int channelNumber, bool uploadToHub)
+{
+	getPresetData().midiChannels = (1 << channelNumber);
+	
+	if (uploadToHub)
+	{
+		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+	}
+
+	notifyConfigWasChanged();
+}
+
 void HubConfiguration::toggleMidiChannel (const int channelNumber, bool uploadToHub)
 {
 	getPresetData().midiChannels ^= (1 << channelNumber);
