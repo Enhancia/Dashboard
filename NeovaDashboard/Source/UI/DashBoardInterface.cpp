@@ -250,6 +250,11 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
         uploadButton->triggerClick();
     }
 
+    if (key == KeyPress ('a', ModifierKeys (ModifierKeys::commandModifier), 'a'))
+    {
+        createAndShowAlertPanel (DashAlertPanel::unknown);
+    }
+
     return false;
 }
 
@@ -486,6 +491,8 @@ void DashBoardInterface::createAndShowAlertPanel (const String& title, const Str
                                                    const String& buttonText, const bool hasCloseButton,
                                                    int returnValue)
 {
+    if (alertPanel->isCurrentlyModal()) alertPanel->exitModalState (0);
+
     alertPanel.reset (new DashAlertPanel (title, message, returnValue, hasCloseButton, buttonText));
     addAndMakeVisible (*alertPanel);
 
@@ -494,9 +501,19 @@ void DashBoardInterface::createAndShowAlertPanel (const String& title, const Str
     alertPanel->setLookAndFeel (&dashBoardLookAndFeel);
     alertPanel->setBounds (getLocalBounds());
 
-    //if (!buttonText.isEmpty()) alertPanel->addButton (buttonText, 0, KeyPress (KeyPress::escapeKey));
+    alertPanel->enterModalState (true, ModalCallbackFunction::forComponent (alertPanelCallback, this), false);
+}
 
-    //alertPanel->setOpaque (false);
+void DashBoardInterface::createAndShowAlertPanel (DashAlertPanel::SpecificReturnValue returnValue)
+{
+    alertPanel.reset (DashAlertPanel::createSpecificAlertPanel (returnValue));
+    addAndMakeVisible (*alertPanel);
+
+    alertPanel->setVisible (true);
+    alertPanel->setAlwaysOnTop (true);
+    alertPanel->setLookAndFeel (&dashBoardLookAndFeel);
+    alertPanel->setBounds (getLocalBounds());
+
     alertPanel->enterModalState (true, ModalCallbackFunction::forComponent (alertPanelCallback, this), false);
 }
 
@@ -519,7 +536,8 @@ void DashBoardInterface::executePanelAction (const int panelReturnValue)
         case DashAlertPanel::outdatedFirmware:
             getCommandManager().invokeDirectly (neova_dash::commands::upgradeHub, true);
             break;
-        case DashAlertPanel::noUploadQuitting: //TODO
+        case DashAlertPanel::noUploadQuitting:
+            JUCEApplication::getInstance()->systemRequestedQuit();
             break;
         default: // modalResult 0 or unknown
             break;

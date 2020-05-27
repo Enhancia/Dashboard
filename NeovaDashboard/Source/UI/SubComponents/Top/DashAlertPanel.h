@@ -25,7 +25,8 @@ public:
     enum SpecificReturnValue
     {
         outdatedFirmware = 1,
-        noUploadQuitting
+        noUploadQuitting,
+        unknown
     };
 
     //==============================================================================
@@ -41,6 +42,9 @@ public:
 
     //==============================================================================
     void buttonClicked (Button* bttn) override;
+
+    //==============================================================================
+    static DashAlertPanel* createSpecificAlertPanel (SpecificReturnValue panelType);
 
 private:
     //==============================================================================
@@ -62,3 +66,5 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DashAlertPanel)
 };
+
+

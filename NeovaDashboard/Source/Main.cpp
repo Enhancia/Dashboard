@@ -77,7 +77,7 @@ public:
     
     	dashInterface.reset (new DashBoardInterface (hubConfig, *dataReader, *updater, *upgradeHandler));
 
-    	mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get()));
+    	mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get(), hubConfig));
     	dashInterface->grabKeyboardFocus();
     
     	//dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::waitingForConnection);
@@ -264,10 +264,11 @@ public:
     class MainWindow    : public DocumentWindow
     {
     public:
-        MainWindow (String name , DashBoardInterface* dashInterface)
+        MainWindow (String name , DashBoardInterface* dashInterface, HubConfiguration& config)
             : DocumentWindow (name, Desktop::getInstance().getDefaultLookAndFeel()
                                                           .findColour (ResizableWindow::backgroundColourId),
-                                    DocumentWindow::allButtons)
+                                    DocumentWindow::allButtons),
+              dashboardInterface (*dashInterface), hubConfig (config)
         {
             setUsingNativeTitleBar (true);
             setContentOwned (dashInterface, true);
@@ -280,10 +281,20 @@ public:
 
         void closeButtonPressed() override
         {
-            JUCEApplication::getInstance()->systemRequestedQuit();
+        	if (hubConfig.wasConfigChangedSinceLastFlash())
+        	{
+        		dashboardInterface.createAndShowAlertPanel (DashAlertPanel::noUploadQuitting);
+        	}
+        	else
+        	{
+            	JUCEApplication::getInstance()->systemRequestedQuit();
+        	}
         }
 
     private:
+    	DashBoardInterface& dashboardInterface;
+    	HubConfiguration& hubConfig;
+
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
     };
 
