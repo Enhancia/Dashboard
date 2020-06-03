@@ -22,6 +22,8 @@ void HubConfiguration::setConfig(uint8_t * data)
 {
 	memcpy(&config, data, sizeof(ConfigData));	
 	setPreset(config.active_preset);
+
+	if (!configWasInitialized) configWasInitialized = true;
 }
 
 void HubConfiguration::getConfig(uint8_t * data, int buffer_size)
@@ -42,6 +44,11 @@ void HubConfiguration::flashHub()
 bool HubConfiguration::wasConfigChangedSinceLastFlash()
 {
 	return configWasChangedSinceLastFlash;
+}
+
+bool HubConfiguration::getConfigWasInitialized()
+{
+	return configWasInitialized;
 }
 
 void HubConfiguration::notifyConfigWasChanged()

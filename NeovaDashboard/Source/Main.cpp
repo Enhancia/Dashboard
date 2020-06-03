@@ -337,20 +337,21 @@ public:
         switch (info.commandID)
         {
             case flashHub:
-				
 				memcpy(data, "jeannine", sizeof("jeannine"));
 				ctrl = 0x04;
 				memcpy(data + 8, &ctrl, sizeof(uint32_t));
 				dashPipe->sendString(data, 12);
 				return true;
             case uploadConfigToHub:
-				hubConfig.getConfig(data+12, sizeof(data)-12);
-				memcpy(data, "jeannine", sizeof("jeannine"));
-				ctrl = 0x03;
-				memcpy(data + 8, &ctrl, sizeof(uint32_t));
-				dashPipe->sendString(data, 12 + hubConfig.CONFIGSIZE);
+            	if (hubConfig.getConfigWasInitialized())
+            	{
+					hubConfig.getConfig(data+12, sizeof(data)-12);
+					memcpy(data, "jeannine", sizeof("jeannine"));
+					ctrl = 0x03;
+					memcpy(data + 8, &ctrl, sizeof(uint32_t));
+					dashPipe->sendString(data, 12 + hubConfig.CONFIGSIZE);
+				}
 				return true;
-
             case upgradeHub:
                 upgradeHandler->launchUpgradeProcedure();
                 return true;

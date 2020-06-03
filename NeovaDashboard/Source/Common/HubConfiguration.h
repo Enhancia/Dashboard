@@ -108,6 +108,7 @@ public:
     //==============================================================================
     void flashHub();
     bool wasConfigChangedSinceLastFlash();
+    bool getConfigWasInitialized();
     void notifyConfigWasChanged();
     void resetConfigWasChanged();
 
@@ -222,6 +223,7 @@ private:
     void initialiseLastGestureConfigs();
     void saveGestureConfig (const GestureData& gestureDataToSave);
     bool configWasChangedSinceLastFlash = false;
+    bool configWasInitialized = false;
 
     //==============================================================================
     void checkHUBCompatibility();
