@@ -162,6 +162,8 @@ public:
                                                        const bool hasCloseButton = true,
                                                        int returnValue = 0);
 
+    void createAndShowAlertPanel (DashAlertPanel::SpecificReturnValue returnValue);
+
     /** 
         \brief  Modal alert panel destructor.
 
