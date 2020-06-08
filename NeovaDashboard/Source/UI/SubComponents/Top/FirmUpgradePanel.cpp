@@ -380,6 +380,8 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 void FirmUpgradePanel::updateComponentsForError (UpgradeState upgradeStateToUpdateTo)
 {
 	stopTimer();
+	currentState = upgradeStateToUpdateTo;
+
 
 	closeButton->setVisible (true);
 	okButton->setVisible (true);
