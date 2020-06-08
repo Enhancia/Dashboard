@@ -22,6 +22,8 @@ void HubConfiguration::setConfig(uint8_t * data)
 {
 	memcpy(&config, data, sizeof(ConfigData));	
 	setPreset(config.active_preset);
+
+	if (!configWasInitialized) configWasInitialized = true;
 }
 
 void HubConfiguration::getConfig(uint8_t * data, int buffer_size)
@@ -42,6 +44,11 @@ void HubConfiguration::flashHub()
 bool HubConfiguration::wasConfigChangedSinceLastFlash()
 {
 	return configWasChangedSinceLastFlash;
+}
+
+bool HubConfiguration::getConfigWasInitialized()
+{
+	return configWasInitialized;
 }
 
 void HubConfiguration::notifyConfigWasChanged()
@@ -72,6 +79,18 @@ void HubConfiguration::setMidiChannel (const int channelNumber, bool shouldChann
 		getPresetData().midiChannels &= ~(1 << channelNumber);
 	}
 
+	if (uploadToHub)
+	{
+		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+	}
+
+	notifyConfigWasChanged();
+}
+
+void HubConfiguration::setMidiChannelExclusive (const int channelNumber, bool uploadToHub)
+{
+	getPresetData().midiChannels = (1 << channelNumber);
+	
 	if (uploadToHub)
 	{
 		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
