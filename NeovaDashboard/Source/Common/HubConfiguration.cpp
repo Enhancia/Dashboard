@@ -172,19 +172,22 @@ void HubConfiguration::setDefaultGestureValues (const int gestureNumber, const n
 	switch (type)
 	{
 		case vibrato:
-			setGestureParameters (presetNumber, gestureNumber, 400.0f, 40.0f);
+			setGestureParameters (presetNumber, gestureNumber, VIBRATO_RANGE_DEFAULT, VIBRATO_THRESH_DEFAULT);
 			break;
 		case pitchBend:
-			setGestureParameters (presetNumber, gestureNumber, -50.0f, -20.0f, 30.0f, 60.0f);
+			setGestureParameters (presetNumber, gestureNumber, PITCHBEND_DEFAULT_LEFTMIN,
+															   PITCHBEND_DEFAULT_LEFTMAX,
+															   PITCHBEND_DEFAULT_RIGHTMIN,
+															   PITCHBEND_DEFAULT_RIGHTMAX);
 			break;
 		case tilt:
-			setGestureParameters (presetNumber, gestureNumber, 0.0f, 50.0f);
+			setGestureParameters (presetNumber, gestureNumber, TILT_DEFAULT_MIN, TILT_DEFAULT_MAX);
 			break;
 		case roll:
-			setGestureParameters (presetNumber, gestureNumber, -50.0f, 50.0f);
+			setGestureParameters (presetNumber, gestureNumber, ROLL_DEFAULT_MIN, ROLL_DEFAULT_MAX);
 			break;
 		case wave:
-			setGestureParameters (presetNumber, gestureNumber, -50.0f, 50.0f);
+			setGestureParameters (presetNumber, gestureNumber, WAVE_DEFAULT_MIN, WAVE_DEFAULT_MAX);
 			break;
 
 		default:
