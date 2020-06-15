@@ -107,28 +107,38 @@ namespace gesture
 {
 	const Colour getHighlightColour (const neova_dash::gesture::GestureType type, const bool active)
 	{
-		if (!active) return neova_dash::colour::inactiveGesture;
+		//if (!active) return neova_dash::colour::inactiveGesture;
+		Colour highlightColour;
 
 		switch (type)
 		{
 			case neova_dash::gesture::vibrato:
-				return neova_dash::colour::vibrato;
+				highlightColour = neova_dash::colour::vibrato;
+        break;
 			
 			case neova_dash::gesture::pitchBend:
-				return neova_dash::colour::pitchBend;
+				highlightColour = neova_dash::colour::pitchBend;
+        break;
 			
 			case neova_dash::gesture::tilt:
-				return neova_dash::colour::tilt;
+				highlightColour = neova_dash::colour::tilt;
+        break;
 			
 			case neova_dash::gesture::roll:
-				return neova_dash::colour::roll;
+				highlightColour = neova_dash::colour::roll;
+        break;
 			
 			case neova_dash::gesture::wave:
-				return neova_dash::colour::wave;
+				highlightColour = neova_dash::colour::wave;
+        break;
 
 			default:
-				return neova_dash::colour::inactiveGesture;
-		}	
+				highlightColour = neova_dash::colour::inactiveGesture;
+		}
+
+		if (!active) highlightColour = highlightColour.withAlpha (0.3f);
+
+		return highlightColour;
 	}
 
     const Colour getHighlightColour (const int typeInt, const bool active)

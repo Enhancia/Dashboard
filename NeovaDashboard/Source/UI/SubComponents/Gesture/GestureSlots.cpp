@@ -172,7 +172,8 @@ void GestureComponent::createButton()
                                                     neova_dash::colour::dashboardBackground,
                                                     neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (id)
                                                                                                       .type),
-                                                    neova_dash::colour::inactiveGesture);
+                                                    neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (id)
+                                                                                                      .type, false));
     addAndMakeVisible (*muteButton);
 
 	using namespace neova_dash;

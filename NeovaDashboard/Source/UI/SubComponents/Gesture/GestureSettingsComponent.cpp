@@ -190,7 +190,8 @@ void GestureSettingsComponent::createToggles()
                                                     neova_dash::colour::dashboardBackground,
                                                     neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (gestureId)
                                                                                                       .type),
-                                                    neova_dash::colour::inactiveGesture);
+                                                    neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (gestureId)
+                                                                                                      .type, false));
     addAndMakeVisible (*muteButton);
 
     muteButton->setShape (neova_dash::path::createPath (neova_dash::path::onOff), false, true, false);
