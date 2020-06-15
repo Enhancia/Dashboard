@@ -165,6 +165,8 @@ void DashUpdater::launchInstaller()
 			getDownloadedFile().revealToUser();
 		}
         #endif
+
+        JUCEApplication::getInstance()->systemRequestedQuit();
     }
 }
 
