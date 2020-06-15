@@ -94,6 +94,7 @@ void FirmUpgradePanel::timerCallback()
 				if (currentState < 0) stopTimer(); // Error: terminates the upgrade process
 
 				updateComponentsForSpecificState (upgradeHandler.getUpgradeState());
+				animateUpgrade();
 			}
 			else
 			{
@@ -327,7 +328,7 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 				case waitingForUpgradeFirm:
 
 					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
-					bodyText->setText ("Step 1 : Waiting for Device Setup...\n\n \n\n ", dontSendNotification);
+					bodyText->setText ("Step 1 : Waiting for Device Setup" + upgradeAnimationString + "\n\n \n\n ", dontSendNotification);
 					break;
 
 				case upgradeFirmConnected:
@@ -340,14 +341,14 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 				case upgradeInProgress:
 
 					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
-					bodyText->setText ("Step 1 : Waiting for Device Setup - OK\n\nStep 2 : Upgrading Firmware... \n\n ", dontSendNotification);
+					bodyText->setText ("Step 1 : Waiting for Device Setup - OK\n\nStep 2 : Upgrading Firmware" + upgradeAnimationString + "\n\n ", dontSendNotification);
 					break;
 
 				case waitingForHubReconnect:
 
 					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
 					bodyText->setText ("Step 1 : Waiting for Device Setup - OK\n\nStep 2 : Upgrading Firmware - OK\n\n"
-									   "Step 3 : Waiting for Device Reboot...", dontSendNotification);
+									   "Step 3 : Waiting for Device Reboot" + upgradeAnimationString, dontSendNotification);
 					break;
 
 				case upgradeSuccessfull:
@@ -429,4 +430,10 @@ String FirmUpgradePanel::getFormattedVersionString (uint16_t version)
 	uint8_t major = uint8_t (version >> 8 & 0xff);
 
 	return String (major) + "." + String (minor); 
+}
+
+void FirmUpgradePanel::animateUpgrade()
+{
+	if (upgradeAnimationString.length() == 3) upgradeAnimationString = "";
+	else upgradeAnimationString += " .";
 }

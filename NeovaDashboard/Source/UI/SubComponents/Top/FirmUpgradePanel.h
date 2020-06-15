@@ -80,10 +80,15 @@ private:
     //==============================================================================
     void createLabels();
     void createButtons();
+    //==============================================================================
 	void updateComponentsForSpecificState (UpgradeState upgradeStateToUpdateTo);
 	void updateComponentsForSpecificState (int upgradeStateToUpdateTo);
 	void updateComponentsForError (UpgradeState upgradeStateToUpdateTo);
 	String getFormattedVersionString (uint16_t version);
+
+    //==============================================================================
+    void animateUpgrade();
+    String upgradeAnimationString;
 
     //==============================================================================
     juce::Rectangle<int> panelArea;
@@ -100,5 +105,9 @@ private:
     UpgradeState currentState = checkingReleases; // Follows upgradeHandler upgradeState enum
     FirmUpgradeType currentUpgrade = none; // Follows upgradeHandler upgradeState enum
 
+    //==============================================================================
+    int animationStep = 0;
+
+    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FirmUpgradePanel)
 };
