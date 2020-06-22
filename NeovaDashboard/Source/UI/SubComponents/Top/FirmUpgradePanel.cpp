@@ -67,14 +67,8 @@ void FirmUpgradePanel::resized()
     okButton->setBounds (buttonArea.withSizeKeepingCentre (okButton->getBestWidthForHeight (buttonArea.getHeight()),
                                      						buttonArea.getHeight()));
 
-    hubUpgradeButton->setBounds (buttonArea.removeFromLeft (buttonArea.getWidth()/2)
-                                	 .withSizeKeepingCentre
-                                    (area.getWidth()/3,
-                                     buttonArea.getHeight()));
-
-    ringUpgradeButton->setBounds (buttonArea.withSizeKeepingCentre
-                                    (area.getWidth()/3,
-                                     buttonArea.getHeight()));
+    upgradeButton->setBounds (buttonArea.withSizeKeepingCentre (upgradeButton->getBestWidthForHeight (buttonArea.getHeight()),
+                                     						    buttonArea.getHeight()));
 
     bodyText->setBounds (area.reduced (area.getWidth()/4, neova_dash::ui::MARGIN));
 }
@@ -141,7 +135,7 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 		}
 	}
 
-	else if (bttn == hubUpgradeButton.get() || bttn == ringUpgradeButton.get())
+	else if (bttn == upgradeButton.get())
 	{
 		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16());
 		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16());
@@ -207,15 +201,10 @@ void FirmUpgradePanel::createLabels()
 void FirmUpgradePanel::createButtons()
 {
 	// Bottom buttons
-    hubUpgradeButton.reset (new TextButton ("hub Button"));
-    addAndMakeVisible (*hubUpgradeButton);
-    hubUpgradeButton->setButtonText ("Upgrade HUB");
-    hubUpgradeButton->addListener (this);
-
-    ringUpgradeButton.reset (new TextButton ("ring Button"));
-    addAndMakeVisible (*ringUpgradeButton);
-    ringUpgradeButton->setButtonText ("Upgrade Ring");
-    ringUpgradeButton->addListener (this);
+    upgradeButton.reset (new TextButton ("Upgrade Button"));
+    addAndMakeVisible (*upgradeButton);
+    upgradeButton->setButtonText ("Upgrade");
+    upgradeButton->addListener (this);
 
     okButton.reset (new TextButton ("Ok Button"));
     addAndMakeVisible (*okButton);
@@ -271,13 +260,12 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 	else
 	{
 		String bodyTextString;
-		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16()) && hubConfig.getHubIsConnected();
+		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16());
 		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected();
 
 		closeButton->setVisible (false);
 		okButton->setVisible (false);
-		hubUpgradeButton->setVisible (false);
-		ringUpgradeButton->setVisible (false);
+		upgradeButton->setVisible (false);
     	bodyText->setJustificationType (Justification::centredLeft);
 
 		switch (upgradeStateToUpdateTo)
@@ -285,8 +273,7 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 				case checkingReleases:
 					closeButton->setVisible (true);
     				okButton->setButtonText ("Ok");
-					hubUpgradeButton->setVisible (hubAvailable);
-					ringUpgradeButton->setVisible (ringAvailable);
+					upgradeButton->setVisible (hubAvailable || ringAvailable);
 					if (!hubAvailable && !ringAvailable) okButton->setVisible (true);
 
 					titleLabel->setText ("Firmware Update", dontSendNotification);
@@ -391,8 +378,7 @@ void FirmUpgradePanel::updateComponentsForError (UpgradeState upgradeStateToUpda
 
 	closeButton->setVisible (true);
 	okButton->setVisible (true);
-	ringUpgradeButton->setVisible (false);
-	hubUpgradeButton->setVisible (false);
+	upgradeButton->setVisible (false);
     bodyText->setJustificationType (Justification::centred);
 	titleLabel->setText ("Error", dontSendNotification);
     okButton->setButtonText ("Close");
