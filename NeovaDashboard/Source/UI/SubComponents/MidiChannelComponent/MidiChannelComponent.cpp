@@ -78,7 +78,7 @@ void MidiChannelComponent::createComboBox()
 	midiChannelBox.setJustificationType (Justification::centred);
 	midiChannelBox.addListener (this);
 
-	update();
+	//update();
 }
 
 void MidiChannelComponent::setHUBToFirstActiveChannelOrChannel1()
