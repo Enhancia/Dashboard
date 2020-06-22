@@ -30,6 +30,7 @@ public:
     enum UpgradeState
     {
         //error states
+        err_timeout = -6,
         err_ringIsNotConnected = -5,
         err_waitingForUpgradeFirmTimeOut = -4,
         err_upgradeLaunchFailed = -3,
@@ -88,7 +89,11 @@ private:
 
     //==============================================================================
     void animateUpgrade();
+    void startTimeoutCount();
+    void timeoutCheck();
     String upgradeAnimationString;
+    String bodyTextString;
+    int timeoutCounter = 0;
 
     //==============================================================================
     juce::Rectangle<int> panelArea;
