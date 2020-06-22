@@ -193,6 +193,8 @@ public:
 					if (hubPowerState == POWER_ON)
 					{
 						hubConfig.setHubIsConnected (true);
+						upgradeHandler->checkForSuccessiveUpgrade();
+
 						if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
 						else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
 					}

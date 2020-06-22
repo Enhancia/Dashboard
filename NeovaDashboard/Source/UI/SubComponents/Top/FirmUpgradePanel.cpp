@@ -131,8 +131,7 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 			if (upgradeHandler.getUpgradeState() != int (checkingReleases))
 				updateComponentsForSpecificState (upgradeHandler.getUpgradeState());
 
-			if      (currentUpgrade == hub)	 upgradeHandler.startHubUpgrade();
-			else if (currentUpgrade == ring) upgradeHandler.startRingUpgrade();
+			upgradeHandler.startUpgrade();
 
 			startTimer (1000);
 		}
@@ -142,15 +141,12 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 		}
 	}
 
-	else if (bttn == hubUpgradeButton.get())
+	else if (bttn == hubUpgradeButton.get() || bttn == ringUpgradeButton.get())
 	{
-		currentUpgrade = hub;
-		updateComponentsForSpecificState (preInstallationWarning);
-	}
+		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16());
+		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16());
 
-	else if (bttn == ringUpgradeButton.get())
-	{
-		currentUpgrade = ring;
+		currentUpgrade = (!ringAvailable && hubAvailable) ? hub : ring;
 		updateComponentsForSpecificState (preInstallationWarning);
 	}
 }
@@ -176,7 +172,17 @@ void FirmUpgradePanel::updateAfterHubConnection()
 	if (currentState == waitingForHubReconnect)
 	{
 		stopTimer();
-		updateComponentsForSpecificState (upgradeSuccessfull);
+
+		if (upgradeHandler.getUpgradeState() == UpgradeHandler::upgradeSuccessfull)
+		{
+			updateComponentsForSpecificState (upgradeSuccessfull);
+		}
+		else // successive upgrade
+		{
+			currentUpgrade = hub;
+			updateComponentsForSpecificState (upgradeHandler.getUpgradeState());
+			startTimer (1000);
+		}
 	}
 	else
 	{
@@ -265,8 +271,8 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 	else
 	{
 		String bodyTextString;
-		bool hubAvailable = upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16();
-		bool ringAvailable = upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16();
+		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16()) && hubConfig.getHubIsConnected();
+		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected();
 
 		closeButton->setVisible (false);
 		okButton->setVisible (false);
@@ -288,12 +294,12 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 
 					if (!hubConfig.getHubIsConnected())
 					{
-						bodyTextString = "No HUB currently connected to the computer.\n\nPlease connect a HUB and retry.";
+						bodyTextString = "No device currently connected to the computer.\n\nPlease connect Neova and retry.";
 					}
 
 					else if (!hubAvailable && !ringAvailable)
 					{
-						bodyTextString = "Your HUB and Ring are up to date!";
+						bodyTextString = "Neova is up to date!";
 					}
 
 					else
@@ -367,7 +373,7 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 
 					titleLabel->setText ("Warning", dontSendNotification);
 					bodyText->setText ("Please make sure your hub is connected with your ring charging on top.\n\n"
-									   "Make sure you ring is connected and has some battery. Do not disconnect your HUB during the process.\n\n"
+									   "Make sure you ring is connected and has some battery. Do not disconnect Neova during the process.\n\n"
 									   "Please note that it may take a several minutes to complete.", dontSendNotification);
 					break;
 
@@ -399,7 +405,7 @@ void FirmUpgradePanel::updateComponentsForError (UpgradeState upgradeStateToUpda
 			break;
 
 		case err_waitingForUpgradeFirmTimeOut:
-			bodyText->setText ("Device took too long to respond.\n\nPlease unplug the HUB and retry.",
+			bodyText->setText ("Device took too long to respond.\n\nPlease unplug the Neova and retry.",
 				               dontSendNotification);
 			break;
 
