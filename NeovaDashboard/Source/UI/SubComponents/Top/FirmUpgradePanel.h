@@ -30,6 +30,7 @@ public:
     enum UpgradeState
     {
         //error states
+        err_timeout = -6,
         err_ringIsNotConnected = -5,
         err_waitingForUpgradeFirmTimeOut = -4,
         err_upgradeLaunchFailed = -3,
@@ -80,10 +81,19 @@ private:
     //==============================================================================
     void createLabels();
     void createButtons();
+    //==============================================================================
 	void updateComponentsForSpecificState (UpgradeState upgradeStateToUpdateTo);
 	void updateComponentsForSpecificState (int upgradeStateToUpdateTo);
 	void updateComponentsForError (UpgradeState upgradeStateToUpdateTo);
 	String getFormattedVersionString (uint16_t version);
+
+    //==============================================================================
+    void animateUpgrade();
+    void startTimeoutCount();
+    void timeoutCheck();
+    String upgradeAnimationString;
+    String bodyTextString;
+    int timeoutCounter = 0;
 
     //==============================================================================
     juce::Rectangle<int> panelArea;
@@ -100,5 +110,9 @@ private:
     UpgradeState currentState = checkingReleases; // Follows upgradeHandler upgradeState enum
     FirmUpgradeType currentUpgrade = none; // Follows upgradeHandler upgradeState enum
 
+    //==============================================================================
+    int animationStep = 0;
+
+    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FirmUpgradePanel)
 };
