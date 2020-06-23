@@ -100,8 +100,7 @@ private:
     std::unique_ptr<Label> bodyText;
     std::unique_ptr<Label> titleLabel;
     std::unique_ptr<DashShapeButton> closeButton;
-    std::unique_ptr<TextButton> hubUpgradeButton;
-    std::unique_ptr<TextButton> ringUpgradeButton;
+    std::unique_ptr<TextButton> upgradeButton;
     std::unique_ptr<TextButton> okButton;
 
     //==============================================================================

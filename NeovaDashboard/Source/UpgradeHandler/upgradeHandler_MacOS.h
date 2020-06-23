@@ -92,9 +92,11 @@ public:
 
     void launchUpgradeProcedure();
     
+    void startUpgrade();
     void startRingUpgrade();
-
     void startHubUpgrade();
+
+    void checkForSuccessiveUpgrade();
     
     String getPortPath(uint8_t * data);
     //==============================================================================
@@ -114,6 +116,7 @@ private:
     uint16_t hubReleaseVersion = 0;
     uint16_t ringReleaseVersion = 0;
     int upgradeState = 0;
+    bool successiveUpgrade = false;
     //==============================================================================
     DashPipe& dPipe;
     HubConfiguration& hubConfig;

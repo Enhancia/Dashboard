@@ -25,10 +25,8 @@ UpgradeHandler::~UpgradeHandler() {}
 //==============================================================================
 void UpgradeHandler::timerCallback()
 {
-	//TODO cacaARefaireCarBlockProcess 
 	set_upgradeCommandReceived(false);
 	setUpgradeState(err_waitingForUpgradeFirmTimeOut);
-	//AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Device took too long time to respond please unplug the hub and retry", "Ok", nullptr);
 	stopTimer();
 }
 
@@ -66,6 +64,8 @@ uint16_t UpgradeHandler::getRingReleaseVersion()
 void UpgradeHandler::setUpgradeState(int state)
 {
 	upgradeState = state;
+
+    if (upgradeState < 0) successiveUpgrade = false; // Stops the HUB from updating upon restart in case of a successive upgrade
 }
 
 int UpgradeHandler::getUpgradeState()
@@ -212,18 +212,6 @@ void UpgradeHandler::closeNrfutil()
     
     err_f.replaceWithText(String(CharPointer_UTF8(err_data)),false,false,nullptr);
     out_f.replaceWithText(String(CharPointer_UTF8(out_data)),false,false,nullptr);
-    
-    
-    //TODO cacaARefaire
-    /*
-    if (getUpgradeState()>=0)
-    {
-        AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Upgrade successfull", "Ok", nullptr);
-    }
-    else
-    {
-        AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Upgrade failed", "Ok", nullptr);
-    }*/
 }
 
 void UpgradeHandler::checkReleasesVersion()
@@ -248,17 +236,6 @@ void UpgradeHandler::checkReleasesVersion()
         uint8_t major = name.trimCharactersAtEnd("." + String(minor)).getTrailingIntValue();
         uint16_t version = ((uint16_t)major << 8) | minor;
         setHubReleaseVersion(version);
-
-        //TODO cacaARefaire
-        /*
-        if (version <= hubConfig.getHubFirmwareVersionUint16())
-        {
-            AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Already up to date", "Ok", nullptr);
-        }
-        else
-        {
-            AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Hub Update " + String(major) + "." + String(minor) + " available", "Ok", nullptr);
-        }*/
     }
     else
     {
@@ -270,8 +247,6 @@ void UpgradeHandler::checkReleasesVersion()
     if (ringFiles.size() == 0)
     {
         setRingReleaseVersion(0);
-        //TODO cacaARefaireCarBlockProcess
-        //AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Already up to date", "Ok", nullptr);
     }
     else if (ringFiles.size() == 1)
     {
@@ -280,18 +255,6 @@ void UpgradeHandler::checkReleasesVersion()
         uint8_t major = name.trimCharactersAtEnd("." + String(minor)).getTrailingIntValue();
         uint16_t version = ((uint16_t)major << 8) | minor;
         setRingReleaseVersion(version);
-        
-        //TODO cacaARefaire
-        /*
-        if (version <= hubConfig.getRingFirmwareVersionUint16())
-        {
-            
-            AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Already up to date", "Ok", nullptr);
-        }
-        else
-        {
-            AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Info", "Ring Update " + String(major) + "." + String(minor) + " available", "Ok", nullptr);
-        }*/
     }
     else
     {
@@ -304,22 +267,31 @@ void UpgradeHandler::launchUpgradeProcedure()
 {
     checkReleasesVersion();
     
-    //TODO sendCommand to open versionUpgradeWindow => versionUpgradeWindow will call startRingUpgrade() || startHubUpgrade()
     commandManager.invokeDirectly (neova_dash::commands::openFirmUpgradePanel, true);
-
-    //TODO à enlever qd versionUpgradeWindow sera implémentée
-    //Test
-    //startRingUpgrade();
 }
 
+void UpgradeHandler::startUpgrade()
+{
+    bool hubAvailable = getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16();
+    bool ringAvailable = (getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected();
+
+    if (hubAvailable != ringAvailable)
+    {
+        if (hubAvailable) startHubUpgrade();
+        else              startRingUpgrade();
+    }
+    else if (hubAvailable) // Both need to be upgraded
+    {
+        successiveUpgrade = true;
+        startRingUpgrade();
+    }
+}
 
 void UpgradeHandler::startRingUpgrade()
 {
 	//check if ring is connected
 	if (!hubConfig.getRingIsConnected())
 	{
-		//TODO cacaARefaire
-		//AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Ring is not connected", "Ok", nullptr);
 		setUpgradeState(err_ringIsNotConnected);
 	}
 	else
@@ -349,5 +321,13 @@ void UpgradeHandler::startHubUpgrade()
 	setUpgradeState(waitingForUpgradeFirm);
 }
 
+void UpgradeHandler::checkForSuccessiveUpgrade()
+{
+    if (upgradeState == upgradeSuccessfull && successiveUpgrade)
+    {
+        successiveUpgrade = false;
+        startHubUpgrade();
+    }
+}
 //==============================================================================
 #endif //JUCE_MAC

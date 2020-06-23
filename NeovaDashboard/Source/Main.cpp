@@ -139,6 +139,7 @@ public:
 					DBG("POWER STATE : " + String(hubPowerState) + " \n");
 					//TODO => mettre interface en mode POWER_ON
 					hubConfig.setHubIsConnected (true);
+					upgradeHandler->checkForSuccessiveUpgrade();
 
 					if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
 					else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
@@ -193,6 +194,8 @@ public:
 					if (hubPowerState == POWER_ON)
 					{
 						hubConfig.setHubIsConnected (true);
+						upgradeHandler->checkForSuccessiveUpgrade();
+
 						if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
 						else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
 					}

@@ -67,14 +67,8 @@ void FirmUpgradePanel::resized()
     okButton->setBounds (buttonArea.withSizeKeepingCentre (okButton->getBestWidthForHeight (buttonArea.getHeight()),
                                      						buttonArea.getHeight()));
 
-    hubUpgradeButton->setBounds (buttonArea.removeFromLeft (buttonArea.getWidth()/2)
-                                	 .withSizeKeepingCentre
-                                    (area.getWidth()/3,
-                                     buttonArea.getHeight()));
-
-    ringUpgradeButton->setBounds (buttonArea.withSizeKeepingCentre
-                                    (area.getWidth()/3,
-                                     buttonArea.getHeight()));
+    upgradeButton->setBounds (buttonArea.withSizeKeepingCentre (upgradeButton->getBestWidthForHeight (buttonArea.getHeight()),
+                                     						    buttonArea.getHeight()));
 
     bodyText->setBounds (area.reduced (area.getWidth()/4, neova_dash::ui::MARGIN));
 }
@@ -125,8 +119,7 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 			if (upgradeHandler.getUpgradeState() != int (checkingReleases))
 				updateComponentsForSpecificState (upgradeHandler.getUpgradeState());
 
-			if      (currentUpgrade == hub)	 upgradeHandler.startHubUpgrade();
-			else if (currentUpgrade == ring) upgradeHandler.startRingUpgrade();
+			upgradeHandler.startUpgrade();
 
 			startTimer (1000);
 		}
@@ -136,15 +129,12 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 		}
 	}
 
-	else if (bttn == hubUpgradeButton.get())
+	else if (bttn == upgradeButton.get())
 	{
-		currentUpgrade = hub;
-		updateComponentsForSpecificState (preInstallationWarning);
-	}
+		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16());
+		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16());
 
-	else if (bttn == ringUpgradeButton.get())
-	{
-		currentUpgrade = ring;
+		currentUpgrade = (!ringAvailable && hubAvailable) ? hub : ring;
 		updateComponentsForSpecificState (preInstallationWarning);
 	}
 }
@@ -170,7 +160,17 @@ void FirmUpgradePanel::updateAfterHubConnection()
 	if (currentState == waitingForHubReconnect)
 	{
 		stopTimer();
-		updateComponentsForSpecificState (upgradeSuccessfull);
+
+		if (upgradeHandler.getUpgradeState() == UpgradeHandler::upgradeSuccessfull)
+		{
+			updateComponentsForSpecificState (upgradeSuccessfull);
+		}
+		else // successive upgrade
+		{
+			currentUpgrade = hub;
+			updateComponentsForSpecificState (upgradeHandler.getUpgradeState());
+			startTimer (1000);
+		}
 	}
 	else
 	{
@@ -195,15 +195,10 @@ void FirmUpgradePanel::createLabels()
 void FirmUpgradePanel::createButtons()
 {
 	// Bottom buttons
-    hubUpgradeButton.reset (new TextButton ("hub Button"));
-    addAndMakeVisible (*hubUpgradeButton);
-    hubUpgradeButton->setButtonText ("Upgrade HUB");
-    hubUpgradeButton->addListener (this);
-
-    ringUpgradeButton.reset (new TextButton ("ring Button"));
-    addAndMakeVisible (*ringUpgradeButton);
-    ringUpgradeButton->setButtonText ("Upgrade Ring");
-    ringUpgradeButton->addListener (this);
+    upgradeButton.reset (new TextButton ("Upgrade Button"));
+    addAndMakeVisible (*upgradeButton);
+    upgradeButton->setButtonText ("Upgrade");
+    upgradeButton->addListener (this);
 
     okButton.reset (new TextButton ("Ok Button"));
     addAndMakeVisible (*okButton);
@@ -258,13 +253,13 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 	}
 	else
 	{
-		bool hubAvailable = upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16();
-		bool ringAvailable = upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16();
+		String bodyTextString;
+		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16());
+		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected();
 
 		closeButton->setVisible (false);
 		okButton->setVisible (false);
-		hubUpgradeButton->setVisible (false);
-		ringUpgradeButton->setVisible (false);
+		upgradeButton->setVisible (false);
     	bodyText->setJustificationType (Justification::centredLeft);
 
 		switch (upgradeStateToUpdateTo)
@@ -272,8 +267,7 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 				case checkingReleases:
 					closeButton->setVisible (true);
     				okButton->setButtonText ("Ok");
-					hubUpgradeButton->setVisible (hubAvailable);
-					ringUpgradeButton->setVisible (ringAvailable);
+					upgradeButton->setVisible (hubAvailable || ringAvailable);
 					if (!hubAvailable && !ringAvailable) okButton->setVisible (true);
 
 					titleLabel->setText ("Firmware Update", dontSendNotification);
@@ -281,12 +275,12 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 
 					if (!hubConfig.getHubIsConnected())
 					{
-						bodyTextString = "No HUB currently connected to the computer.\n\nPlease connect a HUB and retry.";
+						bodyTextString = "No device currently connected to the computer.\n\nPlease connect Neova and retry.";
 					}
 
 					else if (!hubAvailable && !ringAvailable)
 					{
-						bodyTextString = "Your HUB and Ring are up to date!";
+						bodyTextString = "Neova is up to date!";
 					}
 
 					else
@@ -316,27 +310,54 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 					break;
 
 				case waitingForUpgradeFirm:
+					if (currentUpgrade == hub)
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova HUB", dontSendNotification);
+					}
+					else
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova Ring", dontSendNotification);
+					}
 
-					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
 					bodyTextString = "Step 1 : Waiting for Device Setup";
 					break;
 
 				case upgradeFirmConnected:
-
-					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
+					if (currentUpgrade == hub)
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova HUB", dontSendNotification);
+					}
+					else
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova Ring", dontSendNotification);
+					}
+        
 					bodyTextString = "Step 1 : Waiting for Device Setup - OK\n\n  \n\n ";
-
 					break;
 
 				case upgradeInProgress:
-
-					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
+					if (currentUpgrade == hub)
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova HUB", dontSendNotification);
+					}
+					else
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova Ring", dontSendNotification);
+					}
+        
 					bodyTextString = "Step 1 : Waiting for Device Setup - OK\n\nStep 2 : Upgrading Firmware";
 					break;
 
 				case waitingForHubReconnect:
-
-					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
+					if (currentUpgrade == hub)
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova HUB", dontSendNotification);
+					}
+					else
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova Ring", dontSendNotification);
+					}
+        
 					bodyTextString = "Step 1 : Waiting for Device Setup - OK\n\nStep 2 : Upgrading Firmware - OK\n\n"
 									 "Step 3 : Waiting for Device Reboot";
 					break;
@@ -378,8 +399,7 @@ void FirmUpgradePanel::updateComponentsForError (UpgradeState upgradeStateToUpda
 
 	closeButton->setVisible (true);
 	okButton->setVisible (true);
-	ringUpgradeButton->setVisible (false);
-	hubUpgradeButton->setVisible (false);
+	upgradeButton->setVisible (false);
     bodyText->setJustificationType (Justification::centred);
 	titleLabel->setText ("Error", dontSendNotification);
     okButton->setButtonText ("Close");
@@ -392,7 +412,7 @@ void FirmUpgradePanel::updateComponentsForError (UpgradeState upgradeStateToUpda
 			break;
 
 		case err_waitingForUpgradeFirmTimeOut:
-			bodyText->setText ("Device took too long to respond.\n\nPlease unplug the HUB and retry.",
+			bodyText->setText ("Device took too long to respond.\n\nPlease unplug the Neova and retry.",
 				               dontSendNotification);
 			break;
 
