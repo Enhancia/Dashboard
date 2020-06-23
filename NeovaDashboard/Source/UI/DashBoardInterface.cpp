@@ -175,10 +175,13 @@ void DashBoardInterface::resized()
 
     header->setBounds (area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL, MARGIN));
 
-    midiChannelComponent->setBounds (area.removeFromBottom (15)
-                                         .withTrimmedTop (20)
-                                         .withSizeKeepingCentre (area.getWidth()/2, 25));
-    presetSelector->setBounds (area.removeFromBottom (10).withSizeKeepingCentre (area.getWidth()/6, 30));
+    auto presetAndMidiArea = area.removeFromBottom (15);
+
+    presetSelector->setBounds (presetAndMidiArea.withSizeKeepingCentre (area.getWidth()/6, 30));
+    midiChannelComponent->setBounds (presetAndMidiArea.withLeft (presetSelector->getRight() + MARGIN*2)
+                                                      .withRight (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/16)
+                                                      .reduced (4*MARGIN, 0)
+                                                      .expanded (0, 2));
 
     hubComponent->setBounds (area.withSizeKeepingCentre (area.getHeight(), area.getHeight())
                                  .translated (0, -10));
@@ -248,6 +251,11 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
     if (key == KeyPress ('s', ModifierKeys (ModifierKeys::commandModifier), 's'))
     {
         uploadButton->triggerClick();
+    }
+
+    if (key == KeyPress ('a', ModifierKeys (ModifierKeys::commandModifier), 'a'))
+    {
+        createAndShowAlertPanel (DashAlertPanel::unknown);
     }
 
     return false;
@@ -486,6 +494,8 @@ void DashBoardInterface::createAndShowAlertPanel (const String& title, const Str
                                                    const String& buttonText, const bool hasCloseButton,
                                                    int returnValue)
 {
+    if (alertPanel->isCurrentlyModal()) alertPanel->exitModalState (0);
+
     alertPanel.reset (new DashAlertPanel (title, message, returnValue, hasCloseButton, buttonText));
     addAndMakeVisible (*alertPanel);
 
@@ -494,9 +504,19 @@ void DashBoardInterface::createAndShowAlertPanel (const String& title, const Str
     alertPanel->setLookAndFeel (&dashBoardLookAndFeel);
     alertPanel->setBounds (getLocalBounds());
 
-    //if (!buttonText.isEmpty()) alertPanel->addButton (buttonText, 0, KeyPress (KeyPress::escapeKey));
+    alertPanel->enterModalState (true, ModalCallbackFunction::forComponent (alertPanelCallback, this), false);
+}
 
-    //alertPanel->setOpaque (false);
+void DashBoardInterface::createAndShowAlertPanel (DashAlertPanel::SpecificReturnValue returnValue)
+{
+    alertPanel.reset (DashAlertPanel::createSpecificAlertPanel (returnValue));
+    addAndMakeVisible (*alertPanel);
+
+    alertPanel->setVisible (true);
+    alertPanel->setAlwaysOnTop (true);
+    alertPanel->setLookAndFeel (&dashBoardLookAndFeel);
+    alertPanel->setBounds (getLocalBounds());
+
     alertPanel->enterModalState (true, ModalCallbackFunction::forComponent (alertPanelCallback, this), false);
 }
 
@@ -519,7 +539,8 @@ void DashBoardInterface::executePanelAction (const int panelReturnValue)
         case DashAlertPanel::outdatedFirmware:
             getCommandManager().invokeDirectly (neova_dash::commands::upgradeHub, true);
             break;
-        case DashAlertPanel::noUploadQuitting: //TODO
+        case DashAlertPanel::noUploadQuitting:
+            JUCEApplication::getInstance()->systemRequestedQuit();
             break;
         default: // modalResult 0 or unknown
             break;

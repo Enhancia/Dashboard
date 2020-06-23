@@ -16,7 +16,7 @@
 /*
 */
 class MidiChannelComponent : public Component,
-                             public Button::Listener
+                             public ComboBox::Listener
 {
 public:
     //==========================================================================
@@ -28,48 +28,19 @@ public:
     void resized() override;
 
     //==========================================================================
-    void buttonClicked (Button* bttn) override;
+    void comboBoxChanged (ComboBox *comboBoxThatHasChanged) override;
 
     //==========================================================================
     void update();
 
-    //==========================================================================
-    const int MAX_CHANNELS = 4;
-
 private:
     //==========================================================================
-	class ChannelButton : public Button
-	{
-	public:
-		//======================================================================
-		ChannelButton(const String& name, const int channelNumber);
-		~ChannelButton();
-
-		//======================================================================
-		const int channel;
-
-	protected:
-		//======================================================================
-		void paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
-
-	private:
-		//======================================================================
-		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ChannelButton)
-	};
-
-    //==========================================================================
-    void initializeButtons();
-
-    //==========================================================================
-    void selectChannelFifo (const int channelToSelect);
-    void selectChannelLifo (const int channelToSelect);
-    void selectChannelCapped (const int channelToSelect);
-    void unselectChannel (const int channelNumber);
+    void createComboBox();
+    void setHUBToFirstActiveChannelOrChannel1();
     
     //==========================================================================
     HubConfiguration& hubConfig;
-    OwnedArray<ChannelButton> buttons;
-    Array<ChannelButton*> selectedButtons;
+    ComboBox midiChannelBox;
 
     //==========================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiChannelComponent)

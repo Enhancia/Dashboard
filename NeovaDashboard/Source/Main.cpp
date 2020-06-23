@@ -77,7 +77,7 @@ public:
     
     	dashInterface.reset (new DashBoardInterface (hubConfig, *dataReader, *updater, *upgradeHandler));
 
-    	mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get()));
+    	mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get(), hubConfig));
     	dashInterface->grabKeyboardFocus();
     
     	//dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::waitingForConnection);
@@ -139,6 +139,7 @@ public:
 					DBG("POWER STATE : " + String(hubPowerState) + " \n");
 					//TODO => mettre interface en mode POWER_ON
 					hubConfig.setHubIsConnected (true);
+					upgradeHandler->checkForSuccessiveUpgrade();
 
 					if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
 					else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
@@ -193,6 +194,8 @@ public:
 					if (hubPowerState == POWER_ON)
 					{
 						hubConfig.setHubIsConnected (true);
+						upgradeHandler->checkForSuccessiveUpgrade();
+
 						if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
 						else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
 					}
@@ -264,10 +267,11 @@ public:
     class MainWindow    : public DocumentWindow
     {
     public:
-        MainWindow (String name , DashBoardInterface* dashInterface)
+        MainWindow (String name , DashBoardInterface* dashInterface, HubConfiguration& config)
             : DocumentWindow (name, Desktop::getInstance().getDefaultLookAndFeel()
                                                           .findColour (ResizableWindow::backgroundColourId),
-                                    DocumentWindow::allButtons)
+                                    DocumentWindow::allButtons),
+              dashboardInterface (*dashInterface), hubConfig (config)
         {
             setUsingNativeTitleBar (true);
             setContentOwned (dashInterface, true);
@@ -280,10 +284,20 @@ public:
 
         void closeButtonPressed() override
         {
-            JUCEApplication::getInstance()->systemRequestedQuit();
+        	if (hubConfig.wasConfigChangedSinceLastFlash())
+        	{
+        		dashboardInterface.createAndShowAlertPanel (DashAlertPanel::noUploadQuitting);
+        	}
+        	else
+        	{
+            	JUCEApplication::getInstance()->systemRequestedQuit();
+        	}
         }
 
     private:
+    	DashBoardInterface& dashboardInterface;
+    	HubConfiguration& hubConfig;
+
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
     };
 
@@ -337,20 +351,21 @@ public:
         switch (info.commandID)
         {
             case flashHub:
-				
 				memcpy(data, "jeannine", sizeof("jeannine"));
 				ctrl = 0x04;
 				memcpy(data + 8, &ctrl, sizeof(uint32_t));
 				dashPipe->sendString(data, 12);
 				return true;
             case uploadConfigToHub:
-				hubConfig.getConfig(data+12, sizeof(data)-12);
-				memcpy(data, "jeannine", sizeof("jeannine"));
-				ctrl = 0x03;
-				memcpy(data + 8, &ctrl, sizeof(uint32_t));
-				dashPipe->sendString(data, 12 + hubConfig.CONFIGSIZE);
+            	if (hubConfig.getConfigWasInitialized())
+            	{
+					hubConfig.getConfig(data+12, sizeof(data)-12);
+					memcpy(data, "jeannine", sizeof("jeannine"));
+					ctrl = 0x03;
+					memcpy(data + 8, &ctrl, sizeof(uint32_t));
+					dashPipe->sendString(data, 12 + hubConfig.CONFIGSIZE);
+				}
 				return true;
-
             case upgradeHub:
                 upgradeHandler->launchUpgradeProcedure();
                 return true;

@@ -58,6 +58,20 @@ namespace neova_dash
         const float WAVE_MIN = -180.0f;
         const float WAVE_MAX =  180.0f;
 
+        // Gesture default values
+        const float VIBRATO_RANGE_DEFAULT  = 80.0f;
+        const float VIBRATO_THRESH_DEFAULT = 40.0f;
+        const float PITCHBEND_DEFAULT_LEFTMIN = -50.0f;
+        const float PITCHBEND_DEFAULT_LEFTMAX = -20.0f;
+        const float PITCHBEND_DEFAULT_RIGHTMIN = 30.0f;
+        const float PITCHBEND_DEFAULT_RIGHTMAX = 60.0f;
+        const float TILT_DEFAULT_MIN =  0.0f;
+        const float TILT_DEFAULT_MAX =  50.0f;
+        const float ROLL_DEFAULT_MIN = -50.0f;
+        const float ROLL_DEFAULT_MAX =  50.0f;
+        const float WAVE_DEFAULT_MIN = -50.0f;
+        const float WAVE_DEFAULT_MAX =  50.0f;
+
         // Helper methods for gestures
         extern GestureType intToGestureType (const int typeInt);
         extern const String getTypeString (const GestureType type, const bool withSpacingAndCase);

@@ -36,7 +36,8 @@ void DashUpdater::checkForNewAvailableVersion()
 
             for (int subdivision=0; subdivision < 3; subdivision++)
             {
-                if (int (currentVerTemp[0]) < int (latestVerTemp[0]))
+                if (currentVerTemp.upToFirstOccurrenceOf (".", false, false).getIntValue()
+                        < latestVerTemp.upToFirstOccurrenceOf (".", false, false).getIntValue())
                 {
                     availableVersion = fetchFileURL (*repo);
                 }
@@ -164,6 +165,8 @@ void DashUpdater::launchInstaller()
 			getDownloadedFile().revealToUser();
 		}
         #endif
+
+        JUCEApplication::getInstance()->systemRequestedQuit();
     }
 }
 

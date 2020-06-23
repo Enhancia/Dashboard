@@ -132,3 +132,33 @@ void DashAlertPanel::createAndAddButtons (const String& buttonText, const bool a
 
     closeButton->setVisible (addCloseButton);
 }
+
+DashAlertPanel* DashAlertPanel::createSpecificAlertPanel (SpecificReturnValue panelType)
+{
+    switch (panelType)
+    {
+        case outdatedFirmware:
+            return new DashAlertPanel ("You Neova firmware is outdated!",
+                                       "Please upgrade your Neova firmware "
+                                       " to use it with this Dashboard Version.",
+                                       int (panelType),
+                                       true,
+                                       "Upgrade Firmware");
+        case noUploadQuitting:
+            return new DashAlertPanel ("Upload changes to Neova?",
+                                       "You have configuration changes that have not"
+                                       "been uploaded to Neova. Are you sure you want to quit?",
+                                       int (panelType),
+                                       true,
+                                       "Quit Anyways");
+        default:
+            return new DashAlertPanel ("Unknown Alert",
+                                       "Something went wrong? Well, sometimes not "
+                                       "knowing is worse than being sure that things "
+                                       "aren't in their best shape. But you know better.",
+                                       0,
+                                       false,
+                                       "Ok");
+            return nullptr;
+    }
+}

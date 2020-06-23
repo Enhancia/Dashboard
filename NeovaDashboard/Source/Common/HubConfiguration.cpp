@@ -22,6 +22,8 @@ void HubConfiguration::setConfig(uint8_t * data)
 {
 	memcpy(&config, data, sizeof(ConfigData));	
 	setPreset(config.active_preset);
+
+	if (!configWasInitialized) configWasInitialized = true;
 }
 
 void HubConfiguration::getConfig(uint8_t * data, int buffer_size)
@@ -42,6 +44,11 @@ void HubConfiguration::flashHub()
 bool HubConfiguration::wasConfigChangedSinceLastFlash()
 {
 	return configWasChangedSinceLastFlash;
+}
+
+bool HubConfiguration::getConfigWasInitialized()
+{
+	return configWasInitialized;
 }
 
 void HubConfiguration::notifyConfigWasChanged()
@@ -72,6 +79,18 @@ void HubConfiguration::setMidiChannel (const int channelNumber, bool shouldChann
 		getPresetData().midiChannels &= ~(1 << channelNumber);
 	}
 
+	if (uploadToHub)
+	{
+		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+	}
+
+	notifyConfigWasChanged();
+}
+
+void HubConfiguration::setMidiChannelExclusive (const int channelNumber, bool uploadToHub)
+{
+	getPresetData().midiChannels = (1 << channelNumber);
+	
 	if (uploadToHub)
 	{
 		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
@@ -172,19 +191,22 @@ void HubConfiguration::setDefaultGestureValues (const int gestureNumber, const n
 	switch (type)
 	{
 		case vibrato:
-			setGestureParameters (presetNumber, gestureNumber, 400.0f, 40.0f);
+			setGestureParameters (presetNumber, gestureNumber, VIBRATO_RANGE_DEFAULT, VIBRATO_THRESH_DEFAULT);
 			break;
 		case pitchBend:
-			setGestureParameters (presetNumber, gestureNumber, -50.0f, -20.0f, 30.0f, 60.0f);
+			setGestureParameters (presetNumber, gestureNumber, PITCHBEND_DEFAULT_LEFTMIN,
+															   PITCHBEND_DEFAULT_LEFTMAX,
+															   PITCHBEND_DEFAULT_RIGHTMIN,
+															   PITCHBEND_DEFAULT_RIGHTMAX);
 			break;
 		case tilt:
-			setGestureParameters (presetNumber, gestureNumber, 0.0f, 50.0f);
+			setGestureParameters (presetNumber, gestureNumber, TILT_DEFAULT_MIN, TILT_DEFAULT_MAX);
 			break;
 		case roll:
-			setGestureParameters (presetNumber, gestureNumber, -50.0f, 50.0f);
+			setGestureParameters (presetNumber, gestureNumber, ROLL_DEFAULT_MIN, ROLL_DEFAULT_MAX);
 			break;
 		case wave:
-			setGestureParameters (presetNumber, gestureNumber, -50.0f, 50.0f);
+			setGestureParameters (presetNumber, gestureNumber, WAVE_DEFAULT_MIN, WAVE_DEFAULT_MAX);
 			break;
 
 		default:
