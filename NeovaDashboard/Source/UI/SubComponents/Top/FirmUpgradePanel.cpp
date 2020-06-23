@@ -253,7 +253,6 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 	}
 	else
 	{
-		String bodyTextString;
 		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16());
 		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected();
 
