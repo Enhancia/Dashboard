@@ -319,26 +319,55 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 
 				case waitingForUpgradeFirm:
 
-					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
+					if (currentUpgrade == hub)
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova HUB", dontSendNotification);
+					}
+					else
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova Ring", dontSendNotification);
+					}
+
 					bodyText->setText ("Step 1 : Waiting for Device Setup...\n\n \n\n ", dontSendNotification);
 					break;
 
 				case upgradeFirmConnected:
-
-					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
+				
+					if (currentUpgrade == hub)
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova HUB", dontSendNotification);
+					}
+					else
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova Ring", dontSendNotification);
+					}
 					bodyText->setText ("Step 1 : Waiting for Device Setup - OK\n\n  \n\n ", dontSendNotification);
 
 					break;
 
 				case upgradeInProgress:
 
-					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
+					if (currentUpgrade == hub)
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova HUB", dontSendNotification);
+					}
+					else
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova Ring", dontSendNotification);
+					}
 					bodyText->setText ("Step 1 : Waiting for Device Setup - OK\n\nStep 2 : Upgrading Firmware... \n\n ", dontSendNotification);
 					break;
 
 				case waitingForHubReconnect:
 
-					titleLabel->setText ("Upgrade In Progress", dontSendNotification);
+					if (currentUpgrade == hub)
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova HUB", dontSendNotification);
+					}
+					else
+					{
+						titleLabel->setText ("Upgrade In Progress : Neova Ring", dontSendNotification);
+					}
 					bodyText->setText ("Step 1 : Waiting for Device Setup - OK\n\nStep 2 : Upgrading Firmware - OK\n\n"
 									   "Step 3 : Waiting for Device Reboot...", dontSendNotification);
 					break;
