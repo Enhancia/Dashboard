@@ -28,8 +28,11 @@
               resource="1" file="Resources/Font/Ahmet Altun - HalisGR-Light.otf"/>
         <FILE id="ZPoMcG" name="Ahmet Altun - HalisGR-Regular.otf" compile="0"
               resource="1" file="Resources/Font/Ahmet Altun - HalisGR-Regular.otf"/>
+        <FILE id="oYp5JA" name="Neova-font.otf" compile="0" resource="1" file="Resources/Font/Neova-font.otf"/>
         <FILE id="mAdhky" name="NOOA-Demi-Serif-DEMO.ttf" compile="0" resource="1"
               file="Resources/Font/NOOA-Demi-Serif-DEMO.ttf"/>
+        <FILE id="OlE8lJ" name="NOOA-Demi-Serif.ttf" compile="0" resource="1"
+              file="Resources/Font/NOOA-Demi-Serif.ttf"/>
       </GROUP>
     </GROUP>
     <GROUP id="{D6F09228-5F31-FBA3-77A9-E4EDF3219389}" name="Source">

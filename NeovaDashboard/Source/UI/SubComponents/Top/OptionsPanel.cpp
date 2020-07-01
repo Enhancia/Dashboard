@@ -271,17 +271,21 @@ void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> ar
                    Justification::centredTop);
 
   	// Dash Text
-  	auto dashTextArea = area.reduced (MARGIN*2, area.getHeight()/4);
+  	auto dashTextArea = area.reduced (MARGIN*2, area.getHeight()/5);
 
   	g.setColour (neova_dash::colour::mainText);
-  	g.setFont (neova_dash::font::dashFont.withHeight (20));
-  	g.drawText ("Neova DASHBOARD", dashTextArea.removeFromTop (dashTextArea.getHeight()/2),
-  								   Justification::bottomLeft);
+    g.setFont(neova_dash::font::neovaFont.withHeight (22.5f).withExtraKerningFactor (0.15f));
+  	g.drawText ("NEOVA", dashTextArea.removeFromTop (dashTextArea.getHeight()*2/5),
+  								   Justification::centredBottom);
+
+    g.setFont(neova_dash::font::dashFont.withHeight (18.0f).withExtraKerningFactor (0.15f));
+    g.drawText ("DASHBOARD", dashTextArea.removeFromTop (dashTextArea.getHeight()*2/3),
+                     Justification::centred);
 
   	g.setColour (neova_dash::colour::subText);
   	g.setFont (neova_dash::font::dashFont.withHeight (13));
   	g.drawText (String ("v " + JUCEApplication::getInstance()->getApplicationVersion()),
-  		        dashTextArea, Justification::topLeft);
+  		        dashTextArea, Justification::centredBottom);
 }
 
 void OptionsPanel::paintFirmUpdateArea (Graphics& g, juce::Rectangle<int> area)

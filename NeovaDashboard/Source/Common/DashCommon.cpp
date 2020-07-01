@@ -87,11 +87,15 @@ namespace font
                                                             DashData::Ahmet_Altun__HalisGRBold_otfSize));
         else if (type == light)
             return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRLight_otf,
-                                                            DashData::Ahmet_Altun__HalisGRLight_otfSize));
+                                                            DashData::Ahmet_Altun__HalisGRLight_otfSize)); 
         // Enhancia logo (capital only)
         else if (type == enhanciaLogo)
             return Font (Typeface::createSystemTypefaceFor (DashData::NOOADemiSerifDEMO_ttf,
                                                             DashData::NOOADemiSerifDEMO_ttfSize));
+        // Neova logo (capital only)
+        else if (type == neovaLogo)
+            return Font (Typeface::createSystemTypefaceFor (DashData::Neovafont_otf,
+                                                            DashData::Neovafont_otfSize));
           
         return Font();
     }
@@ -100,6 +104,7 @@ namespace font
     const Font dashFontBold  = getDashFont (bold);
     const Font dashFontLight = getDashFont (light);
     const Font enhanciaFont  = getDashFont (enhanciaLogo);
+    const Font neovaFont     = getDashFont (neovaLogo);
 
 }; // namespace font
 

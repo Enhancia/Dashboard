@@ -37,10 +37,10 @@ void HeaderComponent::paint (Graphics& g)
 	auto area = getLocalBounds().reduced (0, neova_dash::ui::MARGIN_SMALL);
     g.setColour (neova_dash::colour::mainText);
 
-    g.setFont (neova_dash::font::dashFont.withHeight (19.0f).boldened().withExtraKerningFactor (0.1f));
-    g.drawText ("Neova", area, Justification::centredTop, false);
+    g.setFont (neova_dash::font::neovaFont.withHeight (15.0f).withExtraKerningFactor (0.1f));
+    g.drawText ("NEOVA", area.withTrimmedTop (neova_dash::ui::MARGIN_SMALL), Justification::centredTop, false);
 
-	g.setFont(neova_dash::font::dashFont.withHeight (12.0f));
+	g.setFont(neova_dash::font::dashFont.withHeight (12.0f).withExtraKerningFactor (0.1f));
 	g.drawText("DASHBOARD", area, Justification::centredBottom, false);
 }
 

@@ -47,11 +47,17 @@ namespace DashData
     extern const char*   Ahmet_Altun__HalisGRRegular_otf;
     const int            Ahmet_Altun__HalisGRRegular_otfSize = 58528;
 
+    extern const char*   Neovafont_otf;
+    const int            Neovafont_otfSize = 2736;
+
     extern const char*   NOOADemiSerifDEMO_ttf;
     const int            NOOADemiSerifDEMO_ttfSize = 18432;
 
+    extern const char*   NOOADemiSerif_ttf;
+    const int            NOOADemiSerif_ttfSize = 18432;
+
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 14;
+    const int namedResourceListSize = 16;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];
