@@ -21,7 +21,11 @@ namespace neova_dash
     			options = 0,
     			onOff,
                 enhanciaLogo,
-                upload
+                upload,
+                tilt,
+                vibrato,
+                pitchBend,
+                roll
     		};
 
         extern const Path createPath (PathId pathToCreate);

@@ -307,7 +307,7 @@ void NewGesturePanel::GestureTypeSelector::paint (Graphics& g)
   	}
 
   	g.setColour (neova_dash::colour::mainText);
-  	drawGesturePath (g, getLocalBounds().reduced (getWidth()/6, getHeight()/6));
+  	drawGesturePath (g, getLocalBounds().reduced(2));
 }
 void NewGesturePanel::GestureTypeSelector::resized()
 {
@@ -335,25 +335,61 @@ void NewGesturePanel::GestureTypeSelector::setHighlighted (bool shouldBeHighligh
 
 void NewGesturePanel::GestureTypeSelector::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
 {
-    // TO DELETE : just draws text
     using namespace neova_dash::gesture;
 
     g.setColour (Colour (0xfff3f3f3));
-
-    g.drawText (getTypeString(intToGestureType(gestureType), true), getLocalBounds(),
+    g.drawText (getTypeString(intToGestureType(gestureType), true), area,
                Justification::centred, true);
 
-    /*
-    Image gestureImage;
-
+    Path gesturePath;
     switch (gestureType)
     {
-        case (neova_dash::gesture::vibrato):   gestureImage = vibratoImage; break;
-        case (neova_dash::gesture::pitchBend): gestureImage = pitchBendImage; break;
-        case (neova_dash::gesture::tilt):      gestureImage = tiltImage; break;
-        case (neova_dash::gesture::roll):      gestureImage = rollImage; break;
-        default: return;
+        case (neova_dash::gesture::tilt):
+            gesturePath = neova_dash::path::createPath (neova_dash::path::tilt);
+            break;
+
+        case (neova_dash::gesture::vibrato):
+            gesturePath = neova_dash::path::createPath (neova_dash::path::vibrato);
+            break;
+
+        case (neova_dash::gesture::pitchBend):
+            gesturePath = neova_dash::path::createPath (neova_dash::path::pitchBend);
+            break;
+
+        case (neova_dash::gesture::roll):
+            gesturePath = neova_dash::path::createPath (neova_dash::path::roll);
+            break;
+
+        default:
+            return;
     }
 
-    g.drawImage (gestureImage, area.toFloat(), RectanglePlacement::centred);*/
+
+    gesturePath.scaleToFit (area.toFloat().getX(),
+                            area.toFloat().getY(),
+                            area.toFloat().getWidth(),
+                            area.toFloat().getHeight(),
+                        false);
+
+    //g.setColour (neova_dash::gesture::getHighlightColour (type, hubConfig.isGestureActive (id)).withAlpha (0.4f));
+
+    ColourGradient gesturePathGradient (getHighlightColour (gestureType, false).withAlpha (0.2f),
+                                        {area.toFloat().getX(),
+                                         area.toFloat().getY() + area.toFloat().getHeight()},
+                                        getHighlightColour (gestureType, false).withAlpha (0.2f),
+                                        {area.toFloat().getX() + area.toFloat().getWidth(),
+                                         area.toFloat().getY()},
+                                        false);
+
+    gesturePathGradient.addColour (0.3, getHighlightColour (gestureType, false).withAlpha (0.0f));
+    gesturePathGradient.addColour (0.7, getHighlightColour (gestureType, false).withAlpha (0.0f));
+
+    Path pathClip;
+    pathClip.addRoundedRectangle (area.toFloat(), 10.0f);
+    g.setGradientFill (gesturePathGradient);
+
+    g.saveState();
+    g.reduceClipRegion (pathClip);
+    g.strokePath (gesturePath, PathStrokeType (2.0f));
+    g.restoreState();
 }
