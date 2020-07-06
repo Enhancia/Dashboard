@@ -295,15 +295,19 @@ void NewGesturePanel::GestureTypeSelector::paint (Graphics& g)
     		g.setColour (neova_dash::gesture::getHighlightColour (gestureType).withAlpha (0.15f));
     		g.fillRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f);
 
-  /*
     		// Outline
-    		g.setColour (Gesture::getHighlightColour (gestureType));
-    		g.drawRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f, 1.0f);*/
+    		g.setColour (neova_dash::gesture::getHighlightColour (gestureType));
+    		g.drawRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f, 1.0f);
   	}
   	else
   	{
+        // Fill
     		g.setColour (neova_dash::colour::gestureBackground);
     		g.fillRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f);
+
+        // Outline
+        g.setColour (neova_dash::gesture::getHighlightColour (gestureType).withAlpha (0.2f));
+        g.drawRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f, 1.0f);
   	}
 
   	g.setColour (neova_dash::colour::mainText);
@@ -371,18 +375,17 @@ void NewGesturePanel::GestureTypeSelector::drawGesturePath (Graphics& g, juce::R
                             area.toFloat().getHeight(),
                         false);
 
-    //g.setColour (neova_dash::gesture::getHighlightColour (type, hubConfig.isGestureActive (id)).withAlpha (0.4f));
-
-    ColourGradient gesturePathGradient (getHighlightColour (gestureType, false).withAlpha (0.2f),
+    Colour pathColour (0xff808080);
+    ColourGradient gesturePathGradient (pathColour.withAlpha (0.2f),
                                         {area.toFloat().getX(),
                                          area.toFloat().getY() + area.toFloat().getHeight()},
-                                        getHighlightColour (gestureType, false).withAlpha (0.2f),
+                                        pathColour.withAlpha (0.2f),
                                         {area.toFloat().getX() + area.toFloat().getWidth(),
                                          area.toFloat().getY()},
                                         false);
 
-    gesturePathGradient.addColour (0.3, getHighlightColour (gestureType, false).withAlpha (0.0f));
-    gesturePathGradient.addColour (0.7, getHighlightColour (gestureType, false).withAlpha (0.0f));
+    gesturePathGradient.addColour (0.3, pathColour.withAlpha (0.0f));
+    gesturePathGradient.addColour (0.7, pathColour.withAlpha (0.0f));
 
     Path pathClip;
     pathClip.addRoundedRectangle (area.toFloat(), 10.0f);

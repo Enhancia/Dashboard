@@ -32,14 +32,14 @@ void DashAlertPanel::paint (Graphics& g)
     using namespace neova_dash::colour;
     
     // options panel area
-    g.setColour (topPanelBackground.withAlpha (0.85f));
+    g.setColour (topPanelBackground.withAlpha (0.95f));
     g.fillRoundedRectangle (panelArea.toFloat(), 10.0f);
     
     // options panel outline
     auto gradOut = ColourGradient::horizontal (Colour (0x10ffffff),
-                                               0.0f, 
+                                               float (panelArea.getX()), 
                                                Colour (0x10ffffff),
-                                               float(getWidth()));
+                                               float(panelArea.getRight()));
     gradOut.addColour (0.5, Colour (0x50ffffff));
 
     g.setGradientFill (gradOut);
@@ -48,7 +48,7 @@ void DashAlertPanel::paint (Graphics& g)
 
 void DashAlertPanel::resized()
 {
-    panelArea = getLocalBounds().withSizeKeepingCentre (getLocalBounds().getWidth()/3, getLocalBounds().getHeight()/3);
+    panelArea = getLocalBounds().withSizeKeepingCentre (getLocalBounds().getWidth()/2, getLocalBounds().getHeight()/2);
     
     auto area = panelArea.reduced (neova_dash::ui::MARGIN);
 
@@ -56,7 +56,7 @@ void DashAlertPanel::resized()
 
     if (showButton)
     {
-        int buttonHeight = area.getHeight()/5;
+        int buttonHeight = area.getHeight()/8;
 
         okButton->setBounds (area.removeFromBottom (buttonHeight)
                                     .withSizeKeepingCentre
@@ -73,7 +73,7 @@ void DashAlertPanel::resized()
                                                                                                 neova_dash::ui::MARGIN_SMALL)));
     #endif
 
-    bodyText->setBounds (area.reduced (neova_dash::ui::MARGIN));
+    bodyText->setBounds (area.reduced (area.getWidth()/6, area.getHeight()/6));
 }
 
 void DashAlertPanel::buttonClicked (Button* bttn)
@@ -95,6 +95,7 @@ void DashAlertPanel::createAndAddLabel (const String& textToSet)
     addAndMakeVisible (*titleLabel);
 
     titleLabel->setJustificationType (Justification::centred);
+    titleLabel->setFont (neova_dash::font::dashFontBold.withHeight (20.0f).withExtraKerningFactor (0.03f));
 }
 
 void DashAlertPanel::createAndAddTextEditor (const String& textToSet)
@@ -140,22 +141,20 @@ DashAlertPanel* DashAlertPanel::createSpecificAlertPanel (SpecificReturnValue pa
         case outdatedFirmware:
             return new DashAlertPanel ("You Neova firmware is outdated!",
                                        "Please upgrade your Neova firmware "
-                                       " to use it with this Dashboard Version.",
+                                       "to use it with this Dashboard Version.",
                                        int (panelType),
                                        true,
                                        "Upgrade Firmware");
         case noUploadQuitting:
             return new DashAlertPanel ("Upload changes to Neova?",
-                                       "You have configuration changes that have not"
-                                       "been uploaded to Neova. Are you sure you want to quit?",
+                                       "You have configuration changes that have not "
+                                       "been uploaded to Neova.\n\nAre you sure you want to quit?",
                                        int (panelType),
                                        true,
                                        "Quit Anyways");
         default:
             return new DashAlertPanel ("Unknown Alert",
-                                       "Something went wrong? Well, sometimes not "
-                                       "knowing is worse than being sure that things "
-                                       "aren't in their best shape. But you know better.",
+                                       "Something went wrong I guess?\nPlease contact Enhancia about your issue!",
                                        0,
                                        false,
                                        "Ok");

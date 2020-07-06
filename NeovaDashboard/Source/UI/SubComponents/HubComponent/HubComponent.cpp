@@ -72,7 +72,8 @@ void HubComponent::resized()
 
 	for (int i=0; i<neova_dash::gesture::NUM_GEST; i++)
 	{
-		leds[i]->setBounds (buttons[i]->getBounds().withHeight (20).translated (0, jmin (-20, -hubSize*7/100)));
+		leds[i]->setBounds (buttons[i]->getBounds().withHeight (20).translated (0, jmin (-20, -hubSize*6/100))
+																   .withSizeKeepingCentre (buttons[i]->getWidth(), hubSize*6/100));
 	}
 
 	buttons[CTRL_ID]->setBounds (Rectangle<int> (hubSize*86/1000,
@@ -273,7 +274,27 @@ void HubComponent::GestureLED::paint (Graphics& g)
 	auto ledArea = Rectangle<float> (float (jmin (getHeight(), getWidth())),
 									 float (jmin (getHeight(), getWidth()))).withCentre (getLocalBounds().getCentre()
 																			                             .toFloat());
+
+	float lightingSizePercent = 0.6f;
+	float lightingAngle = MathConstants<float>::pi/4;
+	float lightingDeltaX = ledArea.getWidth()/4 * (1.0f - lightingSizePercent) * std::cos (lightingAngle);
+	float lightingDeltaY = ledArea.getWidth()/4 * (1.0f - lightingSizePercent) * std::sin (lightingAngle);
+	ColourGradient lightingGrad (Colours::white.withAlpha (0.1f), getLocalBounds().getCentre().toFloat().translated (lightingDeltaX, lightingDeltaY),
+							     Colours::white.withAlpha (0.0f), getLocalBounds().getCentre().toFloat()
+							     															  .translated (std::cos (lightingAngle) * ledArea.getWidth()/2, 
+							     															  	           std::cos (lightingAngle) * ledArea.getWidth()/2),
+							     true);
+	g.setGradientFill (lightingGrad);
+	g.fillEllipse (ledArea.withSizeKeepingCentre (ledArea.getWidth()*lightingSizePercent, ledArea.getHeight()*lightingSizePercent)
+						  /*.translated (lightingDeltaX, lightingDeltaY)*/);
   
+	ColourGradient shadowGrad (Colours::black.withAlpha (0.8f), getLocalBounds().getCentre().toFloat(),
+							   Colours::black.withAlpha (0.0f), getLocalBounds().getCentre().translated (0, ledArea.getWidth()/3).toFloat(),
+							   true);
+	shadowGrad.addColour (0.6, Colours::black.withAlpha (0.15f));
+	g.setGradientFill (shadowGrad);
+	g.fillEllipse (ledArea);
+
 	if (!forceOff &&
 		 ((presetModeState == HubComponent::normalState && hubConfig.getGestureData (id).type != int (neova_dash::gesture::none))
 		 || (presetModeState != HubComponent::normalState && hubConfig.getSelectedPreset() == id)))
@@ -288,12 +309,12 @@ void HubComponent::GestureLED::paint (Graphics& g)
 			                  hubConfig.getGestureData (id).on == 0 ? false : true);
 		}
 
-		ColourGradient ledGrad (ledColour.withAlpha (0.6f), getLocalBounds().getCentre().toFloat(),
-								Colour (0), getLocalBounds().getCentre().translated (0, 5).toFloat(),
+		ColourGradient ledGrad (ledColour.withAlpha (0.4f), getLocalBounds().getCentre().toFloat(),
+								ledColour.withAlpha (0.0f), getLocalBounds().getCentre().translated (0, ledArea.getWidth()/2).toFloat(),
 								true);
 
 		g.setColour (ledColour);
-		g.fillEllipse (Rectangle<float>(3.0f, 3.0f).withCentre (ledArea.getCentre()));
+		g.fillEllipse (Rectangle<float>(ledArea.getWidth()/4, ledArea.getWidth()/4).withCentre (ledArea.getCentre()));
 
 		if ((presetModeState == HubComponent::normalState && hubConfig.getGestureData (id).on != 0)
 			|| (presetModeState != HubComponent::normalState && hubConfig.getSelectedPreset() == id))
@@ -304,8 +325,8 @@ void HubComponent::GestureLED::paint (Graphics& g)
 	}
 	else
 	{
-		g.setColour (Colour (0x80000000));
-		g.fillEllipse (Rectangle<float>(3.0f, 3.0f).withCentre (ledArea.getCentre()));
+		g.setColour (Colour (0xff505050));
+		g.fillEllipse (Rectangle<float>(ledArea.getWidth()/4, ledArea.getWidth()/4).withCentre (ledArea.getCentre()));
 	}
 }
 void HubComponent::GestureLED::resized()

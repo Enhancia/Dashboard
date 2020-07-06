@@ -33,6 +33,8 @@
               file="Resources/Font/NOOA-Demi-Serif-DEMO.ttf"/>
         <FILE id="OlE8lJ" name="NOOA-Demi-Serif.ttf" compile="0" resource="1"
               file="Resources/Font/NOOA-Demi-Serif.ttf"/>
+        <FILE id="qfoB5R" name="TTNorms-Regular.otf" compile="0" resource="1"
+              file="Resources/Font/TTNorms-Regular.otf"/>
       </GROUP>
     </GROUP>
     <GROUP id="{D6F09228-5F31-FBA3-77A9-E4EDF3219389}" name="Source">

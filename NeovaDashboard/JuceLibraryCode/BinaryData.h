@@ -56,8 +56,11 @@ namespace DashData
     extern const char*   NOOADemiSerif_ttf;
     const int            NOOADemiSerif_ttfSize = 18432;
 
+    extern const char*   TTNormsRegular_otf;
+    const int            TTNormsRegular_otfSize = 155520;
+
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 16;
+    const int namedResourceListSize = 17;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

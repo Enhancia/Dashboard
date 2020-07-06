@@ -208,7 +208,6 @@ void OptionsPanel::update()
     {
         upgradeButton->setInterceptsMouseClicks (true, false);
         upgradeButton->setAlpha (1.0f);
-        upgradeButton->setOpaque (true);
     }
 }
 
@@ -253,7 +252,7 @@ void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> ar
     auto enhanciaArea = area.removeFromLeft (area.getWidth()/2);
 
     auto logoArea = enhanciaArea.removeFromTop (area.getHeight()/2)
-                                .reduced (enhanciaArea.getWidth()/3, MARGIN)
+                                .reduced (enhanciaArea.getWidth()/3, MARGIN_SMALL)
                                 .withTrimmedTop (enhanciaArea.getHeight()/6)
                                 .toFloat();
 
@@ -271,14 +270,14 @@ void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> ar
                    Justification::centredTop);
 
   	// Dash Text
-  	auto dashTextArea = area.reduced (MARGIN*2, area.getHeight()/5);
+  	auto dashTextArea = area.reduced (MARGIN*2, area.getHeight()/6);
 
   	g.setColour (neova_dash::colour::mainText);
-    g.setFont(neova_dash::font::neovaFont.withHeight (22.5f).withExtraKerningFactor (0.15f));
+    g.setFont(neova_dash::font::neovaFont.withHeight (22.5f).withExtraKerningFactor (0.33f));
   	g.drawText ("NEOVA", dashTextArea.removeFromTop (dashTextArea.getHeight()*2/5),
   								   Justification::centredBottom);
 
-    g.setFont(neova_dash::font::dashFont.withHeight (18.0f).withExtraKerningFactor (0.15f));
+    g.setFont(neova_dash::font::dashFont.withHeight (19.5f).withExtraKerningFactor (0.26f));
     g.drawText ("DASHBOARD", dashTextArea.removeFromTop (dashTextArea.getHeight()*2/3),
                      Justification::centred);
 

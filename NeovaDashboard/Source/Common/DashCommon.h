@@ -149,6 +149,7 @@ namespace neova_dash
             regular =0,
             bold,
             light,
+            ttNorms,
             enhanciaLogo,
             neovaLogo
         };
@@ -156,6 +157,7 @@ namespace neova_dash
         extern const Font dashFont;
         extern const Font dashFontBold;
         extern const Font dashFontLight;
+        extern const Font dashFontNorms;
         extern const Font enhanciaFont;
         extern const Font neovaFont;
     };

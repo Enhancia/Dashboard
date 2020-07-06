@@ -134,14 +134,14 @@ void DashBoardInterface::drawStateMessage (Graphics& g)
     auto area = getLocalBounds().withTop (hubComponent->getBounds().getBottom())
                                 .reduced (neova_dash::ui::MARGIN*2);
     g.setColour (neova_dash::colour::mainText);
-    g.setFont (neova_dash::font::dashFontLight.withHeight (35.0f));
+    g.setFont (neova_dash::font::dashFontNorms.withHeight (35.0f));
 
     String stateMessage;
 
     if (state == int (waitingForConnection))
     {
         stateMessage = "Welcome to NEOVA DASHBOARD"
-                       "\nPlease connect your HUB.";
+                       "\n\nPlease connect your HUB.";
     }
     else if (state == int (pause))
     {
@@ -149,7 +149,7 @@ void DashBoardInterface::drawStateMessage (Graphics& g)
     }
     else if (state == int (incompatible))
     {
-        g.setFont (neova_dash::font::dashFontLight.withHeight (30.0f));
+        g.setFont (neova_dash::font::dashFontNorms.withHeight (30.0f));
 
         stateMessage = "Your Neova is not compatible with "
                        "this version of the Dashboard.\n\n"

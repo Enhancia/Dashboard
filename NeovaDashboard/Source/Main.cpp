@@ -276,7 +276,8 @@ public:
             setUsingNativeTitleBar (true);
             setContentOwned (dashInterface, true);
             
-            setResizable (false, false);
+            setResizable (true, true); // TO DELETE, FOR TESTING ONLY
+            //setResizable (false, false);
             centreWithSize (getWidth(), getHeight());
 
             setVisible (true);

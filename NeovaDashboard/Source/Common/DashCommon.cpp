@@ -88,6 +88,9 @@ namespace font
         else if (type == light)
             return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRLight_otf,
                                                             DashData::Ahmet_Altun__HalisGRLight_otfSize)); 
+        else if (type == ttNorms)
+            return Font (Typeface::createSystemTypefaceFor (DashData::TTNormsRegular_otf,
+                                                            DashData::TTNormsRegular_otfSize));
         // Enhancia logo (capital only)
         else if (type == enhanciaLogo)
             return Font (Typeface::createSystemTypefaceFor (DashData::NOOADemiSerifDEMO_ttf,
@@ -103,6 +106,7 @@ namespace font
     const Font dashFont      = getDashFont();
     const Font dashFontBold  = getDashFont (bold);
     const Font dashFontLight = getDashFont (light);
+    const Font dashFontNorms = getDashFont (ttNorms);
     const Font enhanciaFont  = getDashFont (enhanciaLogo);
     const Font neovaFont     = getDashFont (neovaLogo);
 
@@ -141,7 +145,7 @@ namespace gesture
 				highlightColour = neova_dash::colour::inactiveGesture;
 		}
 
-		if (!active) highlightColour = highlightColour.withAlpha (0.3f);
+		if (!active) highlightColour = highlightColour.withAlpha (0.4f);
 
 		return highlightColour;
 	}

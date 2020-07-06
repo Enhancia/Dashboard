@@ -47,12 +47,21 @@ void TwoRangeTuner::paint (Graphics& g)
 {   
     drawTunerSliderBackground (g);
     drawValueCursor (g);
+
+    g.setColour (neova_dash::colour::subText);
+    g.setFont (neova_dash::font::dashFontLight.withHeight (13.0f).withExtraKerningFactor (0.08f));
+    juce::Rectangle<int> textRect (100, 50);
+    textRect.setCentre ({getLocalBounds().getCentreX(),
+                         sliderBounds.getCentreY() + int (jmin (sliderBounds.getWidth()/4.0f,
+                                                                sliderBounds.getHeight()/4.0f))});
+
+    g.drawText ("RANGE", textRect, Justification::centredTop);
 }
 
 void TwoRangeTuner::resized()
 {
     // Sets bounds and changes the slider and labels position
-    sliderBounds = getLocalBounds().reduced (30);
+    sliderBounds = getLocalBounds().reduced (neova_dash::ui::MARGIN).translated (0, jmax (20, getHeight()/8));
     resizeSliders();
     resizeButtons();
 
@@ -793,7 +802,7 @@ TwoRangeTuner::DraggableObject TwoRangeTuner::getObjectToDrag (const MouseEvent&
     DraggableObject thumb1 = inverted ? lowThumb : highThumb;
     DraggableObject thumb2 = inverted ? highThumb : lowThumb;
 
-    // The 4th of the angle between the two thumbs.
+    // Tolerance: area around which a thumb can be clicked, its value is the 5th of the angle between the two thumbs.
     double tolerance = ((highSlider->getValue() - lowSlider->getValue())*(std::abs (endAngle - startAngle)))
                                 /(lowSlider->getRange().getLength()*5);
 

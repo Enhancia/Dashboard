@@ -24,14 +24,12 @@ GestureComponent::GestureComponent (HubConfiguration& hubCfg, ApplicationCommand
       draggedGesture (draggedGestureReference),
       draggedOverSlot (draggedOverSlotReference)
 {
-    createLabel();
     createButton();
 	selected = hubConfig.getSelectedGesture() == id;
 }
 
 GestureComponent::~GestureComponent()
 {
-    gestureNameLabel = nullptr;
     muteButton = nullptr;
 }
 
@@ -59,6 +57,12 @@ void GestureComponent::paint (Graphics& g)
     g.reduceClipRegion (roundedRectangleBackground);
 	drawGesturePath (g, getLocalBounds());
     g.restoreState();
+
+    // Gesture Name
+    g.setColour (neova_dash::colour::mainText);
+    g.setFont (neova_dash::font::dashFont.withHeight (17.0f).withExtraKerningFactor (0.06f));
+    g.drawText (neova_dash::gesture::getTypeString (neova_dash::gesture::intToGestureType(type), true).toUpperCase(),
+                getLocalBounds(), Justification::centred);
 
     // Outline
     if (dragMode && draggedGesture != id && draggedOverSlot == id)
@@ -104,22 +108,6 @@ void GestureComponent::resized()
 {
     auto headerArea = getLocalBounds().removeFromTop (30);
 
-    gestureNameLabel->setBounds (getLocalBounds().withSizeKeepingCentre (getWidth()*2/3, 25));
-    const int stringWidth = gestureNameLabel->getFont().getStringWidth (gestureNameLabel->getText());
-
-	/*
-    if (stringWidth/2 > getWidth()/2-30)
-    {
-        gestureNameLabel->setBounds (gestureNameLabel->getBounds()
-                                                      .translated (-(gestureNameLabel->getRight()-getWidth()+30), 0));
-    }
-
-    if (gestureNameLabel->getWidth() < stringWidth)
-    {
-        gestureNameLabel->setFont (gestureNameLabel->getFont().getHeight()
-                                        *gestureNameLabel->getWidth()/stringWidth);
-    }*/
-
     muteButton->setBounds (headerArea.removeFromRight (30 + neova_dash::ui::MARGIN)
                                      .withSizeKeepingCentre (18, 18));
 }
@@ -154,27 +142,6 @@ void GestureComponent::setSolo (bool shouldBeSolo)
 {
     solo = shouldBeSolo;
     repaint();
-}
-void GestureComponent::startNameEntry()
-{
-    gestureNameLabel->showEditor();
-}
-
-void GestureComponent::createLabel()
-{
-	gestureNameLabel = std::make_unique<Label> ("gestureNameLabel",
-                                                neova_dash::gesture::getTypeString
-                                                   (neova_dash::gesture::intToGestureType(type),
-                                                    true).toUpperCase());
-
-    addAndMakeVisible (*gestureNameLabel);
-
-    gestureNameLabel->setEditable (false, false, false);
-    gestureNameLabel->setColour (Label::backgroundColourId, Colour (0x00000000));
-    gestureNameLabel->setColour (Label::textColourId, neova_dash::colour::mainText);
-    gestureNameLabel->setFont (neova_dash::font::dashFont.withHeight (15.0f));
-    gestureNameLabel->setJustificationType (Justification::centred);
-    gestureNameLabel->setInterceptsMouseClicks (false, false);
 }
 
 void GestureComponent::createButton()
@@ -252,25 +219,24 @@ void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
                             area.toFloat().getHeight(),
 		                    false);
 
-    //g.setColour (neova_dash::gesture::getHighlightColour (type, hubConfig.isGestureActive (id)).withAlpha (0.4f));
-
-    ColourGradient gesturePathGradient (neova_dash::gesture::getHighlightColour (type, false).withAlpha (0.4f),
+    Colour pathColour (0xff808080);
+    ColourGradient gesturePathGradient (pathColour.withAlpha (0.4f),
                                         {area.toFloat().getX(),
                                          area.toFloat().getY() + area.toFloat().getHeight() },
-                                        neova_dash::gesture::getHighlightColour (type, false).withAlpha (0.4f),
+                                        pathColour.withAlpha (0.4f),
                                         {area.toFloat().getX() + area.toFloat().getWidth(),
                                          area.toFloat().getY()},
                                         false);
 
-    gesturePathGradient.addColour (0.35, neova_dash::gesture::getHighlightColour (type, false).withAlpha (0.0f));
-    gesturePathGradient.addColour (0.65, neova_dash::gesture::getHighlightColour (type, false).withAlpha (0.0f));
+    gesturePathGradient.addColour (0.35, pathColour.withAlpha (0.0f));
+    gesturePathGradient.addColour (0.65, pathColour.withAlpha (0.0f));
 
     g.setGradientFill (gesturePathGradient);
 	g.strokePath (gesturePath, PathStrokeType (2.0f));
 }
 
 //==============================================================================
-// Gesture Slot 
+// Empty Gesture Slot 
 
 EmptyGestureSlotComponent::EmptyGestureSlotComponent (HubConfiguration& hubCfg, const int slotId,
                                                                                 const bool& dragModeReference,

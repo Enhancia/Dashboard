@@ -40,7 +40,6 @@ public:
     void setSelected (bool);
     void setHighlighted (bool);
     void setSolo (bool);
-    void startNameEntry();
 
     //==============================================================================
     const int id;
@@ -48,7 +47,6 @@ public:
 
 private:
     //==============================================================================
-    void createLabel();
     void createButton();
     void drawGesturePath (Graphics& g, juce::Rectangle<int> area);
 
@@ -56,7 +54,6 @@ private:
     HubConfiguration& hubConfig;
     ApplicationCommandManager& commandManager;
 
-    std::unique_ptr<Label> gestureNameLabel;
     std::unique_ptr<DashShapeButton> muteButton;
 
     /*
