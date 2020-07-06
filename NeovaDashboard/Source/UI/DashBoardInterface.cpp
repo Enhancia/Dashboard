@@ -73,8 +73,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     setSize (dashWidth,
              dashWidth*6/7);
 
-    //setInterfaceStateAndUpdate (waitingForConnection);
-    setInterfaceStateAndUpdate (connected);// TO DELETE
+    setInterfaceStateAndUpdate (waitingForConnection);
 }
 
 DashBoardInterface::~DashBoardInterface()
