@@ -193,7 +193,7 @@
       </MODULEPATHS>
     </VS2017>
     <XCODE_MAC targetFolder="Builds/MacOSX" extraFrameworks="SystemConfiguration"
-               smallIcon="X40b2q" bigIcon="X40b2q">
+               smallIcon="GG4enF" bigIcon="GG4enF">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" headerPath="/Users/macbook/Documents/Dev Dashboard/Dashboard_Interface/NeovaDashboard/Source"
                        targetName="Dashboard - Neova"/>
