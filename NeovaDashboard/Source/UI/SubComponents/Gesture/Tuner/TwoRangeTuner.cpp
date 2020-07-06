@@ -907,7 +907,7 @@ void TwoRangeTuner::drawTunerSliderBackground (Graphics& g)
     {
         auto angle = getThumbAngleRadians (objectBeingDragged);
 
-        Point<float> thumbPoint (float (sliderCentre.x) + arcRadius * std::cos (angle - MathConstants<float>::halfPi),
+        juce::Point<float> thumbPoint (float (sliderCentre.x) + arcRadius * std::cos (angle - MathConstants<float>::halfPi),
                                  float (sliderCentre.y) + arcRadius * std::sin (angle - MathConstants<float>::halfPi));
 
         g.setColour (tunerColour.withAlpha (0.6f));
@@ -984,7 +984,7 @@ void TwoRangeTuner::drawValueCursor (Graphics& g)
     previousCursorAngle = cursorAngle;
 
     auto cursorRadius = sliderRadius + 7;
-    Point<float> cursorPoint (sliderCentre.x + cursorRadius * std::cos (cursorAngle - MathConstants<float>::halfPi),
+    juce::Point<float> cursorPoint (sliderCentre.x + cursorRadius * std::cos (cursorAngle - MathConstants<float>::halfPi),
                               sliderCentre.y + cursorRadius * std::sin (cursorAngle - MathConstants<float>::halfPi));
 
     Path cursorPath;
@@ -1007,7 +1007,7 @@ void TwoRangeTuner::drawValueCursor (Graphics& g)
 
 void TwoRangeTuner::drawLineFromSliderCentre (Graphics& g, float angleRadian)
 {
-    Point<float> point (sliderCentre.x + sliderRadius * std::cos (angleRadian - MathConstants<float>::halfPi),
+    juce::Point<float> point (sliderCentre.x + sliderRadius * std::cos (angleRadian - MathConstants<float>::halfPi),
                         sliderCentre.y + sliderRadius * std::sin (angleRadian - MathConstants<float>::halfPi));
 
     g.drawLine (Line<float> (sliderCentre.toFloat(), point), 1.0f);

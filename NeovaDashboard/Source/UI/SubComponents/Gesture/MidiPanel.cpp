@@ -717,7 +717,7 @@ void MidiRangeTuner::drawCursor (Graphics& g)
     Path cursorPath;
     float cursorX = 11.5f + (lowSlider->getWidth() - 23.0f) * (lastValue / maxMidiFloat);
 
-    Point<float> cursorPoint = {cursorX, lowSlider->getBounds().getCentreY() + 9.0f};
+    juce::Point<float> cursorPoint = {cursorX, lowSlider->getBounds().getCentreY() + 9.0f};
 
     cursorPath.addTriangle ({cursorPoint.x - 3.0f, cursorPoint.y + 3.0f},
                             {cursorPoint.x + 3.0f, cursorPoint.y + 3.0f},
@@ -734,9 +734,9 @@ void MidiRangeTuner::drawSliderBackground (Graphics& g)
                                                   .toFloat(),
                             3.0f);
 
-    Point<float> startPoint (getThumbX (lowThumb), lowSlider->getY() + lowSlider->getHeight() * 0.5f);
+    juce::Point<float> startPoint (getThumbX (lowThumb), lowSlider->getY() + lowSlider->getHeight() * 0.5f);
 
-    Point<float> endPoint (getThumbX (highThumb), highSlider->getY() + highSlider->getHeight() * 0.5f);
+    juce::Point<float> endPoint (getThumbX (highThumb), highSlider->getY() + highSlider->getHeight() * 0.5f);
 
     Path valueTrack;
     valueTrack.startNewSubPath (startPoint);
