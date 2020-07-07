@@ -133,7 +133,7 @@ private:
 
     juce::Rectangle<int> sliderBounds;
     float sliderRadius;
-    Point<int> sliderCentre;
+    juce::Point<int> sliderCentre;
     float startAngle;
     float endAngle;
 

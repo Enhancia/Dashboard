@@ -87,11 +87,18 @@ namespace font
                                                             DashData::Ahmet_Altun__HalisGRBold_otfSize));
         else if (type == light)
             return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRLight_otf,
-                                                            DashData::Ahmet_Altun__HalisGRLight_otfSize));
+                                                            DashData::Ahmet_Altun__HalisGRLight_otfSize)); 
+        else if (type == ttNorms)
+            return Font (Typeface::createSystemTypefaceFor (DashData::TTNormsRegular_otf,
+                                                            DashData::TTNormsRegular_otfSize));
         // Enhancia logo (capital only)
         else if (type == enhanciaLogo)
             return Font (Typeface::createSystemTypefaceFor (DashData::NOOADemiSerifDEMO_ttf,
                                                             DashData::NOOADemiSerifDEMO_ttfSize));
+        // Neova logo (capital only)
+        else if (type == neovaLogo)
+            return Font (Typeface::createSystemTypefaceFor (DashData::Neovafont_otf,
+                                                            DashData::Neovafont_otfSize));
           
         return Font();
     }
@@ -99,7 +106,9 @@ namespace font
     const Font dashFont      = getDashFont();
     const Font dashFontBold  = getDashFont (bold);
     const Font dashFontLight = getDashFont (light);
+    const Font dashFontNorms = getDashFont (ttNorms);
     const Font enhanciaFont  = getDashFont (enhanciaLogo);
+    const Font neovaFont     = getDashFont (neovaLogo);
 
 }; // namespace font
 
@@ -107,28 +116,38 @@ namespace gesture
 {
 	const Colour getHighlightColour (const neova_dash::gesture::GestureType type, const bool active)
 	{
-		if (!active) return neova_dash::colour::inactiveGesture;
+		//if (!active) return neova_dash::colour::inactiveGesture;
+		Colour highlightColour;
 
 		switch (type)
 		{
 			case neova_dash::gesture::vibrato:
-				return neova_dash::colour::vibrato;
+				highlightColour = neova_dash::colour::vibrato;
+        break;
 			
 			case neova_dash::gesture::pitchBend:
-				return neova_dash::colour::pitchBend;
+				highlightColour = neova_dash::colour::pitchBend;
+        break;
 			
 			case neova_dash::gesture::tilt:
-				return neova_dash::colour::tilt;
+				highlightColour = neova_dash::colour::tilt;
+        break;
 			
 			case neova_dash::gesture::roll:
-				return neova_dash::colour::roll;
+				highlightColour = neova_dash::colour::roll;
+        break;
 			
 			case neova_dash::gesture::wave:
-				return neova_dash::colour::wave;
+				highlightColour = neova_dash::colour::wave;
+        break;
 
 			default:
-				return neova_dash::colour::inactiveGesture;
-		}	
+				highlightColour = neova_dash::colour::inactiveGesture;
+		}
+
+		if (!active) highlightColour = highlightColour.withAlpha (0.4f);
+
+		return highlightColour;
 	}
 
     const Colour getHighlightColour (const int typeInt, const bool active)

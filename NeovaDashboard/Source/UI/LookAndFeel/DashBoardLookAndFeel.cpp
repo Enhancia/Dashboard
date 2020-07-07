@@ -114,7 +114,7 @@ void DashBoardLookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int widt
     }
 
     auto thumbWidth = 6.0f;
-    Point<float> thumbPoint (bounds.getCentreX() + arcRadius * std::cos (toAngle - MathConstants<float>::halfPi),
+    juce::Point<float> thumbPoint (bounds.getCentreX() + arcRadius * std::cos (toAngle - MathConstants<float>::halfPi),
                              bounds.getCentreY() + arcRadius * std::sin (toAngle - MathConstants<float>::halfPi));
   if (slider.getThumbBeingDragged() != -1)
   {
@@ -147,10 +147,10 @@ void DashBoardLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int widt
 
         auto trackWidth = jmin (6.0f, slider.isHorizontal() ? height * 0.25f : width * 0.25f);
 
-        Point<float> startPoint (slider.isHorizontal() ? x : x + width * 0.5f,
+        juce::Point<float> startPoint (slider.isHorizontal() ? x : x + width * 0.5f,
                                  slider.isHorizontal() ? y + height * 0.5f : height + y);
 
-        Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
+        juce::Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
                                slider.isHorizontal() ? startPoint.y : y);
 
         Path backgroundTrack;
@@ -161,7 +161,7 @@ void DashBoardLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int widt
                                           , PathStrokeType::curved, PathStrokeType::rounded }); // changed track width
 
         Path valueTrack;
-        Point<float> minPoint, maxPoint, thumbPoint;
+        juce::Point<float> minPoint, maxPoint, thumbPoint;
 
         if (isTwoVal || isThreeVal)
         {
@@ -300,7 +300,7 @@ void RangeTunerLookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int wid
     }
 
     auto thumbWidth = 6.0f;
-    Point<float> thumbPoint (bounds.getCentreX() + arcRadius * std::cos (toAngle - MathConstants<float>::halfPi),
+    juce::Point<float> thumbPoint (bounds.getCentreX() + arcRadius * std::cos (toAngle - MathConstants<float>::halfPi),
                              bounds.getCentreY() + arcRadius * std::sin (toAngle - MathConstants<float>::halfPi));
 
     g.setColour (slider.findColour (Slider::thumbColourId));

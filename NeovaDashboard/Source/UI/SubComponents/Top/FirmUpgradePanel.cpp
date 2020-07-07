@@ -30,16 +30,15 @@ void FirmUpgradePanel::paint (Graphics& g)
     g.setColour (topPanelBackground);
     g.fillRoundedRectangle (panelArea.toFloat(), 10.0f);
     
-    /*
     // options panel outline
     auto gradOut = ColourGradient::horizontal (Colour (0x10ffffff),
-                                               0.0f, 
+                                               float (panelArea.getX()), 
                                                Colour (0x10ffffff),
-                                               float(getWidth()));
+                                               float(panelArea.getRight()));
     gradOut.addColour (0.5, Colour (0x50ffffff));
 
     g.setGradientFill (gradOut);
-    g.drawRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f, 1.0f);*/
+    g.drawRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f, 1.0f);
 }
 
 void FirmUpgradePanel::resized()
@@ -132,7 +131,7 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 	else if (bttn == upgradeButton.get())
 	{
 		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16());
-		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16());
+		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16() && hubConfig.getRingIsConnected());
 
 		currentUpgrade = (!ringAvailable && hubAvailable) ? hub : ring;
 		updateComponentsForSpecificState (preInstallationWarning);
