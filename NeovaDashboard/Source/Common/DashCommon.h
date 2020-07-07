@@ -149,13 +149,17 @@ namespace neova_dash
             regular =0,
             bold,
             light,
-            enhanciaLogo
+            ttNorms,
+            enhanciaLogo,
+            neovaLogo
         };
         
         extern const Font dashFont;
         extern const Font dashFontBold;
         extern const Font dashFontLight;
+        extern const Font dashFontNorms;
         extern const Font enhanciaFont;
+        extern const Font neovaFont;
     };
 
     namespace gesture

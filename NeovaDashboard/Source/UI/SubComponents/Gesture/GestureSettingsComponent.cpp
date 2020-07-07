@@ -59,7 +59,7 @@ void GestureSettingsComponent::paint (Graphics& g)
 
     // Gesture Name text
     g.setColour (neova_dash::colour::mainText);                    
-    g.setFont (neova_dash::font::dashFontBold.withHeight (15.0f));
+    g.setFont (neova_dash::font::dashFont.withHeight (15.0f).withExtraKerningFactor (0.06f));
     g.drawText (neova_dash::gesture::getTypeString (hubConfig.getGestureData (gestureId)
 		                                                     .type, true).toUpperCase(),
                 headerArea.removeFromLeft (getWidth()/3),
@@ -190,7 +190,8 @@ void GestureSettingsComponent::createToggles()
                                                     neova_dash::colour::dashboardBackground,
                                                     neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (gestureId)
                                                                                                       .type),
-                                                    neova_dash::colour::inactiveGesture);
+                                                    neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (gestureId)
+                                                                                                      .type, false));
     addAndMakeVisible (*muteButton);
 
     muteButton->setShape (neova_dash::path::createPath (neova_dash::path::onOff), false, true, false);

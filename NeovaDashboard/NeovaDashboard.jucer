@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="SIAvrc" name="NeovaDashboard" projectType="guiapp" jucerVersion="5.4.7"
-              binaryDataNamespace="DashData" version="0.3.11">
+              binaryDataNamespace="DashData" version="0.3.12">
   <MAINGROUP id="KvQWjZ" name="NeovaDashboard">
     <GROUP id="{20075F30-04A5-410B-6952-3C63688FBF54}" name="Resources">
       <GROUP id="{E0259D2D-3961-75D2-D343-36D8C845436E}" name="Image">
@@ -28,8 +28,13 @@
               resource="1" file="Resources/Font/Ahmet Altun - HalisGR-Light.otf"/>
         <FILE id="ZPoMcG" name="Ahmet Altun - HalisGR-Regular.otf" compile="0"
               resource="1" file="Resources/Font/Ahmet Altun - HalisGR-Regular.otf"/>
+        <FILE id="oYp5JA" name="Neova-font.otf" compile="0" resource="1" file="Resources/Font/Neova-font.otf"/>
         <FILE id="mAdhky" name="NOOA-Demi-Serif-DEMO.ttf" compile="0" resource="1"
               file="Resources/Font/NOOA-Demi-Serif-DEMO.ttf"/>
+        <FILE id="OlE8lJ" name="NOOA-Demi-Serif.ttf" compile="0" resource="1"
+              file="Resources/Font/NOOA-Demi-Serif.ttf"/>
+        <FILE id="qfoB5R" name="TTNorms-Regular.otf" compile="0" resource="1"
+              file="Resources/Font/TTNorms-Regular.otf"/>
       </GROUP>
     </GROUP>
     <GROUP id="{D6F09228-5F31-FBA3-77A9-E4EDF3219389}" name="Source">
@@ -188,7 +193,7 @@
       </MODULEPATHS>
     </VS2017>
     <XCODE_MAC targetFolder="Builds/MacOSX" extraFrameworks="SystemConfiguration"
-               smallIcon="X40b2q" bigIcon="X40b2q">
+               smallIcon="GG4enF" bigIcon="GG4enF">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" headerPath="/Users/macbook/Documents/Dev Dashboard/Dashboard_Interface/NeovaDashboard/Source"
                        targetName="Dashboard - Neova"/>
