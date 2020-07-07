@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="SIAvrc" name="NeovaDashboard" projectType="guiapp" jucerVersion="5.4.7"
-              binaryDataNamespace="DashData" version="0.3.11">
+              binaryDataNamespace="DashData" version="0.3.12">
   <MAINGROUP id="KvQWjZ" name="NeovaDashboard">
     <GROUP id="{20075F30-04A5-410B-6952-3C63688FBF54}" name="Resources">
       <GROUP id="{E0259D2D-3961-75D2-D343-36D8C845436E}" name="Image">
