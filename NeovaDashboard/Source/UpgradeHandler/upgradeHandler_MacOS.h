@@ -111,7 +111,7 @@ private:
     String releaseRelativePath = "/Application Support/Enhancia/FirmwareReleases/";
     String logsRelativePath = "/Logs/Enhancia/NeovaDashboard/Logs/";
     char const * upgradeHubCommandLine[3] = {"dfu", "usb-serial", "-pkg"};
-    char const * upgradeRingCommandLine[7] = {"dfu", "ble", "-ic", "NRF52", "-n", "\"Neova DFU\"", "-pkg"};
+    char const * upgradeRingCommandLine[7] = {"dfu", "ble", "-ic", "NRF52", "-n", "Neova DFU", "-pkg"};
     bool upgradeCommandReceived = false;
     uint16_t hubReleaseVersion = 0;
     uint16_t ringReleaseVersion = 0;
