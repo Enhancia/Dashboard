@@ -122,14 +122,14 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * numCOM)
 		minor = getRingReleaseVersion() & 0xFF;
 		major = (getRingReleaseVersion()>>8) & 0xFF;
 		
-		auto releasePath = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + releaseRelativePath + "ring_" + String(major) + "." + String(minor) + ".zip";
+		auto releasePath = "\"" + File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "\"" + releaseRelativePath + "ring_" + String(major) + "." + String(minor) + ".zip";
 		commandLine = upgradeRingCommandLine + releasePath + " -p " + portCOM;
 	}
 	else if (FirmType == upgradeFirmHub)
 	{
 		minor = getHubReleaseVersion() & 0xFF;
 		major = (getHubReleaseVersion() >> 8) & 0xFF;
-		auto releasePath = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + releaseRelativePath + "hub_" + String(major) + "." + String(minor) + ".zip";
+		auto releasePath = "\"" + File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "\"" + releaseRelativePath + "hub_" + String(major) + "." + String(minor) + ".zip";
 		commandLine = upgradeHubCommandLine + releasePath + " -p " + portCOM;
 	}
 
@@ -215,7 +215,7 @@ void UpgradeHandler::checkReleasesVersion()
 	{
 		String name = hubFiles.getFirst().getFileNameWithoutExtension();
 		uint8_t minor = name.getTrailingIntValue();
-		uint8_t major = name.trimCharactersAtEnd("." + String(minor)).getTrailingIntValue();
+		uint8_t major = name.upToLastOccurrenceOf(".", false, true).getTrailingIntValue();
 		uint16_t version = ((uint16_t)major << 8) | minor;
 		setHubReleaseVersion(version);
 	}
@@ -234,7 +234,7 @@ void UpgradeHandler::checkReleasesVersion()
 	{
 		String name = ringFiles.getFirst().getFileNameWithoutExtension();
 		uint8_t minor = name.getTrailingIntValue();
-		uint8_t major = name.trimCharactersAtEnd("." + String(minor)).getTrailingIntValue();
+		uint8_t major = name.upToLastOccurrenceOf(".", false, true).getTrailingIntValue();
 		uint16_t version = ((uint16_t)major << 8) | minor;
 		setRingReleaseVersion(version);
 	}
