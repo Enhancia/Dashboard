@@ -152,7 +152,7 @@ void DashBoardInterface::drawStateMessage (Graphics& g)
 
         stateMessage = "Your Neova is not compatible with "
                        "this version of the Dashboard.\n\n"
-                       "Please update Neova and the Dahboard "
+                       "Please update Neova and the Dashboard "
                        "to their latest versions.";
     }
 
@@ -409,7 +409,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
             // Open Firm upgrade alert
             if (!updaterPanel->isVisible())
             {
-                createAndShowAlertPanel ("You Neova firmware is outdated!", "Please upgrade your Neova firmware "
+                createAndShowAlertPanel ("Your Neova firmware is outdated!", "Please upgrade your Neova firmware "
                                                                             " to use it with this Dashboard Version.",
                                                                             "Upgrade Firmware",
                                                                             true,
