@@ -9,8 +9,8 @@
 #include "DashBoardInterface.h"
 
 //==============================================================================
-DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& reader, DashUpdater& updtr, UpgradeHandler& upgradeHandler)
-    : hubConfig (data), dataReader (reader), updater (updtr)
+DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& reader, DashUpdater& updtr, UpgradeHandler& upgrdHandler)
+    : hubConfig (data), dataReader (reader), updater (updtr), upgradeHandler (upgrdHandler)
 {
     TRACE_IN;
 
@@ -20,7 +20,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     optionsPanel = std::make_unique<OptionsPanel> (hubConfig, getCommandManager());
     addAndMakeVisible (*optionsPanel);
 
-    firmUpgradePanel = std::make_unique<FirmUpgradePanel> (hubConfig, upgradeHandler);
+    firmUpgradePanel = std::make_unique<FirmUpgradePanel> (hubConfig, upgrdHandler);
     addAndMakeVisible (*firmUpgradePanel);
 
     updaterPanel = std::make_unique<UpdaterPanel> (updater, updater.getDownloadProgressReference());
@@ -366,8 +366,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         hubConfig.selectFirstExistingGesture();
         header->setBatteryVisible (true);
 
-        // TODO replace with update if step 3
-        if (firmUpgradePanel->isVisible())
+        if (firmUpgradePanel->isWaitingForHubReconnect())
         {
             firmUpgradePanel->updateAfterHubConnection();
         }
@@ -404,13 +403,19 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         {
             updaterPanel->resetAndOpenPanel (true);
         }
+
+        else if (firmUpgradePanel->isWaitingForHubReconnect())
+        {
+            firmUpgradePanel->updateAfterHubConnection();
+        }
+
         else if (hubConfig.getHubIsCompatibleInt() < 0)
         {
             // Open Firm upgrade alert
-            if (!updaterPanel->isVisible())
+            if (!upgradeHandler.isUpgrading())
             {
-                createAndShowAlertPanel ("Your Neova firmware is outdated!", "Please upgrade your Neova firmware "
-                                                                            " to use it with this Dashboard Version.",
+                createAndShowAlertPanel ("Your Neova firmware is outdated!", "Please upgrade Neova "
+                                                                            "to use it with the Dashboard.",
                                                                             "Upgrade Firmware",
                                                                             true,
                                                                             DashAlertPanel::outdatedFirmware);

@@ -77,6 +77,9 @@ public:
 
     int getUpgradeState();
 
+    bool waitsForSuccessiveUpgrade();
+    bool isUpgrading();
+
     //==============================================================================
     static VOID CALLBACK childProcessExitCallback(PVOID lpParameter, BOOLEAN TimerOrWaitFired);
     
