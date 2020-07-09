@@ -17,6 +17,10 @@ OptionsPanel::OptionsPanel (HubConfiguration& config, ApplicationCommandManager&
     TRACE_IN;
 
     createButtons();
+    options.addTab (new Component(), "About");
+    options.addTab (new LegalPanel(), "Legal");
+    options.addTab (new Component(), "License");
+	  addAndMakeVisible (options);
     //createMidiBox();
 }
 
@@ -30,7 +34,7 @@ OptionsPanel::~OptionsPanel()
 //==============================================================================
 void OptionsPanel::paint (Graphics& g)
 {
-	  using namespace neova_dash::colour;
+    using namespace neova_dash::colour;
 
     ColourGradient gradFill (topPanelBackground.overlaidWith (Colour (0x10000000)),
                              float (optionsArea.getCentreX()),
@@ -59,11 +63,12 @@ void OptionsPanel::paint (Graphics& g)
     g.setGradientFill (gradOut);
     g.drawRoundedRectangle (optionsArea.toFloat(), 10.0f, 1.0f);
 
+    
     auto area = optionsArea.reduced (neova_dash::ui::MARGIN*2);
 
-    paintProductInformations (g, area.removeFromTop (area.getHeight()/3)
-    										                    .reduced (neova_dash::ui::MARGIN));
-
+    paintProductInformations (g, area.removeFromTop (area.getHeight()/3).reduced (neova_dash::ui::MARGIN));
+    
+    /*
     paintLegalAndRegulatoryArea (g, area.removeFromBottom (area.getHeight()/3)
                                             .reduced (neova_dash::ui::MARGIN*3,
                                                       neova_dash::ui::MARGIN));
@@ -76,20 +81,13 @@ void OptionsPanel::paint (Graphics& g)
 
     g.drawHorizontalLine (area.getBottom(), float (optionsArea.getX() + neova_dash::ui::MARGIN*7),
                                        float (optionsArea.getRight() - neova_dash::ui::MARGIN*7));
-    /*
-    g.setFont (neova_dash::font::dashFont.withHeight (15.0f));
-    g.drawText ("MIDI Channel :", area.removeFromTop (area.getHeight()/3)
-                                      .withTrimmedRight (area.getWidth()/2)
-                                      .reduced (neova_dash::ui::MARGIN),
-                                  Justification::centred);*/
 
     paintFirmUpdateArea (g, area.removeFromTop (area.getHeight()/2));
 
     g.setFont (neova_dash::font::dashFont.withHeight (15.0f));
     g.drawText ("Contact Enhancia :", area.withTrimmedRight (area.getWidth()/2)
                         .reduced (neova_dash::ui::MARGIN),
-                    Justification::centred);
-    
+                    Justification::centred);*/
 }
 
 void OptionsPanel::resized()
@@ -109,10 +107,13 @@ void OptionsPanel::resized()
 
     auto area = optionsArea.reduced (neova_dash::ui::MARGIN*2);
     area.removeFromTop (area.getHeight()/3);
-    area.removeFromBottom (area.getHeight()/3);
+    //area.removeFromBottom (area.getHeight()/3);
 
     area.reduce (neova_dash::ui::MARGIN, neova_dash::ui::MARGIN);
 
+    options.setBounds (area);
+
+    /*
     int buttonW = jmin (90, area.getWidth()/4 - neova_dash::ui::MARGIN_SMALL*2);
 
     auto firmArea = area.removeFromTop (area.getHeight()/2)
@@ -126,7 +127,7 @@ void OptionsPanel::resized()
 
     contactButton->setBounds (contactArea.removeFromLeft (contactArea.getWidth()/2)
                                          .withSizeKeepingCentre (buttonW, 30));
-    sendReportButton->setBounds (contactArea.withSizeKeepingCentre (buttonW, 30));
+    sendReportButton->setBounds (contactArea.withSizeKeepingCentre (buttonW, 30));*/
 }
 
 //==============================================================================
@@ -325,3 +326,209 @@ void OptionsPanel::paintLegalAndRegulatoryArea (Graphics& g, juce::Rectangle<int
                       area,
                       Justification::centred, 8);
 }
+
+// ====================== TabbedOptions =========================
+
+OptionsPanel::TabbedOptions::TabbedOptions()
+{
+}
+
+OptionsPanel::TabbedOptions::~TabbedOptions()
+{
+    removeAllChildren();
+    tabs.clear();
+}
+
+//==============================================================================
+void OptionsPanel::TabbedOptions::paint (Graphics& g)
+{
+    using namespace neova_dash::ui;
+
+    auto area = tabsArea;
+
+    if (!tabs.isEmpty())
+    {
+        //int tabHeight = (tabsArea.getHeight() - (tabs.size() - 1) * MARGIN)/tabs.size();
+        int tabHeightOrWidth = (style == tabsVertical)
+                                    ? jmin (30 , (area.getHeight() - (tabs.size() - 1) * MARGIN)/tabs.size())
+                                    : (area.getWidth() - (tabs.size() - 1) * MARGIN)/tabs.size();
+
+        for (int i =0; i < tabs.size(); i++)
+        {
+            auto tabArea = (style == tabsVertical) ? area.removeFromTop (tabHeightOrWidth)
+                                                   : area.removeFromLeft (tabHeightOrWidth);
+
+            if (i == selectedTab)
+            {
+                g.setColour (neova_dash::colour::mainText.withAlpha (0.1f));
+                g.fillRect ((style == tabsVertical) ? tabArea.withWidth (3)
+                                                    : tabArea.withHeight (3));
+            }
+
+            g.setColour (i == selectedTab ? neova_dash::colour::mainText
+                                          : neova_dash::colour::subText);
+            g.setFont (neova_dash::font::dashFont.withHeight (16.0f));
+            g.drawText (tabs[i]->name,
+                        (style == tabsVertical) ? tabArea.withTrimmedLeft (MARGIN + 5)
+                                                : tabArea.withTrimmedTop (5),
+                        (style == tabsVertical) ? Justification::centredLeft
+                                                : Justification::centred,
+                        true);
+
+            (style == tabsVertical) ? area.removeFromTop (MARGIN)
+                                    : area.removeFromLeft (MARGIN);
+        }
+    }
+}
+
+void OptionsPanel::TabbedOptions::resized()
+{
+    using namespace neova_dash::ui;
+
+    auto area = getLocalBounds();
+    
+    if (style == tabsVertical)
+    {
+        panelArea = area.removeFromRight (getWidth()*4/5);
+        tabsArea = area;
+    }
+    else
+    {
+        tabsArea = area.removeFromTop (30);
+        panelArea = area;
+    }
+
+    if (!tabs.isEmpty())
+    { 
+        auto tabsAreaTemp = tabsArea;
+
+        //int tabHeight = (tabsArea.getHeight() - (tabs.size() - 1) * MARGIN)/tabs.size();
+        int tabHeightOrWidth = (style == tabsVertical)
+                                    ? jmin (30 , (tabsAreaTemp.getHeight() - (tabs.size() - 1) * MARGIN)/tabs.size())
+                                    : (tabsAreaTemp.getWidth() - (tabs.size() - 1) * MARGIN)/tabs.size();
+
+        for (auto* tab : tabs)
+        {
+            tab->button->setBounds ((style == tabsVertical) ? tabsAreaTemp.removeFromTop (tabHeightOrWidth)
+                                                            : tabsAreaTemp.removeFromLeft (tabHeightOrWidth));
+
+            (style == tabsVertical) ? tabsAreaTemp.removeFromTop (MARGIN)
+                                    : tabsAreaTemp.removeFromLeft (MARGIN);
+            
+
+            tab->panel->setBounds (panelArea);
+        }
+    }
+}
+
+//==============================================================================
+void OptionsPanel::TabbedOptions::addTab (Component* panel, String tabName)
+{
+    tabs.add (new Tab (panel, tabName));
+    addAndMakeVisible (tabs.getLast()->button.get());
+    addChildAndSetID (tabs.getLast()->panel.get(), "panel" + String(tabs.size() - 1));
+    findChildWithID ("panel" + String(tabs.size() - 1))->setVisible (false);
+    tabs.getLast()->button->addListener (this);
+
+    // Displays the first tab that is added
+    if (tabs.size() == 1)
+    {
+        switchToTab (0);
+    } 
+}
+
+void OptionsPanel::TabbedOptions::switchToTab (const int tabNumber)
+{
+    if (tabNumber < 0 || tabNumber >= tabs.size()) return;
+
+    if (tabNumber == selectedTab) return;
+    if (auto* pan = findChildWithID("panel" + String(selectedTab))) pan->setVisible(true);
+
+    findChildWithID ("panel" + String(selectedTab))->setVisible (false);
+    findChildWithID ("panel" + String(tabNumber)  )->setVisible (true);
+    selectedTab = tabNumber;
+
+    repaint();
+}
+
+
+Component* OptionsPanel::TabbedOptions::getComponentFromTab (const int tabNumber)
+{
+    if (tabNumber < 0 || tabNumber >= tabs.size()) return nullptr;
+
+    return tabs[tabNumber]->panel.get();
+}
+
+Component* OptionsPanel::TabbedOptions::getComponentFromTab (const String tabName)
+{
+    for (auto* tab : tabs)
+    {
+        if (tab->name == tabName)
+        {
+            return tab->panel.get();
+        }
+    }
+
+  return nullptr;
+}
+
+Component* OptionsPanel::TabbedOptions::getComponentFromSelectedTab()
+{
+    return getComponentFromTab (selectedTab);
+}
+
+//==============================================================================
+void OptionsPanel::TabbedOptions::setStyle (TabbedPanelStyle newStyle)
+{
+    if (newStyle != style)
+    {
+        style = newStyle;
+        resized();
+        repaint();
+    }
+}
+
+//==============================================================================
+void OptionsPanel::TabbedOptions::buttonClicked (Button* bttn)
+{
+    for (int i =0; i < tabs.size(); i++)
+    {
+        if (bttn == tabs[i]->button.get())
+        {
+            switchToTab(i);
+        }
+    }
+}
+
+
+// ====================== LegalPanel =========================
+LegalPanel::LegalPanel() {}
+LegalPanel::~LegalPanel() {}
+
+void LegalPanel::paint (Graphics& g)
+{
+    auto area = getLocalBounds().reduced (0, neova_dash::ui::MARGIN);
+
+    g.setColour (neova_dash::colour::subText);
+    g.setFont (neova_dash::font::dashFont.withHeight (13));
+
+    g.drawText ("LEGAL AND REGULATORY : ", area.removeFromTop (25),
+                Justification::centredTop);
+
+    g.setFont (neova_dash::font::dashFont.withHeight (13));
+    g.drawFittedText ("\n\n\nRING :\n\n"
+                      "FCC ID :    2AUJX-R1\n"
+                      "IC :        25446-R1\n"
+                      "HVIN :      NEOVA-R1",
+                      area.removeFromLeft (area.getWidth()/2),
+                      Justification::centredTop, 8);
+
+    g.drawFittedText ("\n\n\nHUB :\n\n"
+                      "FCC ID :    2AUJX-H1\n"
+                      "IC :        25446-H1\n"
+                      "HVIN :      NEOVA-H1",
+                      area,
+                      Justification::centredTop, 8);
+}
+
+void LegalPanel::resized() {}
