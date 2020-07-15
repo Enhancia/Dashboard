@@ -17,11 +17,12 @@ OptionsPanel::OptionsPanel (HubConfiguration& config, ApplicationCommandManager&
     TRACE_IN;
 
     createButtons();
-    options.addTab (new Component(), "About");
+    options.addTab (new FirmwarePanel (hubConfig), "Firmware");
+    options.addTab (new AboutPanel(), "About");
     options.addTab (new LegalPanel(), "Legal");
-    options.addTab (new Component(), "License");
+    options.addTab (new LicensePanel(), "EULA");
+    options.switchToTab (0);
 	  addAndMakeVisible (options);
-    //createMidiBox();
 }
 
 OptionsPanel::~OptionsPanel()
@@ -500,8 +501,68 @@ void OptionsPanel::TabbedOptions::buttonClicked (Button* bttn)
     }
 }
 
+// ====================== AboutPanel =========================
+
+AboutPanel::AboutPanel()
+{
+}
+
+AboutPanel::~AboutPanel()
+{
+}
+
+void AboutPanel::paint (Graphics& g)
+{
+    auto area = getLocalBounds().reduced (neova_dash::ui::MARGIN, neova_dash::ui::MARGIN);
+
+    g.setColour (neova_dash::colour::mainText);
+    g.setFont (neova_dash::font::dashFont.withHeight (13));
+
+    g.drawFittedText ("Dashboard - Neova :\n\n"
+                      "  - Developpers : Alex LEVACHER, Mathieu HERBELOT\n"
+                      "  - UI / UX     : Mario VIOLA,   Damien LE BOULAIRE\n\n\n"
+                      "\"Dashboard - Neova\" and \"Neova\" are properties of Enhancia SAS.",
+                      area.removeFromTop (area.getHeight()/2),
+                      Justification::topLeft, 5);
+}
+
+void AboutPanel::resized()
+{
+}
+
+// ====================== FirmwarePanel =========================
+
+FirmwarePanel::FirmwarePanel (HubConfiguration& hubConfiguration) : hubConfig (hubConfiguration)
+{
+}
+
+FirmwarePanel::~FirmwarePanel()
+{
+}
+
+void FirmwarePanel::paint (Graphics& g)
+{
+	auto area = getLocalBounds();
+
+    g.setColour (neova_dash::colour::subText);
+    g.setFont (neova_dash::font::dashFont.withHeight (15));
+
+    g.drawText ("Current firmware version : ",
+                area.removeFromLeft (area.getWidth()/2),
+                Justification::centred);
+
+    g.setFont (neova_dash::font::dashFont.withHeight (12));
+    g.drawFittedText (hubConfig.getFirmwareVersionString(),
+                      area.removeFromLeft (area.getWidth()/2),
+                      Justification::centred, 2);
+}
+
+void FirmwarePanel::resized()
+{
+}
 
 // ====================== LegalPanel =========================
+
 LegalPanel::LegalPanel() {}
 LegalPanel::~LegalPanel() {}
 
@@ -509,15 +570,14 @@ void LegalPanel::paint (Graphics& g)
 {
     auto area = getLocalBounds().reduced (0, neova_dash::ui::MARGIN);
 
-    g.setColour (neova_dash::colour::subText);
+    g.setColour (neova_dash::colour::mainText);
     g.setFont (neova_dash::font::dashFont.withHeight (13));
 
     g.drawText ("LEGAL AND REGULATORY : ", area.removeFromTop (25),
                 Justification::centredTop);
 
     g.setFont (neova_dash::font::dashFont.withHeight (13));
-    g.drawFittedText ("\n\n\nRING :\n\n"
-                      "FCC ID :    2AUJX-R1\n"
+    g.drawFittedText ("\n\n\nRING :\n\n"                      "FCC ID :    2AUJX-R1\n"
                       "IC :        25446-R1\n"
                       "HVIN :      NEOVA-R1",
                       area.removeFromLeft (area.getWidth()/2),
@@ -532,3 +592,34 @@ void LegalPanel::paint (Graphics& g)
 }
 
 void LegalPanel::resized() {}
+
+
+// ====================== LicensePanel =========================
+
+LicensePanel::LicensePanel()
+{
+    auto licenseTextString = String::createStringFromData (DashData::_200429__Enhancia_Software_Licence_txt, DashData::_200429__Enhancia_Software_Licence_txtSize);
+
+    licenseTextEdit.setMultiLine (true);
+    licenseTextEdit.setReadOnly (true);
+    licenseTextEdit.setScrollbarsShown (true);
+    licenseTextEdit.setFont (neova_dash::font::dashFont.withHeight (13.0f));
+    licenseTextEdit.setJustification (Justification::horizontallyJustified);
+    licenseTextEdit.setColour (TextEditor::backgroundColourId, neova_dash::colour::subText.withAlpha (0.05f));
+    licenseTextEdit.setColour (TextEditor::textColourId, neova_dash::colour::mainText);
+    licenseTextEdit.setText (licenseTextString, false);
+    addAndMakeVisible (licenseTextEdit);
+}
+
+LicensePanel::~LicensePanel()
+{
+}
+
+void LicensePanel::paint (Graphics& g)
+{
+}
+
+void LicensePanel::resized()
+{
+    licenseTextEdit.setBounds (getLocalBounds());
+}

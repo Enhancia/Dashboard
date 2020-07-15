@@ -128,6 +128,19 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OptionsPanel)
 };
 
+class AboutPanel: public Component
+{
+public:
+    AboutPanel();
+    ~AboutPanel();
+
+    void paint (Graphics& g) override;
+    void resized() override;
+private:
+    //==============================================================================
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutPanel)
+};
+
 class LegalPanel: public Component
 {
 public:
@@ -139,4 +152,39 @@ public:
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LegalPanel)
+};
+
+class FirmwarePanel: public Component
+{
+public:
+    FirmwarePanel (HubConfiguration& hubConfiguration);
+    ~FirmwarePanel();
+
+    void paint (Graphics& g) override;
+    void resized() override;
+private:
+    //==============================================================================
+    HubConfiguration& hubConfig;
+
+    //==============================================================================
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FirmwarePanel)
+};
+
+class LicensePanel: public Component
+{
+public:
+    //==============================================================================
+    LicensePanel();
+    ~LicensePanel();
+
+    //==============================================================================
+    void paint (Graphics& g) override;
+    void resized() override;
+private:
+    //==============================================================================
+    //ViewPort viewPort;
+    TextEditor licenseTextEdit;
+
+    //==============================================================================
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LicensePanel)
 };
