@@ -17,8 +17,8 @@ OptionsPanel::OptionsPanel (HubConfiguration& config, ApplicationCommandManager&
     TRACE_IN;
 
     createButtons();
-    options.addTab (new FirmwarePanel (hubConfig), "Firmware");
-    options.addTab (new AboutPanel(), "About");
+    options.addTab (new GeneralPanel(), "General");
+    options.addTab (new FirmwarePanel (hubConfig, *upgradeButton.get()), "Firmware");
     options.addTab (new LegalPanel(), "Legal");
     options.addTab (new LicensePanel(), "EULA");
     options.switchToTab (0);
@@ -143,47 +143,6 @@ void OptionsPanel::buttonClicked (Button* bttn)
     {
         commandManager.invokeDirectly (neova_dash::commands::upgradeHub, true);
     }
-
-    else if (bttn == sendReportButton.get())
-    {
-        if (auto* dashLogger = dynamic_cast<FileLogger*> (Logger::getCurrentLogger()))
-        {
-            String fullLog = dashLogger->getLogFile().loadFileAsString().removeCharacters ("\n");
-            
-            /* Only keeps the last 3 entries of the log: the one that had an issue, 
-               the one used to send the report, and one more to cover cases where the plugin
-               has to be checked (For instance the plugin check when launching Ableton..)
-               If too long, keeps the 6000 last characters.. */
-            int startIndex = jmax (fullLog.upToLastOccurrenceOf("Neova Dashboard Log", false, false)
-                                          .upToLastOccurrenceOf("Neova Dashboard Log", false, false)
-                                          .lastIndexOf("Neova Dashboard Log"),
-                                   fullLog.length() - 6000);
-      
-          #if JUCE_WINDOWS                    
-            String mail_str ("mailto:damien.leboulaire@enhancia.co"
-                             "?Subject=[Neova Dashboard Report]"
-                             "&cc=alex.levacher@enhancia.co"
-                             "&body=" + fullLog.substring (startIndex));
-            LPCSTR mail_lpc = mail_str.toUTF8();
-
-            ShellExecute (NULL, "open", mail_lpc,
-                          "", "", SW_SHOWNORMAL);
-
-          #elif JUCE_MAC                    
-            String mail_str ("open mailto:damien.leboulaire@enhancia.co"
-                             "?Subject=\"[Neova Dashboard Report]\""
-                             "\\&cc=alex.levacher@enhancia.co"
-                             "\\&body=\"" + fullLog.substring (startIndex) + "\"");
-        
-            system (mail_str.toUTF8());
-          #endif
-        }
-    }
-
-    else if (bttn == contactButton.get())
-    {
-        URL ("https://www.enhancia.co/contact").launchInDefaultBrowser();
-    }
 }
 
 void OptionsPanel::mouseUp (const MouseEvent& event)
@@ -231,19 +190,9 @@ void OptionsPanel::createButtons()
 	  closeButton->addListener (this);
 
     //Update Firm button
-    upgradeButton = std::make_unique <TextButton> ("Upgrade");
-    addAndMakeVisible (*upgradeButton);
+    upgradeButton = std::make_unique <TextButton> ("Check Upgrades");
+    //addAndMakeVisible (*upgradeButton);
     upgradeButton->addListener (this);
-
-    //Contact button
-    contactButton = std::make_unique <TextButton> ("Contact");
-    addAndMakeVisible (*contactButton);
-    contactButton->addListener (this);
-
-    //Send Report button
-    sendReportButton = std::make_unique <TextButton> ("Send Report");
-    addAndMakeVisible (*sendReportButton);
-    sendReportButton->addListener (this);
 }
 
 void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> area)
@@ -254,16 +203,17 @@ void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> ar
     auto enhanciaArea = area.removeFromLeft (area.getWidth()/2);
 
     auto logoArea = enhanciaArea.removeFromTop (area.getHeight()/2)
-                                .reduced (enhanciaArea.getWidth()/3, MARGIN_SMALL)
+                                .reduced (enhanciaArea.getWidth()/4, 0)
                                 .withTrimmedTop (enhanciaArea.getHeight()/6)
                                 .toFloat();
-
+                         
     Path logo = neova_dash::path::createPath (neova_dash::path::enhanciaLogo);
     logo.scaleToFit (logoArea.getX(), logoArea.getY(),
                      logoArea.getWidth(), logoArea.getHeight(), true);
+    g.drawImage (enhanciaLogo, logoArea.toFloat(), RectanglePlacement::fillDestination);
 
     g.setColour (neova_dash::colour::mainText);
-  	g.fillPath (logo);
+  	//g.fillPath (logo);
 
     //Enhancia Text
     g.setColour (neova_dash::colour::mainText);
@@ -332,6 +282,7 @@ void OptionsPanel::paintLegalAndRegulatoryArea (Graphics& g, juce::Rectangle<int
 
 OptionsPanel::TabbedOptions::TabbedOptions()
 {
+    setStyle (tabsHorizontal);
 }
 
 OptionsPanel::TabbedOptions::~TabbedOptions()
@@ -501,64 +452,146 @@ void OptionsPanel::TabbedOptions::buttonClicked (Button* bttn)
     }
 }
 
-// ====================== AboutPanel =========================
+// ====================== GeneralPanel =========================
 
-AboutPanel::AboutPanel()
+GeneralPanel::GeneralPanel()
+{
+    //Contact button
+    contactButton = std::make_unique <TextButton> ("Contact");
+    addAndMakeVisible (*contactButton);
+    contactButton->addListener (this);
+
+    //Send Report button
+    sendReportButton = std::make_unique <TextButton> ("Send Report");
+    addAndMakeVisible (*sendReportButton);
+    sendReportButton->addListener (this);
+}
+
+GeneralPanel::~GeneralPanel()
 {
 }
 
-AboutPanel::~AboutPanel()
-{
-}
-
-void AboutPanel::paint (Graphics& g)
+void GeneralPanel::paint (Graphics& g)
 {
     auto area = getLocalBounds().reduced (neova_dash::ui::MARGIN, neova_dash::ui::MARGIN);
 
     g.setColour (neova_dash::colour::mainText);
     g.setFont (neova_dash::font::dashFont.withHeight (13));
 
-    g.drawFittedText ("Dashboard - Neova :\n\n"
+    g.drawFittedText ("Dashboard - Neova :"
                       "  - Developpers : Alex LEVACHER, Mathieu HERBELOT\n"
-                      "  - UI / UX     : Mario VIOLA,   Damien LE BOULAIRE\n\n\n"
-                      "\"Dashboard - Neova\" and \"Neova\" are properties of Enhancia SAS.",
+                      "                     - UI / UX     : Mario VIOLA,   Damien LE BOULAIRE\n\n\n",
                       area.removeFromTop (area.getHeight()/2),
                       Justification::topLeft, 5);
 }
 
-void AboutPanel::resized()
+void GeneralPanel::resized()
 {
+	auto area = getLocalBounds();
+    area.removeFromTop (area.getHeight()/2);
+
+    contactButton->setBounds (area.removeFromLeft (area.getWidth()/2)
+                                  .withSizeKeepingCentre (contactButton->getBestWidthForHeight (30), 30));
+    
+    sendReportButton->setBounds (area.withSizeKeepingCentre (contactButton->getBestWidthForHeight (30), 30));
+}
+
+void GeneralPanel::buttonClicked (Button* bttn)
+{
+    if (bttn == sendReportButton.get())
+    {
+        if (auto* dashLogger = dynamic_cast<FileLogger*> (Logger::getCurrentLogger()))
+        {
+            String fullLog = dashLogger->getLogFile().loadFileAsString().removeCharacters ("\n");
+            
+            /* Only keeps the last 3 entries of the log: the one that had an issue, 
+               the one used to send the report, and one more to cover cases where the plugin
+               has to be checked (For instance the plugin check when launching Ableton..)
+               If too long, keeps the 6000 last characters.. */
+            int startIndex = jmax (fullLog.upToLastOccurrenceOf("Neova Dashboard Log", false, false)
+                                          .upToLastOccurrenceOf("Neova Dashboard Log", false, false)
+                                          .lastIndexOf("Neova Dashboard Log"),
+                                   fullLog.length() - 6000);
+      
+          #if JUCE_WINDOWS                    
+            String mail_str ("mailto:damien.leboulaire@enhancia.co"
+                             "?Subject=[Neova Dashboard Report]"
+                             "&cc=alex.levacher@enhancia.co"
+                             "&body=" + fullLog.substring (startIndex));
+            LPCSTR mail_lpc = mail_str.toUTF8();
+
+            ShellExecute (NULL, "open", mail_lpc,
+                          "", "", SW_SHOWNORMAL);
+
+          #elif JUCE_MAC                    
+            String mail_str ("open mailto:damien.leboulaire@enhancia.co"
+                             "?Subject=\"[Neova Dashboard Report]\""
+                             "\\&cc=alex.levacher@enhancia.co"
+                             "\\&body=\"" + fullLog.substring (startIndex) + "\"");
+        
+            system (mail_str.toUTF8());
+          #endif
+        }
+    }
+
+    else if (bttn == contactButton.get())
+    {
+        URL ("https://www.enhancia.co/contact").launchInDefaultBrowser();
+    }
 }
 
 // ====================== FirmwarePanel =========================
 
-FirmwarePanel::FirmwarePanel (HubConfiguration& hubConfiguration) : hubConfig (hubConfiguration)
+FirmwarePanel::FirmwarePanel (HubConfiguration& hubConfiguration, TextButton& button)
+  : hubConfig (hubConfiguration), upgradeButton (button)
 {
+    addAndMakeVisible (upgradeButton);
 }
 
 FirmwarePanel::~FirmwarePanel()
 {
+    removeAllChildren();
 }
 
 void FirmwarePanel::paint (Graphics& g)
 {
-	auto area = getLocalBounds();
+    auto area = getLocalBounds().reduced (neova_dash::ui::MARGIN);
+
+    auto ringArea = area.removeFromLeft (area.getWidth()/2);
+    auto hubArea = area;
 
     g.setColour (neova_dash::colour::subText);
     g.setFont (neova_dash::font::dashFont.withHeight (15));
+    g.drawFittedText (hubConfig.getRingFirmwareVersionString(),
+                      ringArea.removeFromBottom (ringArea.getHeight()/3),
+                      Justification::centredTop, 1);
+    g.drawFittedText (hubConfig.getHubFirmwareVersionString(),
+                      hubArea.removeFromBottom (hubArea.getHeight()/3),
+                      Justification::centredTop, 1);
 
-    g.drawText ("Current firmware version : ",
-                area.removeFromLeft (area.getWidth()/2),
-                Justification::centred);
+    Path ringPath = neova_dash::path::createPath (neova_dash::path::ring);
+    Path hubPath = neova_dash::path::createPath (neova_dash::path::hub);
 
-    g.setFont (neova_dash::font::dashFont.withHeight (12));
-    g.drawFittedText (hubConfig.getFirmwareVersionString(),
-                      area.removeFromLeft (area.getWidth()/2),
-                      Justification::centred, 2);
+    ringPath.scaleToFit (ringArea.reduced (ringArea.getHeight()/4).getX(),
+                         ringArea.reduced (ringArea.getHeight()/4).getY(),
+                         ringArea.reduced (ringArea.getHeight()/4).getWidth(),
+                         ringArea.reduced (ringArea.getHeight()/4).getHeight(),
+                         true);
+
+    hubPath.scaleToFit (hubArea.reduced (hubArea.getHeight()/8).getX(),
+                        hubArea.reduced (hubArea.getHeight()/8).getY(),
+                        hubArea.reduced (hubArea.getHeight()/8).getWidth(),
+                        hubArea.reduced (hubArea.getHeight()/8).getHeight(),
+                        true);
+
+    g.strokePath (ringPath, {1.0f, PathStrokeType::curved});
+    g.strokePath (hubPath, {1.0f, PathStrokeType::curved});
 }
 
 void FirmwarePanel::resized()
 {
+    upgradeButton.setBounds (getLocalBounds().withSizeKeepingCentre (upgradeButton.getBestWidthForHeight (30), 30)
+                                             .withBottomY (getLocalBounds().getBottom() - neova_dash::ui::MARGIN));
 }
 
 // ====================== LegalPanel =========================
@@ -568,27 +601,40 @@ LegalPanel::~LegalPanel() {}
 
 void LegalPanel::paint (Graphics& g)
 {
-    auto area = getLocalBounds().reduced (0, neova_dash::ui::MARGIN);
+    auto area = getLocalBounds().reduced (neova_dash::ui::MARGIN);
+    auto ringArea = area.removeFromLeft (area.getWidth()/2);
+    auto hubArea = area;
 
-    g.setColour (neova_dash::colour::mainText);
+    g.setColour (neova_dash::colour::subText);
     g.setFont (neova_dash::font::dashFont.withHeight (13));
-
-    g.drawText ("LEGAL AND REGULATORY : ", area.removeFromTop (25),
-                Justification::centredTop);
-
-    g.setFont (neova_dash::font::dashFont.withHeight (13));
-    g.drawFittedText ("\n\n\nRING :\n\n"                      "FCC ID :    2AUJX-R1\n"
-                      "IC :        25446-R1\n"
+    g.drawFittedText ("\nFCC ID :    2AUJX-R1\n"
+                      "IC :             25446-R1\n"
                       "HVIN :      NEOVA-R1",
-                      area.removeFromLeft (area.getWidth()/2),
-                      Justification::centredTop, 8);
-
-    g.drawFittedText ("\n\n\nHUB :\n\n"
-                      "FCC ID :    2AUJX-H1\n"
-                      "IC :        25446-H1\n"
+                      ringArea.removeFromBottom (ringArea.getHeight()/3),
+                      Justification::centredTop, 4);
+    g.drawFittedText ("\nFCC ID :    2AUJX-H1\n"
+                      "IC :             25446-H1\n"
                       "HVIN :      NEOVA-H1",
-                      area,
-                      Justification::centredTop, 8);
+                      hubArea.removeFromBottom (hubArea.getHeight()/3),
+                      Justification::centredTop, 4);
+
+    Path ringPath = neova_dash::path::createPath (neova_dash::path::ring);
+    Path hubPath = neova_dash::path::createPath (neova_dash::path::hub);
+
+    ringPath.scaleToFit (ringArea.reduced (ringArea.getHeight()/4).getX(),
+                         ringArea.reduced (ringArea.getHeight()/4).getY(),
+                         ringArea.reduced (ringArea.getHeight()/4).getWidth(),
+                         ringArea.reduced (ringArea.getHeight()/4).getHeight(),
+                         true);
+
+    hubPath.scaleToFit (hubArea.reduced (hubArea.getHeight()/8).getX(),
+                        hubArea.reduced (hubArea.getHeight()/8).getY(),
+                        hubArea.reduced (hubArea.getHeight()/8).getWidth(),
+                        hubArea.reduced (hubArea.getHeight()/8).getHeight(),
+                        true);
+
+    g.strokePath (ringPath, {1.0f, PathStrokeType::curved});
+    g.strokePath (hubPath, {1.0f, PathStrokeType::curved});
 }
 
 void LegalPanel::resized() {}
@@ -621,5 +667,5 @@ void LicensePanel::paint (Graphics& g)
 
 void LicensePanel::resized()
 {
-    licenseTextEdit.setBounds (getLocalBounds());
+    licenseTextEdit.setBounds (getLocalBounds().withTrimmedTop (neova_dash::ui::MARGIN));
 }

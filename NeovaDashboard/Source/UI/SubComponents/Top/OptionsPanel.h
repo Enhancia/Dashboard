@@ -78,12 +78,28 @@ private:
         //==============================================================================
         struct Tab
         {
+			class TabButton : public Button
+			{
+			public:
+				TabButton(String tabName) : Button(tabName + String("Button")) {}
+				~TabButton() {}
+
+				void paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
+				{
+					if (shouldDrawButtonAsDown || shouldDrawButtonAsHighlighted)
+					{
+						g.setColour(neova_dash::colour::subText.withAlpha(shouldDrawButtonAsDown ? 0.2f : 0.05f));
+						g.fillRect(getLocalBounds());
+					}
+				}
+
+			private:
+				JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TabButton)
+			};
+
             Tab (Component* panelToUse, String tabName) : name (tabName), panel (panelToUse)
             {
-                button.reset (new TextButton (name));
-                button->setButtonText ("");
-                button->setColour (TextButton::buttonColourId, Colour (0x00000000));
-                button->setColour (TextButton::buttonOnColourId, Colour (0x00000000));
+                button.reset (new TabButton (name));
             }
 
             ~Tab ()
@@ -91,7 +107,7 @@ private:
                 button = nullptr;
             }
 
-            std::unique_ptr<TextButton> button;
+            std::unique_ptr<TabButton> button;
             std::unique_ptr<Component> panel;
             const String name;
         };
@@ -116,37 +132,52 @@ private:
     juce::Rectangle<int> optionsArea;
     std::unique_ptr<DashShapeButton> closeButton;
     TabbedOptions options;
+
+    //==============================================================================
+    Image enhanciaLogo = ImageFileFormat::loadFrom (DashData::logoenhanciawhitetextured_png, DashData::logoenhanciawhitetextured_pngSize);
     
     //==============================================================================
     HubConfiguration& hubConfig;
     ApplicationCommandManager& commandManager;
-    std::unique_ptr<TextButton> upgradeButton;
     std::unique_ptr<TextButton> sendReportButton;
     std::unique_ptr<TextButton> contactButton;
+    std::unique_ptr<TextButton> upgradeButton;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OptionsPanel)
 };
 
-class AboutPanel: public Component
+class GeneralPanel: public Component, Button::Listener
 {
 public:
-    AboutPanel();
-    ~AboutPanel();
+    //==============================================================================
+    GeneralPanel();
+    ~GeneralPanel();
 
+    //==============================================================================
     void paint (Graphics& g) override;
     void resized() override;
+
+    //==============================================================================
+    void buttonClicked (Button* bttn) override;
+
 private:
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutPanel)
+    std::unique_ptr<TextButton> contactButton;
+    std::unique_ptr<TextButton> sendReportButton;
+
+    //==============================================================================
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralPanel)
 };
 
 class LegalPanel: public Component
 {
 public:
+    //==============================================================================
     LegalPanel();
     ~LegalPanel();
 
+    //==============================================================================
     void paint (Graphics& g) override;
     void resized() override;
 private:
@@ -157,14 +188,17 @@ private:
 class FirmwarePanel: public Component
 {
 public:
-    FirmwarePanel (HubConfiguration& hubConfiguration);
+    //==============================================================================
+    FirmwarePanel (HubConfiguration& hubConfiguration, TextButton& button);
     ~FirmwarePanel();
 
+    //==============================================================================
     void paint (Graphics& g) override;
     void resized() override;
 private:
     //==============================================================================
     HubConfiguration& hubConfig;
+    TextButton& upgradeButton;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FirmwarePanel)
@@ -182,7 +216,6 @@ public:
     void resized() override;
 private:
     //==============================================================================
-    //ViewPort viewPort;
     TextEditor licenseTextEdit;
 
     //==============================================================================

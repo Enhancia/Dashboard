@@ -34,6 +34,7 @@ void DashBoardLookAndFeel::setColours()
     setColour (TextEditor::focusedOutlineColourId, Colour (0));
     setColour (TextEditor::highlightColourId, mainText.withAlpha (0.5f));
     setColour (CaretComponent::caretColourId, mainText);
+    setColour (ScrollBar::thumbColourId, subText);
 
   	// Slider
   	setColour (Slider::thumbColourId, tunerSliderThumb);
@@ -244,8 +245,8 @@ void DashBoardLookAndFeel::drawScrollbar (Graphics& g, ScrollBar& scrollbar,
     juce::Rectangle<int> thumbBounds;
 
     if (isScrollbarVertical)
-        thumbBounds = { x + int (std::ceil (width/2.0f)), thumbStartPosition,
-                        int (std::floor (width/2.0f)),     thumbSize };
+        thumbBounds = { x, thumbStartPosition,
+                        width, thumbSize };
     else
         thumbBounds = { thumbStartPosition, y, thumbSize, height };
 
