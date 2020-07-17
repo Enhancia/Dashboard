@@ -27,6 +27,7 @@ namespace neova_dash
                 pitchBend,
                 roll,
                 ring,
+                ringFull,
                 hub
     		};
 

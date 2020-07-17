@@ -60,7 +60,7 @@ void DataReader::timerCallback()
     if (hubConfig.getRingIsConnected())
     {
         hubConfig.setRingIsConnected (false);
-        commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
+        commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
     }
 
     stopTimer();
@@ -79,7 +79,7 @@ bool DataReader::readData (String s)
         if (!hubConfig.getRingIsConnected())
         {
             hubConfig.setRingIsConnected (true);
-            commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
+            commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
         }
         // Notifies Ring is no longer in chargeMode
         else if (hubConfig.getRingIsCharging())
@@ -110,7 +110,7 @@ bool DataReader::readData (String s)
         if (!hubConfig.getRingIsConnected())
         {
             hubConfig.setRingIsConnected (true);
-            commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
+            commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
         }
         // Notifies Ring is in ChargeMode
         else if (!hubConfig.getRingIsCharging())

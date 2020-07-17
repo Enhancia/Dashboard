@@ -147,12 +147,12 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OptionsPanel)
 };
 
-class GeneralPanel: public Component, Button::Listener
+class ContactPanel: public Component, Button::Listener
 {
 public:
     //==============================================================================
-    GeneralPanel();
-    ~GeneralPanel();
+    ContactPanel();
+    ~ContactPanel();
 
     //==============================================================================
     void paint (Graphics& g) override;
@@ -167,7 +167,7 @@ private:
     std::unique_ptr<TextButton> sendReportButton;
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralPanel)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ContactPanel)
 };
 
 class LegalPanel: public Component

@@ -17,12 +17,12 @@ OptionsPanel::OptionsPanel (HubConfiguration& config, ApplicationCommandManager&
     TRACE_IN;
 
     createButtons();
-    options.addTab (new GeneralPanel(), "General");
     options.addTab (new FirmwarePanel (hubConfig, *upgradeButton.get()), "Firmware");
+    options.addTab (new ContactPanel(), "Contact");
     options.addTab (new LegalPanel(), "Legal");
     options.addTab (new LicensePanel(), "EULA");
-    options.switchToTab (0);
-	  addAndMakeVisible (options);
+
+	addAndMakeVisible (options);
 }
 
 OptionsPanel::~OptionsPanel()
@@ -68,27 +68,6 @@ void OptionsPanel::paint (Graphics& g)
     auto area = optionsArea.reduced (neova_dash::ui::MARGIN*2);
 
     paintProductInformations (g, area.removeFromTop (area.getHeight()/3).reduced (neova_dash::ui::MARGIN));
-    
-    /*
-    paintLegalAndRegulatoryArea (g, area.removeFromBottom (area.getHeight()/3)
-                                            .reduced (neova_dash::ui::MARGIN*3,
-                                                      neova_dash::ui::MARGIN));
-
-    area.reduce (neova_dash::ui::MARGIN, neova_dash::ui::MARGIN);
-    
-    g.setColour (neova_dash::colour::subText);
-    g.drawHorizontalLine (area.getY(), float (optionsArea.getX() + neova_dash::ui::MARGIN*7),
-                                       float (optionsArea.getRight() - neova_dash::ui::MARGIN*7));
-
-    g.drawHorizontalLine (area.getBottom(), float (optionsArea.getX() + neova_dash::ui::MARGIN*7),
-                                       float (optionsArea.getRight() - neova_dash::ui::MARGIN*7));
-
-    paintFirmUpdateArea (g, area.removeFromTop (area.getHeight()/2));
-
-    g.setFont (neova_dash::font::dashFont.withHeight (15.0f));
-    g.drawText ("Contact Enhancia :", area.withTrimmedRight (area.getWidth()/2)
-                        .reduced (neova_dash::ui::MARGIN),
-                    Justification::centred);*/
 }
 
 void OptionsPanel::resized()
@@ -210,10 +189,10 @@ void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> ar
     Path logo = neova_dash::path::createPath (neova_dash::path::enhanciaLogo);
     logo.scaleToFit (logoArea.getX(), logoArea.getY(),
                      logoArea.getWidth(), logoArea.getHeight(), true);
-    g.drawImage (enhanciaLogo, logoArea.toFloat(), RectanglePlacement::fillDestination);
+    //g.drawImage (enhanciaLogo, logoArea.toFloat(), RectanglePlacement::fillDestination);
 
     g.setColour (neova_dash::colour::mainText);
-  	//g.fillPath (logo);
+  	g.fillPath (logo);
 
     //Enhancia Text
     g.setColour (neova_dash::colour::mainText);
@@ -296,6 +275,9 @@ void OptionsPanel::TabbedOptions::paint (Graphics& g)
 {
     using namespace neova_dash::ui;
 
+    g.setColour (neova_dash::colour::topPanelBackground.brighter (0.03f));
+    g.fillRect (getLocalBounds());
+
     auto area = tabsArea;
 
     if (!tabs.isEmpty())
@@ -312,7 +294,7 @@ void OptionsPanel::TabbedOptions::paint (Graphics& g)
 
             if (i == selectedTab)
             {
-                g.setColour (neova_dash::colour::mainText.withAlpha (0.1f));
+                g.setColour (neova_dash::colour::mainText);
                 g.fillRect ((style == tabsVertical) ? tabArea.withWidth (3)
                                                     : tabArea.withHeight (3));
             }
@@ -385,7 +367,7 @@ void OptionsPanel::TabbedOptions::addTab (Component* panel, String tabName)
     // Displays the first tab that is added
     if (tabs.size() == 1)
     {
-        switchToTab (0);
+        findChildWithID ("panel0")->setVisible (true);
     } 
 }
 
@@ -452,40 +434,50 @@ void OptionsPanel::TabbedOptions::buttonClicked (Button* bttn)
     }
 }
 
-// ====================== GeneralPanel =========================
+// ====================== ContactPanel =========================
 
-GeneralPanel::GeneralPanel()
+ContactPanel::ContactPanel()
 {
     //Contact button
-    contactButton = std::make_unique <TextButton> ("Contact");
+    contactButton = std::make_unique <TextButton> ("Visit Website");
     addAndMakeVisible (*contactButton);
     contactButton->addListener (this);
 
     //Send Report button
-    sendReportButton = std::make_unique <TextButton> ("Send Report");
+    sendReportButton = std::make_unique <TextButton> ("Send Bug Report");
     addAndMakeVisible (*sendReportButton);
     sendReportButton->addListener (this);
 }
 
-GeneralPanel::~GeneralPanel()
+ContactPanel::~ContactPanel()
 {
 }
 
-void GeneralPanel::paint (Graphics& g)
+void ContactPanel::paint (Graphics& g)
 {
-    auto area = getLocalBounds().reduced (neova_dash::ui::MARGIN, neova_dash::ui::MARGIN);
+    auto area = getLocalBounds().reduced (2*neova_dash::ui::MARGIN, 0).withTrimmedTop (2*neova_dash::ui::MARGIN);
+
+    auto creditsArea = area.removeFromTop (area.getHeight()/2);
+    auto contactArea = area;
 
     g.setColour (neova_dash::colour::mainText);
-    g.setFont (neova_dash::font::dashFont.withHeight (13));
+    g.setFont (neova_dash::font::dashFont.withHeight (14));
 
-    g.drawFittedText ("Dashboard - Neova :"
-                      "  - Developpers : Alex LEVACHER, Mathieu HERBELOT\n"
-                      "                     - UI / UX     : Mario VIOLA,   Damien LE BOULAIRE\n\n\n",
-                      area.removeFromTop (area.getHeight()/2),
-                      Justification::topLeft, 5);
+    g.drawText ("Dashboard Credits :\n\n",
+                creditsArea,
+                Justification::topLeft);
+
+    g.setColour (neova_dash::colour::subText);
+    g.drawFittedText ("Alex LEVACHER (Dev), Mathieu HERBELOT (Dev)\nMario VIOLA (UI), Damien LE BOULAIRE (UX)\n",
+                      creditsArea,
+                      Justification::centred,
+                      4);
+
+    g.setColour (neova_dash::colour::mainText);
+    g.drawText ("Contact ENHANCIA :\n\n", contactArea, Justification::topLeft); 
 }
 
-void GeneralPanel::resized()
+void ContactPanel::resized()
 {
 	auto area = getLocalBounds();
     area.removeFromTop (area.getHeight()/2);
@@ -496,7 +488,7 @@ void GeneralPanel::resized()
     sendReportButton->setBounds (area.withSizeKeepingCentre (contactButton->getBestWidthForHeight (30), 30));
 }
 
-void GeneralPanel::buttonClicked (Button* bttn)
+void ContactPanel::buttonClicked (Button* bttn)
 {
     if (bttn == sendReportButton.get())
     {
@@ -536,7 +528,7 @@ void GeneralPanel::buttonClicked (Button* bttn)
 
     else if (bttn == contactButton.get())
     {
-        URL ("https://www.enhancia.co/contact").launchInDefaultBrowser();
+        URL ("https://www.enhancia.co").launchInDefaultBrowser();
     }
 }
 
