@@ -250,8 +250,9 @@ private:
     
     //==============================================================================
     HubConfiguration& hubConfig; /**< \brief Reference to the internal HubConfiguration object. */
-    DataReader& dataReader; /**< \brief Reference to the internal DataReader object.  */
-    DashUpdater& updater; /**< \brief Reference to the internal DashUpdater object.  */
+    DataReader& dataReader; /**< \brief Reference to the internal DataReader object. */
+    DashUpdater& updater; /**< \brief Reference to the internal DashUpdater object. */
+    UpgradeHandler& upgradeHandler; /**< \brief Reference to the internal UpgradeHandler object. */
 
     bool commandKeyDown = ModifierKeys::currentModifiers.isCommandDown(); /**< \brief Boolean tracking the user's command key presses. */
     

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="SIAvrc" name="NeovaDashboard" projectType="guiapp" jucerVersion="5.4.7"
-              binaryDataNamespace="DashData" version="0.3.12">
+              binaryDataNamespace="DashData" version="0.3.13">
   <MAINGROUP id="KvQWjZ" name="NeovaDashboard">
     <GROUP id="{20075F30-04A5-410B-6952-3C63688FBF54}" name="Resources">
+      <FILE id="U5LMWh" name="200429 - Enhancia Software Licence.txt" compile="0"
+            resource="1" file="Resources/200429 - Enhancia Software Licence.txt"/>
       <GROUP id="{E0259D2D-3961-75D2-D343-36D8C845436E}" name="Image">
         <FILE id="X40b2q" name="Dash-icon-v1.1.png" compile="0" resource="1"
               file="Resources/Image/Dash-icon-v1.1.png"/>
@@ -14,6 +16,8 @@
         <FILE id="qLNiVo" name="Dashboard-HUB-only.png" compile="0" resource="1"
               file="Resources/Image/Dashboard-HUB-only.png"/>
         <FILE id="FAcwQc" name="HUB-BG.png" compile="0" resource="1" file="Resources/Image/HUB-BG.png"/>
+        <FILE id="SCkDL1" name="logo-enhancia-white-textured.png" compile="0"
+              resource="1" file="Resources/Image/logo-enhancia-white-textured.png"/>
         <FILE id="x8nzZs" name="PITCH-icon.png" compile="0" resource="1" file="Resources/Image/PITCH-icon.png"/>
         <FILE id="h2VBsQ" name="ROLL-icon.png" compile="0" resource="1" file="Resources/Image/ROLL-icon.png"/>
         <FILE id="zkVlMd" name="TILT-icon.png" compile="0" resource="1" file="Resources/Image/TILT-icon.png"/>

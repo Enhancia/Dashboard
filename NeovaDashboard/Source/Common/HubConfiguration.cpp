@@ -362,23 +362,41 @@ const int HubConfiguration::getSelectedGesture()
 
 const String HubConfiguration::getFirmwareVersionString()
 {
-	String ringFirm = "-";
-	String hubFirm = "-";
+	return String ("HUB  : ") + getHubFirmwareVersionString() +
+	       String ("\nRING : ") + getRingFirmwareVersionString();
+}
 
-	if (ringIsConnected && hubIsConnected)
-	{
-		ringFirm = String ((config.ring_firmware_version & 0xFF00) >> 8)
-	       				+ "." + String (config.ring_firmware_version & 0x00FF);
-	}
+const String HubConfiguration::getHubFirmwareVersionString ()
+{
+	String hubFirm = "-";
 
 	if (hubIsConnected)
 	{
-		hubFirm = String ((config.hub_firmware_version & 0xFF00) >> 8)
-		       			+ "." + String (config.hub_firmware_version & 0x00FF);
+		hubFirm = "v" + String ((config.hub_firmware_version & 0xFF00) >> 8)
+		       		  + "." + String (config.hub_firmware_version & 0x00FF);
 	}
 
-	return String ("HUB  : ") + hubFirm +
-	       String ("\nRING : ") + ringFirm;
+	return hubFirm;
+}
+
+const String HubConfiguration::getRingFirmwareVersionString ()
+{
+	String ringFirm = "-";
+
+	if (hubIsConnected)
+	{
+		if (ringIsConnected)
+		{
+			ringFirm = "v" + String ((config.ring_firmware_version & 0xFF00) >> 8)
+	       				   + "." + String (config.ring_firmware_version & 0x00FF);
+		}
+		else
+		{
+			ringFirm = "Disconnected";
+		}
+	}
+
+	return ringFirm;
 }
 
 uint16_t HubConfiguration::getHubFirmwareVersionUint16()

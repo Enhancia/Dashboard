@@ -163,6 +163,8 @@ public:
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber);
 
     const String getFirmwareVersionString();
+    const String getHubFirmwareVersionString();
+    const String getRingFirmwareVersionString();
     uint16_t getHubFirmwareVersionUint16();
     uint16_t getRingFirmwareVersionUint16();
 

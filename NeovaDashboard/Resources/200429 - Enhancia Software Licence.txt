@@ -1,0 +1,84 @@
+End-User License Agreement (EULA)
+
+
+This End-User License Agreement (EULA) represents the contractual conditions between you, the Licensee, and Enhancia, located 75 rue Etienne Richerand, 69003 Lyon - France for the use of software, documentation and other materials created by Enhancia. 
+
+You should not register, install or use Enhancia Products until the following license agreement is understood and accepted.
+
+By using Enhancia Products, or allowing anyone else to do so, you are accepting this agreement.
+
+
+
+A- License Grant
+
+
+1. Enhancia grants to you, subject to the following terms and conditions, the non-exclusive right to use each authorized copy of the Product.
+
+2. Enhancia Product license are granted only to a single user. You may use this product on multiple computers, which shall be owned and used by you exclusively. 
+
+3. Renting or lending the licensed Software to a third party is expressly forbidden. 
+
+4. Resale or ownership transfer of individual products obtained in a bundle, or those used to upgrade or cross-grade to other products are not allowed.
+
+5. Enhancia allows you to use any of the sounds and samples in the products you have purchased for commercial recordings without paying any additional license fees or providing source attribution to Enhancia.
+
+6. This license expressly forbids resale or other distribution of the sounds and software included in the Product or their derivatives, either as they exist on disc, reformatted for use in another digital sampler, or mixed, combined, filtered, resynthesized or otherwise edited, for use as sounds, multi-sounds, samples, multi-samples, wavetables, programs or patches in a sampler, microchip or any hardware or software sample playback device. You cannot sell the Product content or give it away for use by others in their sampling or sample playback devices. 
+
+7. In the event Enhancia terminates this agreement due to your breach, you agree to return the original and all other copies of the software and documentation to Enhancia.
+
+8. Enhancia reserves all rights not expressly granted to herein.
+
+
+
+B- License Activation
+
+
+1. In order to use Enhancia Products it is required that you authorize them by registering your Serial Number on[1] enhancia-music.com/account
+
+2. During authorization you will need to enter your name, email address and postal address which will be stored in the Enhancia database. Enhancia uses a secure SSL connection with 128-bit-encryption that meets current security standards to transmit your data over the web. For further information about Enhancia’s handling of personal data please see: [2]enhancia-music.com/privacy-policy
+
+
+
+C- Protection of Software
+
+
+1. You agree to take all reasonable steps to protect the Product and any accompanying documentation from unauthorized copying or use. You agree not to modify the Product to circumvent any method or means adopted or implemented by Enhancia to protect against or discourage the unlicensed use or copying of the Product.
+
+
+
+D- Ownership
+
+
+1. Ownership of, and title to, the enclosed digitally recorded sounds (including any copies) are held by Enhancia. Copies are provided to you only to enable you to exercise your rights under the license.
+
+
+
+E- Term
+
+
+1. This agreement is effective from the date you open this package, and will remain in full force until termination. This agreement will terminate if you break any of the terms or conditions of this agreement. Upon termination you agree to return to Enhancia all copies of this product and accompanying documentation and destroy any other copies made.
+
+
+
+F- Restrictions
+
+
+1. Except as expressly authorized in this agreement, you may not rent, lease, sub-license, distribute, copy, reproduce, display, modify or timeshare the enclosed Product or documentation.
+
+
+
+G- No Support Obligation
+
+
+1. Enhancia will make its best effort to support you in the event of technical difficulty with an Enhancia Product. However, Enhancia is not obligated to furnish or make available to you any additional information, software, technical information, know-how, or support.
+
+
+
+H- Specifications and System Requirements
+
+
+1. All technical specifications of Enhancia Products provided are intended to be estimates or approximations. Due to numerous variables no guarantees of compatibility or performance can be made. End-User is solely responsible for, prior to purchase, ensuring that End-User’s devices are compatible and meet the system requirements for Enhancia Products, and that the applicable Enhancia Products meet End-User’s requirements.
+
+
+
+This EULA is governed by the laws of France.

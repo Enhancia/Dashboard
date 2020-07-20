@@ -69,6 +69,7 @@ private:
         void drawLightningPath (Path& path, juce::Rectangle<float> area);
         void drawBatteryPath (Graphics& g, juce::Rectangle<float> area);
         void drawConnectedPath (Graphics& g, juce::Rectangle<float> area);
+        void drawRingPath (Graphics& g, juce::Rectangle<float> area);
 
         bool waitForRepaint = false;
 

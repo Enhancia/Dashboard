@@ -68,6 +68,16 @@ int UpgradeHandler::getUpgradeState()
 	return upgradeState;
 }
 
+bool UpgradeHandler::waitsForSuccessiveUpgrade()
+{
+    return successiveUpgrade;
+}
+
+bool UpgradeHandler::isUpgrading()
+{
+	return (upgradeState > 0 && upgradeState != upgradeSuccessfull)|| successiveUpgrade;
+}
+
 //==============================================================================
 
 VOID CALLBACK UpgradeHandler::childProcessExitCallback(PVOID lpParameter, BOOLEAN TimerOrWaitFired)
