@@ -81,6 +81,9 @@ public:
 
     int getUpgradeState();
 
+    bool waitsForSuccessiveUpgrade();
+    bool isUpgrading();
+
     //==============================================================================
     static void childProcessExitCallback(int signal);
     

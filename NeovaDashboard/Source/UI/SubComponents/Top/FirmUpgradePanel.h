@@ -76,6 +76,7 @@ public:
     void setAndOpenPanel();
     void closeAndResetPanel();
     void updateAfterHubConnection();
+    bool isWaitingForHubReconnect();
 
 private:
     //==============================================================================

@@ -178,6 +178,10 @@ void FirmUpgradePanel::updateAfterHubConnection()
 	}
 }
 
+bool FirmUpgradePanel::isWaitingForHubReconnect()
+{
+	return currentState == waitingForHubReconnect;
+}
 
 void FirmUpgradePanel::createLabels()
 {

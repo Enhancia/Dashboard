@@ -479,7 +479,7 @@ void GesturePanel::renameGestureInSlot (int slotNumber)
     }
     else
     {
-        /* Tried to rename a gesture, but the selected dlot was empty...
+        /* Tried to rename a gesture, but the selected slot was empty...
         */
         jassertfalse;
     }
@@ -569,7 +569,7 @@ void GesturePanel::unselectCurrentGesture()
     {
         if (!gestureComponentToUnselect->isSelected())
         {
-            // Plume tried to unselect an already unselected gesture...
+            // Dashboard tried to unselect an already unselected gesture...
             jassertfalse;
             return;
         }
@@ -585,9 +585,9 @@ void GesturePanel::unselectCurrentGesture()
         return;
     }
 
-    /* Hitting this assert means that Plume tried to unselect a gesture, but the slot
+    /* Hitting this assert means that the Dashboard tried to unselect a gesture, but the slot
        it tried to access is an empty slot. That might either mean that an emptySlot failed
-       to be updated to a GestureComponent, or that Plume failed to keep track of the actual
+       to be updated to a GestureComponent, or that the Dashboard failed to keep track of the actual
        selected Gesture.
     */
     jassertfalse;
