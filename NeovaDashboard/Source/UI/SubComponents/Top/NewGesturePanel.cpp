@@ -146,8 +146,8 @@ void NewGesturePanel::buttonClicked (Button* bttn)
 void NewGesturePanel::createNewGesture()
 {
     using namespace neova_dash::gesture;
-    hubConfig.setSavedGestureValues (selectedGestureSlot, intToGestureType (selectedGestureType));
 
+    hubConfig.setSavedGestureValues (selectedGestureSlot, intToGestureType (selectedGestureType));
   	updateInterface();
 }
 
@@ -163,13 +163,13 @@ void NewGesturePanel::showPanelForGestureID (const int gestureID)
 {
   	if (gestureID < 0 || gestureID >= neova_dash::gesture::NUM_GEST)
   	{
-    		// Plume tries to create a gesture for an id that can't exist
+    		// Dash tries to create a gesture for an id that can't exist
     		jassertfalse;
     		return;
   	}
   	else if (hubConfig.getGestureData (gestureID).type != int (neova_dash::gesture::none))
   	{
-    		// Plume tries to create a gesture for an id that already has a gesture!!
+    		// Dash tries to create a gesture for an id that already has a gesture!!
     		jassertfalse;
     		return;
   	}

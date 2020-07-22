@@ -172,6 +172,8 @@ void GestureComponent::createButton()
 
         commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
     };
+
+    muteButton->setVisible (gesture::isValidGestureType (type));
 }
 
 void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)

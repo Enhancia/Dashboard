@@ -226,7 +226,7 @@ void HubConfiguration::setDefaultGestureValues (const int gestureNumber, const n
 void HubConfiguration::setSavedGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType type,
 																	   const int presetNumber)
 {
-	if (type == neova_dash::gesture::none || lastGestureConfig[type]->on == 0)
+	if (type == neova_dash::gesture::none || lastGestureConfig[type]->on == 0) 
 	{
 		setDefaultGestureValues (gestureNumber, type, presetNumber);
 		return;
@@ -684,7 +684,7 @@ void HubConfiguration::initialiseLastGestureConfigs()
 
 void HubConfiguration::saveGestureConfig (const GestureData& gestureDataToSave)
 {
-	if (gestureDataToSave.type == neova_dash::gesture::none) return;
+	if (!neova_dash::gesture::isValidGestureType (gestureDataToSave.type)) return;
 
 	*(lastGestureConfig[gestureDataToSave.type]) = gestureDataToSave;
 

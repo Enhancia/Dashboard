@@ -16,8 +16,6 @@
         <FILE id="qLNiVo" name="Dashboard-HUB-only.png" compile="0" resource="1"
               file="Resources/Image/Dashboard-HUB-only.png"/>
         <FILE id="FAcwQc" name="HUB-BG.png" compile="0" resource="1" file="Resources/Image/HUB-BG.png"/>
-        <FILE id="SCkDL1" name="logo-enhancia-white-textured.png" compile="0"
-              resource="1" file="Resources/Image/logo-enhancia-white-textured.png"/>
         <FILE id="x8nzZs" name="PITCH-icon.png" compile="0" resource="1" file="Resources/Image/PITCH-icon.png"/>
         <FILE id="h2VBsQ" name="ROLL-icon.png" compile="0" resource="1" file="Resources/Image/ROLL-icon.png"/>
         <FILE id="zkVlMd" name="TILT-icon.png" compile="0" resource="1" file="Resources/Image/TILT-icon.png"/>

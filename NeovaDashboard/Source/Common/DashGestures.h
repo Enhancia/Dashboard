@@ -74,6 +74,8 @@ namespace neova_dash
 
         // Helper methods for gestures
         extern GestureType intToGestureType (const int typeInt);
+        extern bool isValidGestureType (const int typeInt);
+        extern bool isValidGestureType (const GestureType type);
         extern const String getTypeString (const GestureType type, const bool withSpacingAndCase);
         extern const String getTypeString (const int typeInt, const bool withSpacingAndCase);
         extern const String getDescriptionString (const GestureType type);
