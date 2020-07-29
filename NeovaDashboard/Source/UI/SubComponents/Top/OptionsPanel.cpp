@@ -284,15 +284,9 @@ void OptionsPanel::TabbedOptions::paint (Graphics& g)
 
     if (!tabs.isEmpty())
     {
-        //int tabHeight = (tabsArea.getHeight() - (tabs.size() - 1) * MARGIN)/tabs.size();
-        int tabHeightOrWidth = (style == tabsVertical)
-                                    ? jmin (30 , (area.getHeight() - (tabs.size() - 1) * MARGIN)/tabs.size())
-                                    : (area.getWidth() - (tabs.size() - 1) * MARGIN)/tabs.size();
-
         for (int i =0; i < tabs.size(); i++)
         {
-            auto tabArea = (style == tabsVertical) ? area.removeFromTop (tabHeightOrWidth)
-                                                   : area.removeFromLeft (tabHeightOrWidth);
+            auto tabArea = tabs[i]->button->getBounds();
 
             if (i == selectedTab)
             {
@@ -310,9 +304,6 @@ void OptionsPanel::TabbedOptions::paint (Graphics& g)
                         (style == tabsVertical) ? Justification::centredLeft
                                                 : Justification::centred,
                         true);
-
-            (style == tabsVertical) ? area.removeFromTop (MARGIN)
-                                    : area.removeFromLeft (MARGIN);
         }
     }
 }
@@ -345,12 +336,15 @@ void OptionsPanel::TabbedOptions::resized()
 
         for (auto* tab : tabs)
         {
-            tab->button->setBounds ((style == tabsVertical) ? tabsAreaTemp.removeFromTop (tabHeightOrWidth)
-                                                            : tabsAreaTemp.removeFromLeft (tabHeightOrWidth));
+            tab->button->setBounds (tab == tabs.getLast() ? tabsAreaTemp
+                                                          : (style == tabsVertical) ? tabsAreaTemp.removeFromTop (tabHeightOrWidth)
+                                                                                    : tabsAreaTemp.removeFromLeft (tabHeightOrWidth));
 
-            (style == tabsVertical) ? tabsAreaTemp.removeFromTop (MARGIN)
-                                    : tabsAreaTemp.removeFromLeft (MARGIN);
-            
+            if (tab != tabs.getLast())
+            {
+                (style == tabsVertical) ? tabsAreaTemp.removeFromTop (MARGIN)
+                                        : tabsAreaTemp.removeFromLeft (MARGIN);
+            }
 
             tab->panel->setBounds (panelArea);
         }
