@@ -138,6 +138,16 @@ namespace gesture
 		}
 	}
 
+	bool isValidGestureType (const int typeInt)
+	{
+		return (typeInt >= 0 && typeInt < int (neova_dash::gesture::numTypes));
+	}
+
+	bool isValidGestureType (const neova_dash::gesture::GestureType type)
+	{
+		return (type != neova_dash::gesture::none && type != neova_dash::gesture::numTypes);
+	}
+
 	const String getTypeString (const neova_dash::gesture::GestureType type, const bool withSpacingAndCase)
 	{
 		switch (type)

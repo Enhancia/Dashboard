@@ -134,7 +134,8 @@ private:
     TabbedOptions options;
 
     //==============================================================================
-    //Image enhanciaLogo = ImageFileFormat::loadFrom (DashData::logoenhanciawhitetextured_png, DashData::logoenhanciawhitetextured_pngSize);
+    Image enhanciaLogo = ImageFileFormat::loadFrom (DashData::BRANDPopupgrey_png,
+                                                    DashData::BRANDPopupgrey_pngSize);
     
     //==============================================================================
     HubConfiguration& hubConfig;

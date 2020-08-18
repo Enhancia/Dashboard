@@ -69,37 +69,40 @@ void GestureSettingsComponent::paint (Graphics& g)
 void GestureSettingsComponent::paintBackground (Graphics& g)
 {
     using namespace neova_dash::ui;
-    auto area = getLocalBounds().withBottom (midiPanel->getBottom());
+    auto area = getLocalBounds().withBottom (midiPanel != nullptr ? midiPanel->getBottom() : getHeight());
 
     // Tuner backGround
     g.setColour (neova_dash::colour::gestureBackground);
     g.fillRoundedRectangle (area.toFloat(), 10.0f);
 
     // MidiMap Background
-    g.saveState();
-    g.reduceClipRegion (0, midiPanel->getY(), getWidth(), getLocalBounds().getBottom());
-    g.setColour (neova_dash::colour::gestureBackground2);
-    g.fillRoundedRectangle (area.toFloat(), 10.0f);
-    g.restoreState();
+    if (midiPanel != nullptr)
+    {
+        g.saveState();
+        g.reduceClipRegion (0, midiPanel->getY(), getWidth(), getLocalBounds().getBottom());
+        g.setColour (neova_dash::colour::gestureBackground2);
+        g.fillRoundedRectangle (area.toFloat(), 10.0f);
+        g.restoreState();
 
-    Path tile;
-    tile.addEllipse (0, 0, 2, 2);
+        Path tile;
+        tile.addEllipse (0, 0, 2, 2);
 
-    neova_dash::ui::paintTiledPath (g, tile,
-                                    area.withBottom (midiPanel->getY())
+        neova_dash::ui::paintTiledPath (g, tile,
+                                        area.withBottom (midiPanel->getY())
+                                        .toFloat(),
+                                        15.0f, 15.0f, neova_dash::colour::gestureBackground2, Colour (0), 0.0f);
+
+        g.saveState();
+        
+        //Header Fill
+        g.reduceClipRegion (0, 0, getWidth(), 30);
+        g.setColour (neova_dash::colour::gestureHeader);
+        g.fillRoundedRectangle (area.withBottom (midiPanel->getY() + HEADER_HEIGHT)
                                     .toFloat(),
-                                    15.0f, 15.0f, neova_dash::colour::gestureBackground2, Colour (0), 0.0f);
+                                10.0f);
 
-    g.saveState();
-
-    //Header Fill
-    g.reduceClipRegion (0, 0, getWidth(), 30);
-    g.setColour (neova_dash::colour::gestureHeader);
-    g.fillRoundedRectangle (area.withBottom (midiPanel->getY() + HEADER_HEIGHT)
-                                .toFloat(),
-                            10.0f);
-
-    g.restoreState();
+        g.restoreState();
+    }
 }
 
 void GestureSettingsComponent::resized()
@@ -110,8 +113,8 @@ void GestureSettingsComponent::resized()
     auto headerArea = area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL);
 
     muteButton->setBounds (headerArea.removeFromRight (30).withSizeKeepingCentre (18, 18));
-    midiPanel->setBounds (area.removeFromBottom (jmax (getHeight()/4, 80)));
 
+    if (midiPanel != nullptr) midiPanel->setBounds (area.removeFromBottom (jmax (getHeight()/4, 80)));
     if (gestTuner != nullptr) gestTuner->setBounds (area);
 
 	repaint();
@@ -123,12 +126,8 @@ void GestureSettingsComponent::updateDisplay()
 
     if (!disabled)
     {
-        if (gestTuner != nullptr)
-        {
-            gestTuner->updateDisplay();
-        }
-        
-        midiPanel->updateDisplay();
+        if (gestTuner != nullptr) gestTuner->updateDisplay();
+        if (midiPanel != nullptr) midiPanel->updateDisplay();
     }
 }
 
@@ -205,12 +204,16 @@ void GestureSettingsComponent::createToggles()
             commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
         }
     };
+
+    muteButton->setVisible (neova_dash::gesture::isValidGestureType (hubConfig.getGestureData (gestureId).type));
 }
 
 void GestureSettingsComponent::createMidiPanel()
 {
     midiPanel = std::make_unique<MidiPanel> (hubConfig, dataReader, gestureId);
     addAndMakeVisible (*midiPanel);
+    
+    midiPanel->setVisible (neova_dash::gesture::isValidGestureType (hubConfig.getGestureData (gestureId).type));
 }
 
 Tuner& GestureSettingsComponent::getTuner()

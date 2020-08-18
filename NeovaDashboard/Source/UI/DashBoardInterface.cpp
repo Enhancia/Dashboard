@@ -320,7 +320,11 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
 			return true;
 			
         case updateBatteryDisplay:
-            if (state == int (connected)) header->update();
+            if (state == int (connected))
+            {
+                header->update();
+                hubComponent->repaint();
+            }
             return true;
 
         case updateInterfaceLEDs:
