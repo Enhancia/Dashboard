@@ -180,7 +180,9 @@ void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> ar
 
     // Enhancia Logo
     auto enhanciaArea = area.removeFromLeft (area.getWidth()/2);
+    g.drawImage (enhanciaLogo, enhanciaArea.toFloat(), RectanglePlacement::fillDestination);
 
+    /*
     auto logoArea = enhanciaArea.removeFromTop (area.getHeight()/2)
                                 .reduced (enhanciaArea.getWidth()/4, 0)
                                 .withTrimmedTop (enhanciaArea.getHeight()/6)
@@ -189,7 +191,6 @@ void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> ar
     Path logo = neova_dash::path::createPath (neova_dash::path::enhanciaLogo);
     logo.scaleToFit (logoArea.getX(), logoArea.getY(),
                      logoArea.getWidth(), logoArea.getHeight(), true);
-    //g.drawImage (enhanciaLogo, logoArea.toFloat(), RectanglePlacement::fillDestination);
 
     g.setColour (neova_dash::colour::mainText);
   	g.fillPath (logo);
@@ -197,23 +198,24 @@ void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> ar
     //Enhancia Text
     g.setColour (neova_dash::colour::mainText);
     g.setFont (neova_dash::font::enhanciaFont.withHeight (25).withExtraKerningFactor (0.2f));
-    g.drawText (String ("ENHANCIA "/* + String (CharPointer_UTF8 ("\xe2\x84\xa2"))*/), enhanciaArea.reduced (MARGIN*2),
-                   Justification::centredTop);
+    g.drawText (String ("ENHANCIA "/* + String (CharPointer_UTF8 ("\xe2\x84\xa2"))*///), enhanciaArea.reduced (MARGIN*2),
+    //               Justification::centredTop);*/
 
   	// Dash Text
   	auto dashTextArea = area.reduced (MARGIN*2, area.getHeight()/6);
 
   	g.setColour (neova_dash::colour::mainText);
-    g.setFont(neova_dash::font::neovaFont.withHeight (22.5f).withExtraKerningFactor (0.33f));
+    g.setFont(neova_dash::font::neovaFont.withHeight (19.2f).withExtraKerningFactor (0.4f));
   	g.drawText ("NEOVA", dashTextArea.removeFromTop (dashTextArea.getHeight()*2/5),
-  								   Justification::centredBottom);
+  								   Justification::centred);
 
-    g.setFont(neova_dash::font::dashFont.withHeight (19.5f).withExtraKerningFactor (0.26f));
+    g.setFont(neova_dash::font::dashFontLight.withHeight (13.5f).withExtraKerningFactor (0.5f));
     g.drawText ("DASHBOARD", dashTextArea.removeFromTop (dashTextArea.getHeight()*2/3),
+                                         //.withTrimmedTop (10),
                      Justification::centred);
 
   	g.setColour (neova_dash::colour::subText);
-  	g.setFont (neova_dash::font::dashFont.withHeight (13));
+  	g.setFont (neova_dash::font::dashFont.withHeight (12));
   	g.drawText (String ("v " + JUCEApplication::getInstance()->getApplicationVersion()),
   		        dashTextArea, Justification::centredBottom);
 }
@@ -282,15 +284,9 @@ void OptionsPanel::TabbedOptions::paint (Graphics& g)
 
     if (!tabs.isEmpty())
     {
-        //int tabHeight = (tabsArea.getHeight() - (tabs.size() - 1) * MARGIN)/tabs.size();
-        int tabHeightOrWidth = (style == tabsVertical)
-                                    ? jmin (30 , (area.getHeight() - (tabs.size() - 1) * MARGIN)/tabs.size())
-                                    : (area.getWidth() - (tabs.size() - 1) * MARGIN)/tabs.size();
-
         for (int i =0; i < tabs.size(); i++)
         {
-            auto tabArea = (style == tabsVertical) ? area.removeFromTop (tabHeightOrWidth)
-                                                   : area.removeFromLeft (tabHeightOrWidth);
+            auto tabArea = tabs[i]->button->getBounds();
 
             if (i == selectedTab)
             {
@@ -308,9 +304,6 @@ void OptionsPanel::TabbedOptions::paint (Graphics& g)
                         (style == tabsVertical) ? Justification::centredLeft
                                                 : Justification::centred,
                         true);
-
-            (style == tabsVertical) ? area.removeFromTop (MARGIN)
-                                    : area.removeFromLeft (MARGIN);
         }
     }
 }
@@ -343,12 +336,15 @@ void OptionsPanel::TabbedOptions::resized()
 
         for (auto* tab : tabs)
         {
-            tab->button->setBounds ((style == tabsVertical) ? tabsAreaTemp.removeFromTop (tabHeightOrWidth)
-                                                            : tabsAreaTemp.removeFromLeft (tabHeightOrWidth));
+            tab->button->setBounds (tab == tabs.getLast() ? tabsAreaTemp
+                                                          : (style == tabsVertical) ? tabsAreaTemp.removeFromTop (tabHeightOrWidth)
+                                                                                    : tabsAreaTemp.removeFromLeft (tabHeightOrWidth));
 
-            (style == tabsVertical) ? tabsAreaTemp.removeFromTop (MARGIN)
-                                    : tabsAreaTemp.removeFromLeft (MARGIN);
-            
+            if (tab != tabs.getLast())
+            {
+                (style == tabsVertical) ? tabsAreaTemp.removeFromTop (MARGIN)
+                                        : tabsAreaTemp.removeFromLeft (MARGIN);
+            }
 
             tab->panel->setBounds (panelArea);
         }
@@ -641,7 +637,7 @@ LicensePanel::LicensePanel()
     licenseTextEdit.setMultiLine (true);
     licenseTextEdit.setReadOnly (true);
     licenseTextEdit.setScrollbarsShown (true);
-    licenseTextEdit.setFont (neova_dash::font::dashFont.withHeight (13.0f));
+    licenseTextEdit.setFont (neova_dash::font::dashFontNorms.withHeight (13.0f));
     licenseTextEdit.setJustification (Justification::horizontallyJustified);
     licenseTextEdit.setColour (TextEditor::backgroundColourId, neova_dash::colour::subText.withAlpha (0.05f));
     licenseTextEdit.setColour (TextEditor::textColourId, neova_dash::colour::mainText);
