@@ -61,7 +61,7 @@ void MidiChannelComponent::update()
 	}
 	else
 	{
-		midiChannelBox.setSelectedId (int (channelToSet) + 1);
+		midiChannelBox.setSelectedId (int (channelToSet) + 1, dontSendNotification);
 	}
 
 }
