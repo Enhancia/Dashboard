@@ -30,7 +30,7 @@ public:
 
         uint8_t typeFunc = 0;
         uint8_t reverse = 0;
-		uint8_t on = 1;
+		uint8_t on = 0;
 		uint8_t type = neova_dash::gesture::none;
 		uint8_t midiLow = 0;
 		uint8_t midiHigh = 127;
