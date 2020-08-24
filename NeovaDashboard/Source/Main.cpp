@@ -263,6 +263,13 @@ public:
 		}
 	}
 
+	bool isFirmwareUpgrading()
+	{
+		return (upgradeHandler->getUpgradeState() == UpgradeHandler::waitingForUpgradeFirm ||
+        		upgradeHandler->getUpgradeState() == UpgradeHandler::upgradeFirmConnected  ||
+        		upgradeHandler->getUpgradeState() == UpgradeHandler::upgradeInProgress);
+	}
+
     //==============================================================================
     class MainWindow    : public DocumentWindow
     {
@@ -287,6 +294,10 @@ public:
         	if (hubConfig.wasConfigChangedSinceLastFlash())
         	{
         		dashboardInterface.createAndShowAlertPanel (DashAlertPanel::noUploadQuitting);
+        	}
+        	else if (dynamic_cast<Neova_DashBoard_Interface*> (JUCEApplication::getInstance())->isFirmwareUpgrading())
+        	{
+        		dashboardInterface.createAndShowAlertPanel (DashAlertPanel::upgradePending);
         	}
         	else
         	{

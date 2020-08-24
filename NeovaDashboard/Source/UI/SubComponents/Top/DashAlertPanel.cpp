@@ -152,6 +152,13 @@ DashAlertPanel* DashAlertPanel::createSpecificAlertPanel (SpecificReturnValue pa
                                        int (panelType),
                                        true,
                                        "Quit Anyways");
+        case upgradePending:
+            return new DashAlertPanel ("Interrupt Upgrade ?",
+                                       "Your Neova firmware is currently upgrading.\n\n"
+                                       "Are you sure you want to quit?",
+                                       int (panelType),
+                                       true,
+                                       "Quit Anyways");
         default:
             return new DashAlertPanel ("Unknown Alert",
                                        "Something went wrong I guess?\nPlease contact Enhancia about your issue!",

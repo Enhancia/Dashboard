@@ -550,6 +550,9 @@ void DashBoardInterface::executePanelAction (const int panelReturnValue)
         case DashAlertPanel::noUploadQuitting:
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;
+        case DashAlertPanel::upgradePending:
+            JUCEApplication::getInstance()->systemRequestedQuit();
+            break;
         default: // modalResult 0 or unknown
             break;
     }

@@ -180,7 +180,7 @@ void OptionsPanel::buttonClicked (Button* bttn)
 
     else if (bttn == contactButton.get())
     {
-        URL ("https://www.enhancia.co/contact").launchInDefaultBrowser();
+        URL ("https://www.enhancia-music.com").launchInDefaultBrowser();
     }
 }
 
