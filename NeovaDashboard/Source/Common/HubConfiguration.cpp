@@ -482,7 +482,7 @@ void HubConfiguration::setGestureData (int presetNum, int gestureNum,
 {
 	GestureData& gesture = getGestureData (gestureNum, presetNum);
 
-	gesture.on       = newOn;
+	gesture.on       = (newType == neova_dash::gesture::none) ? 0 : newOn;
 	gesture.type     = newType;
 	gesture.midiLow  = newMidiLow;
 	gesture.midiHigh = newMidiHigh;
