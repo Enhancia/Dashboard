@@ -90,7 +90,11 @@ void FirmUpgradePanel::timerCallback()
 		{
 			jassert (currentState == upgradeInProgress);
 			updateComponentsForSpecificState (waitingForHubReconnect);
-			startTimeoutCount();
+			
+			if (hubConfig.getHubIsConnected())
+			{
+				updateAfterHubConnection();
+			}
 		}
 	}
 
@@ -449,7 +453,7 @@ String FirmUpgradePanel::getFormattedVersionString (uint16_t version)
 
 void FirmUpgradePanel::animateUpgrade()
 {
-	if (currentState > 0)
+	if (currentState > 0 && currentState != upgradeSuccessfull)
 	{
 		if (upgradeAnimationString.length() >= 6) upgradeAnimationString = "";
 		else upgradeAnimationString += " .";
