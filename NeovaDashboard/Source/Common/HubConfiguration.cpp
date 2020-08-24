@@ -419,6 +419,11 @@ bool HubConfiguration::getHubIsConnected()
 void HubConfiguration::setRingIsConnected (bool isConnected)
 {
 	ringIsConnected = isConnected;
+
+	if (isConnected)
+	{
+		checkHUBCompatibility();
+	}
 }
 
 bool HubConfiguration::getRingIsConnected()
