@@ -65,7 +65,7 @@ public:
 		uint16_t hub_firmware_version; ////8 MSB => Major version / 8 => LSB Minor version. ex : 0x0001 = v0.1
 		uint16_t ring_firmware_version;
 
-		uint8_t active_preset = 0; //Ne sert à rien pour l'instant juste pour s'aligner au buffer du zub
+		uint8_t active_preset = 0; //Ne sert Ã  rien pour l'instant juste pour s'aligner au buffer du zub
 		uint8_t midiChannel = 0;
 
     	PresetData presetData0;
@@ -149,7 +149,10 @@ public:
 
     //==============================================================================
     void setSelectedGesture (const int gestureToSelect);
-    void selectFirstExistingGesture();
+    int selectFirstExistingGesture();
+    int selectLastExistingGesture();
+    int selectPreviousGesture (bool loopIfFirstGesture = true);
+    int selectNextGesture (bool loopIfLastGesture = true);
     const int getSelectedGesture();
 
     //==============================================================================
