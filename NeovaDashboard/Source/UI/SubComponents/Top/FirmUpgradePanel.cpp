@@ -39,6 +39,14 @@ void FirmUpgradePanel::paint (Graphics& g)
 
     g.setGradientFill (gradOut);
     g.drawRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f, 1.0f);
+
+    if (currentState > 0 && currentState < upgradeSuccessfull)
+    {
+    	g.setColour (mainText);
+    	g.setFont (neova_dash::font::dashFontNorms.withHeight (11.0f));
+    	g.drawText ("Do not disconnect Neova during the upgrade.\nPlease keep the ring docked during the process.", panelArea.reduced (neova_dash::ui::MARGIN),
+    				Justification::centredBottom);
+    }
 }
 
 void FirmUpgradePanel::resized()

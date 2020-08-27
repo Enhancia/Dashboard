@@ -73,7 +73,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     setSize (dashWidth,
              dashWidth*6/7);
 
-    setInterfaceStateAndUpdate (waitingForConnection);
+    setInterfaceStateAndUpdate (connected); // TO DELETE
+    //setInterfaceStateAndUpdate (waitingForConnection); TO UNCOMMENT
 }
 
 DashBoardInterface::~DashBoardInterface()
@@ -178,7 +179,7 @@ void DashBoardInterface::resized()
     auto presetAndMidiArea = area.removeFromBottom (15);
 
     presetSelector->setBounds (presetAndMidiArea.withSizeKeepingCentre (area.getWidth()/6, 30));
-    midiChannelComponent->setBounds (presetAndMidiArea.withLeft (presetSelector->getRight() + MARGIN*2)
+    midiChannelComponent->setBounds (presetAndMidiArea.withLeft (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/3)
                                                       .withRight (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/16)
                                                       .reduced (4*MARGIN, 0)
                                                       .expanded (0, 2));
