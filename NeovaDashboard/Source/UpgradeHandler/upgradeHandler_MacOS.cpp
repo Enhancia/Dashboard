@@ -243,7 +243,7 @@ void UpgradeHandler::checkReleasesVersion()
     {
         String name = hubFiles.getFirst().getFileNameWithoutExtension();
         uint8_t minor = name.getTrailingIntValue();
-        uint8_t major = name.trimCharactersAtEnd("." + String(minor)).getTrailingIntValue();
+        uint8_t major = name.upToLastOccurrenceOf(".", false, true).getTrailingIntValue();
         uint16_t version = ((uint16_t)major << 8) | minor;
         setHubReleaseVersion(version);
     }
@@ -262,7 +262,7 @@ void UpgradeHandler::checkReleasesVersion()
     {
         String name = ringFiles.getFirst().getFileNameWithoutExtension();
         uint8_t minor = name.getTrailingIntValue();
-        uint8_t major = name.trimCharactersAtEnd("." + String(minor)).getTrailingIntValue();
+        uint8_t major = name.upToLastOccurrenceOf(".", false, true).getTrailingIntValue();
         uint16_t version = ((uint16_t)major << 8) | minor;
         setRingReleaseVersion(version);
     }

@@ -320,6 +320,11 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
 			return true;
 			
         case updateBatteryDisplay:
+            if ((state == int (connected) || state == int (pause)) && hubConfig.getHubIsCompatibleInt() < 0)
+            {
+                setInterfaceStateAndUpdate (incompatible);
+            }
+
             if (state == int (connected))
             {
                 header->update();
@@ -549,6 +554,9 @@ void DashBoardInterface::executePanelAction (const int panelReturnValue)
             getCommandManager().invokeDirectly (neova_dash::commands::upgradeHub, true);
             break;
         case DashAlertPanel::noUploadQuitting:
+            JUCEApplication::getInstance()->systemRequestedQuit();
+            break;
+        case DashAlertPanel::upgradePending:
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;
         default: // modalResult 0 or unknown

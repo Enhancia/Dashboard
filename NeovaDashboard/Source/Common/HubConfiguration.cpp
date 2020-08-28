@@ -82,9 +82,9 @@ void HubConfiguration::setMidiChannel (const int channelNumber, bool shouldChann
 	if (uploadToHub)
 	{
 		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+		notifyConfigWasChanged();
 	}
 
-	notifyConfigWasChanged();
 }
 
 void HubConfiguration::setMidiChannelExclusive (const int channelNumber, bool uploadToHub)
@@ -94,9 +94,9 @@ void HubConfiguration::setMidiChannelExclusive (const int channelNumber, bool up
 	if (uploadToHub)
 	{
 		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+		notifyConfigWasChanged();
 	}
 
-	notifyConfigWasChanged();
 }
 
 void HubConfiguration::toggleMidiChannel (const int channelNumber, bool uploadToHub)
@@ -106,9 +106,9 @@ void HubConfiguration::toggleMidiChannel (const int channelNumber, bool uploadTo
 	if (uploadToHub)
 	{
 		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+		notifyConfigWasChanged();
 	}
 
-	notifyConfigWasChanged();
 }
 
 int HubConfiguration::getMidiChannels()
@@ -138,11 +138,11 @@ void HubConfiguration::setUint8Value (const int gestureNumber, const uint8DataId
 
 	*valToUpdatePtr = newUint8Value;
 	saveGestureConfig (getGestureData (gestureNumber));
-	notifyConfigWasChanged();
 
 	if (uploadToHub)
 	{
 		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+		notifyConfigWasChanged();
 	}
 }
 
@@ -167,11 +167,11 @@ void HubConfiguration::setFloatValue (const int gestureNumber, const floatDataId
 
 	*valToUpdatePtr = newFloatValue;
 	saveGestureConfig (getGestureData (gestureNumber));
-	notifyConfigWasChanged();
 
 	if (uploadToHub)
 	{
 		commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+		notifyConfigWasChanged();
 	}
 }
 
@@ -278,8 +278,8 @@ void HubConfiguration::setPreset (const int gestureNumberToSelect, bool uploadTo
 
 	if (uploadToHub)
 	{
-    	notifyConfigWasChanged();
 		commandManager.invokeDirectly(neova_dash::commands::uploadConfigToHub, true);
+    	notifyConfigWasChanged();
 	}
 }
 
@@ -437,6 +437,11 @@ bool HubConfiguration::getHubIsConnected()
 void HubConfiguration::setRingIsConnected (bool isConnected)
 {
 	ringIsConnected = isConnected;
+
+	if (isConnected)
+	{
+		checkHUBCompatibility();
+	}
 }
 
 bool HubConfiguration::getRingIsConnected()
@@ -500,7 +505,7 @@ void HubConfiguration::setGestureData (int presetNum, int gestureNum,
 {
 	GestureData& gesture = getGestureData (gestureNum, presetNum);
 
-	gesture.on       = newOn;
+	gesture.on       = (newType == neova_dash::gesture::none) ? 0 : newOn;
 	gesture.type     = newType;
 	gesture.midiLow  = newMidiLow;
 	gesture.midiHigh = newMidiHigh;
@@ -551,6 +556,7 @@ void HubConfiguration::moveGestureToId (const int idToMoveFrom, const int idToMo
 	getGestureData (idToMoveTo) = getGestureData (idToMoveFrom);
     setDefaultGestureValues (idToMoveFrom, neova_dash::gesture::none);
     
+    notifyConfigWasChanged();
     commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
 }
 

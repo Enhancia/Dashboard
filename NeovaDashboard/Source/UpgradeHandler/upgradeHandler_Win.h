@@ -106,7 +106,7 @@ private:
     STARTUPINFO si;
     String childOutFileName = "nrfutilOut.log";
     String childErrFileName = "nrfutilErr.log";
-    String nrfutilRelativePath = "\\Enhancia\\utilities\\nrfutil_5.1.0.exe";
+    String nrfutilRelativePath = "\\Enhancia\\utilities\\nrfutil.exe";
     String releaseRelativePath = "\\Enhancia\\NeovaDashboard\\Releases\\";
     String logsRelativePath = "\\Enhancia\\NeovaDashboard\\Logs\\";
     String upgradeHubCommandLine = "nrfutil dfu usb-serial -pkg ";
