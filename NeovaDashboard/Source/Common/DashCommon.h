@@ -93,10 +93,10 @@ namespace neova_dash
         const Colour midiSliderBackground   (0xff434343);
 
         const Colour inactiveGesture        (0xff808080);
-        const Colour vibrato                (0xffec6565);
-        const Colour pitchBend              (0xff1fcaa8);
-        const Colour tilt                   (0xfff3a536);
-        const Colour roll                   (0xffa255f3);
+        const Colour vibrato                (0xffff5ba1);
+        const Colour pitchBend              (0xffb859f2);
+        const Colour tilt                   (0xffffa21d);
+        const Colour roll                   (0xff1ec0b7);
         const Colour wave                   (0xff7c80de);
     };
 

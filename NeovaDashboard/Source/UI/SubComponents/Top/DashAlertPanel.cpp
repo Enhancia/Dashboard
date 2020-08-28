@@ -139,7 +139,7 @@ DashAlertPanel* DashAlertPanel::createSpecificAlertPanel (SpecificReturnValue pa
     switch (panelType)
     {
         case outdatedFirmware:
-            return new DashAlertPanel ("You Neova firmware is outdated!",
+            return new DashAlertPanel ("Your Neova firmware is outdated!",
                                        "Please upgrade your Neova firmware "
                                        "to use it with this Dashboard Version.",
                                        int (panelType),

@@ -117,6 +117,9 @@ private:
     Image hubImage = ImageFileFormat::loadFrom (DashData::DashboardHUBonlycropped_png,
                                                 DashData::DashboardHUBonlycropped_pngSize);
 
+    Image hubRingImage = ImageFileFormat::loadFrom (DashData::DashboardHUBALLcropped_png,
+                                                    DashData::DashboardHUBALLcropped_pngSize);
+
     //==============================================================================
     OwnedArray<HubButton> buttons;
     OwnedArray<GestureLED> leds;
