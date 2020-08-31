@@ -54,8 +54,15 @@ HubComponent::~HubComponent()
 
 void HubComponent::paint (Graphics& g)
 {
-	g.drawImage (hubImage, getLocalBounds().toFloat(),
-						   RectanglePlacement::yBottom);
+	if (dashboardState == 0 || dashboardState == 2) // connected or waiting for connection
+	{
+		g.drawImage (hubConfig.getRingIsCharging() ? hubRingImage : hubImage, getLocalBounds().toFloat(),
+							   												   RectanglePlacement::yBottom);
+	}
+	else 
+	{
+		g.drawImage (hubRingImage, getLocalBounds().toFloat(), RectanglePlacement::yBottom);
+	}
 }
 
 void HubComponent::resized()

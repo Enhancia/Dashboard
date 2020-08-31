@@ -25,7 +25,10 @@ namespace neova_dash
                 tilt,
                 vibrato,
                 pitchBend,
-                roll
+                roll,
+                ring,
+                ringFull,
+                hub
     		};
 
         extern const Path createPath (PathId pathToCreate);

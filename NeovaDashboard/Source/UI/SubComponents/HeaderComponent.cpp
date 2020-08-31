@@ -33,22 +33,23 @@ void HeaderComponent::paint (Graphics& g)
 {
     g.setColour (neova_dash::colour::headerBackground);
     g.fillRoundedRectangle (getLocalBounds().toFloat(), 3.0f);
+    const float spacing = 7.5f;
 
-	auto area = getLocalBounds().reduced (0, neova_dash::ui::MARGIN_SMALL);
+    auto area = getLocalBounds().reduced (0, 0);
     g.setColour (neova_dash::colour::mainText);
 
-    g.setFont (neova_dash::font::neovaFont.withHeight (15.0f).withExtraKerningFactor (0.22f));
-    g.drawText ("NEOVA", area.withTrimmedTop (neova_dash::ui::MARGIN_SMALL), Justification::centredTop, false);
+    g.setFont (neova_dash::font::neovaFont.withHeight (13.5f).withExtraKerningFactor (0.27f));
+    g.drawText ("NEOVA", area.removeFromTop (area.getHeight()/2).withTrimmedBottom (spacing/4), Justification::centredBottom, false);
 
-	g.setFont(neova_dash::font::dashFont.withHeight (13.0f).withExtraKerningFactor (0.17f));
-	g.drawText("DASHBOARD", area, Justification::centredBottom, false);
+  	g.setFont(neova_dash::font::dashFontLight.withHeight (9.5f).withExtraKerningFactor (0.38f));
+  	g.drawText("DASHBOARD", area.withTrimmedTop (spacing*3/4), Justification::centredTop, false);
 }
 
 void HeaderComponent::resized()
 {
-	auto area = getLocalBounds().reduced (neova_dash::ui::MARGIN, 0);
+	  auto area = getLocalBounds();
 
-	batteryComponent->setBounds (area.removeFromRight (jmax (area.getWidth()/9, 88)));
+	  batteryComponent->setBounds (area.removeFromRight (jmax (area.getWidth()/12, 75)));
 
     optionsButton->setBounds (area.removeFromLeft (40));
 }
@@ -112,16 +113,24 @@ HeaderComponent::BatteryComponent::~BatteryComponent()
 
 void HeaderComponent::BatteryComponent::paint (Graphics& g)
 {
-	g.setColour (neova_dash::colour::mainText);
+	  g.setColour (neova_dash::colour::mainText);
 
-	auto area = getLocalBounds().reduced(neova_dash::ui::MARGIN);
+	  auto area = getLocalBounds().reduced(neova_dash::ui::MARGIN);
 
-    g.setFont (neova_dash::font::dashFont.withHeight (13.0f));
-    g.drawText ("Ring :", area.removeFromLeft (area.getWidth()/2), Justification::centred, true);
+    drawRingPath (g, area.removeFromLeft (area.getWidth()/2).reduced (3).toFloat());
 
-    auto batteryArea = area.removeFromLeft (area.getWidth()/2)
-                           .withSizeKeepingCentre (12, area.getHeight()*3/4);
-    drawBatteryPath (g, batteryArea.toFloat());
+    auto batteryArea = area.withSizeKeepingCentre (12, area.getHeight()*3/4);
+
+    if (lastConnectionState)
+    {
+        drawBatteryPath (g, batteryArea.toFloat());
+
+    }
+    else
+    {
+        drawConnectedPath (g, batteryArea//.reduced (area.getWidth()/4, area.getHeight()/4)
+                                  .toFloat());
+    }
     
     /* TO TEST : battery percentage display
     if (lastConnectionState)
@@ -135,13 +144,14 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
                     Justification::centred);
     }*/
 
-    drawConnectedPath (g, area.reduced (area.getWidth()/4, area.getHeight()/4)
-                                  .toFloat());
 }
 
 void HeaderComponent::BatteryComponent::timerCallback()
 {
-    if (!waitForRepaint) repaintIfNeeded();
+    if (!waitForRepaint)
+    {
+        repaintIfNeeded();
+    }
     
     DBG ("Header Timer tick, battery : " << lastBattery);
 }
@@ -152,6 +162,12 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded()
 																					   hubConfig.getRingIsCharging()),
                                       1.0f),
                                 0.0f);
+
+
+    if (lastConnectionState && battery == 0.0f)
+    {
+        launchDelayedRepaint (500);
+    }
 
     if (battery != lastBattery || hubConfig.getRingIsCharging() != lastChargeState)
     {
@@ -295,4 +311,20 @@ void HeaderComponent::BatteryComponent::drawConnectedPath (Graphics& g, juce::Re
                                  crossArea.getX(),
                                  crossArea.getY() + crossArea.getHeight()), 1.5f);
     }
+}
+
+void HeaderComponent::BatteryComponent::drawRingPath (Graphics& g, juce::Rectangle<float> area)
+{
+    Path ringPath = neova_dash::path::createPath (neova_dash::path::ringFull);
+
+    ringPath.scaleToFit (area.getX(),
+                         area.getY(),
+                         area.getWidth(),
+                         area.getHeight(),
+                         true);
+
+    g.setColour (neova_dash::colour::mainText);
+    g.fillPath (ringPath);
+    g.setFont (neova_dash::font::dashFont.withHeight (13.0f));
+    g.drawText (":", getLocalBounds(), Justification::centred);
 }
