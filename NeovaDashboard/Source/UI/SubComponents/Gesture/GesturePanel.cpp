@@ -599,6 +599,7 @@ void GesturePanel::createMenuForGestureId (int id)
 
     gestureMenu.addItem (1, "Duplicate", hubConfig.canDuplicate());
     gestureMenu.addItem (2, "Delete", true);
+    gestureMenu.addItem (3, (hubConfig.getGestureData (id).on == 1) ? "Mute" : "Unmute", true);
     
     handleMenuResult (id,
                       gestureMenu.showMenu (PopupMenu::Options().withParentComponent (getParentComponent())
@@ -623,6 +624,10 @@ void GesturePanel::handleMenuResult (int gestureId, const int menuResult)
 
         case 2: // Delete gesture
             removeGestureAndGestureComponent (gestureId);
+
+        case 3: // Mute gesture
+            hubConfig.setUint8Value (gestureId, HubConfiguration::on, (hubConfig.getGestureData (gestureId).on == 1) ? 0 : 1);
+            commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
     }
 }
 
