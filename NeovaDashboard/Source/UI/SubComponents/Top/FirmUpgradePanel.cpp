@@ -394,8 +394,8 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 
 					titleLabel->setText ("Warning", dontSendNotification);
 					bodyTextString = "Please make sure your hub is connected with your ring charging on top.\n\n"
-									   "Make sure you ring is connected and has some battery. Do not disconnect your HUB during the process.\n\n"
-									   "Please note that it may take a several minutes to complete.";
+									   "Do not disconnect your HUB during the process.\n\n\n"
+									   "The upgrade may take a several minutes to complete.";
 					break;
 
 				default:

@@ -178,7 +178,7 @@ void DashBoardInterface::resized()
     auto presetAndMidiArea = area.removeFromBottom (15);
 
     presetSelector->setBounds (presetAndMidiArea.withSizeKeepingCentre (area.getWidth()/6, 30));
-    midiChannelComponent->setBounds (presetAndMidiArea.withLeft (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/3)
+    midiChannelComponent->setBounds (presetAndMidiArea.withLeft (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/3 + MARGIN * 2)
                                                       .withRight (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/16)
                                                       .reduced (4*MARGIN, 0)
                                                       .expanded (0, 2));
