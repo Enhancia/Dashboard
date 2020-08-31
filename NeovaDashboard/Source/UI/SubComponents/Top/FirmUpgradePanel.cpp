@@ -39,6 +39,14 @@ void FirmUpgradePanel::paint (Graphics& g)
 
     g.setGradientFill (gradOut);
     g.drawRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f, 1.0f);
+
+    if (currentState > 0 && currentState < upgradeSuccessfull)
+    {
+    	g.setColour (subText);
+    	g.setFont (neova_dash::font::dashFontNorms.withHeight (13.0f));
+    	g.drawFittedText ("Do not disconnect Neova during the upgrade.\n\nPlease keep your ring charging during the process.", panelArea.reduced (neova_dash::ui::MARGIN),
+    				Justification::centredBottom, 3);
+    }
 }
 
 void FirmUpgradePanel::resized()
@@ -85,6 +93,7 @@ void FirmUpgradePanel::timerCallback()
 			if (currentState < 0) stopTimer(); // Error: terminates the upgrade process
 
 			updateComponentsForSpecificState (upgradeHandler.getUpgradeState());
+			repaint();
 		}
 		else if (currentState != waitingForHubReconnect)
 		{
