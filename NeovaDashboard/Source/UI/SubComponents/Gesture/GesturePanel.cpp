@@ -21,7 +21,6 @@ GesturePanel::GesturePanel (HubConfiguration& data, DataReader& reader,
     TRACE_IN;
 
     setComponentID ("gesturePanel");
-    setWantsKeyboardFocus (true);
 
     gestureSettings = std::make_unique<GestureSettingsComponent> (int (hubConfig.getGestureData
                                                                     (hubConfig.getSelectedGesture())
@@ -269,24 +268,16 @@ void GesturePanel::handleLeftClickDrag (const MouseEvent&)
 {
 }
 
-bool GesturePanel::keyPressed (const KeyPress &key)
+void GesturePanel::handleKeyPress (const KeyPress &key)
 {
-    if (hasSelectedGesture() && key.isValid())
+    if (key == neova_dash::keyboard_shortcut::selectNextGesture)
     {
-        if (key.getKeyCode() == KeyPress::deleteKey)
-        {
-            removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
-        }
-
-        #if JUCE_MAC
-        else if (key.getKeyCode() == KeyPress::backspaceKey && key.getModifiers().isCommandDown())
-        {
-            removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
-        }
-        #endif
+        selectGestureExclusive (hubConfig.selectNextGesture());
     }
-
-	return false;
+    else if (key == neova_dash::keyboard_shortcut::selectPreviousGesture)
+    {
+        selectGestureExclusive (hubConfig.selectPreviousGesture());
+    }
 }
 
 void GesturePanel::initialiseGestureSlots()

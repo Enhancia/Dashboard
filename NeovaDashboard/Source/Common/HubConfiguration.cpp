@@ -258,7 +258,7 @@ void HubConfiguration::setSavedGestureValues (const int gestureNumber, const neo
 
 void HubConfiguration::setPreset (const int gestureNumberToSelect)
 {
-	if (gestureNumberToSelect < 0 || gestureNumberToSelect > 4 || gestureNumberToSelect == selectedPreset) return;
+	if (gestureNumberToSelect < 0 || gestureNumberToSelect > neova_dash::gesture::NUM_PRESETS || gestureNumberToSelect == selectedPreset) return;
 
 	selectedPreset = gestureNumberToSelect;
 	selectFirstExistingGesture();
@@ -270,7 +270,7 @@ void HubConfiguration::setPreset (const int gestureNumberToSelect)
 
 void HubConfiguration::setPreset (const int gestureNumberToSelect, bool uploadToHub)
 {
-	if (gestureNumberToSelect < 0 || gestureNumberToSelect > 4 || gestureNumberToSelect == selectedPreset) return;
+	if (gestureNumberToSelect < 0 || gestureNumberToSelect > neova_dash::gesture::NUM_PRESETS || gestureNumberToSelect == selectedPreset) return;
 
 	selectedPreset = gestureNumberToSelect;
 	selectFirstExistingGesture();
@@ -617,7 +617,7 @@ bool HubConfiguration::isIdAvailable (const int idToCheck)
 	return (getGestureData (idToCheck).type == neova_dash::gesture::none);
 }
 
-void HubConfiguration::selectFirstExistingGesture()
+int HubConfiguration::selectFirstExistingGesture()
 {
 	selectedGesture = -1;
 
@@ -626,9 +626,73 @@ void HubConfiguration::selectFirstExistingGesture()
         if (getGestureData (slot).type != neova_dash::gesture::none)
         {
             selectedGesture = slot;
-            return;
+            return selectedGesture;
         }
     }
+
+    return selectedGesture;
+}
+
+int HubConfiguration::selectLastExistingGesture()
+{
+	selectedGesture = -1;
+
+    for (int slot = neova_dash::gesture::NUM_GEST - 1; slot >= 0 ; slot--)
+    {
+        if (getGestureData (slot).type != neova_dash::gesture::none)
+        {
+            selectedGesture = slot;
+            return selectedGesture;
+        }
+    }
+
+    return selectedGesture;
+}
+
+int HubConfiguration::selectPreviousGesture (bool loopIfFirstGesture)
+{
+	if (selectedGesture == -1)
+	{
+		selectFirstExistingGesture();
+		return selectedGesture;
+	}
+
+    for (int slot = selectedGesture - 1; slot >= 0; slot--)
+    {
+    	DBG ("Tested Gesture for browse left : " << slot);
+
+        if (slot >= 0 && getGestureData (slot).type != neova_dash::gesture::none)
+        {
+            selectedGesture = slot;
+            return selectedGesture;
+        }
+	}
+
+	if (loopIfFirstGesture) return selectLastExistingGesture();
+
+	return selectedGesture;
+}
+
+int HubConfiguration::selectNextGesture (bool loopIfLastGesture)
+{
+	if (selectedGesture == -1)
+	{
+		selectLastExistingGesture();
+		return selectedGesture;
+	}
+
+    for (int slot = selectedGesture + 1; slot < neova_dash::gesture::NUM_GEST; slot++)
+    {
+        if (getGestureData (slot).type != neova_dash::gesture::none)
+        {
+            selectedGesture = slot;
+            return selectedGesture;
+        }
+	}
+
+	if (loopIfLastGesture) return selectFirstExistingGesture();
+
+	return selectedGesture;
 }
 
 const int HubConfiguration::findAvailableUndefinedCC()
@@ -682,6 +746,7 @@ void HubConfiguration::saveGestureConfig (const GestureData& gestureDataToSave)
 void HubConfiguration::checkHUBCompatibility()
 {
 	jassert (hubIsConnected);
+	// TO DO return if not compatible
 
 	const int hubMajor = (config.hub_firmware_version & 0xFF00) >> 8;
 	const int ringMajor = ringIsConnected ? (config.ring_firmware_version & 0xFF00) >> 8 : hubMajor;

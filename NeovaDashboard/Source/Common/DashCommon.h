@@ -190,4 +190,26 @@ namespace neova_dash
     {
         const String MACHINE_TOKEN ("50327c582d22471d2427faed42c9928dcd8b0e98 "); //std::getenv ("MACHINE_ENHANCIA_OAUTH");
     }
+
+    namespace keyboard_shortcut
+    {
+        const KeyPress selectNextGesture     (KeyPress::rightKey);
+        const KeyPress selectPreviousGesture (KeyPress::leftKey);
+        const KeyPress uploadToHub           ('s', ModifierKeys (ModifierKeys::commandModifier), 's');
+        const KeyPress deleteGesture         (KeyPress::deleteKey);
+        const KeyPress duplicateGesture      ('d', ModifierKeys (ModifierKeys::commandModifier), 'd');
+        const KeyPress displayOptions        ('o', ModifierKeys (ModifierKeys::commandModifier), 'o');
+        const KeyPress muteGesture           ('m', ModifierKeys (ModifierKeys::commandModifier), 'm');
+        const KeyPress selectNextBank        (KeyPress::rightKey, ModifierKeys (ModifierKeys::commandModifier), 0);
+        const KeyPress selectPreviousBank    (KeyPress::leftKey, ModifierKeys (ModifierKeys::commandModifier), 0);
+        const KeyPress selectBank1           ('1', ModifierKeys (ModifierKeys::commandModifier), '1');
+        const KeyPress selectBank2           ('2', ModifierKeys (ModifierKeys::commandModifier), '2');
+        const KeyPress selectBank3           ('3', ModifierKeys (ModifierKeys::commandModifier), '3');
+        const KeyPress selectBank4           ('4', ModifierKeys (ModifierKeys::commandModifier), '4');
+        const KeyPress muteGesture1          (KeyPress::numberPad1);
+        const KeyPress muteGesture2          (KeyPress::numberPad2);
+        const KeyPress muteGesture3          (KeyPress::numberPad3);
+        const KeyPress muteGesture4          (KeyPress::numberPad4);
+        const KeyPress easterEgg             ('n', ModifierKeys (ModifierKeys::commandModifier + ModifierKeys::shiftModifier), 'N');
+    }
 };

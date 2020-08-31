@@ -248,14 +248,124 @@ void DashBoardInterface::modifierKeysChanged (const ModifierKeys& modifiers)
 
 bool DashBoardInterface::keyPressed (const KeyPress& key)
 {
-    if (key == KeyPress ('s', ModifierKeys (ModifierKeys::commandModifier), 's'))
+    DBG ("KEYPRESS : " << key.getTextDescription());
+
+    if (!key.getModifiers().isAnyModifierKeyDown())
     {
-        uploadButton->triggerClick();
+        if (key == neova_dash::keyboard_shortcut::deleteGesture)
+        {
+            if (gesturePanel->hasSelectedGesture())
+            {
+                gesturePanel->removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
+            }
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectPreviousGesture || key == neova_dash::keyboard_shortcut::selectNextGesture)
+        {
+            gesturePanel->handleKeyPress (key);
+        }
+        else if (key == neova_dash::keyboard_shortcut::muteGesture1)
+        {
+            hubConfig.setUint8Value (0,
+                                     HubConfiguration::on,
+                                     (hubConfig.getGestureData (0).on == 1) ? 0 : 1);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::muteGesture2)
+        {
+            hubConfig.setUint8Value (1,
+                                     HubConfiguration::on,
+                                     (hubConfig.getGestureData (1).on == 1) ? 0 : 1);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::muteGesture3)
+        {
+            hubConfig.setUint8Value (2,
+                                     HubConfiguration::on,
+                                     (hubConfig.getGestureData (2).on == 1) ? 0 : 1);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::muteGesture4)
+        {
+            hubConfig.setUint8Value (3,
+                                     HubConfiguration::on,
+                                     (hubConfig.getGestureData (3).on == 1) ? 0 : 1);
+            update();
+        }
     }
 
-    if (key == KeyPress ('a', ModifierKeys (ModifierKeys::commandModifier), 'a'))
+    else if (key.getModifiers().isCommandDown())
     {
-        createAndShowAlertPanel (DashAlertPanel::unknown);
+        if (key == neova_dash::keyboard_shortcut::uploadToHub)
+        {
+            uploadButton->triggerClick();
+        }
+        else if (key == neova_dash::keyboard_shortcut::duplicateGesture)
+        {
+            hubConfig.duplicateGesture (hubConfig.getSelectedGesture());
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::displayOptions)
+        {
+            optionsPanel->setVisible (!optionsPanel->isVisible());
+        }
+        else if (key == neova_dash::keyboard_shortcut::muteGesture)
+        {
+            if (gesturePanel->hasSelectedGesture())
+            {
+                hubConfig.setUint8Value (hubConfig.getSelectedGesture(),
+                                         HubConfiguration::on,
+                                         (hubConfig.getGestureData (hubConfig.getSelectedGesture()).on == 1) ? 0 : 1);
+                update();
+            }
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectPreviousBank)
+        {
+            int presetToSelect = hubConfig.getSelectedPreset() == 0 ? neova_dash::gesture::NUM_PRESETS - 1
+                                                                    : hubConfig.getSelectedPreset() - 1;
+            hubConfig.setPreset (presetToSelect);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectNextBank)
+        {
+            hubConfig.setPreset ((hubConfig.getSelectedPreset() + 1) % neova_dash::gesture::NUM_PRESETS);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectBank1)
+        {
+            hubConfig.setPreset (0);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectBank2)
+        {
+            hubConfig.setPreset (1);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectBank3)
+        {
+            hubConfig.setPreset (2);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectBank4)
+        {
+            hubConfig.setPreset (3);
+            update();
+        }
+        else if (key.getModifiers().isShiftDown())
+        {
+            if (key == neova_dash::keyboard_shortcut::easterEgg)
+            {
+                createAndShowAlertPanel ("Private Navigation", "Neova [HUB]", "Yes", true, 0);
+            }
+        }
+    }
+
+    else if (key.getModifiers().isShiftDown())
+    {
+        if (key == neova_dash::keyboard_shortcut::selectPreviousBank)
+        {
+            hubConfig.setPreset ((hubConfig.getSelectedPreset() - 1) % neova_dash::gesture::NUM_PRESETS);
+            update();
+        }
     }
 
     return false;
