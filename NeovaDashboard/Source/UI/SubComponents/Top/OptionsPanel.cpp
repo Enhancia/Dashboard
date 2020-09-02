@@ -17,10 +17,10 @@ OptionsPanel::OptionsPanel (HubConfiguration& config, ApplicationCommandManager&
     TRACE_IN;
 
     createButtons();
-    options.addTab (new FirmwarePanel (hubConfig, *upgradeButton.get()), "Firmware");
     options.addTab (new ContactPanel(), "Contact");
+    options.addTab (new FirmwarePanel (hubConfig, *upgradeButton.get()), "Firmware");
     options.addTab (new LegalPanel(), "Legal");
-    options.addTab (new LicensePanel(), "EULA");
+    //options.addTab (new LicensePanel(), "EULA");
 
 	addAndMakeVisible (options);
 }
@@ -451,17 +451,12 @@ ContactPanel::~ContactPanel()
 
 void ContactPanel::paint (Graphics& g)
 {
-    auto area = getLocalBounds().reduced (2*neova_dash::ui::MARGIN, 0).withTrimmedTop (2*neova_dash::ui::MARGIN);
-
-    auto creditsArea = area.removeFromTop (area.getHeight()/2);
-    auto contactArea = area;
-
     g.setColour (neova_dash::colour::mainText);
     g.setFont (neova_dash::font::dashFont.withHeight (14));
 
-    g.drawText ("Dashboard Credits :\n\n",
+    /*g.drawText ("Dashboard Credits :\n\n",
                 creditsArea,
-                Justification::topLeft);
+                Justification::topLeft);*/
 
     g.setColour (neova_dash::colour::subText);
     g.drawFittedText ("Alex LEVACHER (Dev), Mathieu HERBELOT (Dev)\nMario VIOLA (UI), Damien LE BOULAIRE (UX)\n",
@@ -475,13 +470,17 @@ void ContactPanel::paint (Graphics& g)
 
 void ContactPanel::resized()
 {
-	auto area = getLocalBounds();
-    area.removeFromTop (area.getHeight()/2);
+    auto area = getLocalBounds().reduced (2*neova_dash::ui::MARGIN, 0).withTrimmedTop (getHeight()/5);
 
-    contactButton->setBounds (area.removeFromLeft (area.getWidth()/2)
-                                  .withSizeKeepingCentre (contactButton->getBestWidthForHeight (30), 30));
+    contactArea = area.removeFromTop (area.getHeight()*2/3);
+    creditsArea = area;
+
+    auto contactAreaTemp = contactArea;
+
+    contactButton->setBounds (contactAreaTemp.removeFromLeft (contactAreaTemp.getWidth()/2)
+                                             .withSizeKeepingCentre (contactButton->getBestWidthForHeight (30), 30));
     
-    sendReportButton->setBounds (area.withSizeKeepingCentre (contactButton->getBestWidthForHeight (30), 30));
+    sendReportButton->setBounds (contactAreaTemp.withSizeKeepingCentre (contactButton->getBestWidthForHeight (30), 30));
 }
 
 void ContactPanel::buttonClicked (Button* bttn)
