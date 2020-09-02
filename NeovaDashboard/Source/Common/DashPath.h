@@ -28,7 +28,8 @@ namespace neova_dash
                 roll,
                 ring,
                 ringFull,
-                hub
+                hub,
+                dashIcon
     		};
 
         extern const Path createPath (PathId pathToCreate);
