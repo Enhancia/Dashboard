@@ -78,6 +78,7 @@ bool DataReader::readData (String s)
 
         if (!hubConfig.getRingIsConnected())
         {
+            DBG ("Set ring is connected CASE 1"); // TO DELETE, debug
             hubConfig.setRingIsConnected (true);
             commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
         }
@@ -109,6 +110,7 @@ bool DataReader::readData (String s)
 
         if (!hubConfig.getRingIsConnected())
         {
+            DBG ("Set ring is connected CASE 2"); // TO DELETE, debug
             hubConfig.setRingIsConnected (true);
             commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
         }

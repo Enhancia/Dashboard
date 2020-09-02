@@ -763,8 +763,11 @@ void HubConfiguration::saveGestureConfig (const GestureData& gestureDataToSave)
 
 void HubConfiguration::checkHUBCompatibility()
 {
-	jassert (hubIsConnected);
-	// TO DO return if not compatible
+	//jassert (hubIsConnected);
+	if (!hubIsConnected)
+	{
+		Logger::writeToLog ("In function " + String(__FUNCTION__) + " : TRYING TO CHECK COMPATIBILITY WITH DISCONNECTED HUB");
+	}
 
 	const int hubMajor = (config.hub_firmware_version & 0xFF00) >> 8;
 	const int ringMajor = ringIsConnected ? (config.ring_firmware_version & 0xFF00) >> 8 : hubMajor;
