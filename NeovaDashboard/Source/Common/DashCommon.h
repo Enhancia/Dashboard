@@ -193,8 +193,10 @@ namespace neova_dash
 
     namespace keyboard_shortcut
     {
-        const KeyPress selectNextGesture     (KeyPress::rightKey);
-        const KeyPress selectPreviousGesture (KeyPress::leftKey);
+        const KeyPress selectGestureLeft     (KeyPress::leftKey);
+        const KeyPress selectGestureRight    (KeyPress::rightKey);
+        const KeyPress selectGestureUp       (KeyPress::upKey);
+        const KeyPress selectGestureDown     (KeyPress::downKey);
         const KeyPress uploadToHub           ('s', ModifierKeys (ModifierKeys::commandModifier), 's');
         const KeyPress deleteGesture         (KeyPress::deleteKey);
         const KeyPress duplicateGesture      ('d', ModifierKeys (ModifierKeys::commandModifier), 'd');

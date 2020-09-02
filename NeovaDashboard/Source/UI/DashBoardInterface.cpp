@@ -259,7 +259,10 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
                 gesturePanel->removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
             }
         }
-        else if (key == neova_dash::keyboard_shortcut::selectPreviousGesture || key == neova_dash::keyboard_shortcut::selectNextGesture)
+        else if (key == neova_dash::keyboard_shortcut::selectGestureLeft ||
+                 key == neova_dash::keyboard_shortcut::selectGestureRight ||
+                 key == neova_dash::keyboard_shortcut::selectGestureUp ||
+                 key == neova_dash::keyboard_shortcut::selectGestureDown)
         {
             gesturePanel->handleKeyPress (key);
         }
@@ -318,16 +321,14 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
                 update();
             }
         }
-        else if (key == neova_dash::keyboard_shortcut::selectPreviousBank)
+        else if (key == neova_dash::keyboard_shortcut::selectPreviousBank && hubConfig.getSelectedPreset() > 0)
         {
-            int presetToSelect = hubConfig.getSelectedPreset() == 0 ? neova_dash::gesture::NUM_PRESETS - 1
-                                                                    : hubConfig.getSelectedPreset() - 1;
-            hubConfig.setPreset (presetToSelect);
+            hubConfig.setPreset (hubConfig.getSelectedPreset() - 1);
             update();
         }
-        else if (key == neova_dash::keyboard_shortcut::selectNextBank)
+        else if (key == neova_dash::keyboard_shortcut::selectNextBank && hubConfig.getSelectedPreset() < neova_dash::gesture::NUM_PRESETS - 1)
         {
-            hubConfig.setPreset ((hubConfig.getSelectedPreset() + 1) % neova_dash::gesture::NUM_PRESETS);
+            hubConfig.setPreset (hubConfig.getSelectedPreset() + 1);
             update();
         }
         else if (key == neova_dash::keyboard_shortcut::selectBank1)

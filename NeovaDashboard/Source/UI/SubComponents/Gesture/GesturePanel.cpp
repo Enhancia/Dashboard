@@ -270,13 +270,21 @@ void GesturePanel::handleLeftClickDrag (const MouseEvent&)
 
 void GesturePanel::handleKeyPress (const KeyPress &key)
 {
-    if (key == neova_dash::keyboard_shortcut::selectNextGesture)
+    if (key == neova_dash::keyboard_shortcut::selectGestureRight)
     {
-        selectGestureExclusive (hubConfig.selectNextGesture());
+        selectGestureExclusive (hubConfig.selectGestureRight());
     }
-    else if (key == neova_dash::keyboard_shortcut::selectPreviousGesture)
+    else if (key == neova_dash::keyboard_shortcut::selectGestureLeft)
     {
-        selectGestureExclusive (hubConfig.selectPreviousGesture());
+        selectGestureExclusive (hubConfig.selectGestureLeft());
+    }
+    else if (key == neova_dash::keyboard_shortcut::selectGestureUp)
+    {
+        selectGestureExclusive (hubConfig.selectGestureUp());
+    }
+    else if (key == neova_dash::keyboard_shortcut::selectGestureDown)
+    {
+        selectGestureExclusive (hubConfig.selectGestureDown());
     }
 }
 

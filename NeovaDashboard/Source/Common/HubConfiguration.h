@@ -151,8 +151,10 @@ public:
     void setSelectedGesture (const int gestureToSelect);
     int selectFirstExistingGesture();
     int selectLastExistingGesture();
-    int selectPreviousGesture (bool loopIfFirstGesture = true);
-    int selectNextGesture (bool loopIfLastGesture = true);
+    int selectGestureLeft  (bool loop = false);
+    int selectGestureRight (bool loop = false);
+    int selectGestureUp    (bool loop = false);
+    int selectGestureDown  (bool loop = false);
     const int getSelectedGesture();
 
     //==============================================================================

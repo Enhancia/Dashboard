@@ -667,7 +667,7 @@ int HubConfiguration::selectLastExistingGesture()
     return selectedGesture;
 }
 
-int HubConfiguration::selectPreviousGesture (bool loopIfFirstGesture)
+int HubConfiguration::selectGestureLeft (bool loop)
 {
 	if (selectedGesture == -1)
 	{
@@ -675,23 +675,24 @@ int HubConfiguration::selectPreviousGesture (bool loopIfFirstGesture)
 		return selectedGesture;
 	}
 
-    for (int slot = selectedGesture - 1; slot >= 0; slot--)
+    int newSlot = selectedGesture - neova_dash::gesture::NUM_GEST/2;
+
+	if (newSlot >= 0 && getGestureData (newSlot).type != neova_dash::gesture::none)
     {
-    	DBG ("Tested Gesture for browse left : " << slot);
+        selectedGesture = newSlot;
+        return selectedGesture;
+    }
 
-        if (slot >= 0 && getGestureData (slot).type != neova_dash::gesture::none)
-        {
-            selectedGesture = slot;
-            return selectedGesture;
-        }
+	if (loop && newSlot < 0 && getGestureData (newSlot + neova_dash::gesture::NUM_GEST).type != neova_dash::gesture::none)
+	{
+        selectedGesture = newSlot + neova_dash::gesture::NUM_GEST;
+        return selectedGesture;
 	}
-
-	if (loopIfFirstGesture) return selectLastExistingGesture();
 
 	return selectedGesture;
 }
 
-int HubConfiguration::selectNextGesture (bool loopIfLastGesture)
+int HubConfiguration::selectGestureRight (bool loop)
 {
 	if (selectedGesture == -1)
 	{
@@ -699,16 +700,101 @@ int HubConfiguration::selectNextGesture (bool loopIfLastGesture)
 		return selectedGesture;
 	}
 
-    for (int slot = selectedGesture + 1; slot < neova_dash::gesture::NUM_GEST; slot++)
+    int newSlot = selectedGesture + neova_dash::gesture::NUM_GEST/2;
+
+    if (newSlot < neova_dash::gesture::NUM_GEST && getGestureData (newSlot).type != neova_dash::gesture::none)
     {
-        if (getGestureData (slot).type != neova_dash::gesture::none)
-        {
-            selectedGesture = slot;
-            return selectedGesture;
-        }
+        selectedGesture = newSlot;
+        return selectedGesture;
+    }
+
+	if (loop && newSlot >= neova_dash::gesture::NUM_GEST && getGestureData (newSlot - neova_dash::gesture::NUM_GEST).type != neova_dash::gesture::none)
+	{
+        selectedGesture = newSlot - neova_dash::gesture::NUM_GEST;
+        return selectedGesture;
 	}
 
-	if (loopIfLastGesture) return selectFirstExistingGesture();
+	return selectedGesture;
+}
+
+int HubConfiguration::selectGestureUp (bool loop)
+{
+	if (selectedGesture == -1)
+	{
+		selectLastExistingGesture();
+		return selectedGesture;
+	}
+
+	const int currentSlotRow = selectedGesture / (neova_dash::gesture::NUM_GEST/2);
+
+    int newSlot = selectedGesture - 1;
+	int newSlotRow = newSlot / (neova_dash::gesture::NUM_GEST/2);
+
+    while (currentSlotRow == newSlotRow && newSlot >= 0)
+    {
+    	if (getGestureData (newSlot).type != neova_dash::gesture::none)
+    	{
+	        selectedGesture = newSlot;
+	        return selectedGesture;
+	    }
+
+	    newSlot--;
+	    newSlotRow = newSlot / (neova_dash::gesture::NUM_GEST/2);
+    }
+
+	if (loop && (currentSlotRow != newSlotRow || newSlot < 0) && getGestureData (newSlot + neova_dash::gesture::NUM_GEST).type != neova_dash::gesture::none)
+	{
+		newSlot = (currentSlotRow + 1) * (neova_dash::gesture::NUM_GEST/2) - 1;
+
+		while (getGestureData (newSlot).type == neova_dash::gesture::none)
+		{ 
+			newSlot--;
+		}
+
+        selectedGesture = newSlot;
+        return selectedGesture;
+	}
+
+	return selectedGesture;
+}
+
+int HubConfiguration::selectGestureDown (bool loop)
+{
+	if (selectedGesture == -1)
+	{
+		selectLastExistingGesture();
+		return selectedGesture;
+	}
+
+	const int currentSlotRow = selectedGesture / (neova_dash::gesture::NUM_GEST/2);
+
+    int newSlot = selectedGesture + 1;
+	int newSlotRow = newSlot / (neova_dash::gesture::NUM_GEST/2);
+
+    while (currentSlotRow == newSlotRow)
+    {
+    	if (getGestureData (newSlot).type != neova_dash::gesture::none)
+    	{
+	        selectedGesture = newSlot;
+	        return selectedGesture;
+	    }
+
+	    newSlot++;
+	    newSlotRow = newSlot / (neova_dash::gesture::NUM_GEST/2);
+    }
+
+	if (loop && currentSlotRow != newSlotRow && getGestureData (newSlot - neova_dash::gesture::NUM_GEST).type != neova_dash::gesture::none)
+	{
+		newSlot = currentSlotRow * (neova_dash::gesture::NUM_GEST/2);
+
+		while (getGestureData (newSlot).type == neova_dash::gesture::none)
+		{ 
+			newSlot++;
+		}
+
+        selectedGesture = newSlot;
+        return selectedGesture;
+	}
 
 	return selectedGesture;
 }
