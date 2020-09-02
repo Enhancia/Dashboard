@@ -556,8 +556,8 @@ void FirmwarePanel::paint (Graphics& g)
     paintSoftwareArea (g);
 
     g.setColour (neova_dash::colour::subText);
-    g.drawVerticalLine (softwareArea.getX(), getHeight() * 1.0 / 3,
-                                             getHeight() * 2.0 / 3);
+    g.drawVerticalLine (softwareArea.getX(), getHeight() * 1.0 / 8,
+                                             getHeight() * 6.0 / 8);
 }
 
 void FirmwarePanel::paintFirmwareArea (Graphics& g)
