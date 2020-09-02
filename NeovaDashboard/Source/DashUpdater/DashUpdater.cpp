@@ -13,7 +13,6 @@
 DashUpdater::DashUpdater() : currentVersion (JUCEApplication::getInstance()->getApplicationVersion())
 {
     checkForNewAvailableVersion();
-    //initializeFileToDownloadString();
 }
 
 DashUpdater::~DashUpdater()

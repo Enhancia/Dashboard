@@ -122,6 +122,11 @@ void OptionsPanel::buttonClicked (Button* bttn)
     {
         commandManager.invokeDirectly (neova_dash::commands::upgradeHub, true);
     }
+
+    else if (bttn == updateButton.get())
+    {
+        commandManager.invokeDirectly (neova_dash::commands::checkDashboardUpdate, true);
+    }
 }
 
 void OptionsPanel::mouseUp (const MouseEvent& event)

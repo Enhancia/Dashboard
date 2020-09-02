@@ -23,7 +23,8 @@ public:
     //==============================================================================
 	enum downloadProgress
 	{
-		downloadAvailable = 0,
+        noDownloadAvailable = 0,
+		downloadAvailable,
 		inProgress,
 		downloadFinished,
         updateRequired

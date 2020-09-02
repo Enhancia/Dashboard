@@ -16,7 +16,7 @@ UpdaterPanel::UpdaterPanel (DashUpdater& updtr, float& updateProgress) : updater
     createLabels();
     createButtons();
 
-    updateComponentsForSpecificStep (downloadAvailable);
+    updateComponentsForSpecificStep (noDownloadAvailable);
 }
 
 UpdaterPanel::~UpdaterPanel()
@@ -100,6 +100,9 @@ void UpdaterPanel::buttonClicked (Button* bttn)
 	{
 		switch (currentProgress)
 		{
+			case noDownloadAvailable:
+				closeAndResetPanel();
+				break;
 			case downloadAvailable:
 				updateComponentsForSpecificStep (inProgress);
 				startTimerHz (2);
@@ -133,7 +136,9 @@ void UpdaterPanel::resetAndOpenPanel (bool updateIsRequired)
 	if (currentProgress != inProgress)
 	{
 		if (isTimerRunning ()) stopTimer();
-		updateComponentsForSpecificStep (updateIsRequired ? updateRequired : downloadAvailable);
+		updateComponentsForSpecificStep (updateIsRequired ? updateRequired
+														  : updater.hasNewAvailableVersion() ? downloadAvailable
+														  									 : noDownloadAvailable);
 
 		setVisible (true);
 	}
@@ -146,7 +151,7 @@ void UpdaterPanel::closeAndResetPanel()
 		if (isTimerRunning ()) stopTimer();
 
 		setVisible (false);
-		updateComponentsForSpecificStep (downloadAvailable);
+		updateComponentsForSpecificStep (noDownloadAvailable);
 	}
 }
 
@@ -192,6 +197,17 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 
 	switch (currentProgress)
 	{
+			case noDownloadAvailable:
+				closeButton->setVisible (true);
+				bottomButton->setVisible (true);
+				bottomButton->setButtonText ("Ok");
+
+				titleLabel->setText ("Up to date !", dontSendNotification);
+
+				bodyText->setText ("No new Dashboard version was found.",
+					               dontSendNotification);
+				break;
+
 			case downloadAvailable:
 				closeButton->setVisible (true);
 				bottomButton->setVisible (true);
