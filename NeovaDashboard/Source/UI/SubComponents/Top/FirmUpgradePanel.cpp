@@ -276,7 +276,7 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 					upgradeButton->setVisible (hubAvailable || ringAvailable);
 					if (!hubAvailable && !ringAvailable) okButton->setVisible (true);
 
-					titleLabel->setText ("Firmware Update", dontSendNotification);
+					titleLabel->setText ("Firmware Upgrade", dontSendNotification);
     				bodyText->setJustificationType (Justification::centred);
 
 					if (!hubConfig.getHubIsConnected())
