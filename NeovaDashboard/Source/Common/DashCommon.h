@@ -33,11 +33,12 @@ namespace neova_dash
             updatePresetModeState = 0x00000005, // Updates the backend preset mode to fit the interface
 
             // Frontend commands
-            updateDashInterface  = 0x01000001, // Updates Dash interface to match the HUB data
-            updateInterfaceLEDs  = 0x01000002, // Updates the Hub lEDs in the Dash interface
-            updateBatteryDisplay = 0x01000003, // Updates the battery display in the header
-            allowUserToFlashHub  = 0x01000004, // Updates upload button after config was changed
-            openFirmUpgradePanel = 0x01000005  // Launches the firm upgrade panel
+            updateDashInterface             = 0x01000001, // Updates Dash interface to match the HUB data
+            setStateAndUpdateDashInterface  = 0x01000002, // Updates Dash interface and state to match HUB data
+            updateInterfaceLEDs             = 0x01000003, // Updates the Hub lEDs in the Dash interface
+            updateBatteryDisplay            = 0x01000004, // Updates the battery display in the header
+            allowUserToFlashHub             = 0x01000005, // Updates upload button after config was changed
+            openFirmUpgradePanel            = 0x01000006  // Launches the firm upgrade panel
     	};
     };
 

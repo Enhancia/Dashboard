@@ -76,13 +76,13 @@ bool DataReader::readData (String s)
     {
         startTimer (3000);
 
+        // Ring was disconnected
         if (!hubConfig.getRingIsConnected())
         {
-            DBG ("Set ring is connected CASE 1"); // TO DELETE, debug
             hubConfig.setRingIsConnected (true);
-            commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
+            commandManager.invokeDirectly (neova_dash::commands::setStateAndUpdateDashInterface, true);
         }
-        // Notifies Ring is no longer in chargeMode
+        // Ring was in chargeMode
         else if (hubConfig.getRingIsCharging())
         {
             hubConfig.setRingIsCharging (false);
@@ -108,13 +108,16 @@ bool DataReader::readData (String s)
     {
         startTimer (3000);
 
+        // Ring was disconnected
         if (!hubConfig.getRingIsConnected())
         {
-            DBG ("Set ring is connected CASE 2"); // TO DELETE, debug
             hubConfig.setRingIsConnected (true);
-            commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
+            hubConfig.setRingIsCharging (true);
+            commandManager.invokeDirectly (neova_dash::commands::setStateAndUpdateDashInterface, true);
+            commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
         }
-        // Notifies Ring is in ChargeMode
+
+        // Notifies Ring wasn't charging
         else if (!hubConfig.getRingIsCharging())
         {
             hubConfig.setRingIsCharging (true);
