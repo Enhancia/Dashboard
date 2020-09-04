@@ -80,7 +80,6 @@ public:
     	mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get(), hubConfig));
     	dashInterface->grabKeyboardFocus();
     
-    	//dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::waitingForConnection);
 		DBG("POWER STATE : " + String(hubPowerState) + " \n");
     
     	commandManager.registerAllCommandsForTarget (this);
@@ -131,7 +130,25 @@ public:
 				DBG("config received\n");
 				hubConfig.setConfig(data + 12);
 
-				if (hubPowerState != POWER_OFF) hubConfig.notifyConfigWasChanged();
+				if (hubPowerState != POWER_OFF)
+				{
+					if (hubConfig.isWaitingForRingCompatibility() && ((hubConfig.getRingFirmwareVersionUint16() & 0xFF00) >> 8) > 0)
+					{
+						DBG ("TENTATIVE DE VOIR QUE C PA KOMPTBL");
+
+						// Dash was waiting for a valid ring firmware version, which it got !
+						hubConfig.stopWaitingForRingCompatibility();
+
+						commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
+
+						//if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
+						//else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
+					}
+					else
+					{
+						hubConfig.notifyConfigWasChanged();
+					}
+				}
 
 				if (hubPowerState == POWER_OFF)
 				{
@@ -141,9 +158,12 @@ public:
 					hubConfig.setHubIsConnected (true);
 					upgradeHandler->checkForSuccessiveUpgrade();
 
-					if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
-					else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
+					commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
+					
+					//if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
+					//else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
 				}
+
 				if (!dashInterface->hasKeyboardFocus (true))
 				{
 					dashInterface->grabKeyboardFocus();
@@ -195,14 +215,16 @@ public:
 					{
 						hubConfig.setHubIsConnected (true);
 						upgradeHandler->checkForSuccessiveUpgrade();
+						
+						commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
 
-						if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
-						else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
+						//if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
+						//else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
 					}
 					else if (hubPowerState == POWER_OFF)
 					{
 						hubConfig.setHubIsConnected (false);
-						dashInterface->setInterfaceStateAndUpdate(DashBoardInterface::waitingForConnection);
+						commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
 					}
 					else
 					{

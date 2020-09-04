@@ -849,8 +849,7 @@ void HubConfiguration::saveGestureConfig (const GestureData& gestureDataToSave)
 
 void HubConfiguration::checkHUBCompatibility()
 {
-	//jassert (hubIsConnected);
-	// TO DO return if not compatible
+	if (!hubIsConnected) return;
 
 	const int hubMajor = (config.hub_firmware_version & 0xFF00) >> 8;
 	const int ringMajor = ringIsConnected ? (config.ring_firmware_version & 0xFF00) >> 8 : hubMajor;
@@ -866,5 +865,30 @@ void HubConfiguration::checkHUBCompatibility()
 		hubIsCompatible = 1;
 	}
 
-	else hubIsCompatible = -1;
+    else if (hubMajor < neova_dash::compatibility::COMPATIBLE_FIRM ||
+	    	 ringMajor < neova_dash::compatibility::COMPATIBLE_FIRM)
+	{		
+		if (ringIsConnected && ringMajor == 0 && hubMajor == neova_dash::compatibility::COMPATIBLE_FIRM)
+		{
+			// Specific case : HUB sent data before the ring could send its version. The check is
+			// postponed until receiving a configuration with a valid ring version number.
+			waitsForRingCompatibilityCheck = true;
+		}
+		else
+		{
+			hubIsCompatible = -1;
+		}
+	}
+}
+
+bool HubConfiguration::isWaitingForRingCompatibility()
+{
+	return waitsForRingCompatibilityCheck;
+}
+
+void HubConfiguration::stopWaitingForRingCompatibility()
+{
+	waitsForRingCompatibilityCheck = false;
+
+	checkHUBCompatibility();
 }

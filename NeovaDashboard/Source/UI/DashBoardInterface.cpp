@@ -385,6 +385,7 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
 
     commands.addArray ({
                             updateDashInterface,
+							setStateAndUpdateDashInterface,
                             updateInterfaceLEDs,
                             updateBatteryDisplay,
                             allowUserToFlashHub,
@@ -401,6 +402,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
     {
         case updateDashInterface:
             result.setInfo ("Update Full Interface", "Udpates Interface To Current Hub Configuration", "Interface", 0);
+            break;
+        case setStateAndUpdateDashInterface:
+            result.setInfo ("Update State And Interface", "Udpates Interface To Match Current Hub State And Configuration", "Interface", 0);
             break;
         case updateInterfaceLEDs:
             result.setInfo ("Update LEDs", "Udpates Hub LEDs To Current Hub Configuration", "Interface", 0);
@@ -434,6 +438,24 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
         case updateDashInterface:
             update();
 			return true;
+
+        case setStateAndUpdateDashInterface:
+            if (hubConfig.getHubIsConnected())
+            {
+                if (hubConfig.getHubIsCompatibleInt() == 0)
+                {
+                    setInterfaceStateAndUpdate (connected);
+                }
+                else
+                {
+                    setInterfaceStateAndUpdate (incompatible);
+                }
+            }
+            else
+            {
+                setInterfaceStateAndUpdate (waitingForConnection);
+            }
+            return true;
 			
         case updateBatteryDisplay:
             if ((state == int (connected) || state == int (pause)) && hubConfig.getHubIsCompatibleInt() < 0)
@@ -481,7 +503,7 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
 
 void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newState)
 {
-    if (state == int (newState)) return;
+    if (state == int (newState)) return update();
 
     state = int (newState);
 
@@ -523,15 +545,13 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         }
         
         presetSelector->setVisible (false);
-        //midiChannelComponent->setVisible (false);
         hubComponent->setInterceptsMouseClicks (false, false);
-        //optionsPanel->setMidiBoxActive (false);
     }
 
     resized();
     repaint();
 
-    if (state == incompatible)
+    if (state == int (incompatible))
     {
         if (hubConfig.getHubIsCompatibleInt() > 0)
         {

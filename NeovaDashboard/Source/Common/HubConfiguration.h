@@ -182,7 +182,10 @@ public:
     bool getRingIsConnected();
 
     bool getHubIsCompatible();
-    int getHubIsCompatibleInt();
+    int  getHubIsCompatibleInt();
+    
+    bool isWaitingForRingCompatibility();
+    void stopWaitingForRingCompatibility();
 
 private:
     //==============================================================================
@@ -220,12 +223,12 @@ private:
     bool ringIsCharging = false;
     bool ringIsConnected = false;
 
+    //==============================================================================
     int hubIsCompatible = 0;
+    bool waitsForRingCompatibilityCheck = false;
 
     //==============================================================================
 	ConfigData config;
-
-    //==============================================================================
     OwnedArray<GestureData> lastGestureConfig;
     void initialiseLastGestureConfigs();
     void saveGestureConfig (const GestureData& gestureDataToSave);
