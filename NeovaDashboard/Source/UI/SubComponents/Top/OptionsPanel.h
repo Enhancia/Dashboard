@@ -169,6 +169,10 @@ private:
     std::unique_ptr<TextButton> sendReportButton;
 
     //==============================================================================
+    juce::Rectangle<int> contactArea;
+    juce::Rectangle<int> creditsArea;
+    
+    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ContactPanel)
 };
 
