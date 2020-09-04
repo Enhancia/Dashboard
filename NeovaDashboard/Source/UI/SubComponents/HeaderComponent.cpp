@@ -102,8 +102,13 @@ void HeaderComponent::setBatteryVisible (bool shouldBeVisible)
 HeaderComponent::BatteryComponent::BatteryComponent (const float& batteryValRef, HubConfiguration& config)
         : batteryValueRef (batteryValRef), hubConfig (config)
 {
+    lastBattery = jmax (jmin (neova_dash::data::convertRawBatteryToPercentage (batteryValueRef,
+                                             hubConfig.getRingIsCharging()),
+                                      1.0f),
+                                0.0f);
+
     startTimer (30000);
-    launchDelayedRepaint (3000);
+    launchDelayedRepaint (2000);
 }
 
 HeaderComponent::BatteryComponent::~BatteryComponent()
@@ -151,9 +156,7 @@ void HeaderComponent::BatteryComponent::timerCallback()
     if (!waitForRepaint)
     {
         repaintIfNeeded();
-    }
-    
-    DBG ("Header Timer tick, battery : " << lastBattery);
+    }    
 }
 
 void HeaderComponent::BatteryComponent::repaintIfNeeded()
@@ -163,13 +166,17 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded()
                                       1.0f),
                                 0.0f);
 
-
-    if (lastConnectionState && battery == 0.0f)
+    if (batteryValueRef == 3.0f && lastConnectionState)
     {
-        launchDelayedRepaint (500);
+        if (hubConfig.getRingIsCharging() != lastChargeState)
+        {
+            lastChargeState = hubConfig.getRingIsCharging();
+        }
+        // Specific case : ring just got into charging and sends a 0-level battery before computing its actual battery level.
+        launchDelayedRepaint (1000);
     }
 
-    if (battery != lastBattery || hubConfig.getRingIsCharging() != lastChargeState)
+    else if (lastConnectionState && (battery != lastBattery || hubConfig.getRingIsCharging() != lastChargeState))
     {
         lastBattery = battery;
         lastChargeState = hubConfig.getRingIsCharging();
@@ -182,6 +189,7 @@ void HeaderComponent::BatteryComponent::update()
     if (hubConfig.getRingIsConnected() != lastConnectionState)
     {
         lastConnectionState = hubConfig.getRingIsConnected();
+
         repaint();
     }
 
@@ -189,8 +197,7 @@ void HeaderComponent::BatteryComponent::update()
     {
         lastChargeState = hubConfig.getRingIsCharging();
         repaint();
-
-        launchDelayedRepaint (3000);
+        launchDelayedRepaint (1000);
     }
 }
 
@@ -234,7 +241,6 @@ void HeaderComponent::BatteryComponent::drawBatteryPath (Graphics& g, juce::Rect
     auto fillArea = area.withHeight (int ((area.toFloat().getHeight() - 7.0f)*(lastBattery)))
                         .withBottomY (area.getBottom()-3)
                         .reduced (3, 0);
-    bool roundedTop = (lastBattery * area.getHeight() < 2.0f);
 
     g.setColour (neova_dash::colour::mainText);
     //g.strokePath (batteryOut, PathStrokeType (1.0f));
@@ -326,5 +332,6 @@ void HeaderComponent::BatteryComponent::drawRingPath (Graphics& g, juce::Rectang
     g.setColour (neova_dash::colour::mainText);
     g.fillPath (ringPath);
     g.setFont (neova_dash::font::dashFont.withHeight (13.0f));
+    g.setColour (neova_dash::colour::subText);
     g.drawText (":", getLocalBounds(), Justification::centred);
 }

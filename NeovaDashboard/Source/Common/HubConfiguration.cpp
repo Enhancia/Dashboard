@@ -849,7 +849,7 @@ void HubConfiguration::saveGestureConfig (const GestureData& gestureDataToSave)
 
 void HubConfiguration::checkHUBCompatibility()
 {
-	jassert (hubIsConnected);
+	//jassert (hubIsConnected);
 	// TO DO return if not compatible
 
 	const int hubMajor = (config.hub_firmware_version & 0xFF00) >> 8;
