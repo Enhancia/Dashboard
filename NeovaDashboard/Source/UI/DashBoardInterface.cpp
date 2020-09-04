@@ -58,7 +58,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     firmUpgradePanel->setVisible (false);
     firmUpgradePanel->setAlwaysOnTop (true);
     updaterPanel->setAlwaysOnTop (true);
-    updaterPanel->setVisible (updater.hasNewAvailableVersion());
+    if (updater.hasNewAvailableVersion()) updaterPanel->resetAndOpenPanel();
+    else                                  updaterPanel->setVisible (false);
 
     // Sets settings
     juce::Rectangle<int> screenArea  = Desktop::getInstance().getDisplays()
@@ -387,7 +388,8 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
                             updateInterfaceLEDs,
                             updateBatteryDisplay,
                             allowUserToFlashHub,
-                            openFirmUpgradePanel
+                            openFirmUpgradePanel,
+                            openDashboardUpdatePanel
                        });
 }
 
@@ -412,6 +414,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
         case openFirmUpgradePanel:
             result.setInfo ("Open Firm Upgrade Panel", "Opens Panel To Start Firm Upgrade Procedure", "Interface", 0);
 			break;
+        case openDashboardUpdatePanel:
+            result.setInfo ("Open Dashboard Update Panel", "Opens Panel To Start Dash Update Procedure", "Interface", 0);
+            break;
         default:
             break;
     }
@@ -458,6 +463,15 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             }
             
             firmUpgradePanel->setAndOpenPanel();
+            return true;
+
+        case openDashboardUpdatePanel:
+            if (!optionsPanel->isVisible())
+            {
+                optionsPanel->setVisible (true);
+            }
+            
+            updaterPanel->resetAndOpenPanel (hubConfig.getHubIsConnected() && hubConfig.getHubIsCompatibleInt() > 0);
             return true;
 
         default:

@@ -26,19 +26,9 @@ void FirmUpgradePanel::paint (Graphics& g)
 {
     using namespace neova_dash::colour;
     
-    // options panel area
+    // firmware panel area
     g.setColour (topPanelBackground);
-    g.fillRoundedRectangle (panelArea.toFloat(), 10.0f);
-    
-    // options panel outline
-    auto gradOut = ColourGradient::horizontal (Colour (0x10ffffff),
-                                               float (panelArea.getX()), 
-                                               Colour (0x10ffffff),
-                                               float(panelArea.getRight()));
-    gradOut.addColour (0.5, Colour (0x50ffffff));
-
-    g.setGradientFill (gradOut);
-    g.drawRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f, 1.0f);
+    g.fillRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f);
 
     if (currentState > 0 && currentState < upgradeSuccessfull)
     {
@@ -54,7 +44,8 @@ void FirmUpgradePanel::resized()
 	using namespace neova_dash::ui;
 
     //panelArea = getLocalBounds().withSizeKeepingCentre (getLocalBounds().getWidth()/3, getLocalBounds().getHeight()/3);
-    panelArea = getLocalBounds().withSizeKeepingCentre (getLocalBounds().getWidth()*3/5, getLocalBounds().getHeight()*3/5);
+    //panelArea = getLocalBounds().withSizeKeepingCentre (getLocalBounds().getWidth()*3/5, getLocalBounds().getHeight()*3/5);
+    panelArea = getLocalBounds().reduced (getWidth()/5, getHeight()/4);
     
     // Close Button
     #if JUCE_WINDOWS
@@ -285,7 +276,7 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 					upgradeButton->setVisible (hubAvailable || ringAvailable);
 					if (!hubAvailable && !ringAvailable) okButton->setVisible (true);
 
-					titleLabel->setText ("Firmware Update", dontSendNotification);
+					titleLabel->setText ("Firmware Upgrade", dontSendNotification);
     				bodyText->setJustificationType (Justification::centred);
 
 					if (!hubConfig.getHubIsConnected())

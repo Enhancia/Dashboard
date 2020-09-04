@@ -322,7 +322,8 @@ public:
                               upgradeHub,
                               upgradeRing,
                               uploadConfigToHub,
-                              updatePresetModeState
+                              updatePresetModeState,
+                              checkDashboardUpdate
                            });
     }
 
@@ -345,9 +346,14 @@ public:
             case upgradeRing:
                 result.setInfo ("Upgrade Ring Firmware", "Updgrades the ring firmware to the most recent version",
                                                          "Firm Update", 0);
+                break;
             case updatePresetModeState:
                 result.setInfo ("Update Preset Mode State", "Updates Preset Mode To Fit Interface",
                                                             "Hub State Set", 0);
+            	break;
+            case checkDashboardUpdate:
+                result.setInfo ("Check Dashboard Update", "Checks the Dashboard for new updates",
+                                                          "Dashbaord Update", 0);
                 break;
             default:
                 break;
@@ -393,6 +399,11 @@ public:
 
             case upgradeRing:
                 return true;
+
+            case checkDashboardUpdate:
+            	updater->checkForNewAvailableVersion();
+            	commandManager.invokeDirectly (neova_dash::commands::openDashboardUpdatePanel, true);
+            	return true;
 
             default:
                 return false;

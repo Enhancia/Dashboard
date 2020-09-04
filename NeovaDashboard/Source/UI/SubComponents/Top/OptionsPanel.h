@@ -143,6 +143,7 @@ private:
     std::unique_ptr<TextButton> sendReportButton;
     std::unique_ptr<TextButton> contactButton;
     std::unique_ptr<TextButton> upgradeButton;
+    std::unique_ptr<TextButton> updateButton;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OptionsPanel)
@@ -190,7 +191,7 @@ class FirmwarePanel: public Component
 {
 public:
     //==============================================================================
-    FirmwarePanel (HubConfiguration& hubConfiguration, TextButton& button);
+    FirmwarePanel (HubConfiguration& hubConfiguration, TextButton& firmButton, TextButton& softButton);
     ~FirmwarePanel();
 
     //==============================================================================
@@ -198,8 +199,17 @@ public:
     void resized() override;
 private:
     //==============================================================================
+    void paintFirmwareArea (Graphics& g);
+    void paintSoftwareArea (Graphics& g);
+
+    //==============================================================================
     HubConfiguration& hubConfig;
     TextButton& upgradeButton;
+    TextButton& updateButton;
+
+    //==============================================================================
+    juce::Rectangle<int> firmwareArea;
+    juce::Rectangle<int> softwareArea;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FirmwarePanel)
@@ -215,6 +225,7 @@ public:
     //==============================================================================
     void paint (Graphics& g) override;
     void resized() override;
+
 private:
     //==============================================================================
     TextEditor licenseTextEdit;

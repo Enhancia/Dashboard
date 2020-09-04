@@ -16,7 +16,7 @@ UpdaterPanel::UpdaterPanel (DashUpdater& updtr, float& updateProgress) : updater
     createLabels();
     createButtons();
 
-    updateComponentsForSpecificStep (downloadAvailable);
+    updateComponentsForSpecificStep (noDownloadAvailable);
 }
 
 UpdaterPanel::~UpdaterPanel()
@@ -27,26 +27,16 @@ void UpdaterPanel::paint (Graphics& g)
 {
     using namespace neova_dash::colour;
     
-    // options panel area
-    g.setColour (topPanelBackground.withAlpha (0.85f));
-    g.fillRoundedRectangle (panelArea.toFloat(), 10.0f);
-    
-    // options panel outline
-    auto gradOut = ColourGradient::horizontal (Colour (0x10ffffff),
-                                               0.0f, 
-                                               Colour (0x10ffffff),
-                                               float(getWidth()));
-    gradOut.addColour (0.5, Colour (0x50ffffff));
-
-    g.setGradientFill (gradOut);
-    g.drawRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f, 1.0f);
+    // updater panel area
+    g.setColour (topPanelBackground);
+    g.fillRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f);
 }
 
 void UpdaterPanel::resized()
 {
 	using namespace neova_dash::ui;
 
-    panelArea = getLocalBounds().withSizeKeepingCentre (getLocalBounds().getWidth()/3, getLocalBounds().getHeight()/3);
+    panelArea = getLocalBounds().reduced (getWidth()/5, getHeight()/4);
     
     // Close Button
     #if JUCE_WINDOWS
@@ -100,6 +90,9 @@ void UpdaterPanel::buttonClicked (Button* bttn)
 	{
 		switch (currentProgress)
 		{
+			case noDownloadAvailable:
+				closeAndResetPanel();
+				break;
 			case downloadAvailable:
 				updateComponentsForSpecificStep (inProgress);
 				startTimerHz (2);
@@ -133,7 +126,9 @@ void UpdaterPanel::resetAndOpenPanel (bool updateIsRequired)
 	if (currentProgress != inProgress)
 	{
 		if (isTimerRunning ()) stopTimer();
-		updateComponentsForSpecificStep (updateIsRequired ? updateRequired : downloadAvailable);
+		updateComponentsForSpecificStep (updateIsRequired ? updateRequired
+														  : updater.hasNewAvailableVersion() ? downloadAvailable
+														  									 : noDownloadAvailable);
 
 		setVisible (true);
 	}
@@ -146,7 +141,7 @@ void UpdaterPanel::closeAndResetPanel()
 		if (isTimerRunning ()) stopTimer();
 
 		setVisible (false);
-		updateComponentsForSpecificStep (downloadAvailable);
+		updateComponentsForSpecificStep (noDownloadAvailable);
 	}
 }
 
@@ -192,6 +187,17 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 
 	switch (currentProgress)
 	{
+			case noDownloadAvailable:
+				closeButton->setVisible (true);
+				bottomButton->setVisible (true);
+				bottomButton->setButtonText ("Ok");
+
+				titleLabel->setText ("Up to date !", dontSendNotification);
+
+				bodyText->setText ("No new Dashboard version was found.",
+					               dontSendNotification);
+				break;
+
 			case downloadAvailable:
 				closeButton->setVisible (true);
 				bottomButton->setVisible (true);

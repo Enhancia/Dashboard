@@ -17,7 +17,7 @@ OptionsPanel::OptionsPanel (HubConfiguration& config, ApplicationCommandManager&
     TRACE_IN;
 
     createButtons();
-    options.addTab (new FirmwarePanel (hubConfig, *upgradeButton.get()), "Firmware");
+    options.addTab (new FirmwarePanel (hubConfig, *upgradeButton.get(), *updateButton.get()), "Updates");
     options.addTab (new ContactPanel(), "Contact");
     options.addTab (new LegalPanel(), "Legal");
     options.addTab (new LicensePanel(), "EULA");
@@ -122,6 +122,11 @@ void OptionsPanel::buttonClicked (Button* bttn)
     {
         commandManager.invokeDirectly (neova_dash::commands::upgradeHub, true);
     }
+
+    else if (bttn == updateButton.get())
+    {
+        commandManager.invokeDirectly (neova_dash::commands::checkDashboardUpdate, true);
+    }
 }
 
 void OptionsPanel::mouseUp (const MouseEvent& event)
@@ -170,8 +175,11 @@ void OptionsPanel::createButtons()
 
     //Update Firm button
     upgradeButton = std::make_unique <TextButton> ("Check Upgrades");
-    //addAndMakeVisible (*upgradeButton);
     upgradeButton->addListener (this);
+
+    //Update Soft button
+    updateButton = std::make_unique <TextButton> ("Check Updates");
+    updateButton->addListener (this);
 }
 
 void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> area)
@@ -530,10 +538,11 @@ void ContactPanel::buttonClicked (Button* bttn)
 
 // ====================== FirmwarePanel =========================
 
-FirmwarePanel::FirmwarePanel (HubConfiguration& hubConfiguration, TextButton& button)
-  : hubConfig (hubConfiguration), upgradeButton (button)
+FirmwarePanel::FirmwarePanel (HubConfiguration& hubConfiguration, TextButton& firmButton, TextButton& softButton)
+  : hubConfig (hubConfiguration), upgradeButton (firmButton), updateButton (softButton)
 {
     addAndMakeVisible (upgradeButton);
+    addAndMakeVisible (updateButton);
 }
 
 FirmwarePanel::~FirmwarePanel()
@@ -543,10 +552,20 @@ FirmwarePanel::~FirmwarePanel()
 
 void FirmwarePanel::paint (Graphics& g)
 {
-    auto area = getLocalBounds().reduced (neova_dash::ui::MARGIN);
+    paintFirmwareArea (g);
+    paintSoftwareArea (g);
 
-    auto ringArea = area.removeFromLeft (area.getWidth()/2);
-    auto hubArea = area;
+    g.setColour (neova_dash::colour::subText);
+    g.drawVerticalLine (softwareArea.getX(), getHeight() * 1.0 / 8,
+                                             getHeight() * 6.0 / 8);
+}
+
+void FirmwarePanel::paintFirmwareArea (Graphics& g)
+{
+    auto firmAreaTemp = firmwareArea.reduced (neova_dash::ui::MARGIN*2);
+
+    auto ringArea = firmAreaTemp.removeFromLeft (firmAreaTemp.getWidth()/2);
+    auto hubArea = firmAreaTemp;
 
     g.setColour (neova_dash::colour::subText);
     g.setFont (neova_dash::font::dashFont.withHeight (15));
@@ -576,10 +595,39 @@ void FirmwarePanel::paint (Graphics& g)
     g.strokePath (hubPath, {1.0f, PathStrokeType::curved});
 }
 
+void FirmwarePanel::paintSoftwareArea (Graphics& g)
+{
+    auto softAreaTemp = softwareArea.reduced (neova_dash::ui::MARGIN*2);
+
+    g.setColour (neova_dash::colour::subText);
+    g.setFont (neova_dash::font::dashFont.withHeight (15));
+    g.drawFittedText (JUCEApplication::getInstance()->getApplicationVersion(),
+                      softAreaTemp.removeFromBottom (softAreaTemp.getHeight()/3),
+                      Justification::centredTop, 1);
+
+    Path dashPath = neova_dash::path::createPath (neova_dash::path::dashIcon);
+
+    dashPath.scaleToFit (softAreaTemp.reduced (softAreaTemp.getHeight()/4).getX(),
+                         softAreaTemp.reduced (softAreaTemp.getHeight()/4).getY(),
+                         softAreaTemp.reduced (softAreaTemp.getHeight()/4).getWidth(),
+                         softAreaTemp.reduced (softAreaTemp.getHeight()/4).getHeight(),
+                         true);
+
+    g.strokePath (dashPath, {1.0f, PathStrokeType::curved});
+}
+
 void FirmwarePanel::resized()
 {
-    upgradeButton.setBounds (getLocalBounds().withSizeKeepingCentre (upgradeButton.getBestWidthForHeight (30), 30)
-                                             .withBottomY (getLocalBounds().getBottom() - neova_dash::ui::MARGIN));
+    auto area = getLocalBounds().reduced (0, neova_dash::ui::MARGIN);
+
+    firmwareArea = area.removeFromLeft (area.getWidth()/2); 
+    softwareArea = area;
+
+    upgradeButton.setBounds (firmwareArea.withSizeKeepingCentre (upgradeButton.getBestWidthForHeight (30), 30)
+                                         .withBottomY (getLocalBounds().getBottom() - neova_dash::ui::MARGIN));
+
+    updateButton.setBounds (softwareArea.withSizeKeepingCentre (upgradeButton.getBestWidthForHeight (30), 30)
+                                        .withBottomY (getLocalBounds().getBottom() - neova_dash::ui::MARGIN));
 }
 
 // ====================== LegalPanel =========================
