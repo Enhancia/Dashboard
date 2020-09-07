@@ -246,7 +246,7 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 
 				if (updater.wasSuccessful())
 				{
-					bottomButton->setButtonText ("Install");
+					bottomButton->setButtonText ("Start Installer");
 					bodyText->setText ("Successfully downloaded installer!", dontSendNotification);
 				}
 				else
