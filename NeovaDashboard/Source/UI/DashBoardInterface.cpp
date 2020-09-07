@@ -58,8 +58,12 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     firmUpgradePanel->setVisible (false);
     firmUpgradePanel->setAlwaysOnTop (true);
     updaterPanel->setAlwaysOnTop (true);
-    if (updater.hasNewAvailableVersion()) updaterPanel->resetAndOpenPanel();
-    else                                  updaterPanel->setVisible (false);
+    if (updater.hasNewAvailableVersion())
+    {
+        optionsPanel->setVisible (true);
+        updaterPanel->resetAndOpenPanel();
+    }
+    else updaterPanel->setVisible (false);
 
     // Sets settings
     juce::Rectangle<int> screenArea  = Desktop::getInstance().getDisplays()
@@ -267,6 +271,16 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
         {
             gesturePanel->handleKeyPress (key);
         }
+        else if (key == neova_dash::keyboard_shortcut::muteGesture)
+        {
+            if (gesturePanel->hasSelectedGesture())
+            {
+                hubConfig.setUint8Value (hubConfig.getSelectedGesture(),
+                                         HubConfiguration::on,
+                                         (hubConfig.getGestureData (hubConfig.getSelectedGesture()).on == 1) ? 0 : 1);
+                update();
+            }
+        }
         else if (key == neova_dash::keyboard_shortcut::muteGesture1)
         {
             hubConfig.setUint8Value (0,
@@ -311,16 +325,6 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
         else if (key == neova_dash::keyboard_shortcut::displayOptions)
         {
             optionsPanel->setVisible (!optionsPanel->isVisible());
-        }
-        else if (key == neova_dash::keyboard_shortcut::muteGesture)
-        {
-            if (gesturePanel->hasSelectedGesture())
-            {
-                hubConfig.setUint8Value (hubConfig.getSelectedGesture(),
-                                         HubConfiguration::on,
-                                         (hubConfig.getGestureData (hubConfig.getSelectedGesture()).on == 1) ? 0 : 1);
-                update();
-            }
         }
         else if (key == neova_dash::keyboard_shortcut::selectPreviousBank && hubConfig.getSelectedPreset() > 0)
         {
@@ -555,6 +559,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
     {
         if (hubConfig.getHubIsCompatibleInt() > 0)
         {
+            optionsPanel->setVisible (true);
             updaterPanel->resetAndOpenPanel (true);
         }
 

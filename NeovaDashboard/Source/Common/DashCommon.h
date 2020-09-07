@@ -201,10 +201,16 @@ namespace neova_dash
         const KeyPress selectGestureUp       (KeyPress::upKey);
         const KeyPress selectGestureDown     (KeyPress::downKey);
         const KeyPress uploadToHub           ('s', ModifierKeys (ModifierKeys::commandModifier), 's');
+
+        #if JUCE_WINDOWS
         const KeyPress deleteGesture         (KeyPress::deleteKey);
+        #elif JUCE_MAC
+        const KeyPress deleteGesture         (KeyPress::backspaceKey);
+        #endif
+
         const KeyPress duplicateGesture      ('d', ModifierKeys (ModifierKeys::commandModifier), 'd');
         const KeyPress displayOptions        ('o', ModifierKeys (ModifierKeys::commandModifier), 'o');
-        const KeyPress muteGesture           ('m', ModifierKeys (ModifierKeys::commandModifier), 'm');
+        const KeyPress muteGesture           (KeyPress::spaceKey);
         const KeyPress selectNextBank        (KeyPress::rightKey, ModifierKeys (ModifierKeys::commandModifier), 0);
         const KeyPress selectPreviousBank    (KeyPress::leftKey, ModifierKeys (ModifierKeys::commandModifier), 0);
         const KeyPress selectBank1           ('1', ModifierKeys (ModifierKeys::commandModifier), '1');

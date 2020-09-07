@@ -103,11 +103,12 @@ void OneRangeTuner::resizeButtons()
 {
     using namespace neova_dash::ui;
 
-    auto buttonsArea = getLocalBounds().reduced (0, 2*MARGIN)
-									   .withLeft (getLocalBounds().getRight() - 70);
+    auto buttonsArea = getLocalBounds().withLeft (getLocalBounds().getRight() - 80)
+                                       .withHeight (70)
+                                       .reduced (MARGIN);
 
-    maxAngleButton->setBounds (buttonsArea.removeFromTop (35).reduced (MARGIN/2));
-    minAngleButton->setBounds (buttonsArea.removeFromTop (35).reduced (MARGIN/2));
+    maxAngleButton->setBounds (buttonsArea.removeFromTop (buttonsArea.getHeight()/2).withTrimmedBottom (MARGIN/2));
+    minAngleButton->setBounds (buttonsArea.withTrimmedTop (MARGIN/2));
 }
     
 void OneRangeTuner::updateComponents()

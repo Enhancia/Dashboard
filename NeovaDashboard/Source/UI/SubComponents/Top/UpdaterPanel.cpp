@@ -52,12 +52,9 @@ void UpdaterPanel::resized()
 
     titleLabel->setBounds (area.removeFromTop (area.getHeight()/5));
 
-    int buttonHeight = area.getHeight()/5;
-
-    bottomButton->setBounds (area.removeFromBottom (buttonHeight)
-                                .withSizeKeepingCentre
-                                    (bottomButton->getBestWidthForHeight (buttonHeight),
-                                     buttonHeight));
+    auto buttonArea = area.removeFromBottom (jmin (area.getHeight()/5, 40));
+    bottomButton->setBounds (buttonArea.withSizeKeepingCentre (bottomButton->getBestWidthForHeight (buttonArea.getHeight()),
+                                     						   buttonArea.getHeight()));
 
     bodyText->setBounds (area.reduced (neova_dash::ui::MARGIN));
 }
@@ -75,7 +72,7 @@ void UpdaterPanel::timerCallback()
 		return;
 	}
 
-	bodyText->setText (String (int (progress*100)) + " %", dontSendNotification);
+	bodyText->setText ("Progress :\n\n" + String (int (progress*100)) + " %", dontSendNotification);
 }
 
 
@@ -149,6 +146,7 @@ void UpdaterPanel::createLabels()
 {
     titleLabel.reset (new Label ("Title Label", ""));
     addAndMakeVisible (*titleLabel);
+    titleLabel->setFont (neova_dash::font::dashFontBold.withHeight (25.0f));
     titleLabel->setJustificationType (Justification::centred);
 
     bodyText.reset (new Label ("Body Text", ""));
@@ -192,7 +190,7 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 				bottomButton->setVisible (true);
 				bottomButton->setButtonText ("Ok");
 
-				titleLabel->setText ("Up to date !", dontSendNotification);
+				titleLabel->setText ("Dashboard up to date", dontSendNotification);
 
 				bodyText->setText ("No new Dashboard version was found.",
 					               dontSendNotification);
@@ -203,9 +201,10 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 				bottomButton->setVisible (true);
 				bottomButton->setButtonText ("Download");
 
-				titleLabel->setText ("New Dashboard Version Available !", dontSendNotification);
+				titleLabel->setText ("Dashboard Update", dontSendNotification);
 
-				bodyText->setText ("Current : " + JUCEApplication::getInstance()->getApplicationVersion()
+				bodyText->setText ("A new Dashboard version is available!\n\n\n"
+								   "Current : " + JUCEApplication::getInstance()->getApplicationVersion()
 												+ "\n\nNew : " + updater.getLatestVersionString(),
 					               dontSendNotification);
 				break;
@@ -216,17 +215,18 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 				bottomButton->setVisible (updater.hasNewAvailableVersion());
 				bottomButton->setButtonText ("Download");
 
-				titleLabel->setText ("Your Dashboard needs to be updated to be compatible with Neova!", dontSendNotification);
+				titleLabel->setText ("Dashboard Update (Required)", dontSendNotification);
 				
 				if (updater.hasNewAvailableVersion())
 				{
-					bodyText->setText ("Current : " + JUCEApplication::getInstance()->getApplicationVersion()
+					bodyText->setText ("Your Dashboard is outdated! Please update your Dashboard to use it with your Neova product.\n\n\n"
+									   "Current : " + JUCEApplication::getInstance()->getApplicationVersion()
 													+ "\n\nNew : " + updater.getLatestVersionString(),
 						               dontSendNotification);
 				}
 				else
 				{
-					bodyText->setText ("No new version was found. Make sure you have an internet connection and try again.",
+					bodyText->setText ("No up-to-date version found.\n\nMake sure you are connected to internet and try again.",
 						               dontSendNotification);
 				}
 				break;
@@ -235,14 +235,14 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 				closeButton->setVisible (false);
 				bottomButton->setVisible (false);
 
-				titleLabel->setText ("Download In Progress . . .", dontSendNotification);
-				bodyText->setText ("Waiting to download", dontSendNotification);
+				titleLabel->setText ("Downloading  . . .", dontSendNotification);
+				bodyText->setText ("Preparing download", dontSendNotification);
 				break;
 
 			case downloadFinished:
 				closeButton->setVisible (true);
 				bottomButton->setVisible (true);
-				titleLabel->setText ("Download ended", dontSendNotification);
+				titleLabel->setText ("Download Finished", dontSendNotification);
 
 				if (updater.wasSuccessful())
 				{
@@ -258,4 +258,6 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 			default:
 				break;
 	}
+
+	resized();
 }

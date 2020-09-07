@@ -95,15 +95,18 @@ void TwoRangeTuner::resizeButtons()
 {
     using namespace neova_dash::ui;
 
-    auto buttonsAreaLeft = getLocalBounds().reduced (0, 2*MARGIN)
-                                           .withRight (getLocalBounds().getX() + 70);
-    auto buttonsAreaRight = getLocalBounds().reduced (0, 2*MARGIN)
-                                            .withLeft (getLocalBounds().getRight() - 70);
+    auto buttonsAreaLeft = getLocalBounds().withRight (getLocalBounds().getX() + 80)
+                                           .withHeight (70)
+                                           .reduced (MARGIN);
 
-    maxLeftAngleButton->setBounds (buttonsAreaLeft.removeFromTop (35).reduced (MARGIN/2));
-    minLeftAngleButton->setBounds (buttonsAreaLeft.removeFromTop (35).reduced (MARGIN/2));
-    maxRightAngleButton->setBounds (buttonsAreaRight.removeFromTop (35).reduced (MARGIN/2));
-    minRightAngleButton->setBounds (buttonsAreaRight.removeFromTop (35).reduced (MARGIN/2));
+    auto buttonsAreaRight = getLocalBounds().withLeft (getLocalBounds().getRight() - 80)
+                                            .withHeight (70)
+                                            .reduced (MARGIN);
+
+    maxLeftAngleButton->setBounds (buttonsAreaLeft.removeFromTop (buttonsAreaLeft.getHeight()/2).withTrimmedBottom (MARGIN/2));
+    minLeftAngleButton->setBounds (buttonsAreaLeft.withTrimmedTop (MARGIN/2));
+    maxRightAngleButton->setBounds (buttonsAreaRight.removeFromTop (buttonsAreaRight.getHeight()/2).withTrimmedBottom (MARGIN/2));
+    minRightAngleButton->setBounds (buttonsAreaRight.withTrimmedTop (MARGIN/2));
 }
 
 void TwoRangeTuner::updateComponents()

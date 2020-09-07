@@ -169,6 +169,7 @@ private:
     std::unique_ptr<TextButton> sendReportButton;
 
     //==============================================================================
+    juce::Rectangle<int> aboutArea;
     juce::Rectangle<int> contactArea;
     juce::Rectangle<int> creditsArea;
     

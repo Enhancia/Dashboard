@@ -17,7 +17,7 @@ OptionsPanel::OptionsPanel (HubConfiguration& config, ApplicationCommandManager&
     TRACE_IN;
 
     createButtons();
-    options.addTab (new ContactPanel(), "Contact");
+    options.addTab (new ContactPanel(), "About");
     options.addTab (new FirmwarePanel (hubConfig, *upgradeButton.get(), *updateButton.get()), "Updates");
     options.addTab (new LegalPanel(), "Legal");
     //options.addTab (new LicensePanel(), "EULA");
@@ -286,7 +286,7 @@ void OptionsPanel::TabbedOptions::paint (Graphics& g)
     using namespace neova_dash::ui;
 
     g.setColour (neova_dash::colour::topPanelBackground.brighter (0.03f));
-    g.fillRect (getLocalBounds());
+    g.fillRect (panelArea);
 
     auto area = tabsArea;
 
@@ -298,6 +298,9 @@ void OptionsPanel::TabbedOptions::paint (Graphics& g)
 
             if (i == selectedTab)
             {
+                g.setColour (neova_dash::colour::topPanelBackground.brighter (0.03f));
+                g.fillRect (tabArea);
+
                 g.setColour (neova_dash::colour::mainText);
                 g.fillRect ((style == tabsVertical) ? tabArea.withWidth (3)
                                                     : tabArea.withHeight (3));
@@ -443,7 +446,7 @@ void OptionsPanel::TabbedOptions::buttonClicked (Button* bttn)
 ContactPanel::ContactPanel()
 {
     //Contact button
-    contactButton = std::make_unique <TextButton> ("Visit Website");
+    contactButton = std::make_unique <TextButton> ("Enhancia's Website");
     addAndMakeVisible (*contactButton);
     contactButton->addListener (this);
 
@@ -459,28 +462,46 @@ ContactPanel::~ContactPanel()
 
 void ContactPanel::paint (Graphics& g)
 {
+    g.setFont (neova_dash::font::dashFont.withHeight (17));
+    g.setColour (neova_dash::colour::subText);
+
+    String osString;
+    #if JUCE_WINDOWS
+    osString = "Win x64";
+    #elif JUCE_MAC
+    osString = "MacOS";
+    #endif
+
+    g.drawText ("Dashboard - Neova " + JUCEApplication::getInstance()->getApplicationVersion()
+                                            + " " + osString
+                                            + "  |  Copyright 2020 Enhancia, inc.",
+                      aboutArea,
+                      Justification::centred);
+
     g.setColour (neova_dash::colour::mainText);
-    g.setFont (neova_dash::font::dashFont.withHeight (14));
 
     /*g.drawText ("Dashboard Credits :\n\n",
                 creditsArea,
                 Justification::topLeft);*/
 
+    g.setFont (neova_dash::font::dashFont.withHeight (13));
     g.setColour (neova_dash::colour::subText);
-    g.drawFittedText ("Alex LEVACHER (Dev), Mathieu HERBELOT (Dev)\nMario VIOLA (UI), Damien LE BOULAIRE (UX)\n",
+    g.drawFittedText ("Dev : Alex LEVACHER, Mathieu HERBELOT | UI : Mario VIOLA | UX : Damien LE BOULAIRE\n",
                       creditsArea,
                       Justification::centred,
-                      4);
+                      1);
 
+    /*g.setFont (neova_dash::font::dashFont.withHeight (15));
     g.setColour (neova_dash::colour::mainText);
-    g.drawText ("Contact ENHANCIA :\n\n", contactArea, Justification::topLeft); 
+    g.drawText ("Contact ENHANCIA :\n\n", contactArea, Justification::topLeft);*/
 }
 
 void ContactPanel::resized()
 {
-    auto area = getLocalBounds().reduced (2*neova_dash::ui::MARGIN, 0).withTrimmedTop (getHeight()/5);
+    auto area = getLocalBounds().reduced (2*neova_dash::ui::MARGIN, 0).withTrimmedTop (neova_dash::ui::MARGIN);
 
-    contactArea = area.removeFromTop (area.getHeight()*2/3);
+    aboutArea = area.removeFromTop (area.getHeight()/3);
+    contactArea = area.removeFromTop (area.getHeight()/2);
     creditsArea = area;
 
     auto contactAreaTemp = contactArea;
@@ -531,7 +552,7 @@ void ContactPanel::buttonClicked (Button* bttn)
 
     else if (bttn == contactButton.get())
     {
-        URL ("https://www.enhancia.co").launchInDefaultBrowser();
+        URL ("https://www.enhancia-music.com").launchInDefaultBrowser();
     }
 }
 
