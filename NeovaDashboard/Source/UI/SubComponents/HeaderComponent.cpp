@@ -106,9 +106,11 @@ HeaderComponent::BatteryComponent::BatteryComponent (const float& batteryValRef,
                                              hubConfig.getRingIsCharging()),
                                       1.0f),
                                 0.0f);
+    lastConnectionState = hubConfig.getRingIsConnected();
 
     startTimer (int (batteryCheckTimer), 30000);
-    //startTimer (int (blinkTimer), 1000);
+    if (lastConnectionState) startTimer (int (blinkTimer), 1000);
+
     launchDelayedRepaint (2000);
 }
 
@@ -120,9 +122,9 @@ HeaderComponent::BatteryComponent::~BatteryComponent()
 
 void HeaderComponent::BatteryComponent::paint (Graphics& g)
 {
-	  g.setColour (neova_dash::colour::mainText);
+	g.setColour (neova_dash::colour::mainText);
 
-	  auto area = getLocalBounds().reduced(neova_dash::ui::MARGIN);
+	auto area = getLocalBounds().reduced(neova_dash::ui::MARGIN);
 
     drawRingPath (g, area.removeFromLeft (area.getWidth()/4).reduced (3).toFloat());
 
@@ -131,13 +133,13 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
 
     indicatorsArea = area.withTrimmedLeft (neova_dash::ui::MARGIN);
 
-    if (lastConnectionState)
-    {
-        drawBatteryPath (g, indicatorsArea.toFloat());
-    }
+	if (lastConnectionState)
+	{
+		drawBatteryPath(g, indicatorsArea.toFloat());
+	}
     else
     {
-        drawConnectedPath (g, indicatorsArea.withSizeKeepingCentre (30, area.getHeight()*3/4)
+        drawConnectedPath (g, indicatorsArea.withSizeKeepingCentre (15, area.getHeight()*3/4)
                                             .toFloat());
     }
     
@@ -162,7 +164,7 @@ void HeaderComponent::BatteryComponent::timerCallback (int timerID)
         repaintIfNeeded();
     }    
     else if (timerID == int (blinkTimer))
-    {
+    {         
         blinkState = !blinkState;
         repaintBlinkingIndicators();
     }    
@@ -175,7 +177,10 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded()
                                       1.0f),
                                 0.0f);
 
-    DBG ("Computing battery level\nRaw     " << batteryValueRef << "\nRounded " << battery);
+    DBG ("----------------\nComputing battery level\nRaw      " << batteryValueRef
+                << "\nRounded  " << battery
+                << "\nCharging " << (lastChargeState ? "Yes" : "No")
+                << "\n----------------");
 
     if (batteryValueRef == 3.0f && lastConnectionState)
     {
@@ -186,7 +191,7 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded()
 
         numBlinkingIndicators = (!lastChargeState && lastBattery == 0.0f) ? 4
                                                                           : (lastChargeState && lastBattery != 1.0f) ? 1
-                                                                                                                     : 0;
+                                                                          : 0;
 
         // Specific case : ring just got into charging and sends a 0-level battery before computing its actual battery level.
         launchDelayedRepaint (500);
@@ -198,13 +203,39 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded()
         lastChargeState = hubConfig.getRingIsCharging();
         
         numIndicators = battery < 0.0f ? 0
-                                       : battery < 0.2f ? 1
-                                                        : battery < 0.4 ? 2
-                                                                        : battery < 0.7 ? 3
-                                                                                        : 4;
+                            : (battery == 0.0f && !lastChargeState) ? 4
+                            : battery < 0.2f ? 1
+                            : battery < 0.4 ? 2
+                            : battery < 0.7 ? 3
+                            : 4;
+
         numBlinkingIndicators = (!lastChargeState && lastBattery == 0.0f) ? 4
                                                                           : (lastChargeState && lastBattery != 1.0f) ? 1
-                                                                                                                     : 0;
+                                                                          : 0;
+        repaint();
+    }
+
+    else if (hubConfig.getRingIsConnected() != lastConnectionState)
+    {
+        lastConnectionState = hubConfig.getRingIsConnected();
+
+        if (lastConnectionState) startTimer (int (blinkTimer), 1000);
+        else                     stopTimer (int (blinkTimer));
+        
+        if (lastConnectionState)
+        {
+            numIndicators = battery < 0.0f ? 0
+                                : (battery == 0.0f && !lastChargeState) ? 4
+                                : battery < 0.2f ? 1
+                                : battery < 0.4 ? 2
+                                : battery < 0.7 ? 3
+                                : 4;
+
+            numBlinkingIndicators = (!lastChargeState && lastBattery == 0.0f) ? 4
+                                                                              : (lastChargeState && lastBattery != 1.0f) ? 1
+                                                                              : 0;
+        }
+
         repaint();
     }
 }
@@ -229,18 +260,13 @@ void HeaderComponent::BatteryComponent::update()
 {
     if (hubConfig.getRingIsConnected() != lastConnectionState)
     {
-        lastConnectionState = hubConfig.getRingIsConnected();
-
-        if (lastConnectionState) startTimer (int (blinkTimer), 1000);
-        else                     stopTimer (int (blinkTimer));
-
-        repaint();
+        repaintIfNeeded();
     }
 
     if (hubConfig.getRingIsCharging() != lastChargeState)
     {
-        lastChargeState = hubConfig.getRingIsCharging();
-        repaint();
+        repaintIfNeeded();
+        repaint (getLocalBounds().withRight (15));
         launchDelayedRepaint (1000);
     }
 }
@@ -278,7 +304,7 @@ void HeaderComponent::BatteryComponent::drawBatteryPath (Graphics& g, juce::Rect
 {
     const Colour fillColour = lastBattery < 0.2f ? Colours::red
                                                  : lastBattery < 0.4f ? Colours::yellow
-                                                                      : Colours::lime;
+                                                 : Colours::lime;
 
     const int indicatorAreaWidth = area.getWidth()/4;
 
@@ -286,7 +312,7 @@ void HeaderComponent::BatteryComponent::drawBatteryPath (Graphics& g, juce::Rect
     {
         auto indicatorArea = area.removeFromLeft (indicatorAreaWidth);
 
-        if (indicator < numIndicators)
+        if (indicator < numIndicators || numBlinkingIndicators == 4)
         {
             // Blinking fill
             if (numBlinkingIndicators == 4 || (numBlinkingIndicators == 1 && indicator == numIndicators-1))
@@ -307,12 +333,6 @@ void HeaderComponent::BatteryComponent::drawBatteryPath (Graphics& g, juce::Rect
         }
         
         g.fillEllipse (indicatorArea.withSizeKeepingCentre (4, 4));
-
-        if (lastChargeState)
-        {
-            g.setColour (Colours::white.withAlpha (0.2f));
-            g.drawEllipse (indicatorArea.withSizeKeepingCentre (4, 4), 1.0f);
-        }
     }
 }
 
@@ -367,6 +387,14 @@ void HeaderComponent::BatteryComponent::drawRingPath (Graphics& g, juce::Rectang
                          true);
 
     g.setColour (neova_dash::colour::mainText);
+
+    if (lastChargeState)
+    {
+        auto zipzoopArea = area.withSizeKeepingCentre (7.0f, 20.0f)
+                                         .withX (area.getX() - 7.0f);
+		//g.drawRect(zipzoopArea, 1.0f);
+        drawLightningPath (ringPath, zipzoopArea);
+    }
+
     g.fillPath (ringPath);
-    g.setFont (neova_dash::font::dashFont.withHeight (13.0f));
 }
