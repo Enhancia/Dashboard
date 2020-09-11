@@ -26,12 +26,12 @@ namespace neova_dash
     	enum commandIDs
     	{
             // Backend commands
-            flashHub                 = 0x00000001, // Writes Temp Hub Config To Its Memory
-            upgradeHub               = 0x00000002, // Upgrades Hub Firm
-            upgradeRing              = 0x00000003, // Upgrades Ring Firm
-            uploadConfigToHub        = 0x00000004, // Uploads config to HUB
-            updatePresetModeState    = 0x00000005, // Updates the backend preset mode to fit the interface
-            checkDashboardUpdate     = 0x00000006, // checks database for new dashboard updates
+            flashHub                    = 0x00000001, // Writes Temp Hub Config To Its Memory
+            upgradeHub                  = 0x00000002, // Upgrades Hub Firm
+            upgradeRing                 = 0x00000003, // Upgrades Ring Firm
+            uploadConfigToHub           = 0x00000004, // Uploads config to HUB
+            updatePresetModeState       = 0x00000005, // Updates the backend preset mode to fit the interface
+            checkDashboardUpdate        = 0x00000006, // checks database for new dashboard updates
 
             // Frontend commands
             updateDashInterface             = 0x01000001, // Updates Dash interface to match the HUB data
@@ -40,7 +40,8 @@ namespace neova_dash
             updateBatteryDisplay            = 0x01000004, // Updates the battery display in the header
             allowUserToFlashHub             = 0x01000005, // Updates upload button after config was changed
             openFirmUpgradePanel            = 0x01000006, // Launches the firm upgrade panel
-            openDashboardUpdatePanel        = 0x01000007  // Launches the soft update panel
+            openDashboardUpdatePanel        = 0x01000007, // Launches the soft update panel
+            checkAndUpdateNotifications     = 0x01000008  // Updates and looks for data that should trigger notifications on the interface
     	};
     };
 
@@ -83,11 +84,14 @@ namespace neova_dash
         const Colour topPanelTransparentArea(0xc0000005);
         const Colour headerBackground       (0xff464646);
         const Colour uploadButtonBackground (0xff565656);
+        const Colour notificationBubble     (0xffff7200);
+
         const Colour emptySlotOutline       (0xff808080);
         const Colour emptySlotBackground    (0x10808080);
         const Colour gestureHeader          (0xff636363);
         const Colour gestureBackground      (0xff353535);
         const Colour gestureBackground2     (0xff2c2c2c);
+
         const Colour mainText               (0xfff0f0f0);
         const Colour subText                (0x80f0f0f0);
 

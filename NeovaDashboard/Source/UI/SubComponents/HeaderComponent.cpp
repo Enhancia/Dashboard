@@ -68,6 +68,7 @@ void HeaderComponent::createButton()
     optionsButton = std::make_unique <DashShapeButton> ("Open Options Button",
                                                        Colour(0),
                                                        neova_dash::colour::mainText);
+    optionsButton->setComponentID ("optionsButton");
     addAndMakeVisible (*optionsButton);
 
     optionsButton->setShape (neova_dash::path::createPath (neova_dash::path::options),
@@ -129,7 +130,6 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
     if (lastConnectionState)
     {
         drawBatteryPath (g, batteryArea.toFloat());
-
     }
     else
     {

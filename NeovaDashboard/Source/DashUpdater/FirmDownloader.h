@@ -17,7 +17,7 @@
 /**
     \class  FirmDownloader FirmDownloader.h
  
-    \brief  Manages checking for updates and downloading the newest installer.
+    \brief  Manages checking for updates and downloading the newest firmware.
 */
 class FirmDownloader : public URL::DownloadTask::Listener,
 					   public Timer
@@ -39,7 +39,7 @@ public:
     };
 
 	//==============================================================================
-	FirmDownloader();
+	FirmDownloader (ApplicationCommandManager& manager);
 	~FirmDownloader();
 
     //==============================================================================
@@ -114,6 +114,9 @@ private:
 
     //==============================================================================
     std::unique_ptr<URL::DownloadTask> downloadTask;
+
+    //==============================================================================
+    ApplicationCommandManager& commandManager;
 
     //==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FirmDownloader)

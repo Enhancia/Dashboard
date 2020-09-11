@@ -66,7 +66,7 @@ public:
 
 		upgradeHandler = std::make_unique<UpgradeHandler>(*dashPipe, hubConfig, commandManager);
 		updater = std::make_unique<DashUpdater>();
-		firmDownloader = std::make_unique<FirmDownloader>();
+		firmDownloader = std::make_unique<FirmDownloader> (commandManager);
 
 		/* Test if hub is already connected */
 		/* For testing */
@@ -374,6 +374,10 @@ public:
                                                             "Hub State Set", 0);
             	break;
             case checkDashboardUpdate:
+                result.setInfo ("Check Dashboard Update", "Checks the Dashboard for new updates",
+                                                          "Dashbaord Update", 0);
+                break;
+            case checkAndUpdateNotifications:
                 result.setInfo ("Check Dashboard Update", "Checks the Dashboard for new updates",
                                                           "Dashbaord Update", 0);
                 break;
