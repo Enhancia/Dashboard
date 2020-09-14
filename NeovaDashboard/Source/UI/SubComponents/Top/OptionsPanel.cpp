@@ -291,7 +291,8 @@ void OptionsPanel::setUpdateTabAlertCount()
 {
     int alertCount = 0;
 
-    if (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16())
+    if ((upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16())
+            && hubConfig.getHubIsConnected())
     {
         alertCount++; // Hub upgrade
     }
@@ -679,7 +680,7 @@ void UpdateAndUpgradePanel::paintFirmwareArea (Graphics& g)
 
     const int notificationRadius = 10;
     g.setColour (neova_dash::colour::notificationBubble);
-    if ((upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16()))
+    if ((upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16()) && hubConfig.getHubIsConnected())
     {
         g.fillEllipse (hubArea.withTrimmedTop (hubArea.getHeight()*2/3)
                                .withTrimmedLeft (hubArea.getWidth()*2/3)

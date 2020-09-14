@@ -111,14 +111,15 @@ void DashBoardInterface::paintOverChildren (Graphics& g)
 {
     if (!optionsPanel->isVisible())
     {    
-        const bool hubUpgradeAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16());
+        const bool hubUpgradeAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16())  && hubConfig.getRingIsConnected();
         const bool ringUpgradeAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected();
      
         if (hubUpgradeAvailable || ringUpgradeAvailable || updater.hasNewAvailableVersion()) // if Dash Update or Firm Upgrade available
         {
             int alertCount = 0;
 
-            if (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16())
+            if ((upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16())
+                    && hubConfig.getHubIsConnected())
                 alertCount++; // Hub upgrade
             
             if ((upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16())

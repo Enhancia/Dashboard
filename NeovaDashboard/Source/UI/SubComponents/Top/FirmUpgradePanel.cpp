@@ -134,7 +134,7 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 
 	else if (bttn == upgradeButton.get())
 	{
-		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16());
+		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16() && hubConfig.getHubIsConnected());
 		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16() && hubConfig.getRingIsConnected());
 
 		currentUpgrade = (!ringAvailable && hubAvailable) ? hub : ring;
@@ -262,7 +262,7 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 	}
 	else
 	{
-		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16());
+		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16()) && hubConfig.getHubIsConnected();
 		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected();
 
 		closeButton->setVisible (false);
