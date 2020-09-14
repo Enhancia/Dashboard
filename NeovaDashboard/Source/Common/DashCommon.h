@@ -121,13 +121,17 @@ namespace neova_dash
             if (rawBatteryValue < 3.46f && !isCharging) return 0.0f;
             else if (rawBatteryValue > 4.12 && isCharging) return 1.0f;
 
-            Array<float> batteryTiers ( {3.52f, 3.58f, 3.61f, 3.64f, 3.69f,
-                                          3.76f, 3.84f, 3.92f, 4.01f, 4.12f});
+            const float cutThresh = 3.46f;
+            Array<float> batteryTiers ( {3.52f, 3.58f, 3.61f, 3.64f,
+                                         3.69f, 3.76f, 3.84f, 3.92f, 4.01f, 4.12f});
 
-            float battery = isCharging ? 0.0f : 0.1f;
+            // Standard behaviour
+            float battery = 0.0f;
 
             for (float batteryTier : batteryTiers)
             {
+                if (isCharging && batteryTier == batteryTiers[0]) continue; // Skips 1st check if ring is charging, 1st level is 2nd battery tier
+
                 if (rawBatteryValue > batteryTier)
                 {
                     battery += 0.1f;

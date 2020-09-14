@@ -42,9 +42,16 @@ public:
 
 private:
 	class BatteryComponent : public Component,
-                             public Timer
+                             public MultiTimer
 	{
 	public:
+        //==========================================================================
+        enum timerIds
+        {
+            batteryCheckTimer = 0,
+            blinkTimer = 1
+        };
+
 		//==========================================================================
 		BatteryComponent (const float& batteryValRef, HubConfiguration& config);
 		~BatteryComponent();
@@ -54,16 +61,18 @@ private:
 		void resized() override { repaint(); }
 
         //==========================================================================
-        void timerCallback() override;
+        void timerCallback (int timerID) override;
         
         //==========================================================================
         void repaintIfNeeded();
+        void repaintBlinkingIndicators();
         void update();
 
 		//==========================================================================
 		const float& batteryValueRef;
 
 	private:
+
         //==========================================================================
         void launchDelayedRepaint (const int delayMs);
         void drawLightningPath (Path& path, juce::Rectangle<float> area);
@@ -77,7 +86,13 @@ private:
         HubConfiguration& hubConfig;
         bool lastChargeState = false;
         bool lastConnectionState = false;
+
+        //==========================================================================
         float lastBattery = -1.0f;
+        int numIndicators = 0;
+        int numBlinkingIndicators = 0;
+        juce::Rectangle<int> indicatorsArea;
+        bool blinkState = false;
 
 		//==========================================================================
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BatteryComponent)
