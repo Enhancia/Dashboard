@@ -84,7 +84,7 @@ namespace neova_dash
         const Colour topPanelTransparentArea(0xc0000005);
         const Colour headerBackground       (0xff464646);
         const Colour uploadButtonBackground (0xff565656);
-        const Colour notificationBubble     (0xffff7200);
+        const Colour notificationBubble     (0xff8090f0);
 
         const Colour emptySlotOutline       (0xff808080);
         const Colour emptySlotBackground    (0x10808080);

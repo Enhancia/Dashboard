@@ -134,7 +134,7 @@ void DashBoardInterface::paintOverChildren (Graphics& g)
 
             // Paint Alert Number
             g.setColour (neova_dash::colour::mainText);
-            g.setFont (neova_dash::font::dashFontBold.withHeight (12.0f));
+            g.setFont (neova_dash::font::dashFontBold.withHeight (15.0f));
             g.drawText (String (alertCount), notificationArea, Justification::centred);
         }
     }
@@ -233,7 +233,7 @@ void DashBoardInterface::resized()
     uploadButton->setBounds (area.withSize (jmax (140, area.getWidth()/7 + 40), area.getHeight()*6/10)
                                  .withSizeKeepingCentre (jmax (140, area.getWidth()/7 + 40), HEADER_HEIGHT));
 
-    notificationArea = juce::Rectangle<int> (15, 15).withCentre (getLocalPoint (header->findChildWithID ("optionsButton"),
+    notificationArea = juce::Rectangle<int> (18, 18).withCentre (getLocalPoint (header->findChildWithID ("optionsButton"),
                                                                                 header->findChildWithID ("optionsButton")
                                                                                       ->getBounds()
                                                                                       .getCentre()
