@@ -11,7 +11,8 @@
 #include "UpdaterPanel.h"
 
 //==============================================================================
-UpdaterPanel::UpdaterPanel (DashUpdater& updtr, float& updateProgress) : updater (updtr), progress (updateProgress)
+UpdaterPanel::UpdaterPanel (DashUpdater& updtr, ApplicationCommandManager& manager, float& updateProgress)
+	: updater (updtr), progress (updateProgress), commandManager (manager)
 {
     createLabels();
     createButtons();
@@ -139,6 +140,8 @@ void UpdaterPanel::closeAndResetPanel()
 
 		setVisible (false);
 		updateComponentsForSpecificStep (noDownloadAvailable);
+
+    	commandManager.invokeDirectly (neova_dash::commands::checkAndUpdateNotifications, true);
 	}
 }
 

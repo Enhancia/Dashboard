@@ -11,18 +11,20 @@
 #include "OptionsPanel.h"
 
 //==============================================================================
-OptionsPanel::OptionsPanel (HubConfiguration& config, ApplicationCommandManager& manager)
-    : hubConfig (config), commandManager (manager)
+OptionsPanel::OptionsPanel (HubConfiguration& config, DashUpdater& updtr, UpgradeHandler& handler, ApplicationCommandManager& manager)
+    : hubConfig (config), commandManager (manager), updater (updtr), upgradeHandler (handler)
 {
     TRACE_IN;
 
     createButtons();
     options.addTab (new ContactPanel(), "About");
-    options.addTab (new FirmwarePanel (hubConfig, *upgradeButton.get(), *updateButton.get()), "Updates");
+    options.addTab (new UpdateAndUpgradePanel (hubConfig, updater, upgradeHandler,
+											   *upgradeButton.get(), *updateButton.get()), "Updates");
     options.addTab (new LegalPanel(), "Legal");
     //options.addTab (new LicensePanel(), "EULA");
 
 	addAndMakeVisible (options);
+    setUpdateTabAlertCount();
 }
 
 OptionsPanel::~OptionsPanel()
@@ -139,11 +141,14 @@ void OptionsPanel::mouseUp (const MouseEvent& event)
 
 void OptionsPanel::visibilityChanged()
 {
+    if (isVisible()) setUpdateTabAlertCount();
 }
 
 void OptionsPanel::update()
 {
-    if (!hubConfig.getHubIsConnected() || hubConfig.getHubIsCompatibleInt() > 0)
+    if (!hubConfig.getHubIsConnected() || hubConfig.getHubIsCompatibleInt() > 0
+                                       || (upgradeHandler.getHubReleaseVersion() <= hubConfig.getHubFirmwareVersionUint16()
+                                             && upgradeHandler.getRingReleaseVersion() <= hubConfig.getRingFirmwareVersionUint16()))
     {
         upgradeButton->setInterceptsMouseClicks (false, false);
         upgradeButton->setOpaque (false);
@@ -154,6 +159,21 @@ void OptionsPanel::update()
         upgradeButton->setInterceptsMouseClicks (true, false);
         upgradeButton->setAlpha (1.0f);
     }
+
+
+    if (!updater.hasNewAvailableVersion())
+    {
+        updateButton->setInterceptsMouseClicks (false, false);
+        updateButton->setOpaque (false);
+        updateButton->setAlpha (0.5f);
+    }
+    else
+    {
+        updateButton->setInterceptsMouseClicks (true, false);
+        updateButton->setAlpha (1.0f);
+    }
+
+    setUpdateTabAlertCount();
 }
 
 void OptionsPanel::createButtons()
@@ -267,6 +287,28 @@ void OptionsPanel::paintLegalAndRegulatoryArea (Graphics& g, juce::Rectangle<int
                       Justification::centred, 8);
 }
 
+void OptionsPanel::setUpdateTabAlertCount()
+{
+    int alertCount = 0;
+
+    if (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16())
+    {
+        alertCount++; // Hub upgrade
+    }
+    if ((upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16())
+            && hubConfig.getRingIsConnected())
+    {
+        alertCount++; // Ring upgrade
+    }
+
+    if (updater.hasNewAvailableVersion())
+    {
+        alertCount++; // soft update
+    }
+    
+    options.setTabAlertCount ("Updates", alertCount);
+}
+
 // ====================== TabbedOptions =========================
 
 OptionsPanel::TabbedOptions::TabbedOptions()
@@ -308,6 +350,7 @@ void OptionsPanel::TabbedOptions::paint (Graphics& g)
 
             g.setColour (i == selectedTab ? neova_dash::colour::mainText
                                           : neova_dash::colour::subText);
+            
             g.setFont (neova_dash::font::dashFont.withHeight (16.0f));
             g.drawText (tabs[i]->name,
                         (style == tabsVertical) ? tabArea.withTrimmedLeft (MARGIN + 5)
@@ -315,6 +358,19 @@ void OptionsPanel::TabbedOptions::paint (Graphics& g)
                         (style == tabsVertical) ? Justification::centredLeft
                                                 : Justification::centred,
                         true);
+
+            if (tabs[i]->alertCount > 0)
+            {
+                auto alertArea = juce::Rectangle<int> (15, 15).withCentre ({tabArea.getRight() - 8 - neova_dash::ui::MARGIN * 2,
+                                                                            tabArea.getCentreY()});
+                
+                g.setColour (neova_dash::colour::notificationBubble);
+                g.fillEllipse (alertArea.toFloat());
+             
+                g.setColour (neova_dash::colour::mainText);
+                g.setFont (neova_dash::font::dashFontBold.withHeight (13.0f));
+                g.drawText (String (tabs[i]->alertCount), alertArea, Justification::centred);
+            }
         }
     }
 }
@@ -418,6 +474,26 @@ Component* OptionsPanel::TabbedOptions::getComponentFromSelectedTab()
     return getComponentFromTab (selectedTab);
 }
 
+void OptionsPanel::TabbedOptions::setTabAlertCount (const int tabNumber, const int alertCount)
+{
+    if (tabNumber < 0 || tabNumber > tabs.size()) return;
+
+    tabs[tabNumber]->alertCount = alertCount;
+    repaint();
+}
+
+void OptionsPanel::TabbedOptions::setTabAlertCount (const String tabName, const int alertCount)
+{
+    for (int i = 0; i < tabs.size(); i++)
+    {
+        if (tabs[i]->name == tabName)
+        {
+            setTabAlertCount (i, alertCount);
+            return;
+        }
+    }
+}
+
 //==============================================================================
 void OptionsPanel::TabbedOptions::setStyle (TabbedPanelStyle newStyle)
 {
@@ -440,6 +516,18 @@ void OptionsPanel::TabbedOptions::buttonClicked (Button* bttn)
         }
     }
 }
+
+//==============================================================================
+OptionsPanel::TabbedOptions::Tab* OptionsPanel::TabbedOptions::getTabByName (const String tabNameToSearch)
+{
+    for (auto tab : tabs)
+    {
+        if (tab->name == tabNameToSearch) return tab;
+    }
+
+    return nullptr;
+}
+
 
 // ====================== ContactPanel =========================
 
@@ -556,21 +644,22 @@ void ContactPanel::buttonClicked (Button* bttn)
     }
 }
 
-// ====================== FirmwarePanel =========================
+// ====================== UpdateAndUpgradePanel =========================
 
-FirmwarePanel::FirmwarePanel (HubConfiguration& hubConfiguration, TextButton& firmButton, TextButton& softButton)
-  : hubConfig (hubConfiguration), upgradeButton (firmButton), updateButton (softButton)
+UpdateAndUpgradePanel::UpdateAndUpgradePanel (HubConfiguration& hubConfiguration, DashUpdater& updtr, UpgradeHandler& handler,
+                                              TextButton& firmButton, TextButton& softButton)
+  : hubConfig (hubConfiguration), upgradeButton (firmButton), updateButton (softButton), updater (updtr), upgradeHandler (handler)
 {
     addAndMakeVisible (upgradeButton);
     addAndMakeVisible (updateButton);
 }
 
-FirmwarePanel::~FirmwarePanel()
+UpdateAndUpgradePanel::~UpdateAndUpgradePanel()
 {
     removeAllChildren();
 }
 
-void FirmwarePanel::paint (Graphics& g)
+void UpdateAndUpgradePanel::paint (Graphics& g)
 {
     paintFirmwareArea (g);
     paintSoftwareArea (g);
@@ -580,12 +669,31 @@ void FirmwarePanel::paint (Graphics& g)
                                              getHeight() * 6.0 / 8);
 }
 
-void FirmwarePanel::paintFirmwareArea (Graphics& g)
+void UpdateAndUpgradePanel::paintFirmwareArea (Graphics& g)
 {
     auto firmAreaTemp = firmwareArea.reduced (neova_dash::ui::MARGIN*2);
 
     auto ringArea = firmAreaTemp.removeFromLeft (firmAreaTemp.getWidth()/2);
-    auto hubArea = firmAreaTemp;
+    auto hubArea = firmAreaTemp;     
+
+
+    const int notificationRadius = 10;
+    g.setColour (neova_dash::colour::notificationBubble);
+    if ((upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16()))
+    {
+        g.fillEllipse (hubArea.withTrimmedTop (hubArea.getHeight()*2/3)
+                               .withTrimmedLeft (hubArea.getWidth()*2/3)
+                               .withSizeKeepingCentre (notificationRadius, notificationRadius)
+                               .withY (hubArea.getY() + hubArea.getHeight()*2/3 + 6 - notificationRadius/2).toFloat());
+    }
+    
+    if ((upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected())
+    {
+        g.fillEllipse (ringArea.withTrimmedTop (ringArea.getHeight()*2/3)
+                               .withTrimmedLeft (ringArea.getWidth()*2/3)
+                               .withSizeKeepingCentre (notificationRadius, notificationRadius)
+                               .withY (ringArea.getY() + ringArea.getHeight()*2/3 + 6 - notificationRadius/2).toFloat());
+    }
 
     g.setColour (neova_dash::colour::subText);
     g.setFont (neova_dash::font::dashFont.withHeight (15));
@@ -615,13 +723,23 @@ void FirmwarePanel::paintFirmwareArea (Graphics& g)
     g.strokePath (hubPath, {1.0f, PathStrokeType::curved});
 }
 
-void FirmwarePanel::paintSoftwareArea (Graphics& g)
+void UpdateAndUpgradePanel::paintSoftwareArea (Graphics& g)
 {
     auto softAreaTemp = softwareArea.reduced (neova_dash::ui::MARGIN*2);
 
+    const int notificationRadius = 10;
+    g.setColour (neova_dash::colour::notificationBubble);
+    if (updater.hasNewAvailableVersion())
+    {
+        g.fillEllipse (softAreaTemp.withTrimmedTop (softAreaTemp.getHeight()*2/3)
+                                   .withTrimmedLeft (softAreaTemp.getWidth()*1/2)
+                                   .withSizeKeepingCentre (notificationRadius, notificationRadius)
+                                   .withY (softAreaTemp.getY() + softAreaTemp.getHeight()*2/3 + 6 - notificationRadius/2).toFloat());
+    }
+
     g.setColour (neova_dash::colour::subText);
     g.setFont (neova_dash::font::dashFont.withHeight (15));
-    g.drawFittedText (JUCEApplication::getInstance()->getApplicationVersion(),
+    g.drawFittedText ("v" + JUCEApplication::getInstance()->getApplicationVersion(),
                       softAreaTemp.removeFromBottom (softAreaTemp.getHeight()/3),
                       Justification::centredTop, 1);
 
@@ -636,7 +754,7 @@ void FirmwarePanel::paintSoftwareArea (Graphics& g)
     g.strokePath (dashPath, {1.0f, PathStrokeType::curved});
 }
 
-void FirmwarePanel::resized()
+void UpdateAndUpgradePanel::resized()
 {
     auto area = getLocalBounds().reduced (0, neova_dash::ui::MARGIN);
 

@@ -17,13 +17,13 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     setLookAndFeel (&dashBoardLookAndFeel);
 
     // Creates Components
-    optionsPanel = std::make_unique<OptionsPanel> (hubConfig, getCommandManager());
+    optionsPanel = std::make_unique<OptionsPanel> (hubConfig, updater, upgradeHandler, getCommandManager());
     addAndMakeVisible (*optionsPanel);
 
-    firmUpgradePanel = std::make_unique<FirmUpgradePanel> (hubConfig, upgrdHandler);
+    firmUpgradePanel = std::make_unique<FirmUpgradePanel> (hubConfig, upgrdHandler, getCommandManager());
     addAndMakeVisible (*firmUpgradePanel);
 
-    updaterPanel = std::make_unique<UpdaterPanel> (updater, updater.getDownloadProgressReference());
+    updaterPanel = std::make_unique<UpdaterPanel> (updater, getCommandManager(), updater.getDownloadProgressReference());
     addAndMakeVisible (*updaterPanel);
 
     header = std::make_unique<HeaderComponent> (*optionsPanel, hubConfig, dataReader);
@@ -104,6 +104,39 @@ void DashBoardInterface::paint (Graphics& g)
     if (state != connected)
     {
         drawStateMessage (g);
+    }
+}
+
+void DashBoardInterface::paintOverChildren (Graphics& g)
+{
+    if (!optionsPanel->isVisible())
+    {    
+        const bool hubUpgradeAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16());
+        const bool ringUpgradeAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected();
+     
+        if (hubUpgradeAvailable || ringUpgradeAvailable || updater.hasNewAvailableVersion()) // if Dash Update or Firm Upgrade available
+        {
+            int alertCount = 0;
+
+            if (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16())
+                alertCount++; // Hub upgrade
+            
+            if ((upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16())
+                    && hubConfig.getRingIsConnected())
+                alertCount++; // Ring upgrade
+
+            if (updater.hasNewAvailableVersion())
+                alertCount++; // soft update
+            
+            // Paint ellipse
+            g.setColour (neova_dash::colour::notificationBubble);
+            g.fillEllipse (notificationArea.toFloat());
+
+            // Paint Alert Number
+            g.setColour (neova_dash::colour::mainText);
+            g.setFont (neova_dash::font::dashFontBold.withHeight (15.0f));
+            g.drawText (String (alertCount), notificationArea, Justification::centred);
+        }
     }
 }
 
@@ -199,6 +232,12 @@ void DashBoardInterface::resized()
 
     uploadButton->setBounds (area.withSize (jmax (140, area.getWidth()/7 + 40), area.getHeight()*6/10)
                                  .withSizeKeepingCentre (jmax (140, area.getWidth()/7 + 40), HEADER_HEIGHT));
+
+    notificationArea = juce::Rectangle<int> (18, 18).withCentre (getLocalPoint (header->findChildWithID ("optionsButton"),
+                                                                                header->findChildWithID ("optionsButton")
+                                                                                      ->getBounds()
+                                                                                      .getCentre()
+                                                                                      .translated (8, -8)));
 }
 
 //==============================================================================
@@ -394,7 +433,8 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
                             updateBatteryDisplay,
                             allowUserToFlashHub,
                             openFirmUpgradePanel,
-                            openDashboardUpdatePanel
+                            openDashboardUpdatePanel,
+                            checkAndUpdateNotifications
                        });
 }
 
@@ -424,6 +464,11 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
 			break;
         case openDashboardUpdatePanel:
             result.setInfo ("Open Dashboard Update Panel", "Opens Panel To Start Dash Update Procedure", "Interface", 0);
+            break;
+        case checkAndUpdateNotifications:
+            result.setInfo ("Check And Update Notifications", "Updates info that could trigger a notification"
+                                                              " and updates interface to display potential notifications",
+                                                              "Interface", 0);
             break;
         default:
             break;
@@ -498,6 +543,13 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             }
             
             updaterPanel->resetAndOpenPanel (hubConfig.getHubIsConnected() && hubConfig.getHubIsCompatibleInt() > 0);
+            return true;
+
+        case checkAndUpdateNotifications:
+            upgradeHandler.checkReleasesVersion();
+            updater.checkForNewAvailableVersion();
+
+            updateForNotifications();
             return true;
 
         default:
@@ -726,5 +778,15 @@ void DashBoardInterface::update()
         optionsPanel->update();
         midiChannelComponent->update();
         uploadButton->update();
+        repaint (notificationArea);
+    }
+}
+
+void DashBoardInterface::updateForNotifications()
+{
+    if (state == connected)
+    {
+        optionsPanel->update();
+        repaint (notificationArea);
     }
 }

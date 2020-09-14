@@ -81,6 +81,7 @@ public:
 
     //==============================================================================
     void paint (Graphics&) override;
+    void paintOverChildren (Graphics&) override;
     void resized() override;
 
     //==============================================================================
@@ -144,6 +145,13 @@ public:
         of the interface needs to be updated to match those.
     */
     void update();
+
+    /** 
+        \brief  Notification update method.
+
+        This method will update parts of the interface that display notifications.
+    */
+    void updateForNotifications();
 
     //==============================================================================
     /** 
@@ -261,6 +269,7 @@ private:
 
     //==============================================================================
     Image backgroundImage = ImageFileFormat::loadFrom (DashData::HUBBG_png, DashData::HUBBG_pngSize); /**< Interface's background image. */
+    juce::Rectangle<int> notificationArea;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DashBoardInterface)
