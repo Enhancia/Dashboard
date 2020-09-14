@@ -11,8 +11,8 @@
 #include "FirmUpgradePanel.h"
 
 //==============================================================================
-FirmUpgradePanel::FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler)
-	: hubConfig (config), upgradeHandler (handler)
+FirmUpgradePanel::FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler, ApplicationCommandManager& manager)
+	: hubConfig (config), upgradeHandler (handler), commandManager (manager)
 {
     createLabels();
     createButtons();
@@ -156,6 +156,8 @@ void FirmUpgradePanel::closeAndResetPanel()
 	setVisible (false);
 	currentUpgrade = none;
 	updateComponentsForSpecificState (checkingReleases);
+    
+    commandManager.invokeDirectly (neova_dash::commands::checkAndUpdateNotifications, true);
 }
 
 void FirmUpgradePanel::updateAfterHubConnection()

@@ -106,6 +106,8 @@ void FirmDownloader::finished (URL::DownloadTask* task, bool success)
 		startTimer (400);
 	}
 
+	const MessageManagerLock mmLock;
+
     commandManager.invokeDirectly (neova_dash::commands::checkAndUpdateNotifications, true);
 }
 

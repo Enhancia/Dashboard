@@ -19,6 +19,7 @@ UpgradeHandler::UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config, App
     : dPipe (dashPipe), hubConfig(config), commandManager (manager)
 {
     instanceUp = this;
+    checkReleasesVersion();
 }
 UpgradeHandler::~UpgradeHandler() {}
 

@@ -23,8 +23,8 @@ OptionsPanel::OptionsPanel (HubConfiguration& config, DashUpdater& updtr, Upgrad
     options.addTab (new LegalPanel(), "Legal");
     //options.addTab (new LicensePanel(), "EULA");
 
-    setUpdateTabAlertCount();
 	addAndMakeVisible (options);
+    setUpdateTabAlertCount();
 }
 
 OptionsPanel::~OptionsPanel()
@@ -290,8 +290,6 @@ void OptionsPanel::setUpdateTabAlertCount()
     {
         alertCount++; // soft update
     }
-
-    //alertCount = 1; // TO DELETE
     
     options.setTabAlertCount ("Updates", alertCount);
 }
@@ -677,7 +675,7 @@ void UpdateAndUpgradePanel::paintFirmwareArea (Graphics& g)
     if ((upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected())
     {
         g.fillEllipse (ringArea.withTrimmedTop (ringArea.getHeight()*2/3)
-                               .withTrimmedRight (ringArea.getWidth()*2/3)
+                               .withTrimmedLeft (ringArea.getWidth()*2/3)
                                .withSizeKeepingCentre (notificationRadius, notificationRadius)
                                .withY (ringArea.getY() + ringArea.getHeight()*2/3 + 6 - notificationRadius/2).toFloat());
     }
@@ -714,9 +712,19 @@ void UpdateAndUpgradePanel::paintSoftwareArea (Graphics& g)
 {
     auto softAreaTemp = softwareArea.reduced (neova_dash::ui::MARGIN*2);
 
+    const int notificationRadius = 10;
+    g.setColour (neova_dash::colour::notificationBubble);
+    if (updater.hasNewAvailableVersion())
+    {
+        g.fillEllipse (softAreaTemp.withTrimmedTop (softAreaTemp.getHeight()*2/3)
+                                   .withTrimmedLeft (softAreaTemp.getWidth()*1/2)
+                                   .withSizeKeepingCentre (notificationRadius, notificationRadius)
+                                   .withY (softAreaTemp.getY() + softAreaTemp.getHeight()*2/3 + 6 - notificationRadius/2).toFloat());
+    }
+
     g.setColour (neova_dash::colour::subText);
     g.setFont (neova_dash::font::dashFont.withHeight (15));
-    g.drawFittedText (JUCEApplication::getInstance()->getApplicationVersion(),
+    g.drawFittedText ("v" + JUCEApplication::getInstance()->getApplicationVersion(),
                       softAreaTemp.removeFromBottom (softAreaTemp.getHeight()/3),
                       Justification::centredTop, 1);
 

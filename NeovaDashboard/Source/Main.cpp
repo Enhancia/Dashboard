@@ -273,8 +273,10 @@ public:
 				else if (type_of_firm == UpgradeHandler::err_two_hub)
 				{
 					DBG("two hub connected\n");
-					//TODO sale, à refaire car bloque le process
-					AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Two hubs detected, the 2nd one will not be recognize (disconnect all the hubs & reconnect the 2nd to use it)", "Sorry, Thanks", nullptr);
+                	dashInterface->createAndShowAlertPanel ("Error", "Two hubs detected. Only the first one will be used."
+                													 "(Disconnect all the hubs and reconnect the latter one to use it)",
+                													 "Ok", true, 0);
+					//AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", , "Sorry, Thanks", nullptr);
 				}
 				else
 				{
@@ -428,6 +430,7 @@ public:
 
             case checkDashboardUpdate:
             	updater->checkForNewAvailableVersion();
+            	
             	commandManager.invokeDirectly (neova_dash::commands::openDashboardUpdatePanel, true);
             	return true;
 

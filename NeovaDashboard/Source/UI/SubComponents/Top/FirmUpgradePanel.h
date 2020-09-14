@@ -59,7 +59,7 @@ public:
 	};
 
     //==============================================================================
-    FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler);
+    FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler, ApplicationCommandManager& manager);
     ~FirmUpgradePanel();
 
     //==============================================================================
@@ -107,6 +107,7 @@ private:
     //==============================================================================
     UpgradeHandler& upgradeHandler;
     HubConfiguration& hubConfig;
+    ApplicationCommandManager& commandManager;
     UpgradeState currentState = checkingReleases; // Follows upgradeHandler upgradeState enum
     FirmUpgradeType currentUpgrade = none; // Follows upgradeHandler upgradeState enum
 
