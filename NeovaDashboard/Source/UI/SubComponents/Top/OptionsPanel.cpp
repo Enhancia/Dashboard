@@ -146,7 +146,9 @@ void OptionsPanel::visibilityChanged()
 
 void OptionsPanel::update()
 {
-    if (!hubConfig.getHubIsConnected() || hubConfig.getHubIsCompatibleInt() > 0)
+    if (!hubConfig.getHubIsConnected() || hubConfig.getHubIsCompatibleInt() > 0
+                                       || (upgradeHandler.getHubReleaseVersion() <= hubConfig.getHubFirmwareVersionUint16()
+                                             && upgradeHandler.getRingReleaseVersion() <= hubConfig.getRingFirmwareVersionUint16()))
     {
         upgradeButton->setInterceptsMouseClicks (false, false);
         upgradeButton->setOpaque (false);
@@ -156,6 +158,19 @@ void OptionsPanel::update()
     {
         upgradeButton->setInterceptsMouseClicks (true, false);
         upgradeButton->setAlpha (1.0f);
+    }
+
+
+    if (!updater.hasNewAvailableVersion())
+    {
+        updateButton->setInterceptsMouseClicks (false, false);
+        updateButton->setOpaque (false);
+        updateButton->setAlpha (0.5f);
+    }
+    else
+    {
+        updateButton->setInterceptsMouseClicks (true, false);
+        updateButton->setAlpha (1.0f);
     }
 
     setUpdateTabAlertCount();
