@@ -295,13 +295,25 @@ void OneRangeTuner::buttonClicked (Button* bttn)
 {
     if (bttn == minAngleButton)
     {
-        lowSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
+        if (value > getRangeHigh())
+        {
+            highSlider->setValue (value, sendNotification);
+            setRangeHigh (float (highSlider->getValue()));
+        }
+
+        lowSlider->setValue (value, sendNotification);
         setRangeLow (float (lowSlider->getValue()));
     }
 
     else if (bttn == maxAngleButton)
     {
-        highSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
+        if (value < getRangeLow())
+        {
+            lowSlider->setValue (value, sendNotification);
+            setRangeLow (float (lowSlider->getValue()));
+        }
+
+        highSlider->setValue (value, sendNotification);
         setRangeHigh (float (highSlider->getValue()));
     }
 }
