@@ -89,6 +89,7 @@ private:
 
         //==========================================================================
         float lastBattery = -1.0f;
+        float lastRawBattery = 3.0f;
         int numIndicators = 0;
         int numBlinkingIndicators = 0;
         juce::Rectangle<int> indicatorsArea;

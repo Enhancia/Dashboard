@@ -130,7 +130,7 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
     drawRingPath (g, area.removeFromLeft (area.getWidth()/4).reduced (3).toFloat());
 
     g.setColour (neova_dash::colour::subText);
-    g.drawText (":", area, Justification::centredLeft);
+    //g.drawText (":", area, Justification::centredLeft);
 
     indicatorsArea = area.withTrimmedLeft (neova_dash::ui::MARGIN);
 
@@ -177,6 +177,7 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded()
 																					   hubConfig.getRingIsCharging()),
                                       1.0f),
                                 0.0f);
+    const float newRawBattery = batteryValueRef;
 
     DBG ("----------------\nComputing battery level\nRaw      " << batteryValueRef
                 << "\nRounded  " << battery
@@ -198,9 +199,11 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded()
         launchDelayedRepaint (500);
     }
 
-    else if (lastConnectionState && (battery != lastBattery || hubConfig.getRingIsCharging() != lastChargeState))
+    else if (lastConnectionState && ((battery != lastBattery && (!lastChargeState || (newRawBattery - lastBattery) < 0.01f))
+                                     || hubConfig.getRingIsCharging() != lastChargeState))
     {
         lastBattery = battery;
+        lastRawBattery = newRawBattery;
         lastChargeState = hubConfig.getRingIsCharging();
         
         numIndicators = battery < 0.0f ? 0
@@ -392,7 +395,7 @@ void HeaderComponent::BatteryComponent::drawRingPath (Graphics& g, juce::Rectang
     if (lastChargeState)
     {
         auto zipzoopArea = area.withSizeKeepingCentre (7.0f, 20.0f)
-                                         .withX (area.getX() - 7.0f);
+                                         .withX (area.getRight() + 1.0f);
 		//g.drawRect(zipzoopArea, 1.0f);
         drawLightningPath (ringPath, zipzoopArea);
     }
