@@ -535,7 +535,7 @@ OptionsPanel::TabbedOptions::Tab* OptionsPanel::TabbedOptions::getTabByName (con
 ContactPanel::ContactPanel()
 {
     //Contact button
-    contactButton = std::make_unique <TextButton> ("Enhancia's Website");
+    contactButton = std::make_unique <TextButton> ("Contact Enhancia");
     addAndMakeVisible (*contactButton);
     contactButton->addListener (this);
 
@@ -641,7 +641,7 @@ void ContactPanel::buttonClicked (Button* bttn)
 
     else if (bttn == contactButton.get())
     {
-        URL ("https://www.enhancia-music.com").launchInDefaultBrowser();
+        URL ("https://www.enhancia-music.com/contact/").launchInDefaultBrowser();
     }
 }
 
