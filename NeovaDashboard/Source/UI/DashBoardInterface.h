@@ -109,6 +109,15 @@ public:
     */
     void setInterfaceStateAndUpdate (const InterfaceState newState);
 
+    /** 
+        \brief  Interface state setter.
+
+        This method will look for the right interface state to update to, then change the interface state.
+        Depending on the wanted state, interface subcomponents will be set visible or invisible,
+        and be updated accordingly.
+    */
+    void setInterfaceStateAndUpdate();
+
     //==============================================================================
     /** 
         \brief  Preset mode state getter.

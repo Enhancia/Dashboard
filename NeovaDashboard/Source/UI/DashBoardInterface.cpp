@@ -490,21 +490,7 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
 			return true;
 
         case setStateAndUpdateDashInterface:
-            if (hubConfig.getHubIsConnected())
-            {
-                if (hubConfig.getHubIsCompatibleInt() == 0)
-                {
-                    setInterfaceStateAndUpdate (connected);
-                }
-                else
-                {
-                    setInterfaceStateAndUpdate (incompatible);
-                }
-            }
-            else
-            {
-                setInterfaceStateAndUpdate (waitingForConnection);
-            }
+            setInterfaceStateAndUpdate();
             return true;
 			
         case updateBatteryDisplay:
@@ -633,6 +619,25 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
                                                                             DashAlertPanel::outdatedFirmware);
             }
         }
+    }
+}
+
+void DashBoardInterface::setInterfaceStateAndUpdate()
+{
+    if (hubConfig.getHubIsConnected())
+    {
+        if (hubConfig.getHubIsCompatibleInt() == 0)
+        {
+            setInterfaceStateAndUpdate (connected);
+        }
+        else
+        {
+            setInterfaceStateAndUpdate (incompatible);
+        }
+    }
+    else
+    {
+        setInterfaceStateAndUpdate (waitingForConnection);
     }
 }
 
