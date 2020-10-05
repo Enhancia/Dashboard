@@ -199,7 +199,7 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded()
         launchDelayedRepaint (500);
     }
 
-    else if (lastConnectionState && ((battery != lastBattery && (!lastChargeState || (newRawBattery - lastBattery) < 0.01f))
+    else if (lastConnectionState && ((battery != lastBattery && (!lastChargeState || (newRawBattery - lastRawBattery) < 0.01f))
                                      || hubConfig.getRingIsCharging() != lastChargeState))
     {
         lastBattery = battery;
