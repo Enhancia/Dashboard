@@ -129,20 +129,16 @@ public:
 			case 0x03:
 				DBG("config received\n");
 				hubConfig.setConfig(data + 12);
-
+				
 				if (hubPowerState != POWER_OFF)
 				{
 					if (hubConfig.isWaitingForRingCompatibility() && ((hubConfig.getRingFirmwareVersionUint16() & 0xFF00) >> 8) > 0)
 					{
-						DBG ("TENTATIVE DE VOIR QUE C PA KOMPTBL");
-
 						// Dash was waiting for a valid ring firmware version, which it got !
 						hubConfig.stopWaitingForRingCompatibility();
 
-						commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
-
-						//if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
-						//else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
+						if (dashInterface->hasKeyboardFocus (true)) commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
+						else 										dashInterface->setInterfaceStateAndUpdate();
 					}
 					else
 					{
@@ -157,11 +153,9 @@ public:
 					//TODO => mettre interface en mode POWER_ON
 					hubConfig.setHubIsConnected (true);
 					upgradeHandler->checkForSuccessiveUpgrade();
-
-					commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
 					
-					//if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
-					//else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
+					if (dashInterface->hasKeyboardFocus (true)) commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
+					else 										dashInterface->setInterfaceStateAndUpdate();
 				}
 
 				if (!dashInterface->hasKeyboardFocus (true))
@@ -194,6 +188,9 @@ public:
 
 			case 0x06:
 				DBG("hub_power_state received\n");
+
+				DBG("KBD FOCUS ? " << (dashInterface->hasKeyboardFocus(true) ? "YES" : "NO"));
+
 				if (hubPowerState == POWER_OFF && *(uint8_t*)(data + 12) == POWER_ON)
 				{
 					/*2 cas possibles :	- hub branché après lancement dashBoard et driver envoie POWER_ON CMD à sa connexion
@@ -216,15 +213,15 @@ public:
 						hubConfig.setHubIsConnected (true);
 						upgradeHandler->checkForSuccessiveUpgrade();
 						
-						commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
-
-						//if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
-						//else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
+						if (dashInterface->hasKeyboardFocus (true)) commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
+						else 										dashInterface->setInterfaceStateAndUpdate();
 					}
 					else if (hubPowerState == POWER_OFF)
 					{
 						hubConfig.setHubIsConnected (false);
-						commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
+						
+						if (dashInterface->hasKeyboardFocus (true)) commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
+						else 										dashInterface->setInterfaceStateAndUpdate();
 					}
 					else
 					{
