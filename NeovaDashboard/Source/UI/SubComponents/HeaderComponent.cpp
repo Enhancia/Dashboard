@@ -104,15 +104,16 @@ HeaderComponent::BatteryComponent::BatteryComponent (const float& batteryValRef,
         : batteryValueRef (batteryValRef), hubConfig (config)
 {
     lastBattery = jmax (jmin (neova_dash::data::convertRawBatteryToPercentage (batteryValueRef,
-                                             hubConfig.getRingIsCharging()),
+                                                                               hubConfig.getRingIsCharging()),
                                       1.0f),
                                 0.0f);
+    lastRawBattery = batteryValueRef;
     lastConnectionState = hubConfig.getRingIsConnected();
 
     startTimer (int (batteryCheckTimer), 30000);
     if (lastConnectionState) startTimer (int (blinkTimer), 1000);
 
-    launchDelayedRepaint (2000);
+    launchDelayedRepaint (2000, true);
 }
 
 HeaderComponent::BatteryComponent::~BatteryComponent()
@@ -171,7 +172,7 @@ void HeaderComponent::BatteryComponent::timerCallback (int timerID)
     }    
 }
 
-void HeaderComponent::BatteryComponent::repaintIfNeeded()
+void HeaderComponent::BatteryComponent::repaintIfNeeded (bool forceRepaint)
 {
     const float battery = jmax (jmin (neova_dash::data::convertRawBatteryToPercentage (batteryValueRef,
 																					   hubConfig.getRingIsCharging()),
@@ -181,10 +182,9 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded()
 
     DBG ("----------------\nComputing battery level\nRaw      " << batteryValueRef
                 << "\nRounded  " << battery
-                << "\nCharging " << (lastChargeState ? "Yes" : "No")
-                << "\n----------------");
+                << "\nCharging " << (lastChargeState ? "Yes" : "No"));
 
-    if (batteryValueRef == 3.0f && lastConnectionState)
+    if (batteryValueRef < 3.4f && lastConnectionState)
     {
         if (hubConfig.getRingIsCharging() != lastChargeState)
         {
@@ -199,8 +199,10 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded()
         launchDelayedRepaint (500);
     }
 
-    else if (lastConnectionState && ((battery != lastBattery && (!lastChargeState || (newRawBattery - lastRawBattery) < 0.01f))
-                                     || hubConfig.getRingIsCharging() != lastChargeState))
+    else if (forceRepaint
+             || lastConnectionState && ((battery != lastBattery && ((!lastChargeState && (newRawBattery - lastRawBattery) < 0.0f) ||
+                                                                    (lastChargeState && (newRawBattery - lastRawBattery) > 0.01f)))
+                                        || hubConfig.getRingIsCharging() != lastChargeState))
     {
         lastBattery = battery;
         lastRawBattery = newRawBattery;
@@ -275,15 +277,22 @@ void HeaderComponent::BatteryComponent::update()
     }
 }
 
-void HeaderComponent::BatteryComponent::launchDelayedRepaint (const int delayMs)
+void HeaderComponent::BatteryComponent::launchDelayedRepaint (const int delayMs, bool forceRepaint)
 {
-    auto repaintBatteryLambda = [this] () {
+    auto repaintBatteryLambda = [this] (){
                                               repaintIfNeeded();
                                               waitForRepaint = false;
-                                          };
+                                         };
+    
+    auto repaintBatteryLambdaForce = [this] (){
+                                                    repaintIfNeeded(true);
+                                                    waitForRepaint = false;
+                                              };
 
     waitForRepaint = true;
-    Timer::callAfterDelay (delayMs, repaintBatteryLambda);
+    
+    if (forceRepaint)   Timer::callAfterDelay (delayMs, repaintBatteryLambdaForce);
+    else                Timer::callAfterDelay (delayMs, repaintBatteryLambda);
 }
 
 void HeaderComponent::BatteryComponent::drawLightningPath (Path& path, juce::Rectangle<float> area)
