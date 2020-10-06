@@ -160,7 +160,6 @@ void OptionsPanel::update()
         upgradeButton->setAlpha (1.0f);
     }
 
-
     if (!updater.hasNewAvailableVersion())
     {
         updateButton->setInterceptsMouseClicks (false, false);

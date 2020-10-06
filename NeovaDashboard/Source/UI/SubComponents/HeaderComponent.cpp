@@ -104,15 +104,16 @@ HeaderComponent::BatteryComponent::BatteryComponent (const float& batteryValRef,
         : batteryValueRef (batteryValRef), hubConfig (config)
 {
     lastBattery = jmax (jmin (neova_dash::data::convertRawBatteryToPercentage (batteryValueRef,
-                                             hubConfig.getRingIsCharging()),
+                                                                               hubConfig.getRingIsCharging()),
                                       1.0f),
                                 0.0f);
+    lastRawBattery = batteryValueRef;
     lastConnectionState = hubConfig.getRingIsConnected();
 
     startTimer (int (batteryCheckTimer), 30000);
     if (lastConnectionState) startTimer (int (blinkTimer), 1000);
 
-    launchDelayedRepaint (2000);
+    launchDelayedRepaint (2000, true);
 }
 
 HeaderComponent::BatteryComponent::~BatteryComponent()
@@ -130,7 +131,7 @@ void HeaderComponent::BatteryComponent::paint (Graphics& g)
     drawRingPath (g, area.removeFromLeft (area.getWidth()/4).reduced (3).toFloat());
 
     g.setColour (neova_dash::colour::subText);
-    g.drawText (":", area, Justification::centredLeft);
+    //g.drawText (":", area, Justification::centredLeft);
 
     indicatorsArea = area.withTrimmedLeft (neova_dash::ui::MARGIN);
 
@@ -171,19 +172,19 @@ void HeaderComponent::BatteryComponent::timerCallback (int timerID)
     }    
 }
 
-void HeaderComponent::BatteryComponent::repaintIfNeeded()
+void HeaderComponent::BatteryComponent::repaintIfNeeded (bool forceRepaint)
 {
     const float battery = jmax (jmin (neova_dash::data::convertRawBatteryToPercentage (batteryValueRef,
 																					   hubConfig.getRingIsCharging()),
                                       1.0f),
                                 0.0f);
+    const float newRawBattery = batteryValueRef;
 
     DBG ("----------------\nComputing battery level\nRaw      " << batteryValueRef
                 << "\nRounded  " << battery
-                << "\nCharging " << (lastChargeState ? "Yes" : "No")
-                << "\n----------------");
+                << "\nCharging " << (lastChargeState ? "Yes" : "No"));
 
-    if (batteryValueRef == 3.0f && lastConnectionState)
+    if (batteryValueRef < 3.4f && lastConnectionState)
     {
         if (hubConfig.getRingIsCharging() != lastChargeState)
         {
@@ -198,9 +199,13 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded()
         launchDelayedRepaint (500);
     }
 
-    else if (lastConnectionState && (battery != lastBattery || hubConfig.getRingIsCharging() != lastChargeState))
+    else if (forceRepaint
+             || lastConnectionState && ((battery != lastBattery && ((!lastChargeState && (newRawBattery - lastRawBattery) < 0.0f) ||
+                                                                    (lastChargeState && (newRawBattery - lastRawBattery) > 0.01f)))
+                                        || hubConfig.getRingIsCharging() != lastChargeState))
     {
         lastBattery = battery;
+        lastRawBattery = newRawBattery;
         lastChargeState = hubConfig.getRingIsCharging();
         
         numIndicators = battery < 0.0f ? 0
@@ -272,15 +277,22 @@ void HeaderComponent::BatteryComponent::update()
     }
 }
 
-void HeaderComponent::BatteryComponent::launchDelayedRepaint (const int delayMs)
+void HeaderComponent::BatteryComponent::launchDelayedRepaint (const int delayMs, bool forceRepaint)
 {
-    auto repaintBatteryLambda = [this] () {
+    auto repaintBatteryLambda = [this] (){
                                               repaintIfNeeded();
                                               waitForRepaint = false;
-                                          };
+                                         };
+    
+    auto repaintBatteryLambdaForce = [this] (){
+                                                    repaintIfNeeded(true);
+                                                    waitForRepaint = false;
+                                              };
 
     waitForRepaint = true;
-    Timer::callAfterDelay (delayMs, repaintBatteryLambda);
+    
+    if (forceRepaint)   Timer::callAfterDelay (delayMs, repaintBatteryLambdaForce);
+    else                Timer::callAfterDelay (delayMs, repaintBatteryLambda);
 }
 
 void HeaderComponent::BatteryComponent::drawLightningPath (Path& path, juce::Rectangle<float> area)
@@ -392,7 +404,7 @@ void HeaderComponent::BatteryComponent::drawRingPath (Graphics& g, juce::Rectang
     if (lastChargeState)
     {
         auto zipzoopArea = area.withSizeKeepingCentre (7.0f, 20.0f)
-                                         .withX (area.getX() - 7.0f);
+                                         .withX (area.getRight() + 1.0f);
 		//g.drawRect(zipzoopArea, 1.0f);
         drawLightningPath (ringPath, zipzoopArea);
     }
