@@ -90,6 +90,7 @@ void FirmUpgradePanel::timerCallback()
 		{
 			jassert (currentState == upgradeInProgress);
 			updateComponentsForSpecificState (waitingForHubReconnect);
+			startTimeoutCount();
 			
 			if (hubConfig.getHubIsConnected())
 			{
@@ -475,7 +476,7 @@ void FirmUpgradePanel::startTimeoutCount()
 
 void FirmUpgradePanel::timeoutCheck()
 {
-	if (timeoutCounter >= 30) // While waiting for the hub, the timer acts as a timeout in case hub doesnt reconnect
+	if (timeoutCounter >= 45) // While waiting for the hub, the timer acts as a timeout in case hub doesnt reconnect
 	{
 		DBG ("HUB didn't reconnect");
 		stopTimer();

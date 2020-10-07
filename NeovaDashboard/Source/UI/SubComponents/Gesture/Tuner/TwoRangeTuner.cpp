@@ -370,36 +370,61 @@ void TwoRangeTuner::buttonClicked (Button* bttn)
 {
     if (bttn == maxLeftAngleButton)
     {
-        if (/*gestureRange.convertFrom0to1 (value)*/ value > getRangeRightLow())
+        if (value > getRangeRightLow())
         {
+            leftHighSlider->setValue (getRangeRightLow(), sendNotification);
             leftLowSlider->setValue (getRangeRightLow(), sendNotification);
         }
         else
         {
-            leftLowSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
+            if (value > getRangeLeftHigh())
+            {
+                leftHighSlider->setValue (value);
+            }
+
+            leftLowSlider->setValue (value, sendNotification);
         }
+        setRangeLeftHigh (float (leftHighSlider->getValue()));
         setRangeLeftLow (float (leftLowSlider->getValue()));
     }
     else if (bttn == minLeftAngleButton)
     {
+        if (value < getRangeLeftLow())
+        {
+            leftLowSlider->setValue (value, sendNotification);
+            setRangeLeftLow (float (leftLowSlider->getValue()));
+        }
+
         leftHighSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
         setRangeLeftHigh (float (leftHighSlider->getValue()));
     }
      if (bttn == minRightAngleButton)
     {
+        if (value > getRangeRightHigh())
+        {
+            rightHighSlider->setValue (value, sendNotification);
+            setRangeRightHigh (float (rightHighSlider->getValue()));
+        }
         rightLowSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
         setRangeRightLow (float (rightLowSlider->getValue()));
     }
     else if (bttn == maxRightAngleButton)
     {
-        if (/*gestureRange.convertFrom0to1 (value)*/ value < getRangeLeftHigh())
+        if (value < getRangeLeftHigh())
         {
+            rightLowSlider->setValue (getRangeLeftHigh(), sendNotification);
             rightHighSlider->setValue (getRangeLeftHigh(), sendNotification);
         }
         else
         {
+            if (value < getRangeRightLow())
+            {
+                rightLowSlider->setValue (value);
+            }
+
             rightHighSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
         }
+        setRangeRightLow (float (rightLowSlider->getValue()));
         setRangeRightHigh (float (rightHighSlider->getValue()));
     }
 }
