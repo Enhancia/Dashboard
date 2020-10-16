@@ -138,6 +138,10 @@
                   file="Source/UI/SubComponents/MidiChannelComponent/MidiChannelComponent.h"/>
           </GROUP>
           <GROUP id="{51129B3F-9778-3EB2-0AEC-193428E77A11}" name="Top">
+            <FILE id="ooGcfS" name="BugReportPanel.cpp" compile="1" resource="0"
+                  file="Source/UI/SubComponents/Top/BugReportPanel.cpp"/>
+            <FILE id="uEMOKz" name="BugReportPanel.h" compile="0" resource="0"
+                  file="Source/UI/SubComponents/Top/BugReportPanel.h"/>
             <FILE id="BzMjm3" name="DashAlertPanel.cpp" compile="1" resource="0"
                   file="Source/UI/SubComponents/Top/DashAlertPanel.cpp"/>
             <FILE id="Ko72q9" name="DashAlertPanel.h" compile="0" resource="0"

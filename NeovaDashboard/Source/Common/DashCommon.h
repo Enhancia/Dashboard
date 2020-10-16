@@ -41,7 +41,8 @@ namespace neova_dash
             allowUserToFlashHub             = 0x01000005, // Updates upload button after config was changed
             openFirmUpgradePanel            = 0x01000006, // Launches the firm upgrade panel
             openDashboardUpdatePanel        = 0x01000007, // Launches the soft update panel
-            checkAndUpdateNotifications     = 0x01000008  // Updates and looks for data that should trigger notifications on the interface
+            checkAndUpdateNotifications     = 0x01000008, // Updates and looks for data that should trigger notifications on the interface
+            openBugReportPanel              = 0x01000009  // Launches the bug report panel
     	};
     };
 
