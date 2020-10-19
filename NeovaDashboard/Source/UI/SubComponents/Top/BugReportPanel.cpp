@@ -11,7 +11,8 @@
 #include "BugReportPanel.h"
 
 //==============================================================================
-BugReportPanel::BugReportPanel (ApplicationCommandManager& manager) : commandManager (manager)
+BugReportPanel::BugReportPanel (ApplicationCommandManager& manager)
+	: commandManager (manager), credentials (Base64::toBase64 (key + String(":") + code))
 {
     createLabels();
     createButtons();
@@ -41,11 +42,18 @@ void BugReportPanel::paint (Graphics& g)
     }
     else
     {
+    	g.setColour (mainText);
+    	g.setFont (neova_dash::font::dashFontNorms.withHeight (18.0f));
+
     	if (currentStep == reportSentOk)
     	{
-	    	g.setColour (mainText);
-	    	g.setFont (neova_dash::font::dashFontNorms.withHeight (18.0f));
 	    	g.drawFittedText ("Thank you for your feedback !\n\nWe will take your input into account.",
+	    					  panelArea.withTrimmedTop (titleLabel->getHeight()).withBottom (bottomButton->getY()),
+	    					  Justification::centred, 3);
+    	}
+    	if (currentStep == reportSentError)
+    	{
+	    	g.drawFittedText ("Error !\n\nFailed to send bug report... Please try again later.",
 	    					  panelArea.withTrimmedTop (titleLabel->getHeight()).withBottom (bottomButton->getY()),
 	    					  Justification::centred, 3);
     	}
@@ -269,30 +277,39 @@ void BugReportPanel::checkFormEntry()
 //==============================================================================
 void BugReportPanel::sendTicketAndUpdate()
 {
-	const String mimeBoundary ("8b030e29628a41fc816c7ba481f509c3");
-
 	URL ticketURL = createURLForTicket (mimeBoundary);
 
-    String credentials; // TODO Fill
+    //String credentials; // TODO Fill
 
     // Gets response headers and display them
     const String headers ("Authorization:Basic " + credentials + "\r\n"
                           "Content-Type:multipart/form-data;boundary=" + mimeBoundary + "\r\n");
     int statusCode;
+    StringPairArray responseHeaders;
 
-    std::unique_ptr<InputStream> webStream (happyFoxURL.createInputStream (true,
+    std::unique_ptr<InputStream> webStream (ticketURL.createInputStream (true,
                                                                            nullptr,
                                                                            nullptr,
                                                                            headers,
                                                                            0,
-                                                                           StringPairArray(),
+                                                                           &responseHeaders,
                                                                            &statusCode,
                                                                            5,
                                                                            "POST"));
 
     if (dynamic_cast<WebInputStream*> (webStream.get())->isError() || statusCode >= 400)
-    {    
-		return updateComponentsForSpecificStep (reportSentError);
+    {   
+    	const String response = webStream->readEntireStreamAsString();
+
+    	DBG ("Failed to send ticket .. \n Stream error    ? "
+    			<< (dynamic_cast<WebInputStream*> (webStream.get())->isError() ? "Yes" : "No")
+    			<< "\n Code            : " << statusCode
+    			<< "\n POST Data       : " << ticketURL.getPostData().substring (0, 1000)
+    			<< "\n Response Headers: " << responseHeaders.getDescription()
+				<< "\n Response        : " << response);
+
+		updateComponentsForSpecificStep (reportSentError);
+        return;
     }
 
 	updateComponentsForSpecificStep (reportSentOk);
@@ -302,14 +319,89 @@ URL BugReportPanel::createURLForTicket (const String& boundary)
 {
     URL happyFoxURL (String ("https://enhancia.happyfox.com/api/1.1/json/tickets/"));
 
-    // TODO
+    // Fills file array
+    Array<File> filesToAttach;
+    getFilestoAttach (filesToAttach);
+
+    // Creates POST data and attaches it to URL
+    String data = createMultipartData (mimeBoundary, filesToAttach);
+    happyFoxURL = happyFoxURL.withPOSTData (data);
 
 	return happyFoxURL;
 }
 
-String BugReportPanel::createMultipartData (const String& mimeBoundary, const Array<File>& txtFilesToAttach)
+String BugReportPanel::createMultipartData (const String& boundary, const Array<File>& txtFilesToAttach)
 {
 	String multipartData;
 
+	// Individual params
+    auto addFormDataParameter = [] (String& dataToAppendTo, const String paramName, const String paramValue, const String boundary)
+    {
+        dataToAppendTo += "--" + boundary + "\r\n";
+        dataToAppendTo += "Content-Disposition: form-data; name=\"" + paramName + "\"\r\n\r\n"
+                                                                    + paramValue
+                                                                    + "\r\n";
+    };
+
+    addFormDataParameter (multipartData, "subject", "\"Dashboard Bug Report\"", boundary);
+    addFormDataParameter (multipartData, "text", "\"" + messageEditor->getText() + "\"", boundary);
+    addFormDataParameter (multipartData, "category", "2", boundary);
+    addFormDataParameter (multipartData, "priority", "1", boundary);
+    addFormDataParameter (multipartData, "email", mailLabel->getText(), boundary);
+    addFormDataParameter (multipartData, "name", nameLabel->getText(), boundary);
+
+    // Log files
+    for (auto file : txtFilesToAttach)
+    {
+	    multipartData += "--" + boundary + "\r\n";
+	    multipartData += "Content-Disposition: form-data; name=\"attachments\"; filename=\"" + file.getFileName() + "\"\r\n"
+	                     "Content-Type: text/plain\r\n\r\n";
+	    // MAYBE TODO automotic Content-Type, if we link other files eventually
+
+	    multipartData += file.loadFileAsString() + "\r\n";
+	}
+
+    // End
+    multipartData += "--" + boundary + "--";
+
 	return multipartData;
+}
+
+void BugReportPanel::getFilestoAttach (Array<File>& fileArrayToFill)
+{
+	StringArray fileStrings;
+
+	#if JUCE_WINDOWS
+
+	// Dash Log File
+	fileStrings.add (File::getSpecialLocation (File::userApplicationDataDirectory).getFullPathName()
+							+ "\\Enhancia\\NeovaDashboard\\Logs\\neovaDashLog.txt");
+	// NRFUTIL Log File
+	fileStrings.add (File::getSpecialLocation (File::userApplicationDataDirectory).getFullPathName()
+							+ "\\Enhancia\\NeovaDashboard\\Logs\\nrfutilErr.log");
+	// Daemon Log File
+	fileStrings.add (File::getSpecialLocation (File::globalApplicationsDirectoryX86).getFullPathName()
+							+ "\\Enhancia\\Enhancia_Service_Reader\\Enhancia_Service_Reader_Log.txt");
+
+	#elif JUCE_MAC
+
+	// Dash Log File
+	fileStrings.add (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName()
+							+ "/Logs/Enhancia/NeovaDashboard/Logs/neovaDashLog.txt");
+	// NRFUTIL Log File
+	fileStrings.add (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName()
+							+ "/Logs/Enhancia/NeovaDashboard/Logs/nrfutilErr.txt");
+	// Daemon Log File
+	fileStrings.add (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName()
+							+ "/Caches/DaemonSerialPort_MacOS/EnhanciaDaemonlog.txt");
+
+	#endif
+
+	for (auto fileString : fileStrings)
+	{
+		if (File (fileString).existsAsFile())
+		{
+			fileArrayToFill.add (File (fileString));
+		}
+	}
 }

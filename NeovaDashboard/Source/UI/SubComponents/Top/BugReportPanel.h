@@ -56,8 +56,9 @@ private:
 
     //==============================================================================
     void sendTicketAndUpdate();
-    URL createURLForTicket();
-    String createMultipartData (const String& mimeBoundary, const Array<File>& txtFilesToAttach);
+    URL createURLForTicket (const String& boundary);
+    String createMultipartData (const String& boundary, const Array<File>& txtFilesToAttach);
+    void getFilestoAttach (Array<File>& fileArrayToFill);
 
     //==============================================================================
     juce::Rectangle<int> panelArea;
@@ -72,6 +73,12 @@ private:
     ReportStep currentStep = newReport;
     bool nameIsCorrect = false;
     bool mailIsCorrect = false;
+
+    //==============================================================================
+    const String key = "655b11ebbe874e48b754aca2a68f6af1";
+    const String code = "25cbca823bb449a0960ee5f4500095bc";
+    const String credentials;
+    const String mimeBoundary = "8b030e29628a41fc816c7ba481f509c3";
 
     //==============================================================================
     ApplicationCommandManager& commandManager;
