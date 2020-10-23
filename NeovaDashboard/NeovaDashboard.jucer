@@ -203,7 +203,7 @@
       </MODULEPATHS>
     </VS2017>
     <XCODE_MAC targetFolder="Builds/MacOSX" extraFrameworks="SystemConfiguration"
-               smallIcon="GG4enF" bigIcon="GG4enF">
+               smallIcon="GG4enF" bigIcon="GG4enF" customPList="&lt;plist version=&quot;1.0&quot;&gt;&#10;&lt;dict&gt;&#10;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;&lt;dict&gt;&#10;    &lt;key&gt;NSExceptionDomains&lt;/key&gt;&#10;    &lt;dict&gt;&#10;        &lt;key&gt;enhancia.happyfox.com&lt;/key&gt;&#10;        &lt;dict&gt;&#10;            &lt;key&gt;NSIncludesSubdomains&lt;/key&gt;&#10;            &lt;true/&gt;&#10;            &lt;key&gt;NSTemporaryExceptionAllowsInsecureHTTPLoads&lt;/key&gt;&#10;            &lt;true/&gt;&#10;        &lt;/dict&gt;&#10;    &lt;/dict&gt;&#10;&lt;/dict&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" headerPath="/Users/macbook/Documents/Dev Dashboard/Dashboard_Interface/NeovaDashboard/Source"
                        targetName="Dashboard - Neova"/>

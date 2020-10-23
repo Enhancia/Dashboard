@@ -279,11 +279,9 @@ void BugReportPanel::sendTicketAndUpdate()
 {
 	URL ticketURL = createURLForTicket (mimeBoundary);
 
-    //String credentials; // TODO Fill
-
     // Gets response headers and display them
-    const String headers ("Authorization:Basic " + credentials + "\r\n"
-                          "Content-Type:multipart/form-data;boundary=" + mimeBoundary + "\r\n");
+    const String headers ("\r\nAuthorization: Basic " + credentials + "\r\n"
+                          "Content-Type: multipart/form-data;boundary=" + mimeBoundary + "\r\n");
     int statusCode;
     StringPairArray responseHeaders;
 
@@ -291,21 +289,30 @@ void BugReportPanel::sendTicketAndUpdate()
                                                                            nullptr,
                                                                            nullptr,
                                                                            headers,
-                                                                           0,
+                                                                           10000,
                                                                            &responseHeaders,
                                                                            &statusCode,
                                                                            5,
                                                                            "POST"));
 
+
+    if (webStream == nullptr)
+    {
+        DBG ("Failed to create Input Stream !");
+        updateComponentsForSpecificStep (reportSentError);
+        return;
+    }
+    
     if (dynamic_cast<WebInputStream*> (webStream.get())->isError() || statusCode >= 400)
-    {   
+    {
     	const String response = webStream->readEntireStreamAsString();
 
     	DBG ("Failed to send ticket .. \n Stream error    ? "
     			<< (dynamic_cast<WebInputStream*> (webStream.get())->isError() ? "Yes" : "No")
     			<< "\n Code            : " << statusCode
     			<< "\n POST Data       : " << ticketURL.getPostData().substring (0, 1000)
-    			<< "\n Response Headers: " << responseHeaders.getDescription()
+                << "\n Request  Headers: " << dynamic_cast<WebInputStream*> (webStream.get())->getRequestHeaders().getDescription()
+                << "\n Response Headers: " << responseHeaders.getDescription()
 				<< "\n Response        : " << response);
 
 		updateComponentsForSpecificStep (reportSentError);
@@ -317,7 +324,13 @@ void BugReportPanel::sendTicketAndUpdate()
 
 URL BugReportPanel::createURLForTicket (const String& boundary)
 {
-    URL happyFoxURL (String ("https://enhancia.happyfox.com/api/1.1/json/tickets/"));
+    URL happyFoxURL;
+
+    #if JUCE_WINDOWS
+    happyFoxURL = happyFoxURL.withNewDomainAndPath ("https://enhancia.happyfox.com/api/1.1/json/tickets/");
+    #elif JUCE_MAC
+    happyFoxURL = happyFoxURL.withNewDomainAndPath ("http://enhancia.happyfox.com/api/1.1/json/tickets/"); // TODO change when we have SSL certificate
+    #endif
 
     // Fills file array
     Array<File> filesToAttach;
@@ -393,7 +406,7 @@ void BugReportPanel::getFilestoAttach (Array<File>& fileArrayToFill)
 							+ "/Logs/Enhancia/NeovaDashboard/Logs/nrfutilErr.txt");
 	// Daemon Log File
 	fileStrings.add (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName()
-							+ "/Caches/DaemonSerialPort_MacOS/EnhanciaDaemonlog.txt");
+							+ "/Caches/DaemonSeriaPort_MacOS/EnhanciaDaemonlog.txt");
 
 	#endif
 
