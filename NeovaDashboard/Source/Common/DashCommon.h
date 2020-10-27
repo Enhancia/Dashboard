@@ -150,7 +150,19 @@ namespace neova_dash
 
     namespace compatibility
     {
-        const int COMPATIBLE_FIRM = 202;
+        static bool isTestVersion()
+        {
+            if (JUCEApplication::getInstance() != nullptr)
+            {
+                return JUCEApplication::getInstance()->getApplicationVersion()
+                                                     .upToFirstOccurrenceOf (".", false, true)
+                                                     .getIntValue() >= 100;
+            }
+
+            return false;
+        }
+
+        const int COMPATIBLE_FIRM = 1;
     }
 
     namespace font
