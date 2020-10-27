@@ -13,7 +13,12 @@
 #include "upgradeHandler_Win.h"
 //==============================================================================
 UpgradeHandler::UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config, ApplicationCommandManager& manager)
-	: dPipe (dashPipe), hubConfig(config), commandManager (manager) {}
+	: dPipe (dashPipe), hubConfig(config), commandManager (manager)
+
+{
+	checkReleasesVersion();
+}
+
 UpgradeHandler::~UpgradeHandler() {}
 
 //==============================================================================

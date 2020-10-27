@@ -10,7 +10,7 @@
 
 #include "FirmDownloader.h"
 
-FirmDownloader::FirmDownloader()
+FirmDownloader::FirmDownloader (ApplicationCommandManager& manager) : commandManager (manager)
 {
 	downloadFolder = File::getSpecialLocation (File::userApplicationDataDirectory).getFullPathName() + releaseRelativeLocation;
 
@@ -101,10 +101,14 @@ void FirmDownloader::finished (URL::DownloadTask* task, bool success)
 
 	DBG ("Download finished " << (successful ? "Successfully" : "Unsuccessfully"));
 
-	if (device == hub)
+	if (device == hub) // Lauches download for ring
 	{
 		startTimer (400);
 	}
+
+	const MessageManagerLock mmLock;
+
+    commandManager.invokeDirectly (neova_dash::commands::checkAndUpdateNotifications, true);
 }
 
 void FirmDownloader::progress (URL::DownloadTask* task,

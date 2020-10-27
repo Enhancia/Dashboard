@@ -13,13 +13,16 @@
 #include "../../../../JuceLibraryCode/JuceHeader.h"
 #include "../../../Common/DashCommon.h"
 #include "../../../Common/HubConfiguration.h"
+#include "../../../DashUpdater/DashUpdater.h"
 #include "../DashShapeButton.h"
 
 #if JUCE_WINDOWS
 #include <windows.h>
 #include <ShellAPI.h>
+#include "../../../UpgradeHandler/upgradeHandler_Win.h"
 #elif JUCE_MAC
 #include <stdlib.h>
+#include "../../../UpgradeHandler/upgradeHandler_MacOS.h"
 #endif
 
 class OptionsPanel    : public Component,
@@ -27,7 +30,7 @@ class OptionsPanel    : public Component,
 {
 public:
     //==============================================================================
-    explicit OptionsPanel (HubConfiguration& config, ApplicationCommandManager& manager);
+    explicit OptionsPanel (HubConfiguration& config, DashUpdater& updtr, UpgradeHandler& handler, ApplicationCommandManager& manager);
     ~OptionsPanel();
 
     //==============================================================================
@@ -60,6 +63,9 @@ private:
         //==============================================================================
         void addTab (Component* panel, String tabName);
         void switchToTab (const int tabNumber);
+        void setTabAlertCount (const int tabNumber, const int alertCount);
+        void setTabAlertCount (const String tabName, const int alertCount);
+
         Component* getComponentFromTab (const int tabNumber);
         Component* getComponentFromTab (const String tabName);
         Component* getComponentFromSelectedTab();
@@ -110,7 +116,11 @@ private:
             std::unique_ptr<TabButton> button;
             std::unique_ptr<Component> panel;
             const String name;
+            int alertCount = 0;
         };
+
+        //==============================================================================
+        Tab* getTabByName (const String tabNameToSearch);
 
         //==============================================================================
         juce::Rectangle<int> panelArea, tabsArea;
@@ -129,6 +139,9 @@ private:
     void paintLegalAndRegulatoryArea (Graphics& g, juce::Rectangle<int> area);
 
     //==============================================================================
+    void setUpdateTabAlertCount();
+
+    //==============================================================================
     juce::Rectangle<int> optionsArea;
     std::unique_ptr<DashShapeButton> closeButton;
     TabbedOptions options;
@@ -139,10 +152,13 @@ private:
     
     //==============================================================================
     HubConfiguration& hubConfig;
+    DashUpdater& updater; /**< \brief Reference to the internal DashUpdater object. */
+    UpgradeHandler& upgradeHandler; /**< \brief Reference to the internal UpgradeHandler object. */
     ApplicationCommandManager& commandManager;
     std::unique_ptr<TextButton> sendReportButton;
     std::unique_ptr<TextButton> contactButton;
     std::unique_ptr<TextButton> upgradeButton;
+    std::unique_ptr<TextButton> updateButton;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OptionsPanel)
@@ -152,7 +168,7 @@ class ContactPanel: public Component, Button::Listener
 {
 public:
     //==============================================================================
-    ContactPanel();
+    ContactPanel (TextButton& bugReportButton);
     ~ContactPanel();
 
     //==============================================================================
@@ -165,8 +181,13 @@ public:
 private:
     //==============================================================================
     std::unique_ptr<TextButton> contactButton;
-    std::unique_ptr<TextButton> sendReportButton;
+    TextButton& sendReportButton;
 
+    //==============================================================================
+    juce::Rectangle<int> aboutArea;
+    juce::Rectangle<int> contactArea;
+    juce::Rectangle<int> creditsArea;
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ContactPanel)
 };
@@ -186,23 +207,35 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LegalPanel)
 };
 
-class FirmwarePanel: public Component
+class UpdateAndUpgradePanel: public Component
 {
 public:
     //==============================================================================
-    FirmwarePanel (HubConfiguration& hubConfiguration, TextButton& button);
-    ~FirmwarePanel();
+    UpdateAndUpgradePanel (HubConfiguration& hubConfiguration, DashUpdater& updtr, UpgradeHandler& handler,
+                           TextButton& firmButton, TextButton& softButton);
+    ~UpdateAndUpgradePanel();
 
     //==============================================================================
     void paint (Graphics& g) override;
     void resized() override;
 private:
     //==============================================================================
-    HubConfiguration& hubConfig;
-    TextButton& upgradeButton;
+    void paintFirmwareArea (Graphics& g);
+    void paintSoftwareArea (Graphics& g);
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FirmwarePanel)
+    HubConfiguration& hubConfig;
+    UpgradeHandler& upgradeHandler;
+    DashUpdater& updater;
+    TextButton& upgradeButton;
+    TextButton& updateButton;
+
+    //==============================================================================
+    juce::Rectangle<int> firmwareArea;
+    juce::Rectangle<int> softwareArea;
+
+    //==============================================================================
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UpdateAndUpgradePanel)
 };
 
 class LicensePanel: public Component
@@ -215,6 +248,7 @@ public:
     //==============================================================================
     void paint (Graphics& g) override;
     void resized() override;
+
 private:
     //==============================================================================
     TextEditor licenseTextEdit;

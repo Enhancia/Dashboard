@@ -65,7 +65,7 @@ public:
 		uint16_t hub_firmware_version; ////8 MSB => Major version / 8 => LSB Minor version. ex : 0x0001 = v0.1
 		uint16_t ring_firmware_version;
 
-		uint8_t active_preset = 0; //Ne sert à rien pour l'instant juste pour s'aligner au buffer du zub
+		uint8_t active_preset = 0; //Ne sert Ã  rien pour l'instant juste pour s'aligner au buffer du zub
 		uint8_t midiChannel = 0;
 
     	PresetData presetData0;
@@ -149,7 +149,12 @@ public:
 
     //==============================================================================
     void setSelectedGesture (const int gestureToSelect);
-    void selectFirstExistingGesture();
+    int selectFirstExistingGesture();
+    int selectLastExistingGesture();
+    int selectGestureLeft  (bool loop = false);
+    int selectGestureRight (bool loop = false);
+    int selectGestureUp    (bool loop = false);
+    int selectGestureDown  (bool loop = false);
     const int getSelectedGesture();
 
     //==============================================================================
@@ -177,7 +182,10 @@ public:
     bool getRingIsConnected();
 
     bool getHubIsCompatible();
-    int getHubIsCompatibleInt();
+    int  getHubIsCompatibleInt();
+    
+    bool isWaitingForRingCompatibility();
+    void stopWaitingForRingCompatibility();
 
 private:
     //==============================================================================
@@ -215,12 +223,12 @@ private:
     bool ringIsCharging = false;
     bool ringIsConnected = false;
 
+    //==============================================================================
     int hubIsCompatible = 0;
+    bool waitsForRingCompatibilityCheck = false;
 
     //==============================================================================
 	ConfigData config;
-
-    //==============================================================================
     OwnedArray<GestureData> lastGestureConfig;
     void initialiseLastGestureConfigs();
     void saveGestureConfig (const GestureData& gestureDataToSave);

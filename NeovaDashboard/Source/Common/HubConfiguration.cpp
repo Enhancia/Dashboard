@@ -258,7 +258,7 @@ void HubConfiguration::setSavedGestureValues (const int gestureNumber, const neo
 
 void HubConfiguration::setPreset (const int gestureNumberToSelect)
 {
-	if (gestureNumberToSelect < 0 || gestureNumberToSelect > 4 || gestureNumberToSelect == selectedPreset) return;
+	if (gestureNumberToSelect < 0 || gestureNumberToSelect > neova_dash::gesture::NUM_PRESETS || gestureNumberToSelect == selectedPreset) return;
 
 	selectedPreset = gestureNumberToSelect;
 	selectFirstExistingGesture();
@@ -270,7 +270,7 @@ void HubConfiguration::setPreset (const int gestureNumberToSelect)
 
 void HubConfiguration::setPreset (const int gestureNumberToSelect, bool uploadToHub)
 {
-	if (gestureNumberToSelect < 0 || gestureNumberToSelect > 4 || gestureNumberToSelect == selectedPreset) return;
+	if (gestureNumberToSelect < 0 || gestureNumberToSelect > neova_dash::gesture::NUM_PRESETS || gestureNumberToSelect == selectedPreset) return;
 
 	selectedPreset = gestureNumberToSelect;
 	selectFirstExistingGesture();
@@ -635,7 +635,7 @@ bool HubConfiguration::isIdAvailable (const int idToCheck)
 	return (getGestureData (idToCheck).type == neova_dash::gesture::none);
 }
 
-void HubConfiguration::selectFirstExistingGesture()
+int HubConfiguration::selectFirstExistingGesture()
 {
 	selectedGesture = -1;
 
@@ -644,9 +644,159 @@ void HubConfiguration::selectFirstExistingGesture()
         if (getGestureData (slot).type != neova_dash::gesture::none)
         {
             selectedGesture = slot;
-            return;
+            return selectedGesture;
         }
     }
+
+    return selectedGesture;
+}
+
+int HubConfiguration::selectLastExistingGesture()
+{
+	selectedGesture = -1;
+
+    for (int slot = neova_dash::gesture::NUM_GEST - 1; slot >= 0 ; slot--)
+    {
+        if (getGestureData (slot).type != neova_dash::gesture::none)
+        {
+            selectedGesture = slot;
+            return selectedGesture;
+        }
+    }
+
+    return selectedGesture;
+}
+
+int HubConfiguration::selectGestureLeft (bool loop)
+{
+	if (selectedGesture == -1)
+	{
+		selectFirstExistingGesture();
+		return selectedGesture;
+	}
+
+    int newSlot = selectedGesture - neova_dash::gesture::NUM_GEST/2;
+
+	if (newSlot >= 0 && getGestureData (newSlot).type != neova_dash::gesture::none)
+    {
+        selectedGesture = newSlot;
+        return selectedGesture;
+    }
+
+	if (loop && newSlot < 0 && getGestureData (newSlot + neova_dash::gesture::NUM_GEST).type != neova_dash::gesture::none)
+	{
+        selectedGesture = newSlot + neova_dash::gesture::NUM_GEST;
+        return selectedGesture;
+	}
+
+	return selectedGesture;
+}
+
+int HubConfiguration::selectGestureRight (bool loop)
+{
+	if (selectedGesture == -1)
+	{
+		selectLastExistingGesture();
+		return selectedGesture;
+	}
+
+    int newSlot = selectedGesture + neova_dash::gesture::NUM_GEST/2;
+
+    if (newSlot < neova_dash::gesture::NUM_GEST && getGestureData (newSlot).type != neova_dash::gesture::none)
+    {
+        selectedGesture = newSlot;
+        return selectedGesture;
+    }
+
+	if (loop && newSlot >= neova_dash::gesture::NUM_GEST && getGestureData (newSlot - neova_dash::gesture::NUM_GEST).type != neova_dash::gesture::none)
+	{
+        selectedGesture = newSlot - neova_dash::gesture::NUM_GEST;
+        return selectedGesture;
+	}
+
+	return selectedGesture;
+}
+
+int HubConfiguration::selectGestureUp (bool loop)
+{
+	if (selectedGesture == -1)
+	{
+		selectLastExistingGesture();
+		return selectedGesture;
+	}
+
+	const int currentSlotRow = selectedGesture / (neova_dash::gesture::NUM_GEST/2);
+
+    int newSlot = selectedGesture - 1;
+	int newSlotRow = newSlot / (neova_dash::gesture::NUM_GEST/2);
+
+    while (currentSlotRow == newSlotRow && newSlot >= 0)
+    {
+    	if (getGestureData (newSlot).type != neova_dash::gesture::none)
+    	{
+	        selectedGesture = newSlot;
+	        return selectedGesture;
+	    }
+
+	    newSlot--;
+	    newSlotRow = newSlot / (neova_dash::gesture::NUM_GEST/2);
+    }
+
+	if (loop && (currentSlotRow != newSlotRow || newSlot < 0) && getGestureData (newSlot + neova_dash::gesture::NUM_GEST).type != neova_dash::gesture::none)
+	{
+		newSlot = (currentSlotRow + 1) * (neova_dash::gesture::NUM_GEST/2) - 1;
+
+		while (getGestureData (newSlot).type == neova_dash::gesture::none)
+		{ 
+			newSlot--;
+		}
+
+        selectedGesture = newSlot;
+        return selectedGesture;
+	}
+
+	return selectedGesture;
+}
+
+int HubConfiguration::selectGestureDown (bool loop)
+{
+	if (selectedGesture == -1)
+	{
+		selectLastExistingGesture();
+		return selectedGesture;
+	}
+
+	const int currentSlotRow = selectedGesture / (neova_dash::gesture::NUM_GEST/2);
+
+    int newSlot = selectedGesture + 1;
+	int newSlotRow = newSlot / (neova_dash::gesture::NUM_GEST/2);
+
+    while (currentSlotRow == newSlotRow)
+    {
+    	if (getGestureData (newSlot).type != neova_dash::gesture::none)
+    	{
+	        selectedGesture = newSlot;
+	        return selectedGesture;
+	    }
+
+	    newSlot++;
+	    newSlotRow = newSlot / (neova_dash::gesture::NUM_GEST/2);
+    }
+
+	if (loop && currentSlotRow != newSlotRow && getGestureData (newSlot - neova_dash::gesture::NUM_GEST).type != neova_dash::gesture::none)
+	{
+		newSlot = currentSlotRow * (neova_dash::gesture::NUM_GEST/2);
+
+		while (getGestureData (newSlot).type == neova_dash::gesture::none)
+		{ 
+			newSlot++;
+		}
+
+        selectedGesture = newSlot;
+        return selectedGesture;
+	}
+
+	return selectedGesture;
 }
 
 const int HubConfiguration::findAvailableUndefinedCC()
@@ -699,7 +849,7 @@ void HubConfiguration::saveGestureConfig (const GestureData& gestureDataToSave)
 
 void HubConfiguration::checkHUBCompatibility()
 {
-	jassert (hubIsConnected);
+	if (!hubIsConnected) return;
 
 	const int hubMajor = (config.hub_firmware_version & 0xFF00) >> 8;
 	const int ringMajor = ringIsConnected ? (config.ring_firmware_version & 0xFF00) >> 8 : hubMajor;
@@ -715,5 +865,30 @@ void HubConfiguration::checkHUBCompatibility()
 		hubIsCompatible = 1;
 	}
 
-	else hubIsCompatible = -1;
+    else if (hubMajor < neova_dash::compatibility::COMPATIBLE_FIRM ||
+	    	 ringMajor < neova_dash::compatibility::COMPATIBLE_FIRM)
+	{		
+		if (ringIsConnected && ringMajor == 0 && hubMajor == neova_dash::compatibility::COMPATIBLE_FIRM)
+		{
+			// Specific case : HUB sent data before the ring could send its version. The check is
+			// postponed until receiving a configuration with a valid ring version number.
+			waitsForRingCompatibilityCheck = true;
+		}
+		else
+		{
+			hubIsCompatible = -1;
+		}
+	}
+}
+
+bool HubConfiguration::isWaitingForRingCompatibility()
+{
+	return waitsForRingCompatibilityCheck;
+}
+
+void HubConfiguration::stopWaitingForRingCompatibility()
+{
+	waitsForRingCompatibilityCheck = false;
+
+	checkHUBCompatibility();
 }

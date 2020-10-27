@@ -9,13 +9,10 @@
 namespace DashData
 {
     extern const char*   _200429__Enhancia_Software_Licence_txt;
-    const int            _200429__Enhancia_Software_Licence_txtSize = 4704;
+    const int            _200429__Enhancia_Software_Licence_txtSize = 4621;
 
     extern const char*   BRANDPopupgrey_png;
     const int            BRANDPopupgrey_pngSize = 15533;
-
-    extern const char*   BRANDPopupwhite_png;
-    const int            BRANDPopupwhite_pngSize = 18298;
 
     extern const char*   Dashiconv1_1_png;
     const int            Dashiconv1_1_pngSize = 775692;
@@ -72,7 +69,7 @@ namespace DashData
     const int            TTNormsRegular_otfSize = 155520;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 21;
+    const int namedResourceListSize = 20;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

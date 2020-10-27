@@ -26,18 +26,23 @@ namespace neova_dash
     	enum commandIDs
     	{
             // Backend commands
-            flashHub              = 0x00000001, // Writes Temp Hub Config To Its Memory
-            upgradeHub            = 0x00000002, // Upgrades Hub Firm
-            upgradeRing           = 0x00000003, // Upgrades Ring Firm
-            uploadConfigToHub     = 0x00000004, // Uploads config to HUB
-            updatePresetModeState = 0x00000005, // Updates the backend preset mode to fit the interface
+            flashHub                    = 0x00000001, // Writes Temp Hub Config To Its Memory
+            upgradeHub                  = 0x00000002, // Upgrades Hub Firm
+            upgradeRing                 = 0x00000003, // Upgrades Ring Firm
+            uploadConfigToHub           = 0x00000004, // Uploads config to HUB
+            updatePresetModeState       = 0x00000005, // Updates the backend preset mode to fit the interface
+            checkDashboardUpdate        = 0x00000006, // checks database for new dashboard updates
 
             // Frontend commands
-            updateDashInterface  = 0x01000001, // Updates Dash interface to match the HUB data
-            updateInterfaceLEDs  = 0x01000002, // Updates the Hub lEDs in the Dash interface
-            updateBatteryDisplay = 0x01000003, // Updates the battery display in the header
-            allowUserToFlashHub  = 0x01000004, // Updates upload button after config was changed
-            openFirmUpgradePanel = 0x01000005  // Launches the firm upgrade panel
+            updateDashInterface             = 0x01000001, // Updates Dash interface to match the HUB data
+            setStateAndUpdateDashInterface  = 0x01000002, // Updates Dash interface and state to match HUB data
+            updateInterfaceLEDs             = 0x01000003, // Updates the Hub lEDs in the Dash interface
+            updateBatteryDisplay            = 0x01000004, // Updates the battery display in the header
+            allowUserToFlashHub             = 0x01000005, // Updates upload button after config was changed
+            openFirmUpgradePanel            = 0x01000006, // Launches the firm upgrade panel
+            openDashboardUpdatePanel        = 0x01000007, // Launches the soft update panel
+            checkAndUpdateNotifications     = 0x01000008, // Updates and looks for data that should trigger notifications on the interface
+            openBugReportPanel              = 0x01000009  // Launches the bug report panel
     	};
     };
 
@@ -52,17 +57,17 @@ namespace neova_dash
         const float VIBRATO_DISPLAY_MAX  = 100.0f;
         const float VIBRATO_THRESH_DISPLAY_MAX = 100.0f;
     
-        const float PITCHBEND_DISPLAY_MIN = -90.0f;
-        const float PITCHBEND_DISPLAY_MAX =  90.0f;
+        const float PITCHBEND_DISPLAY_MIN = -80.0f;
+        const float PITCHBEND_DISPLAY_MAX =  80.0f;
     
-        const float TILT_DISPLAY_MIN = -90.0f;
-        const float TILT_DISPLAY_MAX =  90.0f;
+        const float TILT_DISPLAY_MIN = -80.0f;
+        const float TILT_DISPLAY_MAX =  80.0f;
     
-        const float ROLL_DISPLAY_MIN = -90.0f;
-        const float ROLL_DISPLAY_MAX =  90.0f;
+        const float ROLL_DISPLAY_MIN = -80.0f;
+        const float ROLL_DISPLAY_MAX =  80.0f;
     
-        const float WAVE_DISPLAY_MIN = -90.0f;
-        const float WAVE_DISPLAY_MAX =  90.0f;
+        const float WAVE_DISPLAY_MIN = -80.0f;
+        const float WAVE_DISPLAY_MAX =  80.0f;
 
         const int FRAMERATE = 60; // Display frequency in Hz
 
@@ -80,11 +85,14 @@ namespace neova_dash
         const Colour topPanelTransparentArea(0xc0000005);
         const Colour headerBackground       (0xff464646);
         const Colour uploadButtonBackground (0xff565656);
+        const Colour notificationBubble     (0xff8090f0);
+
         const Colour emptySlotOutline       (0xff808080);
         const Colour emptySlotBackground    (0x10808080);
         const Colour gestureHeader          (0xff636363);
         const Colour gestureBackground      (0xff353535);
         const Colour gestureBackground2     (0xff2c2c2c);
+
         const Colour mainText               (0xfff0f0f0);
         const Colour subText                (0x80f0f0f0);
 
@@ -118,13 +126,17 @@ namespace neova_dash
             if (rawBatteryValue < 3.46f && !isCharging) return 0.0f;
             else if (rawBatteryValue > 4.12 && isCharging) return 1.0f;
 
-            Array<float> batteryTiers ( {3.52f, 3.58f, 3.61f, 3.64f, 3.69f,
-                                          3.76f, 3.84f, 3.92f, 4.01f, 4.12f});
+            const float cutThresh = 3.46f;
+            Array<float> batteryTiers ( {3.52f, 3.58f, 3.61f, 3.64f,
+                                         3.69f, 3.76f, 3.84f, 3.92f, 4.01f, 4.12f});
 
-            float battery = isCharging ? 0.0f : 0.1f;
+            // Standard behaviour
+            float battery = 0.0f;
 
             for (float batteryTier : batteryTiers)
             {
+                if (isCharging && batteryTier == batteryTiers[0]) continue; // Skips 1st check if ring is charging, 1st level is 2nd battery tier
+
                 if (rawBatteryValue > batteryTier)
                 {
                     battery += 0.1f;
@@ -139,7 +151,19 @@ namespace neova_dash
 
     namespace compatibility
     {
-        const int COMPATIBLE_FIRM = 202;
+        static bool isTestVersion()
+        {
+            if (JUCEApplication::getInstance() != nullptr)
+            {
+                return JUCEApplication::getInstance()->getApplicationVersion()
+                                                     .upToFirstOccurrenceOf (".", false, true)
+                                                     .getIntValue() >= 100;
+            }
+
+            return false;
+        }
+
+        const int COMPATIBLE_FIRM = 1;
     }
 
     namespace font
@@ -189,5 +213,35 @@ namespace neova_dash
     namespace auth
     {
         const String MACHINE_TOKEN ("50327c582d22471d2427faed42c9928dcd8b0e98 "); //std::getenv ("MACHINE_ENHANCIA_OAUTH");
+    }
+
+    namespace keyboard_shortcut
+    {
+        const KeyPress selectGestureLeft     (KeyPress::leftKey);
+        const KeyPress selectGestureRight    (KeyPress::rightKey);
+        const KeyPress selectGestureUp       (KeyPress::upKey);
+        const KeyPress selectGestureDown     (KeyPress::downKey);
+        const KeyPress uploadToHub           ('s', ModifierKeys (ModifierKeys::commandModifier), 's');
+
+        #if JUCE_WINDOWS
+        const KeyPress deleteGesture         (KeyPress::deleteKey);
+        #elif JUCE_MAC
+        const KeyPress deleteGesture         (KeyPress::backspaceKey);
+        #endif
+
+        const KeyPress duplicateGesture      ('d', ModifierKeys (ModifierKeys::commandModifier), 'd');
+        const KeyPress displayOptions        ('o', ModifierKeys (ModifierKeys::commandModifier), 'o');
+        const KeyPress muteGesture           (KeyPress::spaceKey);
+        const KeyPress selectNextBank        (KeyPress::rightKey, ModifierKeys (ModifierKeys::commandModifier), 0);
+        const KeyPress selectPreviousBank    (KeyPress::leftKey, ModifierKeys (ModifierKeys::commandModifier), 0);
+        const KeyPress selectBank1           ('1', ModifierKeys (ModifierKeys::commandModifier), '1');
+        const KeyPress selectBank2           ('2', ModifierKeys (ModifierKeys::commandModifier), '2');
+        const KeyPress selectBank3           ('3', ModifierKeys (ModifierKeys::commandModifier), '3');
+        const KeyPress selectBank4           ('4', ModifierKeys (ModifierKeys::commandModifier), '4');
+        const KeyPress muteGesture1          (KeyPress::numberPad1);
+        const KeyPress muteGesture2          (KeyPress::numberPad2);
+        const KeyPress muteGesture3          (KeyPress::numberPad3);
+        const KeyPress muteGesture4          (KeyPress::numberPad4);
+        const KeyPress easterEgg             ('n', ModifierKeys (ModifierKeys::commandModifier + ModifierKeys::shiftModifier), 'N');
     }
 };

@@ -42,8 +42,6 @@ void NewGesturePanel::paint (Graphics& g)
     gradTransp.addColour (0.05f, neova_dash::colour::topPanelTransparentArea);
 
     g.setGradientFill (gradTransp);
-    
-    //g.setColour (Colours::black); // TO DELETE
     g.fillRect (getLocalBounds());
     
     // panel area

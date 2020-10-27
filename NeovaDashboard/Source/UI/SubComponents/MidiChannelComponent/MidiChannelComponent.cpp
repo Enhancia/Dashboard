@@ -31,14 +31,17 @@ void MidiChannelComponent::paint (Graphics& g)
 	g.setColour (neova_dash::colour::mainText);
 
 	//g.drawRect (getLocalBounds());
-	g.drawText ("MIDI Channel :", getLocalBounds().withRight (midiChannelBox.getX()), Justification::centred);
+	g.drawText ("MIDI Channel:", getLocalBounds().withRight (midiChannelBox.getX()), Justification::left);
+	g.drawText (midiChannelBox.getText(), getLocalBounds().withTrimmedLeft (g.getCurrentFont().getStringWidth ("MIDI Channel:"))
+														  .withTrimmedRight (15)
+										, Justification::centred);
 }
 
 void MidiChannelComponent::resized()
 {
 	auto area = getLocalBounds();
 
-	midiChannelBox.setBounds (area.removeFromRight (getWidth()/3));
+	midiChannelBox.setBounds (area.removeFromRight (getWidth()*3/8));
 }
 
 void MidiChannelComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
@@ -46,6 +49,7 @@ void MidiChannelComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 	if (auto* comboBoxThatHasChanged = &midiChannelBox)
 	{
 		hubConfig.setMidiChannelExclusive (midiChannelBox.getSelectedId() - 1);
+		repaint();
 	}
 }
 
@@ -76,6 +80,7 @@ void MidiChannelComponent::createComboBox()
 	}
 
 	midiChannelBox.setJustificationType (Justification::centred);
+	midiChannelBox.setColour (ComboBox::textColourId, Colour (0x000000));
 	midiChannelBox.addListener (this);
 
 	//update();
