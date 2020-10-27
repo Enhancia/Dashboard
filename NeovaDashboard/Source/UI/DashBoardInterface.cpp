@@ -26,6 +26,9 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     updaterPanel = std::make_unique<UpdaterPanel> (updater, getCommandManager(), updater.getDownloadProgressReference());
     addAndMakeVisible (*updaterPanel);
 
+    bugReportPanel = std::make_unique<BugReportPanel> (getCommandManager());
+    addAndMakeVisible (*bugReportPanel);
+
     header = std::make_unique<HeaderComponent> (*optionsPanel, hubConfig, dataReader);
     addAndMakeVisible (*header);
 	
@@ -64,6 +67,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
         updaterPanel->resetAndOpenPanel();
     }
     else updaterPanel->setVisible (false);
+    bugReportPanel->setVisible (false);
+    bugReportPanel->setAlwaysOnTop (true);
 
     // Sets settings
     juce::Rectangle<int> screenArea  = Desktop::getInstance().getDisplays()
@@ -206,6 +211,7 @@ void DashBoardInterface::resized()
     optionsPanel->setBounds (area);
     firmUpgradePanel->setBounds (area);
     updaterPanel->setBounds (area);
+    bugReportPanel->setBounds (area);
 
 	auto gPanelArea = area.removeFromBottom (area.getHeight() / 2 - 35);
 
@@ -435,7 +441,8 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
                             allowUserToFlashHub,
                             openFirmUpgradePanel,
                             openDashboardUpdatePanel,
-                            checkAndUpdateNotifications
+                            checkAndUpdateNotifications,
+                            openBugReportPanel
                        });
 }
 
@@ -470,6 +477,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
             result.setInfo ("Check And Update Notifications", "Updates info that could trigger a notification"
                                                               " and updates interface to display potential notifications",
                                                               "Interface", 0);
+            break;
+        case openBugReportPanel:
+            result.setInfo ("Open Bug Report Panel", "Opens Panel To Bug Report Procedure", "Interface", 0);
             break;
         default:
             break;
@@ -537,6 +547,15 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             updater.checkForNewAvailableVersion();
 
             updateForNotifications();
+            return true;
+
+        case openBugReportPanel:
+            if (!optionsPanel->isVisible())
+            {
+                optionsPanel->setVisible (true);
+            }
+            
+            bugReportPanel->resetAndOpenPanel();
             return true;
 
         default:

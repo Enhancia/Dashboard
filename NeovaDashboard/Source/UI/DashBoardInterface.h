@@ -18,6 +18,7 @@
 #include "SubComponents/Top/FirmUpgradePanel.h"
 #include "SubComponents/Top/NewGesturePanel.h"
 #include "SubComponents/Top/UpdaterPanel.h"
+#include "SubComponents/Top/BugReportPanel.h"
 #include "SubComponents/HeaderComponent.h"
 #include "SubComponents/HubComponent/HubComponent.h"
 #include "SubComponents/MidiChannelComponent/MidiChannelComponent.h"
@@ -259,6 +260,7 @@ private:
     std::unique_ptr<OptionsPanel> optionsPanel; /**< \brief Interface's option menu. */
     std::unique_ptr<FirmUpgradePanel> firmUpgradePanel; /**< \brief Interface's firmware upgrade alert panel. */
     std::unique_ptr<UpdaterPanel> updaterPanel; /**< \brief Interface's update menu. */
+    std::unique_ptr<BugReportPanel> bugReportPanel; /**< \brief Interface's bug report menu. */
     std::unique_ptr<MidiChannelComponent> midiChannelComponent; /**< \brief Interface's MIDI channel selector */
     std::unique_ptr<DashAlertPanel> alertPanel; /**< \brief Interface's modal alert panel. */
 

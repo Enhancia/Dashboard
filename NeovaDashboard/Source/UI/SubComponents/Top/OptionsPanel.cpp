@@ -17,7 +17,7 @@ OptionsPanel::OptionsPanel (HubConfiguration& config, DashUpdater& updtr, Upgrad
     TRACE_IN;
 
     createButtons();
-    options.addTab (new ContactPanel(), "About");
+    options.addTab (new ContactPanel (*sendReportButton.get()), "About");
     options.addTab (new UpdateAndUpgradePanel (hubConfig, updater, upgradeHandler,
 											   *upgradeButton.get(), *updateButton.get()), "Updates");
     options.addTab (new LegalPanel(), "Legal");
@@ -129,6 +129,11 @@ void OptionsPanel::buttonClicked (Button* bttn)
     {
         commandManager.invokeDirectly (neova_dash::commands::checkDashboardUpdate, true);
     }
+
+    if (bttn == sendReportButton.get())
+    {
+        commandManager.invokeDirectly (neova_dash::commands::openBugReportPanel, true);
+    }
 }
 
 void OptionsPanel::mouseUp (const MouseEvent& event)
@@ -199,6 +204,10 @@ void OptionsPanel::createButtons()
     //Update Soft button
     updateButton = std::make_unique <TextButton> ("Check Updates");
     updateButton->addListener (this);
+
+    //Send Report button
+    sendReportButton = std::make_unique <TextButton> ("Send Bug Report");
+    sendReportButton->addListener (this);
 }
 
 void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> area)
@@ -531,17 +540,14 @@ OptionsPanel::TabbedOptions::Tab* OptionsPanel::TabbedOptions::getTabByName (con
 
 // ====================== ContactPanel =========================
 
-ContactPanel::ContactPanel()
+ContactPanel::ContactPanel (TextButton& bugReportButton) : sendReportButton (bugReportButton)
 {
     //Contact button
     contactButton = std::make_unique <TextButton> ("Contact Enhancia");
     addAndMakeVisible (*contactButton);
     contactButton->addListener (this);
 
-    //Send Report button
-    sendReportButton = std::make_unique <TextButton> ("Send Bug Report");
-    addAndMakeVisible (*sendReportButton);
-    sendReportButton->addListener (this);
+    addAndMakeVisible (sendReportButton);
 }
 
 ContactPanel::~ContactPanel()
@@ -597,48 +603,12 @@ void ContactPanel::resized()
     contactButton->setBounds (contactAreaTemp.removeFromLeft (contactAreaTemp.getWidth()/2)
                                              .withSizeKeepingCentre (contactButton->getBestWidthForHeight (30), 30));
     
-    sendReportButton->setBounds (contactAreaTemp.withSizeKeepingCentre (contactButton->getBestWidthForHeight (30), 30));
+    sendReportButton.setBounds (contactAreaTemp.withSizeKeepingCentre (contactButton->getBestWidthForHeight (30), 30));
 }
 
 void ContactPanel::buttonClicked (Button* bttn)
 {
-    if (bttn == sendReportButton.get())
-    {
-        if (auto* dashLogger = dynamic_cast<FileLogger*> (Logger::getCurrentLogger()))
-        {
-            String fullLog = dashLogger->getLogFile().loadFileAsString().removeCharacters ("\n");
-            
-            /* Only keeps the last 3 entries of the log: the one that had an issue, 
-               the one used to send the report, and one more to cover cases where the plugin
-               has to be checked (For instance the plugin check when launching Ableton..)
-               If too long, keeps the 6000 last characters.. */
-            int startIndex = jmax (fullLog.upToLastOccurrenceOf("Neova Dashboard Log", false, false)
-                                          .upToLastOccurrenceOf("Neova Dashboard Log", false, false)
-                                          .lastIndexOf("Neova Dashboard Log"),
-                                   fullLog.length() - 6000);
-      
-          #if JUCE_WINDOWS                    
-            String mail_str ("mailto:damien.leboulaire@enhancia.co"
-                             "?Subject=[Neova Dashboard Report]"
-                             "&cc=alex.levacher@enhancia.co"
-                             "&body=" + fullLog.substring (startIndex));
-            LPCSTR mail_lpc = mail_str.toUTF8();
-
-            ShellExecute (NULL, "open", mail_lpc,
-                          "", "", SW_SHOWNORMAL);
-
-          #elif JUCE_MAC                    
-            String mail_str ("open mailto:damien.leboulaire@enhancia.co"
-                             "?Subject=\"[Neova Dashboard Report]\""
-                             "\\&cc=alex.levacher@enhancia.co"
-                             "\\&body=\"" + fullLog.substring (startIndex) + "\"");
-        
-            system (mail_str.toUTF8());
-          #endif
-        }
-    }
-
-    else if (bttn == contactButton.get())
+    if (bttn == contactButton.get())
     {
         URL ("https://www.enhancia-music.com/contact/").launchInDefaultBrowser();
     }
