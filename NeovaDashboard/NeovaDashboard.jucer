@@ -138,6 +138,10 @@
                   file="Source/UI/SubComponents/MidiChannelComponent/MidiChannelComponent.h"/>
           </GROUP>
           <GROUP id="{51129B3F-9778-3EB2-0AEC-193428E77A11}" name="Top">
+            <FILE id="ooGcfS" name="BugReportPanel.cpp" compile="1" resource="0"
+                  file="Source/UI/SubComponents/Top/BugReportPanel.cpp"/>
+            <FILE id="uEMOKz" name="BugReportPanel.h" compile="0" resource="0"
+                  file="Source/UI/SubComponents/Top/BugReportPanel.h"/>
             <FILE id="BzMjm3" name="DashAlertPanel.cpp" compile="1" resource="0"
                   file="Source/UI/SubComponents/Top/DashAlertPanel.cpp"/>
             <FILE id="Ko72q9" name="DashAlertPanel.h" compile="0" resource="0"
@@ -199,7 +203,7 @@
       </MODULEPATHS>
     </VS2017>
     <XCODE_MAC targetFolder="Builds/MacOSX" extraFrameworks="SystemConfiguration"
-               smallIcon="GG4enF" bigIcon="GG4enF">
+               smallIcon="GG4enF" bigIcon="GG4enF" customPList="&lt;plist version=&quot;1.0&quot;&gt;&#10;&lt;dict&gt;&#10;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;&lt;dict&gt;&#10;    &lt;key&gt;NSExceptionDomains&lt;/key&gt;&#10;    &lt;dict&gt;&#10;        &lt;key&gt;enhancia.happyfox.com&lt;/key&gt;&#10;        &lt;dict&gt;&#10;            &lt;key&gt;NSIncludesSubdomains&lt;/key&gt;&#10;            &lt;true/&gt;&#10;            &lt;key&gt;NSTemporaryExceptionAllowsInsecureHTTPLoads&lt;/key&gt;&#10;            &lt;true/&gt;&#10;        &lt;/dict&gt;&#10;    &lt;/dict&gt;&#10;&lt;/dict&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" headerPath="/Users/macbook/Documents/Dev Dashboard/Dashboard_Interface/NeovaDashboard/Source"
                        targetName="Dashboard - Neova"/>

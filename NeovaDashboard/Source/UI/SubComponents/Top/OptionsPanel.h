@@ -168,7 +168,7 @@ class ContactPanel: public Component, Button::Listener
 {
 public:
     //==============================================================================
-    ContactPanel();
+    ContactPanel (TextButton& bugReportButton);
     ~ContactPanel();
 
     //==============================================================================
@@ -181,7 +181,7 @@ public:
 private:
     //==============================================================================
     std::unique_ptr<TextButton> contactButton;
-    std::unique_ptr<TextButton> sendReportButton;
+    TextButton& sendReportButton;
 
     //==============================================================================
     juce::Rectangle<int> aboutArea;
