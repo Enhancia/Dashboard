@@ -103,11 +103,12 @@ void OneRangeTuner::resizeButtons()
 {
     using namespace neova_dash::ui;
 
-    auto buttonsArea = getLocalBounds().reduced (0, 2*MARGIN)
-									   .withLeft (getLocalBounds().getRight() - 70);
+    auto buttonsArea = getLocalBounds().withLeft (getLocalBounds().getRight() - 80)
+                                       .withHeight (70)
+                                       .reduced (MARGIN);
 
-    maxAngleButton->setBounds (buttonsArea.removeFromTop (35).reduced (MARGIN/2));
-    minAngleButton->setBounds (buttonsArea.removeFromTop (35).reduced (MARGIN/2));
+    maxAngleButton->setBounds (buttonsArea.removeFromTop (buttonsArea.getHeight()/2).withTrimmedBottom (MARGIN/2));
+    minAngleButton->setBounds (buttonsArea.withTrimmedTop (MARGIN/2));
 }
     
 void OneRangeTuner::updateComponents()
@@ -294,13 +295,25 @@ void OneRangeTuner::buttonClicked (Button* bttn)
 {
     if (bttn == minAngleButton)
     {
-        lowSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
+        if (value > getRangeHigh())
+        {
+            highSlider->setValue (value, sendNotification);
+            setRangeHigh (float (highSlider->getValue()));
+        }
+
+        lowSlider->setValue (value, sendNotification);
         setRangeLow (float (lowSlider->getValue()));
     }
 
     else if (bttn == maxAngleButton)
     {
-        highSlider->setValue (/*gestureRange.convertFrom0to1 (value)*/ value, sendNotification);
+        if (value < getRangeLow())
+        {
+            lowSlider->setValue (value, sendNotification);
+            setRangeLow (float (lowSlider->getValue()));
+        }
+
+        highSlider->setValue (value, sendNotification);
         setRangeHigh (float (highSlider->getValue()));
     }
 }

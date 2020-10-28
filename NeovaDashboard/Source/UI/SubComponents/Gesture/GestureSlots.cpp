@@ -89,11 +89,11 @@ void GestureComponent::paint (Graphics& g)
     g.setColour (neova_dash::colour::subText);
     
     g.drawText (hubConfig.getGestureData (id).midiType == neova_dash::gesture::pitchMidi
-                    ? "Pitch MIDI"
+                    ? "Pitch"
                     : hubConfig.getGestureData (id).midiType == neova_dash::gesture::ccMidi
-                        ? "CC " + String (hubConfig.getGestureData (id).cc) + " MIDI"
+                        ? "CC " + String (hubConfig.getGestureData (id).cc)
                         : hubConfig.getGestureData (id).midiType == neova_dash::gesture::afterTouchMidi
-                            ? "Aftertouch Midi" : "Unknown MIDI",
+                            ? "Aftertouch" : "Unknown MIDI",
                 stateArea, Justification::centred, true);
 
     // Highlight
@@ -172,6 +172,8 @@ void GestureComponent::createButton()
 
         commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
     };
+
+    muteButton->setVisible (gesture::isValidGestureType (type));
 }
 
 void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)

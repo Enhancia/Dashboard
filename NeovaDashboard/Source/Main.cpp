@@ -66,7 +66,7 @@ public:
 
 		upgradeHandler = std::make_unique<UpgradeHandler>(*dashPipe, hubConfig, commandManager);
 		updater = std::make_unique<DashUpdater>();
-		firmDownloader = std::make_unique<FirmDownloader>();
+		firmDownloader = std::make_unique<FirmDownloader> (commandManager);
 
 		/* Test if hub is already connected */
 		/* For testing */
@@ -80,7 +80,6 @@ public:
     	mainWindow.reset (new MainWindow (getApplicationName(), dashInterface.get(), hubConfig));
     	dashInterface->grabKeyboardFocus();
     
-    	//dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::waitingForConnection);
 		DBG("POWER STATE : " + String(hubPowerState) + " \n");
     
     	commandManager.registerAllCommandsForTarget (this);
@@ -130,8 +129,22 @@ public:
 			case 0x03:
 				DBG("config received\n");
 				hubConfig.setConfig(data + 12);
+				
+				if (hubPowerState != POWER_OFF)
+				{
+					if (hubConfig.isWaitingForRingCompatibility() && ((hubConfig.getRingFirmwareVersionUint16() & 0xFF00) >> 8) > 0)
+					{
+						// Dash was waiting for a valid ring firmware version, which it got !
+						hubConfig.stopWaitingForRingCompatibility();
 
-				if (hubPowerState != POWER_OFF) hubConfig.notifyConfigWasChanged();
+						if (dashInterface->hasKeyboardFocus (true)) commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
+						else 										dashInterface->setInterfaceStateAndUpdate();
+					}
+					else
+					{
+						hubConfig.notifyConfigWasChanged();
+					}
+				}
 
 				if (hubPowerState == POWER_OFF)
 				{
@@ -140,10 +153,11 @@ public:
 					//TODO => mettre interface en mode POWER_ON
 					hubConfig.setHubIsConnected (true);
 					upgradeHandler->checkForSuccessiveUpgrade();
-
-					if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
-					else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
+					
+					if (dashInterface->hasKeyboardFocus (true)) commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
+					else 										dashInterface->setInterfaceStateAndUpdate();
 				}
+
 				if (!dashInterface->hasKeyboardFocus (true))
 				{
 					dashInterface->grabKeyboardFocus();
@@ -174,6 +188,9 @@ public:
 
 			case 0x06:
 				DBG("hub_power_state received\n");
+
+				DBG("KBD FOCUS ? " << (dashInterface->hasKeyboardFocus(true) ? "YES" : "NO"));
+
 				if (hubPowerState == POWER_OFF && *(uint8_t*)(data + 12) == POWER_ON)
 				{
 					/*2 cas possibles :	- hub branché après lancement dashBoard et driver envoie POWER_ON CMD à sa connexion
@@ -195,14 +212,16 @@ public:
 					{
 						hubConfig.setHubIsConnected (true);
 						upgradeHandler->checkForSuccessiveUpgrade();
-
-						if (hubConfig.getHubIsCompatible()) dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::connected);
-						else 								dashInterface->setInterfaceStateAndUpdate (DashBoardInterface::incompatible);
+						
+						if (dashInterface->hasKeyboardFocus (true)) commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
+						else 										dashInterface->setInterfaceStateAndUpdate();
 					}
 					else if (hubPowerState == POWER_OFF)
 					{
 						hubConfig.setHubIsConnected (false);
-						dashInterface->setInterfaceStateAndUpdate(DashBoardInterface::waitingForConnection);
+						
+						if (dashInterface->hasKeyboardFocus (true)) commandManager.invokeDirectly(neova_dash::commands::setStateAndUpdateDashInterface, true);
+						else 										dashInterface->setInterfaceStateAndUpdate();
 					}
 					else
 					{
@@ -251,8 +270,10 @@ public:
 				else if (type_of_firm == UpgradeHandler::err_two_hub)
 				{
 					DBG("two hub connected\n");
-					//TODO sale, à refaire car bloque le process
-					AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", "Two hubs detected, the 2nd one will not be recognize (disconnect all the hubs & reconnect the 2nd to use it)", "Sorry, Thanks", nullptr);
+                	dashInterface->createAndShowAlertPanel ("Error", "Two hubs detected. Only the first one will be used."
+                													 "(Disconnect all the hubs and reconnect the latter one to use it)",
+                													 "Ok", true, 0);
+					//AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Erreur", , "Sorry, Thanks", nullptr);
 				}
 				else
 				{
@@ -261,6 +282,13 @@ public:
 				break;
 			}
 		}
+	}
+
+	bool isFirmwareUpgrading()
+	{
+		return (upgradeHandler->getUpgradeState() == UpgradeHandler::waitingForUpgradeFirm ||
+        		upgradeHandler->getUpgradeState() == UpgradeHandler::upgradeFirmConnected  ||
+        		upgradeHandler->getUpgradeState() == UpgradeHandler::upgradeInProgress);
 	}
 
     //==============================================================================
@@ -288,6 +316,10 @@ public:
         	{
         		dashboardInterface.createAndShowAlertPanel (DashAlertPanel::noUploadQuitting);
         	}
+        	else if (dynamic_cast<Neova_DashBoard_Interface*> (JUCEApplication::getInstance())->isFirmwareUpgrading())
+        	{
+        		dashboardInterface.createAndShowAlertPanel (DashAlertPanel::upgradePending);
+        	}
         	else
         	{
             	JUCEApplication::getInstance()->systemRequestedQuit();
@@ -311,7 +343,8 @@ public:
                               upgradeHub,
                               upgradeRing,
                               uploadConfigToHub,
-                              updatePresetModeState
+                              updatePresetModeState,
+                              checkDashboardUpdate
                            });
     }
 
@@ -334,9 +367,18 @@ public:
             case upgradeRing:
                 result.setInfo ("Upgrade Ring Firmware", "Updgrades the ring firmware to the most recent version",
                                                          "Firm Update", 0);
+                break;
             case updatePresetModeState:
                 result.setInfo ("Update Preset Mode State", "Updates Preset Mode To Fit Interface",
                                                             "Hub State Set", 0);
+            	break;
+            case checkDashboardUpdate:
+                result.setInfo ("Check Dashboard Update", "Checks the Dashboard for new updates",
+                                                          "Dashbaord Update", 0);
+                break;
+            case checkAndUpdateNotifications:
+                result.setInfo ("Check Dashboard Update", "Checks the Dashboard for new updates",
+                                                          "Dashbaord Update", 0);
                 break;
             default:
                 break;
@@ -382,6 +424,12 @@ public:
 
             case upgradeRing:
                 return true;
+
+            case checkDashboardUpdate:
+            	updater->checkForNewAvailableVersion();
+            	
+            	commandManager.invokeDirectly (neova_dash::commands::openDashboardUpdatePanel, true);
+            	return true;
 
             default:
                 return false;

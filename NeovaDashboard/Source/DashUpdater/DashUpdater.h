@@ -68,7 +68,8 @@ private:
 
 	//==============================================================================
     const String AUTH_TOKEN = "1ebaae86812185390234259e630e73b92c38da4a"; /*std::getenv ("MACHINE_ENHANCIA_OAUTH");*/
-    const URL REPO_URL = URL ("https://api.github.com/repos/Enhancia/Dashboard_Releases/releases/latest"); /*std::getenv ("REALEASE_REPO_PATH");*/
+    const URL REPO_URL = URL (neova_dash::compatibility::isTestVersion() ? "https://api.github.com/repos/Enhancia/Dashboard_Releases_Internal/releases/latest"
+                                                                         : "https://api.github.com/repos/Enhancia/Dashboard_Releases/releases/latest"); /*std::getenv ("REALEASE_REPO_PATH");*/
 
     //==============================================================================
     String fileToDownloadString = "";

@@ -26,6 +26,7 @@ public:
     {
         outdatedFirmware = 1,
         noUploadQuitting,
+        upgradePending,
         unknown
     };
 

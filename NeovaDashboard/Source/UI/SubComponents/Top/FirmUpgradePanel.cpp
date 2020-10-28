@@ -11,8 +11,8 @@
 #include "FirmUpgradePanel.h"
 
 //==============================================================================
-FirmUpgradePanel::FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler)
-	: hubConfig (config), upgradeHandler (handler)
+FirmUpgradePanel::FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler, ApplicationCommandManager& manager)
+	: hubConfig (config), upgradeHandler (handler), commandManager (manager)
 {
     createLabels();
     createButtons();
@@ -26,19 +26,17 @@ void FirmUpgradePanel::paint (Graphics& g)
 {
     using namespace neova_dash::colour;
     
-    // options panel area
+    // firmware panel area
     g.setColour (topPanelBackground);
-    g.fillRoundedRectangle (panelArea.toFloat(), 10.0f);
-    
-    // options panel outline
-    auto gradOut = ColourGradient::horizontal (Colour (0x10ffffff),
-                                               float (panelArea.getX()), 
-                                               Colour (0x10ffffff),
-                                               float(panelArea.getRight()));
-    gradOut.addColour (0.5, Colour (0x50ffffff));
+    g.fillRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f);
 
-    g.setGradientFill (gradOut);
-    g.drawRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f, 1.0f);
+    if (currentState > 0 && currentState < upgradeSuccessfull)
+    {
+    	g.setColour (subText);
+    	g.setFont (neova_dash::font::dashFontNorms.withHeight (13.0f));
+    	g.drawFittedText ("Do not disconnect Neova during the upgrade.\n\nPlease keep your ring charging during the process.", panelArea.reduced (neova_dash::ui::MARGIN),
+    				Justification::centredBottom, 3);
+    }
 }
 
 void FirmUpgradePanel::resized()
@@ -46,7 +44,8 @@ void FirmUpgradePanel::resized()
 	using namespace neova_dash::ui;
 
     //panelArea = getLocalBounds().withSizeKeepingCentre (getLocalBounds().getWidth()/3, getLocalBounds().getHeight()/3);
-    panelArea = getLocalBounds().withSizeKeepingCentre (getLocalBounds().getWidth()*3/5, getLocalBounds().getHeight()*3/5);
+    //panelArea = getLocalBounds().withSizeKeepingCentre (getLocalBounds().getWidth()*3/5, getLocalBounds().getHeight()*3/5);
+    panelArea = getLocalBounds().reduced (getWidth()/5, getHeight()/4);
     
     // Close Button
     #if JUCE_WINDOWS
@@ -85,12 +84,18 @@ void FirmUpgradePanel::timerCallback()
 			if (currentState < 0) stopTimer(); // Error: terminates the upgrade process
 
 			updateComponentsForSpecificState (upgradeHandler.getUpgradeState());
+			repaint();
 		}
 		else if (currentState != waitingForHubReconnect)
 		{
 			jassert (currentState == upgradeInProgress);
 			updateComponentsForSpecificState (waitingForHubReconnect);
 			startTimeoutCount();
+			
+			if (hubConfig.getHubIsConnected())
+			{
+				updateAfterHubConnection();
+			}
 		}
 	}
 
@@ -130,7 +135,7 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 
 	else if (bttn == upgradeButton.get())
 	{
-		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16());
+		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16() && hubConfig.getHubIsConnected());
 		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16() && hubConfig.getRingIsConnected());
 
 		currentUpgrade = (!ringAvailable && hubAvailable) ? hub : ring;
@@ -152,6 +157,8 @@ void FirmUpgradePanel::closeAndResetPanel()
 	setVisible (false);
 	currentUpgrade = none;
 	updateComponentsForSpecificState (checkingReleases);
+    
+    commandManager.invokeDirectly (neova_dash::commands::checkAndUpdateNotifications, true);
 }
 
 void FirmUpgradePanel::updateAfterHubConnection()
@@ -256,7 +263,7 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 	}
 	else
 	{
-		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16());
+		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16()) && hubConfig.getHubIsConnected();
 		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected();
 
 		closeButton->setVisible (false);
@@ -272,7 +279,7 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 					upgradeButton->setVisible (hubAvailable || ringAvailable);
 					if (!hubAvailable && !ringAvailable) okButton->setVisible (true);
 
-					titleLabel->setText ("Firmware Update", dontSendNotification);
+					titleLabel->setText ("Firmware Upgrade", dontSendNotification);
     				bodyText->setJustificationType (Justification::centred);
 
 					if (!hubConfig.getHubIsConnected())
@@ -381,8 +388,8 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 
 					titleLabel->setText ("Warning", dontSendNotification);
 					bodyTextString = "Please make sure your hub is connected with your ring charging on top.\n\n"
-									   "Make sure you ring is connected and has some battery. Do not disconnect your HUB during the process.\n\n"
-									   "Please note that it may take a several minutes to complete.";
+									   "Do not disconnect your HUB during the process.\n\n\n"
+									   "The upgrade may take a several minutes to complete.";
 					break;
 
 				default:
@@ -453,7 +460,7 @@ String FirmUpgradePanel::getFormattedVersionString (uint16_t version)
 
 void FirmUpgradePanel::animateUpgrade()
 {
-	if (currentState > 0)
+	if (currentState > 0 && currentState != upgradeSuccessfull)
 	{
 		if (upgradeAnimationString.length() >= 6) upgradeAnimationString = "";
 		else upgradeAnimationString += " .";
@@ -469,7 +476,7 @@ void FirmUpgradePanel::startTimeoutCount()
 
 void FirmUpgradePanel::timeoutCheck()
 {
-	if (timeoutCounter >= 30) // While waiting for the hub, the timer acts as a timeout in case hub doesnt reconnect
+	if (timeoutCounter >= 45) // While waiting for the hub, the timer acts as a timeout in case hub doesnt reconnect
 	{
 		DBG ("HUB didn't reconnect");
 		stopTimer();

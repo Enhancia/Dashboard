@@ -21,7 +21,6 @@ GesturePanel::GesturePanel (HubConfiguration& data, DataReader& reader,
     TRACE_IN;
 
     setComponentID ("gesturePanel");
-    setWantsKeyboardFocus (true);
 
     gestureSettings = std::make_unique<GestureSettingsComponent> (int (hubConfig.getGestureData
                                                                     (hubConfig.getSelectedGesture())
@@ -269,24 +268,24 @@ void GesturePanel::handleLeftClickDrag (const MouseEvent&)
 {
 }
 
-bool GesturePanel::keyPressed (const KeyPress &key)
+void GesturePanel::handleKeyPress (const KeyPress &key)
 {
-    if (hasSelectedGesture() && key.isValid())
+    if (key == neova_dash::keyboard_shortcut::selectGestureRight)
     {
-        if (key.getKeyCode() == KeyPress::deleteKey)
-        {
-            removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
-        }
-
-        #if JUCE_MAC
-        else if (key.getKeyCode() == KeyPress::backspaceKey && key.getModifiers().isCommandDown())
-        {
-            removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
-        }
-        #endif
+        selectGestureExclusive (hubConfig.selectGestureRight());
     }
-
-	return false;
+    else if (key == neova_dash::keyboard_shortcut::selectGestureLeft)
+    {
+        selectGestureExclusive (hubConfig.selectGestureLeft());
+    }
+    else if (key == neova_dash::keyboard_shortcut::selectGestureUp)
+    {
+        selectGestureExclusive (hubConfig.selectGestureUp());
+    }
+    else if (key == neova_dash::keyboard_shortcut::selectGestureDown)
+    {
+        selectGestureExclusive (hubConfig.selectGestureDown());
+    }
 }
 
 void GesturePanel::initialiseGestureSlots()
@@ -599,6 +598,7 @@ void GesturePanel::createMenuForGestureId (int id)
 
     gestureMenu.addItem (1, "Duplicate", hubConfig.canDuplicate());
     gestureMenu.addItem (2, "Delete", true);
+    gestureMenu.addItem (3, (hubConfig.getGestureData (id).on == 1) ? "Mute" : "Unmute", true);
     
     handleMenuResult (id,
                       gestureMenu.showMenu (PopupMenu::Options().withParentComponent (getParentComponent())
@@ -623,6 +623,10 @@ void GesturePanel::handleMenuResult (int gestureId, const int menuResult)
 
         case 2: // Delete gesture
             removeGestureAndGestureComponent (gestureId);
+
+        case 3: // Mute gesture
+            hubConfig.setUint8Value (gestureId, HubConfiguration::on, (hubConfig.getGestureData (gestureId).on == 1) ? 0 : 1);
+            commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
     }
 }
 

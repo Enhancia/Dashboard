@@ -17,7 +17,7 @@
 /**
     \class  FirmDownloader FirmDownloader.h
  
-    \brief  Manages checking for updates and downloading the newest installer.
+    \brief  Manages checking for updates and downloading the newest firmware.
 */
 class FirmDownloader : public URL::DownloadTask::Listener,
 					   public Timer
@@ -39,7 +39,7 @@ public:
     };
 
 	//==============================================================================
-	FirmDownloader();
+	FirmDownloader (ApplicationCommandManager& manager);
 	~FirmDownloader();
 
     //==============================================================================
@@ -79,7 +79,8 @@ private:
 
 	//==============================================================================
     const String AUTH_TOKEN = "1ebaae86812185390234259e630e73b92c38da4a"; /*std::getenv ("MACHINE_ENHANCIA_OAUTH");*/
-    const URL REPO_URL = URL ("https://api.github.com/repos/Enhancia/Firmware_Releases/releases/latest"); /*std::getenv ("REALEASE_REPO_PATH");*/
+    const URL REPO_URL = URL (neova_dash::compatibility::isTestVersion() ? "https://api.github.com/repos/Enhancia/Firmware_Releases_Internal/releases/latest"
+                                                                         : "https://api.github.com/repos/Enhancia/Firmware_Releases/releases/latest"); /*std::getenv ("REALEASE_REPO_PATH");*/
 
     //==============================================================================
     String fileToDownloadHubURL = "";
@@ -114,6 +115,9 @@ private:
 
     //==============================================================================
     std::unique_ptr<URL::DownloadTask> downloadTask;
+
+    //==============================================================================
+    ApplicationCommandManager& commandManager;
 
     //==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FirmDownloader)

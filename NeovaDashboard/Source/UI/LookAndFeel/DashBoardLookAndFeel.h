@@ -48,6 +48,14 @@ public:
     Font getTextButtonFont (TextButton& bttn, int buttonHeight) override;
     Font getComboBoxFont (ComboBox& cb) override;
     
+    //==============================================================================
+    void drawButtonBackground (Graphics& g,
+                               Button& buttonToDraw,
+                               const Colour &   backgroundColour,
+                               bool  shouldDrawButtonAsHighlighted,
+                               bool  shouldDrawButtonAsDown ) override; 
+
+    //==============================================================================
     //void drawPopupMenuBackground (Graphics&, int width, int height) override;
 	  /*
     void drawPopupMenuItem (Graphics&, const Rectangle<int>& area,

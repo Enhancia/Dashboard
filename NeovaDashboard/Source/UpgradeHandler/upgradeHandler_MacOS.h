@@ -110,11 +110,11 @@ private:
     int out_pipe[2], err_pipe[2];
     String childOutFileName = "nrfutilOut.txt";
     String childErrFileName = "nrfutilErr.txt";
-    String nrfutilRelativePath = "/Application Support/Enhancia/nrfutil_5.1.0";
+    String nrfutilRelativePath = "/Application Support/Enhancia/nrfutil";
     String releaseRelativePath = "/Application Support/Enhancia/FirmwareReleases/";
     String logsRelativePath = "/Logs/Enhancia/NeovaDashboard/Logs/";
     char const * upgradeHubCommandLine[3] = {"dfu", "usb-serial", "-pkg"};
-    char const * upgradeRingCommandLine[7] = {"dfu", "ble", "-ic", "NRF52", "-n", "\"Neova DFU\"", "-pkg"};
+    char const * upgradeRingCommandLine[7] = {"dfu", "ble", "-ic", "NRF52", "-n", "Neova DFU", "-pkg"};
     bool upgradeCommandReceived = false;
     uint16_t hubReleaseVersion = 0;
     uint16_t ringReleaseVersion = 0;

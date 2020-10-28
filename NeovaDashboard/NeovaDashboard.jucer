@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="SIAvrc" name="NeovaDashboard" projectType="guiapp" jucerVersion="5.4.7"
-              binaryDataNamespace="DashData" version="0.3.13">
+              binaryDataNamespace="DashData" version="1.0.0">
   <MAINGROUP id="KvQWjZ" name="NeovaDashboard">
     <GROUP id="{20075F30-04A5-410B-6952-3C63688FBF54}" name="Resources">
-      <FILE id="U5LMWh" name="200429 - Enhancia Software Licence.txt" compile="0"
+      <FILE id="Z37IRj" name="200429 - Enhancia Software Licence.txt" compile="0"
             resource="1" file="Resources/200429 - Enhancia Software Licence.txt"/>
       <GROUP id="{E0259D2D-3961-75D2-D343-36D8C845436E}" name="Image">
+        <FILE id="XOvIDe" name="BRAND-Popup-grey.png" compile="0" resource="1"
+              file="Resources/Image/BRAND-Popup-grey.png"/>
         <FILE id="X40b2q" name="Dash-icon-v1.1.png" compile="0" resource="1"
               file="Resources/Image/Dash-icon-v1.1.png"/>
         <FILE id="GG4enF" name="Dash-icon-v1.2.png" compile="0" resource="1"
               file="Resources/Image/Dash-icon-v1.2.png"/>
+        <FILE id="OPWpx2" name="Dashboard-HUB-ALL-cropped.png" compile="0"
+              resource="1" file="Resources/Image/Dashboard-HUB-ALL-cropped.png"/>
         <FILE id="DDoCAI" name="Dashboard-HUB-only-cropped.png" compile="0"
               resource="1" file="Resources/Image/Dashboard-HUB-only-cropped.png"/>
         <FILE id="qLNiVo" name="Dashboard-HUB-only.png" compile="0" resource="1"
               file="Resources/Image/Dashboard-HUB-only.png"/>
         <FILE id="FAcwQc" name="HUB-BG.png" compile="0" resource="1" file="Resources/Image/HUB-BG.png"/>
-        <FILE id="SCkDL1" name="logo-enhancia-white-textured.png" compile="0"
-              resource="1" file="Resources/Image/logo-enhancia-white-textured.png"/>
         <FILE id="x8nzZs" name="PITCH-icon.png" compile="0" resource="1" file="Resources/Image/PITCH-icon.png"/>
         <FILE id="h2VBsQ" name="ROLL-icon.png" compile="0" resource="1" file="Resources/Image/ROLL-icon.png"/>
         <FILE id="zkVlMd" name="TILT-icon.png" compile="0" resource="1" file="Resources/Image/TILT-icon.png"/>
@@ -136,6 +138,10 @@
                   file="Source/UI/SubComponents/MidiChannelComponent/MidiChannelComponent.h"/>
           </GROUP>
           <GROUP id="{51129B3F-9778-3EB2-0AEC-193428E77A11}" name="Top">
+            <FILE id="ooGcfS" name="BugReportPanel.cpp" compile="1" resource="0"
+                  file="Source/UI/SubComponents/Top/BugReportPanel.cpp"/>
+            <FILE id="uEMOKz" name="BugReportPanel.h" compile="0" resource="0"
+                  file="Source/UI/SubComponents/Top/BugReportPanel.h"/>
             <FILE id="BzMjm3" name="DashAlertPanel.cpp" compile="1" resource="0"
                   file="Source/UI/SubComponents/Top/DashAlertPanel.cpp"/>
             <FILE id="Ko72q9" name="DashAlertPanel.h" compile="0" resource="0"
@@ -197,7 +203,7 @@
       </MODULEPATHS>
     </VS2017>
     <XCODE_MAC targetFolder="Builds/MacOSX" extraFrameworks="SystemConfiguration"
-               smallIcon="GG4enF" bigIcon="GG4enF">
+               smallIcon="GG4enF" bigIcon="GG4enF" customPList="&lt;plist version=&quot;1.0&quot;&gt;&#10;&lt;dict&gt;&#10;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;&lt;dict&gt;&#10;    &lt;key&gt;NSExceptionDomains&lt;/key&gt;&#10;    &lt;dict&gt;&#10;        &lt;key&gt;enhancia.happyfox.com&lt;/key&gt;&#10;        &lt;dict&gt;&#10;            &lt;key&gt;NSIncludesSubdomains&lt;/key&gt;&#10;            &lt;true/&gt;&#10;            &lt;key&gt;NSTemporaryExceptionAllowsInsecureHTTPLoads&lt;/key&gt;&#10;            &lt;true/&gt;&#10;        &lt;/dict&gt;&#10;    &lt;/dict&gt;&#10;&lt;/dict&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" headerPath="/Users/macbook/Documents/Dev Dashboard/Dashboard_Interface/NeovaDashboard/Source"
                        targetName="Dashboard - Neova"/>
@@ -258,5 +264,5 @@
     <WINDOWS/>
     <OSX/>
   </LIVE_SETTINGS>
-  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_ENABLE_REPAINT_DEBUGGING="0"/>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
 </JUCERPROJECT>

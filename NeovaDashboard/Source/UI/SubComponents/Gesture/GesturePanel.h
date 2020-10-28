@@ -48,7 +48,7 @@ public:
     void mouseDown (const MouseEvent &event) override;
     void mouseUp (const MouseEvent &event) override;
     void mouseDrag (const MouseEvent &event) override;
-    bool keyPressed (const KeyPress &key) override;
+    void handleKeyPress (const KeyPress &key);
 
     //==============================================================================
     void initialiseGestureSlots();

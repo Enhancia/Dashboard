@@ -86,19 +86,19 @@ namespace gesture
 		}
 		if (type == int (pitchBend))
 		{
-			return (value < -90.0f || value > 90.0f);
+			return (value < PITCHBEND_MIN || value > PITCHBEND_MAX);
 		}
 		if (type == int (tilt))
 		{
-			return (value < -90.0f || value > 90.0f);
+			return (value < TILT_MIN || value > TILT_MAX);
 		}
 		if (type == int (roll))
 		{
-			return (value < -90.0f || value > 90.0f);
+			return (value < ROLL_MIN || value > ROLL_MAX);
 		}
 		if (type == int (wave))
 		{
-			return (value < -90.0f || value > 90.0f);
+			return (value < WAVE_MIN || value > WAVE_MAX);
 		}
 
 		return true; // default
@@ -136,6 +136,16 @@ namespace gesture
 	        case int (neova_dash::gesture::wave):      return neova_dash::gesture::wave;
 	        default:                                   return neova_dash::gesture::none;
 		}
+	}
+
+	bool isValidGestureType (const int typeInt)
+	{
+		return (typeInt >= 0 && typeInt < int (neova_dash::gesture::numTypes));
+	}
+
+	bool isValidGestureType (const neova_dash::gesture::GestureType type)
+	{
+		return (type != neova_dash::gesture::none && type != neova_dash::gesture::numTypes);
 	}
 
 	const String getTypeString (const neova_dash::gesture::GestureType type, const bool withSpacingAndCase)

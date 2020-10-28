@@ -11,12 +11,13 @@
 #include "UpdaterPanel.h"
 
 //==============================================================================
-UpdaterPanel::UpdaterPanel (DashUpdater& updtr, float& updateProgress) : updater (updtr), progress (updateProgress)
+UpdaterPanel::UpdaterPanel (DashUpdater& updtr, ApplicationCommandManager& manager, float& updateProgress)
+	: updater (updtr), progress (updateProgress), commandManager (manager)
 {
     createLabels();
     createButtons();
 
-    updateComponentsForSpecificStep (downloadAvailable);
+    updateComponentsForSpecificStep (noDownloadAvailable);
 }
 
 UpdaterPanel::~UpdaterPanel()
@@ -27,26 +28,16 @@ void UpdaterPanel::paint (Graphics& g)
 {
     using namespace neova_dash::colour;
     
-    // options panel area
-    g.setColour (topPanelBackground.withAlpha (0.85f));
-    g.fillRoundedRectangle (panelArea.toFloat(), 10.0f);
-    
-    // options panel outline
-    auto gradOut = ColourGradient::horizontal (Colour (0x10ffffff),
-                                               0.0f, 
-                                               Colour (0x10ffffff),
-                                               float(getWidth()));
-    gradOut.addColour (0.5, Colour (0x50ffffff));
-
-    g.setGradientFill (gradOut);
-    g.drawRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f, 1.0f);
+    // updater panel area
+    g.setColour (topPanelBackground);
+    g.fillRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f);
 }
 
 void UpdaterPanel::resized()
 {
 	using namespace neova_dash::ui;
 
-    panelArea = getLocalBounds().withSizeKeepingCentre (getLocalBounds().getWidth()/3, getLocalBounds().getHeight()/3);
+    panelArea = getLocalBounds().reduced (getWidth()/5, getHeight()/4);
     
     // Close Button
     #if JUCE_WINDOWS
@@ -62,12 +53,9 @@ void UpdaterPanel::resized()
 
     titleLabel->setBounds (area.removeFromTop (area.getHeight()/5));
 
-    int buttonHeight = area.getHeight()/5;
-
-    bottomButton->setBounds (area.removeFromBottom (buttonHeight)
-                                .withSizeKeepingCentre
-                                    (bottomButton->getBestWidthForHeight (buttonHeight),
-                                     buttonHeight));
+    auto buttonArea = area.removeFromBottom (jmin (area.getHeight()/5, 40));
+    bottomButton->setBounds (buttonArea.withSizeKeepingCentre (bottomButton->getBestWidthForHeight (buttonArea.getHeight()),
+                                     						   buttonArea.getHeight()));
 
     bodyText->setBounds (area.reduced (neova_dash::ui::MARGIN));
 }
@@ -85,7 +73,7 @@ void UpdaterPanel::timerCallback()
 		return;
 	}
 
-	bodyText->setText (String (int (progress*100)) + " %", dontSendNotification);
+	bodyText->setText ("Progress :\n\n" + String (int (progress*100)) + " %", dontSendNotification);
 }
 
 
@@ -100,6 +88,9 @@ void UpdaterPanel::buttonClicked (Button* bttn)
 	{
 		switch (currentProgress)
 		{
+			case noDownloadAvailable:
+				closeAndResetPanel();
+				break;
 			case downloadAvailable:
 				updateComponentsForSpecificStep (inProgress);
 				startTimerHz (2);
@@ -133,7 +124,9 @@ void UpdaterPanel::resetAndOpenPanel (bool updateIsRequired)
 	if (currentProgress != inProgress)
 	{
 		if (isTimerRunning ()) stopTimer();
-		updateComponentsForSpecificStep (updateIsRequired ? updateRequired : downloadAvailable);
+		updateComponentsForSpecificStep (updateIsRequired ? updateRequired
+														  : updater.hasNewAvailableVersion() ? downloadAvailable
+														  									 : noDownloadAvailable);
 
 		setVisible (true);
 	}
@@ -146,7 +139,9 @@ void UpdaterPanel::closeAndResetPanel()
 		if (isTimerRunning ()) stopTimer();
 
 		setVisible (false);
-		updateComponentsForSpecificStep (downloadAvailable);
+		updateComponentsForSpecificStep (noDownloadAvailable);
+
+    	commandManager.invokeDirectly (neova_dash::commands::checkAndUpdateNotifications, true);
 	}
 }
 
@@ -154,6 +149,7 @@ void UpdaterPanel::createLabels()
 {
     titleLabel.reset (new Label ("Title Label", ""));
     addAndMakeVisible (*titleLabel);
+    titleLabel->setFont (neova_dash::font::dashFontBold.withHeight (25.0f));
     titleLabel->setJustificationType (Justification::centred);
 
     bodyText.reset (new Label ("Body Text", ""));
@@ -192,14 +188,26 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 
 	switch (currentProgress)
 	{
+			case noDownloadAvailable:
+				closeButton->setVisible (true);
+				bottomButton->setVisible (true);
+				bottomButton->setButtonText ("Ok");
+
+				titleLabel->setText ("Dashboard up to date", dontSendNotification);
+
+				bodyText->setText ("No new Dashboard version was found.",
+					               dontSendNotification);
+				break;
+
 			case downloadAvailable:
 				closeButton->setVisible (true);
 				bottomButton->setVisible (true);
 				bottomButton->setButtonText ("Download");
 
-				titleLabel->setText ("New Dashboard Version Available !", dontSendNotification);
+				titleLabel->setText ("Dashboard Update", dontSendNotification);
 
-				bodyText->setText ("Current : " + JUCEApplication::getInstance()->getApplicationVersion()
+				bodyText->setText ("A new Dashboard version is available!\n\n\n"
+								   "Current : " + JUCEApplication::getInstance()->getApplicationVersion()
 												+ "\n\nNew : " + updater.getLatestVersionString(),
 					               dontSendNotification);
 				break;
@@ -210,17 +218,18 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 				bottomButton->setVisible (updater.hasNewAvailableVersion());
 				bottomButton->setButtonText ("Download");
 
-				titleLabel->setText ("Your Dashboard needs to be updated to be compatible with Neova!", dontSendNotification);
+				titleLabel->setText ("Dashboard Update (Required)", dontSendNotification);
 				
 				if (updater.hasNewAvailableVersion())
 				{
-					bodyText->setText ("Current : " + JUCEApplication::getInstance()->getApplicationVersion()
+					bodyText->setText ("Your Dashboard is outdated! Please update your Dashboard to use it with your Neova product.\n\n\n"
+									   "Current : " + JUCEApplication::getInstance()->getApplicationVersion()
 													+ "\n\nNew : " + updater.getLatestVersionString(),
 						               dontSendNotification);
 				}
 				else
 				{
-					bodyText->setText ("No new version was found. Make sure you have an internet connection and try again.",
+					bodyText->setText ("No up-to-date version found.\n\nMake sure you are connected to internet and try again.",
 						               dontSendNotification);
 				}
 				break;
@@ -229,18 +238,18 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 				closeButton->setVisible (false);
 				bottomButton->setVisible (false);
 
-				titleLabel->setText ("Download In Progress . . .", dontSendNotification);
-				bodyText->setText ("Waiting to download", dontSendNotification);
+				titleLabel->setText ("Downloading  . . .", dontSendNotification);
+				bodyText->setText ("Preparing download", dontSendNotification);
 				break;
 
 			case downloadFinished:
 				closeButton->setVisible (true);
 				bottomButton->setVisible (true);
-				titleLabel->setText ("Download ended", dontSendNotification);
+				titleLabel->setText ("Download Finished", dontSendNotification);
 
 				if (updater.wasSuccessful())
 				{
-					bottomButton->setButtonText ("Install");
+					bottomButton->setButtonText ("Start Installer");
 					bodyText->setText ("Successfully downloaded installer!", dontSendNotification);
 				}
 				else
@@ -252,4 +261,6 @@ void UpdaterPanel::updateComponentsForSpecificStep (downloadProgress downloadSte
 			default:
 				break;
 	}
+
+	resized();
 }

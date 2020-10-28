@@ -64,7 +64,7 @@ void DashBoardLookAndFeel::setColours()
 
 Font DashBoardLookAndFeel::getTextButtonFont (TextButton&, int buttonHeight)
 {
-    return neova_dash::font::dashFont.withHeight ((buttonHeight * 6.0f) / 10.0f);
+    return neova_dash::font::dashFontNorms.withHeight ((buttonHeight * 5.0f) / 10.0f);
 }
 
 Font DashBoardLookAndFeel::getComboBoxFont (ComboBox& cb)
@@ -253,6 +253,50 @@ void DashBoardLookAndFeel::drawScrollbar (Graphics& g, ScrollBar& scrollbar,
     auto c = scrollbar.findColour (ScrollBar::ColourIds::thumbColourId);
     g.setColour (isMouseOver ? c.brighter (0.25f) : c);
     g.fillRect (thumbBounds.reduced (1).toFloat());
+}
+
+void DashBoardLookAndFeel::drawButtonBackground (Graphics& g,
+                                                 Button& button,
+                                                 const Colour& backgroundColour,
+                                                 bool shouldDrawButtonAsHighlighted,
+                                                 bool shouldDrawButtonAsDown)
+{
+    const int width = button.getWidth();
+    const int height = button.getHeight();
+
+    const float outlineThickness = button.isEnabled() ? ((shouldDrawButtonAsDown || shouldDrawButtonAsHighlighted) ? 1.2f : 0.7f) : 0.4f;
+    const float halfThickness = outlineThickness * 0.5f;
+
+    const float indentL = button.isConnectedOnLeft()   ? 0.1f : halfThickness;
+    const float indentR = button.isConnectedOnRight()  ? 0.1f : halfThickness;
+    const float indentT = button.isConnectedOnTop()    ? 0.1f : halfThickness;
+    const float indentB = button.isConnectedOnBottom() ? 0.1f : halfThickness;
+
+    const Colour baseColour (backgroundColour.darker (shouldDrawButtonAsDown ? 0.1f : 0.0f)
+                                             .brighter (shouldDrawButtonAsHighlighted ? 0.05f : 0.0f)
+                                             .withMultipliedAlpha (button.isEnabled() ? 1.0f : 0.5f));
+
+    // Button panel outline
+    auto gradOut = ColourGradient::horizontal (Colour (0x10ffffff),
+                                               indentL, 
+                                               Colour (0x10ffffff),
+                                               width - indentL - indentR);
+    gradOut.addColour (0.5, Colour (0x35ffffff));
+
+    g.setColour (baseColour);
+    g.fillRoundedRectangle (indentL,
+                            indentT,
+                            width - indentL - indentR,
+                            height - indentT - indentB, 
+                            6.0f);
+
+    g.setGradientFill (gradOut);
+    g.drawRoundedRectangle (indentL,
+                            indentT,
+                            width - indentL - indentR,
+                            height - indentT - indentB, 
+                            6.0f,
+                            outlineThickness);
 }
 
 //==============================================================================================================================

@@ -17,14 +17,17 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     setLookAndFeel (&dashBoardLookAndFeel);
 
     // Creates Components
-    optionsPanel = std::make_unique<OptionsPanel> (hubConfig, getCommandManager());
+    optionsPanel = std::make_unique<OptionsPanel> (hubConfig, updater, upgradeHandler, getCommandManager());
     addAndMakeVisible (*optionsPanel);
 
-    firmUpgradePanel = std::make_unique<FirmUpgradePanel> (hubConfig, upgrdHandler);
+    firmUpgradePanel = std::make_unique<FirmUpgradePanel> (hubConfig, upgrdHandler, getCommandManager());
     addAndMakeVisible (*firmUpgradePanel);
 
-    updaterPanel = std::make_unique<UpdaterPanel> (updater, updater.getDownloadProgressReference());
+    updaterPanel = std::make_unique<UpdaterPanel> (updater, getCommandManager(), updater.getDownloadProgressReference());
     addAndMakeVisible (*updaterPanel);
+
+    bugReportPanel = std::make_unique<BugReportPanel> (getCommandManager());
+    addAndMakeVisible (*bugReportPanel);
 
     header = std::make_unique<HeaderComponent> (*optionsPanel, hubConfig, dataReader);
     addAndMakeVisible (*header);
@@ -58,7 +61,14 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     firmUpgradePanel->setVisible (false);
     firmUpgradePanel->setAlwaysOnTop (true);
     updaterPanel->setAlwaysOnTop (true);
-    updaterPanel->setVisible (updater.hasNewAvailableVersion());
+    if (updater.hasNewAvailableVersion())
+    {
+        optionsPanel->setVisible (true);
+        updaterPanel->resetAndOpenPanel();
+    }
+    else updaterPanel->setVisible (false);
+    bugReportPanel->setVisible (false);
+    bugReportPanel->setAlwaysOnTop (true);
 
     // Sets settings
     juce::Rectangle<int> screenArea  = Desktop::getInstance().getDisplays()
@@ -99,6 +109,40 @@ void DashBoardInterface::paint (Graphics& g)
     if (state != connected)
     {
         drawStateMessage (g);
+    }
+}
+
+void DashBoardInterface::paintOverChildren (Graphics& g)
+{
+    if (!optionsPanel->isVisible())
+    {    
+        const bool hubUpgradeAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16())  && hubConfig.getRingIsConnected();
+        const bool ringUpgradeAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected();
+     
+        if (hubUpgradeAvailable || ringUpgradeAvailable || updater.hasNewAvailableVersion()) // if Dash Update or Firm Upgrade available
+        {
+            int alertCount = 0;
+
+            if ((upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16())
+                    && hubConfig.getHubIsConnected())
+                alertCount++; // Hub upgrade
+            
+            if ((upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16())
+                    && hubConfig.getRingIsConnected())
+                alertCount++; // Ring upgrade
+
+            if (updater.hasNewAvailableVersion())
+                alertCount++; // soft update
+            
+            // Paint ellipse
+            g.setColour (neova_dash::colour::notificationBubble);
+            g.fillEllipse (notificationArea.toFloat());
+
+            // Paint Alert Number
+            g.setColour (neova_dash::colour::mainText);
+            g.setFont (neova_dash::font::dashFontBold.withHeight (15.0f));
+            g.drawText (String (alertCount), notificationArea, Justification::centred);
+        }
     }
 }
 
@@ -167,6 +211,7 @@ void DashBoardInterface::resized()
     optionsPanel->setBounds (area);
     firmUpgradePanel->setBounds (area);
     updaterPanel->setBounds (area);
+    bugReportPanel->setBounds (area);
 
 	auto gPanelArea = area.removeFromBottom (area.getHeight() / 2 - 35);
 
@@ -178,7 +223,7 @@ void DashBoardInterface::resized()
     auto presetAndMidiArea = area.removeFromBottom (15);
 
     presetSelector->setBounds (presetAndMidiArea.withSizeKeepingCentre (area.getWidth()/6, 30));
-    midiChannelComponent->setBounds (presetAndMidiArea.withLeft (presetSelector->getRight() + MARGIN*2)
+    midiChannelComponent->setBounds (presetAndMidiArea.withLeft (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/3 + MARGIN * 2)
                                                       .withRight (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/16)
                                                       .reduced (4*MARGIN, 0)
                                                       .expanded (0, 2));
@@ -194,6 +239,12 @@ void DashBoardInterface::resized()
 
     uploadButton->setBounds (area.withSize (jmax (140, area.getWidth()/7 + 40), area.getHeight()*6/10)
                                  .withSizeKeepingCentre (jmax (140, area.getWidth()/7 + 40), HEADER_HEIGHT));
+
+    notificationArea = juce::Rectangle<int> (18, 18).withCentre (getLocalPoint (header->findChildWithID ("optionsButton"),
+                                                                                header->findChildWithID ("optionsButton")
+                                                                                      ->getBounds()
+                                                                                      .getCentre()
+                                                                                      .translated (8, -8)));
 }
 
 //==============================================================================
@@ -248,14 +299,125 @@ void DashBoardInterface::modifierKeysChanged (const ModifierKeys& modifiers)
 
 bool DashBoardInterface::keyPressed (const KeyPress& key)
 {
-    if (key == KeyPress ('s', ModifierKeys (ModifierKeys::commandModifier), 's'))
+    DBG ("KEYPRESS : " << key.getTextDescription());
+
+    if (!key.getModifiers().isAnyModifierKeyDown())
     {
-        uploadButton->triggerClick();
+        if (key == neova_dash::keyboard_shortcut::deleteGesture)
+        {
+            if (gesturePanel->hasSelectedGesture())
+            {
+                gesturePanel->removeGestureAndGestureComponent (hubConfig.getSelectedGesture());
+            }
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectGestureLeft ||
+                 key == neova_dash::keyboard_shortcut::selectGestureRight ||
+                 key == neova_dash::keyboard_shortcut::selectGestureUp ||
+                 key == neova_dash::keyboard_shortcut::selectGestureDown)
+        {
+            gesturePanel->handleKeyPress (key);
+        }
+        else if (key == neova_dash::keyboard_shortcut::muteGesture)
+        {
+            if (gesturePanel->hasSelectedGesture())
+            {
+                hubConfig.setUint8Value (hubConfig.getSelectedGesture(),
+                                         HubConfiguration::on,
+                                         (hubConfig.getGestureData (hubConfig.getSelectedGesture()).on == 1) ? 0 : 1);
+                update();
+            }
+        }
+        else if (key == neova_dash::keyboard_shortcut::muteGesture1)
+        {
+            hubConfig.setUint8Value (0,
+                                     HubConfiguration::on,
+                                     (hubConfig.getGestureData (0).on == 1) ? 0 : 1);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::muteGesture2)
+        {
+            hubConfig.setUint8Value (1,
+                                     HubConfiguration::on,
+                                     (hubConfig.getGestureData (1).on == 1) ? 0 : 1);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::muteGesture3)
+        {
+            hubConfig.setUint8Value (2,
+                                     HubConfiguration::on,
+                                     (hubConfig.getGestureData (2).on == 1) ? 0 : 1);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::muteGesture4)
+        {
+            hubConfig.setUint8Value (3,
+                                     HubConfiguration::on,
+                                     (hubConfig.getGestureData (3).on == 1) ? 0 : 1);
+            update();
+        }
     }
 
-    if (key == KeyPress ('a', ModifierKeys (ModifierKeys::commandModifier), 'a'))
+    else if (key.getModifiers().isCommandDown())
     {
-        createAndShowAlertPanel (DashAlertPanel::unknown);
+        if (key == neova_dash::keyboard_shortcut::uploadToHub)
+        {
+            uploadButton->triggerClick();
+        }
+        else if (key == neova_dash::keyboard_shortcut::duplicateGesture)
+        {
+            hubConfig.duplicateGesture (hubConfig.getSelectedGesture());
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::displayOptions)
+        {
+            optionsPanel->setVisible (!optionsPanel->isVisible());
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectPreviousBank && hubConfig.getSelectedPreset() > 0)
+        {
+            hubConfig.setPreset (hubConfig.getSelectedPreset() - 1);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectNextBank && hubConfig.getSelectedPreset() < neova_dash::gesture::NUM_PRESETS - 1)
+        {
+            hubConfig.setPreset (hubConfig.getSelectedPreset() + 1);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectBank1)
+        {
+            hubConfig.setPreset (0);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectBank2)
+        {
+            hubConfig.setPreset (1);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectBank3)
+        {
+            hubConfig.setPreset (2);
+            update();
+        }
+        else if (key == neova_dash::keyboard_shortcut::selectBank4)
+        {
+            hubConfig.setPreset (3);
+            update();
+        }
+        else if (key.getModifiers().isShiftDown())
+        {
+            if (key == neova_dash::keyboard_shortcut::easterEgg)
+            {
+                createAndShowAlertPanel ("Private Navigation", "Neova [HUB]", "Yes", true, 0);
+            }
+        }
+    }
+
+    else if (key.getModifiers().isShiftDown())
+    {
+        if (key == neova_dash::keyboard_shortcut::selectPreviousBank)
+        {
+            hubConfig.setPreset ((hubConfig.getSelectedPreset() - 1) % neova_dash::gesture::NUM_PRESETS);
+            update();
+        }
     }
 
     return false;
@@ -273,10 +435,14 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
 
     commands.addArray ({
                             updateDashInterface,
+							setStateAndUpdateDashInterface,
                             updateInterfaceLEDs,
                             updateBatteryDisplay,
                             allowUserToFlashHub,
-                            openFirmUpgradePanel
+                            openFirmUpgradePanel,
+                            openDashboardUpdatePanel,
+                            checkAndUpdateNotifications,
+                            openBugReportPanel
                        });
 }
 
@@ -288,6 +454,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
     {
         case updateDashInterface:
             result.setInfo ("Update Full Interface", "Udpates Interface To Current Hub Configuration", "Interface", 0);
+            break;
+        case setStateAndUpdateDashInterface:
+            result.setInfo ("Update State And Interface", "Udpates Interface To Match Current Hub State And Configuration", "Interface", 0);
             break;
         case updateInterfaceLEDs:
             result.setInfo ("Update LEDs", "Udpates Hub LEDs To Current Hub Configuration", "Interface", 0);
@@ -301,6 +470,17 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
         case openFirmUpgradePanel:
             result.setInfo ("Open Firm Upgrade Panel", "Opens Panel To Start Firm Upgrade Procedure", "Interface", 0);
 			break;
+        case openDashboardUpdatePanel:
+            result.setInfo ("Open Dashboard Update Panel", "Opens Panel To Start Dash Update Procedure", "Interface", 0);
+            break;
+        case checkAndUpdateNotifications:
+            result.setInfo ("Check And Update Notifications", "Updates info that could trigger a notification"
+                                                              " and updates interface to display potential notifications",
+                                                              "Interface", 0);
+            break;
+        case openBugReportPanel:
+            result.setInfo ("Open Bug Report Panel", "Opens Panel To Bug Report Procedure", "Interface", 0);
+            break;
         default:
             break;
     }
@@ -318,9 +498,22 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
         case updateDashInterface:
             update();
 			return true;
+
+        case setStateAndUpdateDashInterface:
+            setInterfaceStateAndUpdate();
+            return true;
 			
         case updateBatteryDisplay:
-            if (state == int (connected)) header->update();
+            if ((state == int (connected) || state == int (pause)) && hubConfig.getHubIsCompatibleInt() < 0)
+            {
+                setInterfaceStateAndUpdate (incompatible);
+            }
+
+            if (state == int (connected))
+            {
+                header->update();
+                hubComponent->repaint();
+            }
             return true;
 
         case updateInterfaceLEDs:
@@ -340,6 +533,31 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             firmUpgradePanel->setAndOpenPanel();
             return true;
 
+        case openDashboardUpdatePanel:
+            if (!optionsPanel->isVisible())
+            {
+                optionsPanel->setVisible (true);
+            }
+            
+            updaterPanel->resetAndOpenPanel (hubConfig.getHubIsConnected() && hubConfig.getHubIsCompatibleInt() > 0);
+            return true;
+
+        case checkAndUpdateNotifications:
+            upgradeHandler.checkReleasesVersion();
+            updater.checkForNewAvailableVersion();
+
+            updateForNotifications();
+            return true;
+
+        case openBugReportPanel:
+            if (!optionsPanel->isVisible())
+            {
+                optionsPanel->setVisible (true);
+            }
+            
+            bugReportPanel->resetAndOpenPanel();
+            return true;
+
         default:
             return false;
     }
@@ -347,7 +565,7 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
 
 void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newState)
 {
-    if (state == int (newState)) return;
+    if (state == int (newState)) return update();
 
     state = int (newState);
 
@@ -389,18 +607,17 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         }
         
         presetSelector->setVisible (false);
-        //midiChannelComponent->setVisible (false);
         hubComponent->setInterceptsMouseClicks (false, false);
-        //optionsPanel->setMidiBoxActive (false);
     }
 
     resized();
     repaint();
 
-    if (state == incompatible)
+    if (state == int (incompatible))
     {
         if (hubConfig.getHubIsCompatibleInt() > 0)
         {
+            optionsPanel->setVisible (true);
             updaterPanel->resetAndOpenPanel (true);
         }
 
@@ -421,6 +638,25 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
                                                                             DashAlertPanel::outdatedFirmware);
             }
         }
+    }
+}
+
+void DashBoardInterface::setInterfaceStateAndUpdate()
+{
+    if (hubConfig.getHubIsConnected())
+    {
+        if (hubConfig.getHubIsCompatibleInt() == 0)
+        {
+            setInterfaceStateAndUpdate (connected);
+        }
+        else
+        {
+            setInterfaceStateAndUpdate (incompatible);
+        }
+    }
+    else
+    {
+        setInterfaceStateAndUpdate (waitingForConnection);
     }
 }
 
@@ -547,6 +783,9 @@ void DashBoardInterface::executePanelAction (const int panelReturnValue)
         case DashAlertPanel::noUploadQuitting:
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;
+        case DashAlertPanel::upgradePending:
+            JUCEApplication::getInstance()->systemRequestedQuit();
+            break;
         default: // modalResult 0 or unknown
             break;
     }
@@ -564,5 +803,15 @@ void DashBoardInterface::update()
         optionsPanel->update();
         midiChannelComponent->update();
         uploadButton->update();
+        repaint (notificationArea);
+    }
+}
+
+void DashBoardInterface::updateForNotifications()
+{
+    if (state == connected)
+    {
+        optionsPanel->update();
+        repaint (notificationArea);
     }
 }

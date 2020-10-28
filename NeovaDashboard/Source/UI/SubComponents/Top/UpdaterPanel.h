@@ -23,14 +23,15 @@ public:
     //==============================================================================
 	enum downloadProgress
 	{
-		downloadAvailable = 0,
+        noDownloadAvailable = 0,
+		downloadAvailable,
 		inProgress,
 		downloadFinished,
         updateRequired
 	};
 
     //==============================================================================
-    UpdaterPanel (DashUpdater& updtr, float& updateProgress);
+    UpdaterPanel (DashUpdater& updtr, ApplicationCommandManager& manager, float& updateProgress);
     ~UpdaterPanel();
 
     //==============================================================================
@@ -65,6 +66,7 @@ private:
 
     //==============================================================================
     DashUpdater& updater;
+    ApplicationCommandManager& commandManager;
     float& progress;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UpdaterPanel)
