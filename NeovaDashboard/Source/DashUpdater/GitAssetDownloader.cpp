@@ -10,7 +10,7 @@
 
 #include "GitAssetDownloader.h"
 
-URL::DownloadTask* GitAssetDownloader::downloadAsset (const URL& assetURL, const File& fileToDownloadTo,
+std::unique_ptr<URL::DownloadTask> GitAssetDownloader::downloadAsset (const URL& assetURL, const File& fileToDownloadTo,
 																  	   URL::DownloadTask::Listener* listenerPtr)
 {
 	URL serverURL;
@@ -34,9 +34,8 @@ bool GitAssetDownloader::getRedirectURL (const URL& assetURL, URL& redirectURL)
 	StringPairArray responseHeaders;
 
 	// Num redirects to follow is set to 0: no redirect is followed and response headers tell what the redirect URL was.
-    std::unique_ptr<WebInputStream> gitAssetStream (dynamic_cast<WebInputStream*> (assetURL.createInputStream (false, nullptr, nullptr,
-																	 		 		 						   headers, 0, &responseHeaders,
-																	 		 		 						   &status, 0)));
+    std::unique_ptr<InputStream> gitAssetStream (assetURL.createInputStream (false, nullptr, nullptr, headers, 
+    																			0, &responseHeaders, &status, 0));
 	if (gitAssetStream == nullptr || status != 302) // Error or no redirect
 	{
 		if (status == 200)
