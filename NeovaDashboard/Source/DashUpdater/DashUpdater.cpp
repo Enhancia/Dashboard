@@ -104,7 +104,7 @@ void DashUpdater::startDownloadProcess()
                                                             fileToDownloadString.fromFirstOccurrenceOf (".", true, true));
     
     //downloadTask.reset (assetURL.downloadToFile (downloadedFile, "\r\nAccept: application/octet-stream\r\n", this));
-    downloadTask.reset (GitAssetDownloader::downloadAsset (fileToDownloadURL, downloadedFile, this));
+    downloadTask = GitAssetDownloader::downloadAsset (fileToDownloadURL, downloadedFile, this);
 }
 
 bool DashUpdater::hasNewAvailableVersion()
