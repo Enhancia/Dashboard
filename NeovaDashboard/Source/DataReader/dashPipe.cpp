@@ -5,6 +5,9 @@
 
   ==============================================================================
 */
+#include "../../JuceLibraryCode/JuceHeader.h"
+
+#if (JUCE_WINDOWS || defined(__OBJC__))
 
 #include "dashPipe.h"
 
@@ -162,3 +165,5 @@ void DashPipe::messageReceived (const MemoryBlock &message)
 		Logger::writeToLog("Hub message : Error");
 	}
 }
+
+#endif // JUCE WIN || OBJC

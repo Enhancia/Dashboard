@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="SIAvrc" name="NeovaDashboard" projectType="guiapp" binaryDataNamespace="DashData"
-              version="101.0.2" jucerFormatVersion="1" addUsingNamespaceToJuceHeader="0">
+              version="101.0.2" jucerFormatVersion="1">
   <MAINGROUP id="KvQWjZ" name="NeovaDashboard">
     <GROUP id="{20075F30-04A5-410B-6952-3C63688FBF54}" name="Resources">
       <FILE id="Z37IRj" name="200429 - Enhancia Software Licence.txt" compile="0"
@@ -61,6 +61,8 @@
               file="Source/UpgradeHandler/upgradeHandler_MacOS.cpp"/>
         <FILE id="BzNQll" name="upgradeHandler_MacOS.h" compile="0" resource="0"
               file="Source/UpgradeHandler/upgradeHandler_MacOS.h"/>
+        <FILE id="zygS7f" name="upgradeHandler_MacOS.mm" compile="1" resource="0"
+              file="Source/UpgradeHandler/upgradeHandler_MacOS.mm"/>
         <FILE id="F1zBgp" name="upgradeHandler_Win.cpp" compile="1" resource="0"
               file="Source/UpgradeHandler/upgradeHandler_Win.cpp"/>
         <FILE id="fJdPKE" name="upgradeHandler_Win.h" compile="0" resource="0"
@@ -69,6 +71,8 @@
       <GROUP id="{F1A202D6-9B60-4E7E-8087-5D8D2D86697D}" name="DataReader">
         <FILE id="LxyiW7" name="dashPipe.cpp" compile="1" resource="0" file="Source/DataReader/dashPipe.cpp"/>
         <FILE id="NnGjmL" name="dashPipe.h" compile="0" resource="0" file="Source/DataReader/dashPipe.h"/>
+        <FILE id="dJu8Yi" name="DataReaderMac.mm" compile="1" resource="0"
+              file="Source/DataReader/DataReaderMac.mm"/>
         <FILE id="ZkLoBX" name="DataReader.cpp" compile="1" resource="0" file="Source/DataReader/DataReader.cpp"/>
         <FILE id="JVzsaa" name="DataReader.h" compile="0" resource="0" file="Source/DataReader/DataReader.h"/>
         <FILE id="iu2Cq4" name="StatutPipe.cpp" compile="1" resource="0" file="Source/DataReader/StatutPipe.cpp"/>

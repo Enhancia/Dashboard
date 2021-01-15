@@ -14,9 +14,6 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../Common/DashCommon.h"
 
-#if JUCE_MAC
-#include <SystemConfiguration/SystemConfiguration.h>
-#endif //JUCE_MAC
 //==============================================================================
 /*
     This component lives inside our window, and this is where you should put all

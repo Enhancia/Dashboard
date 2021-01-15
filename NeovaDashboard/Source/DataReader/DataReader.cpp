@@ -5,6 +5,9 @@
 
   ==============================================================================
 */
+#include "../../JuceLibraryCode/JuceHeader.h"
+
+#if (JUCE_WINDOWS || defined(__OBJC__))
 
 #include "DataReader.h"
 
@@ -234,3 +237,5 @@ void DataReader::changeListenerCallback (ChangeBroadcaster * source)
     statutPipe.reset();
   #endif
 }
+
+#endif //JUCE WIN || OBJC

@@ -15,7 +15,6 @@
 #include "../Common/DashCommon.h"
 
 #if JUCE_MAC
-#include <SystemConfiguration/SystemConfiguration.h>
 
 //==============================================================================
 
