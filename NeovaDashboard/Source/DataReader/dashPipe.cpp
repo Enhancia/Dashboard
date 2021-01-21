@@ -27,6 +27,7 @@ DashPipe::DashPipe(): InterprocessConnection (true, 0x6a6d626e)
 DashPipe::~DashPipe()
 {
 	TRACE_IN;
+    disconnect();
 }
 
 //==============================================================================

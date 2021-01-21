@@ -45,6 +45,8 @@ DataReader::~DataReader()
   #if JUCE_MAC
     statutPipe = nullptr;
   #endif
+    
+    disconnect();
 }
 
 //==============================================================================
