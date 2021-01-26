@@ -325,12 +325,7 @@ void BugReportPanel::sendTicketAndUpdate()
 URL BugReportPanel::createURLForTicket (const String& boundary)
 {
     URL happyFoxURL;
-
-    #if JUCE_WINDOWS
     happyFoxURL = happyFoxURL.withNewDomainAndPath ("https://enhancia.happyfox.com/api/1.1/json/tickets/");
-    #elif JUCE_MAC
-    happyFoxURL = happyFoxURL.withNewDomainAndPath ("http://enhancia.happyfox.com/api/1.1/json/tickets/"); // TODO change when we have SSL certificate
-    #endif
 
     // Fills file array
     Array<File> filesToAttach;

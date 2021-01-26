@@ -5,6 +5,9 @@
 
   ==============================================================================
 */
+#include "../../JuceLibraryCode/JuceHeader.h"
+
+#if (JUCE_WINDOWS || defined(__OBJC__))
 
 #include "dashPipe.h"
 
@@ -24,6 +27,7 @@ DashPipe::DashPipe(): InterprocessConnection (true, 0x6a6d626e)
 DashPipe::~DashPipe()
 {
 	TRACE_IN;
+    disconnect();
 }
 
 //==============================================================================
@@ -162,3 +166,5 @@ void DashPipe::messageReceived (const MemoryBlock &message)
 		Logger::writeToLog("Hub message : Error");
 	}
 }
+
+#endif // JUCE WIN || OBJC

@@ -36,7 +36,7 @@ void FirmDownloader::checkForNewAvailableVersion()
         	{
 				if (!currentVersionHub.isEmpty() && currentVersionHub.containsOnly(".0123456789"))
 				{
-					availableHub = latestVersionHub.removeCharacters(".").getIntValue() > currentVersionHub.removeCharacters(".").getIntValue();
+					availableHub = latestVersionHub.removeCharacters(".").getIntValue() != currentVersionHub.removeCharacters(".").getIntValue();
 				}
 				else availableHub = true;
         	}
@@ -45,7 +45,7 @@ void FirmDownloader::checkForNewAvailableVersion()
         	{
         		if (!currentVersionRing.isEmpty() && currentVersionRing.containsOnly (".0123456789"))
         		{
-        			availableRing = latestVersionRing.removeCharacters(".").getIntValue() > currentVersionRing.removeCharacters(".").getIntValue();
+        			availableRing = latestVersionRing.removeCharacters(".").getIntValue() != currentVersionRing.removeCharacters(".").getIntValue();
         		}
 				else availableRing = true;
         	}
@@ -184,7 +184,7 @@ void FirmDownloader::downloadForDevice (deviceFirmware& deviceToDownloadFor)
 
     downloadedFile = downloadFolder.getNonexistentChildFile (fileToDownloadString, "");
     //downloadTask.reset (assetURL.downloadToFile (downloadedFile, "\r\nAccept: application/octet-stream\r\n", this));
-    downloadTask.reset (GitAssetDownloader::downloadAsset (fileToDownloadURL, downloadedFile, this));
+    downloadTask = GitAssetDownloader::downloadAsset (fileToDownloadURL, downloadedFile, this);
 }
 
 bool FirmDownloader::hasNewAvailableVersion()

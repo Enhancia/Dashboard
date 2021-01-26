@@ -6,9 +6,9 @@
  ==============================================================================
  */
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "../../JuceLibraryCode/JuceHeader.h"
 
-#if JUCE_MAC
+#if (JUCE_MAC && defined(__OBJC__))
 
 #include "upgradeHandler_MacOS.h"
 
