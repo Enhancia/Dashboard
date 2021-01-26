@@ -36,9 +36,17 @@ void DashUpdater::checkForNewAvailableVersion()
             for (int subdivision=0; subdivision < 3; subdivision++)
             {
                 if (currentVerTemp.upToFirstOccurrenceOf (".", false, false).getIntValue()
+                        > latestVerTemp.upToFirstOccurrenceOf (".", false, false).getIntValue())
+                {
+                    // Version is somehow larger than latest.. Should not happen unless on test builds
+                    return;
+                }
+
+                if (currentVerTemp.upToFirstOccurrenceOf (".", false, false).getIntValue()
                         < latestVerTemp.upToFirstOccurrenceOf (".", false, false).getIntValue())
                 {
                     availableVersion = fetchFileURL (*repo);
+                    return;
                 }
 
                 currentVerTemp = currentVerTemp.fromFirstOccurrenceOf (".", false, false);
