@@ -13,8 +13,6 @@
 NewGesturePanel::NewGesturePanel (HubConfiguration& config, ApplicationCommandManager& manager)
     : hubConfig (config), commandManager (manager)
 {
-    TRACE_IN;
-
   	createCloseButton();
   	createGestureSelectorButtons();
   	createAndAddTextEditor();
@@ -22,10 +20,8 @@ NewGesturePanel::NewGesturePanel (HubConfiguration& config, ApplicationCommandMa
 
 NewGesturePanel::~NewGesturePanel()
 {
-    TRACE_IN;
-
     closeButton = nullptr;
-	  descriptionTextEditor = nullptr;
+	descriptionTextEditor = nullptr;
 }
 
 //==============================================================================
@@ -72,7 +68,7 @@ void NewGesturePanel::paint (Graphics& g)
 
 void NewGesturePanel::resized()
 {
-	  using namespace neova_dash::ui;
+	using namespace neova_dash::ui;
 
     // Panel Area
     panelArea = getLocalBounds().reduced (getWidth()/4, getHeight()/6);

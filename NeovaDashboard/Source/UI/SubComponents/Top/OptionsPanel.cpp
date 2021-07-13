@@ -14,8 +14,6 @@
 OptionsPanel::OptionsPanel (HubConfiguration& config, DashUpdater& updtr, UpgradeHandler& handler, ApplicationCommandManager& manager)
     : hubConfig (config), commandManager (manager), updater (updtr), upgradeHandler (handler)
 {
-    TRACE_IN;
-
     createButtons();
     options.addTab (new ContactPanel (*sendReportButton.get()), "About");
     options.addTab (new UpdateAndUpgradePanel (hubConfig, updater, upgradeHandler,
@@ -29,8 +27,6 @@ OptionsPanel::OptionsPanel (HubConfiguration& config, DashUpdater& updtr, Upgrad
 
 OptionsPanel::~OptionsPanel()
 {
-    TRACE_IN;
-
     closeButton = nullptr;
 }
 

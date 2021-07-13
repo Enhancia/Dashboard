@@ -18,8 +18,6 @@ HubComponent::HubComponent (HubConfiguration& config, NewGesturePanel& newGest,
     : hubConfig (config), commandManager (manager),
       newGesturePanel (newGest), presetModeState (presetState), dashboardState (dashState)
 {
-	TRACE_IN;
-
 	currentPreset = hubConfig.getSelectedPreset();
 
 	// Creates Bottom Buttons And Lights
@@ -41,8 +39,6 @@ HubComponent::HubComponent (HubConfiguration& config, NewGesturePanel& newGest,
 
 HubComponent::~HubComponent()
 {
-	TRACE_IN;
-
 	for (int i =0; i < buttons.size(); i++)
 	{
 		buttons[i]->removeListener (this);
