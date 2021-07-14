@@ -70,12 +70,8 @@ void MidiPanel::resized()
 
     auto rangeArea = area.withTrimmedBottom (MARGIN).withTrimmedRight (MARGIN);
 
-    if (hubConfig.getGestureData (id).type != neova_dash::gesture::vibrato &&
-        hubConfig.getGestureData (id).type != neova_dash::gesture::pitchBend)
-    {
-        reverseButton->setBounds (rangeArea.removeFromRight (18 + MARGIN)
+    reverseButton->setBounds (rangeArea.removeFromRight (18 + MARGIN)
                                            .withSizeKeepingCentre (18, 18));
-    }
 
     midiRangeTuner->setBounds (rangeArea.withSizeKeepingCentre (rangeArea.getWidth() - 2*MARGIN, 40));
 }
@@ -222,9 +218,7 @@ void MidiPanel::createButton()
 
 void MidiPanel::setComponentsVisibility()
 {
-    bool shouldGrayOutBox =   (hubConfig.getGestureData (id).type == neova_dash::gesture::vibrato ||
-                               hubConfig.getGestureData (id).type == neova_dash::gesture::pitchBend ||
-                               hubConfig.getGestureData (id).type == neova_dash::gesture::none);
+    bool shouldGrayOutBox =   (hubConfig.getGestureData (id).type == neova_dash::gesture::none);
 
     bool shouldGrayOutTuner = (hubConfig.getGestureData (id).midiType == neova_dash::gesture::pitchMidi||
                                hubConfig.getGestureData (id).type == neova_dash::gesture::none);
@@ -505,7 +499,7 @@ void MidiRangeTuner::updateDisplay()
     HubConfiguration::GestureData& gestureData = hubConfig.getGestureData (id);
     const int type = gestureData.type;
 
-    if (type == none || !isEnabled()) return;
+    if (type == neova_dash::gesture::none || !isEnabled()) return;
 
     const float& value =  (type == vibrato) ? dataReader.getFloatValueReference (neova_dash::data::variance)
                          :(type == pitchBend) ? dataReader.getFloatValueReference (neova_dash::data::roll)
@@ -520,7 +514,8 @@ void MidiRangeTuner::updateDisplay()
                                                                  gestureData.reverse,
                                                                  gestureData.gestureParam0,
                                                                  gestureData.gestureParam1,
-                                                                 gestureData.gestureParam2,
+                                                                 (type != vibrato ? gestureData.gestureParam2
+                                                                                  : dataReader.getFloatValueReference (neova_dash::data::acceleration)),
                                                                  gestureData.gestureParam3,
                                                                  gestureData.gestureParam4,
                                                                  gestureData.gestureParam5);
@@ -710,9 +705,7 @@ void MidiRangeTuner::drawCursor (Graphics& g)
 {
     if (lastValue == -1) return;
 
-    float maxMidiFloat = (   hubConfig.getGestureData (id).type == neova_dash::gesture::pitchBend
-    					  || hubConfig.getGestureData (id).type == neova_dash::gesture::vibrato)
-		                      ? 16383.0f : 127.0f;
+    float maxMidiFloat = 127.0f;
 
     Path cursorPath;
     float cursorX = 11.5f + (lowSlider->getWidth() - 23.0f) * (lastValue / maxMidiFloat);
