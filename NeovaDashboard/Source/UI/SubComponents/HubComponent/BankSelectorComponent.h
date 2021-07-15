@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-    PresetSelectorComponent.h
+    BankSelectorComponent.h
     Created: 17 Sep 2019 3:57:45pm
     Author:  Enhancia Dev
 
@@ -19,13 +19,13 @@
 //==============================================================================
 /*
 */
-class PresetSelectorComponent    : public Component,
+class BankSelectorComponent    : public Component,
                                    private Button::Listener
 {
 public:
     //==============================================================================
-    PresetSelectorComponent (HubConfiguration& config, ApplicationCommandManager& manager);
-    ~PresetSelectorComponent();
+    BankSelectorComponent (HubConfiguration& config, ApplicationCommandManager& manager);
+    ~BankSelectorComponent();
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -35,11 +35,18 @@ public:
     void buttonClicked (Button* bttn) override;
 
     //==============================================================================
+    void mouseUp (const MouseEvent& event) override;
+
+    //==============================================================================
     void update();
 
 private:
     //==============================================================================
     void createButtons();
+
+    //==============================================================================
+    void createBankMenu();
+    void handleMenuResult (const int menuResult);
 
     //==============================================================================
     HubConfiguration& hubConfig;
@@ -49,5 +56,5 @@ private:
     std::unique_ptr<DashShapeButton> rightArrowButton;
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetSelectorComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BankSelectorComponent)
 };
