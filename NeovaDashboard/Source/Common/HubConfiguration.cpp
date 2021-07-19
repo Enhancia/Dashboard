@@ -116,6 +116,19 @@ int HubConfiguration::getMidiChannels()
 	return getPresetData().midiChannels;
 }
 
+const int HubConfiguration::getNumActiveMidiChannels()
+{
+	const uint16_t midiChannels =  getPresetData().midiChannels;
+	int count = 0;
+
+	for (int numChannel = 0; numChannel < 16; numChannel++)
+	{
+		count += (midiChannels >> numChannel) & 1;
+	}
+
+	return count;
+}
+
 void HubConfiguration::setUint8Value (const int gestureNumber, const uint8DataId dataId,
 													           const uint8 newUint8Value,
 													           bool uploadToHub)

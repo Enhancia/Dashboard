@@ -28,6 +28,9 @@ public:
     void resized() override;
 
     //==========================================================================
+    void mouseEnter (const MouseEvent& event) override;
+    void mouseExit (const MouseEvent& event) override;
+    void mouseUp (const MouseEvent& event) override;
     void comboBoxChanged (ComboBox *comboBoxThatHasChanged) override;
 
     //==========================================================================
@@ -35,7 +38,13 @@ public:
 
 private:
     //==========================================================================
+    bool highlighted = false;
+
+    //==========================================================================
     void createComboBox();
+    void createPopupMenu();
+    void drawArrowPath (Graphics& g, juce::Rectangle<float> area);
+    void handleMenuResult (const int menuResult);
     void setHUBToFirstActiveChannelOrChannel1();
     
     //==========================================================================

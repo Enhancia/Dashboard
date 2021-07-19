@@ -162,6 +162,7 @@ public:
     void setMidiChannelExclusive (const int channelNumber, bool uploadToHub = true);
     void toggleMidiChannel (const int channelNumber, bool uploadToHub = true);
     int getMidiChannels();
+    const int getNumActiveMidiChannels();
 
     //==============================================================================
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber, const int presetNumber);
