@@ -101,6 +101,12 @@ void HubConfiguration::setMidiChannelExclusive (const int channelNumber, bool up
 
 void HubConfiguration::toggleMidiChannel (const int channelNumber, bool uploadToHub)
 {
+	if (getNumActiveMidiChannels() == 1 && std::log2 (getMidiChannels()) == channelNumber)
+	{
+		// TODO ajout message d'erreur log (décommenter & tester)
+		// neova_dash::log::writeToLog ("Cannot have 0 active midi channels.", neova_dash::log::hubConfiguration);
+		return;
+	}
 	getPresetData().midiChannels ^= (1 << channelNumber);
 
 	if (uploadToHub)
