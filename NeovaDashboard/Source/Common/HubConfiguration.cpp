@@ -185,7 +185,7 @@ void HubConfiguration::setDefaultGestureValues (const int gestureNumber, const n
                                   uint8_t (type),
                                   0,
                                   127,
-                                  uint8_t ((type == neova_dash::gesture::none) ? 0 : findAvailableUndefinedCC()),
+                                  uint8_t ((type == neova_dash::gesture::none) ? 0 : findNextAvailableCC()),
                                   neova_dash::gesture::ccMidi);
 
     switch (type)
@@ -237,7 +237,7 @@ void HubConfiguration::setSavedGestureValues (const int gestureNumber, const neo
                                   uint8_t (type),
                                   lastGestureConfig[type]->midiLow,
                                   lastGestureConfig[type]->midiHigh,
-                                  uint8_t (findAvailableUndefinedCC()),
+                                  uint8_t (findNextAvailableCC()),
                                   neova_dash::gesture::ccMidi);
 
     setGestureParameters (presetNumber, gestureNumber, lastGestureConfig[type]->gestureParam0,
@@ -571,7 +571,7 @@ void HubConfiguration::moveGestureToId (const int idToMoveFrom, const int idToMo
 	  																				+ " (Id " + String (idToMoveFrom) + ") : Moving to id "
 	  																				+ String (idToMoveTo), neova_dash::log::config);
 
-	getGestureData (idToMoveTo) = getGestureData (idToMoveFrom);
+    getGestureData (idToMoveTo) = getGestureData (idToMoveFrom);
     setDefaultGestureValues (idToMoveFrom, neova_dash::gesture::none);
     
     notifyConfigWasChanged();
@@ -826,29 +826,25 @@ int HubConfiguration::selectGestureDown (bool loop)
     return selectedGesture;
 }
 
-const int HubConfiguration::findAvailableUndefinedCC()
+const int HubConfiguration::findNextAvailableCC()
 {
-    Array<int> ccArray (neova_dash::midi::undefinedCCs, sizeof(neova_dash::midi::undefinedCCs));
+    Array<int> ccArray (neova_dash::midi::defaultCCs, sizeof(neova_dash::midi::defaultCCs));
 
-    for (int undefinedCc : ccArray)
+    for (int defaultCc : ccArray)
     {
         bool isCcUnused = true;
-        int preset = 0;
+        const int preset = selectedPreset;
+        int gesture = -1;
 
-        while (preset++ < neova_dash::gesture::NUM_PRESETS && isCcUnused)
+        while (++gesture < neova_dash::gesture::NUM_GEST && isCcUnused)
         {
-            int gesture = 0;
-
-            while (gesture++ < neova_dash::gesture::NUM_GEST && isCcUnused)
+            if (isGestureActive (gesture, preset) && getGestureData (gesture, preset).cc == defaultCc)
             {
-                if (isGestureActive (gesture, preset) && getGestureData (gesture, preset).cc == undefinedCc)
-                {
-                    isCcUnused = false;
-                }
+                isCcUnused = false;
             }
         }
 
-        if (isCcUnused) return undefinedCc;
+        if (isCcUnused) return defaultCc;
     }
 
     return ccArray.getLast();
