@@ -258,18 +258,13 @@ void HubConfiguration::setSavedGestureValues (const int gestureNumber, const neo
 
 void HubConfiguration::setPreset (const int presetNumberToSelect)
 {
-    if (presetNumberToSelect < 0 || presetNumberToSelect > neova_dash::gesture::NUM_PRESETS || presetNumberToSelect == selectedPreset) return;
-
-    selectedPreset = presetNumberToSelect;
-    selectFirstExistingGesture();
-    config.active_preset = uint8_t (presetNumberToSelect);
-    
-    notifyConfigWasChanged();
-    commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);  
+	setPreset (gestureNumberToSelect, true);
 }
 
 void HubConfiguration::setPreset (const int presetNumberToSelect, bool uploadToHub)
 {
+	neova_dash::log::writeToLog ("Bank #" + String (presetNumberToSelect) + " : Selecting", neova_dash::log::config);
+
     if (presetNumberToSelect < 0 || presetNumberToSelect > neova_dash::gesture::NUM_PRESETS || presetNumberToSelect == selectedPreset) return;
 
     selectedPreset = presetNumberToSelect;
@@ -572,7 +567,11 @@ void HubConfiguration::moveGestureToId (const int idToMoveFrom, const int idToMo
     if (getGestureData (idToMoveFrom).type == neova_dash::gesture::none ||
         getGestureData (idToMoveTo).type   != neova_dash::gesture::none   ) return;
 
-    getGestureData (idToMoveTo) = getGestureData (idToMoveFrom);
+	  neova_dash::log::writeToLog ("Gesture " + neova_dash::gesture::getTypeString (getGestureData (idToMoveFrom).type, true)
+	  																				+ " (Id " + String (idToMoveFrom) + ") : Moving to id "
+	  																				+ String (idToMoveTo), neova_dash::log::config);
+
+	getGestureData (idToMoveTo) = getGestureData (idToMoveFrom);
     setDefaultGestureValues (idToMoveFrom, neova_dash::gesture::none);
     
     notifyConfigWasChanged();
@@ -582,6 +581,10 @@ void HubConfiguration::moveGestureToId (const int idToMoveFrom, const int idToMo
 void HubConfiguration::duplicateGesture (const int idToDuplicateFrom, const bool prioritizeHigherId)
 {
     int idToDuplicateTo = findClosestIdToDuplicate (idToDuplicateFrom, prioritizeHigherId);
+	  
+	  neova_dash::log::writeToLog ("Gesture " + neova_dash::gesture::getTypeString (getGestureData (idToDuplicateFrom).type, true)
+	  																				+ " (Id " + String (idToDuplicateFrom) + ") : Duplicating to id "
+	  																				+ String (idToDuplicateTo), neova_dash::log::config);
 
     if (isIdAvailable (idToDuplicateFrom) || idToDuplicateTo == -1) return;
 
@@ -596,6 +599,11 @@ void HubConfiguration::swapGestures (const int firstId, const int secondId)
     if (firstId == secondId || firstId  < 0 || firstId  >= neova_dash::gesture::NUM_GEST ||
                                secondId < 0 || secondId >= neova_dash::gesture::NUM_GEST)
         return;
+
+	  neova_dash::log::writeToLog ("Gesture " + neova_dash::gesture::getTypeString (getGestureData (firstId).type, true)
+	  																				+ " (Id " + String (firstId) + ") : Swapping with Gesture "
+                                       			+  neova_dash::gesture::getTypeString (getGestureData (secondId).type, true)
+                                       			+ " (Id " + String (secondId) + ")", neova_dash::log::config);
 
     GestureData secondGestureCopy (getGestureData (secondId));
     

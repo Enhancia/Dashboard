@@ -12,8 +12,6 @@
 DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& reader, DashUpdater& updtr, UpgradeHandler& upgrdHandler)
     : hubConfig (data), dataReader (reader), updater (updtr), upgradeHandler (upgrdHandler)
 {
-    TRACE_IN;
-
     setLookAndFeel (&dashBoardLookAndFeel);
 
     // Creates Components
@@ -88,8 +86,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
 
 DashBoardInterface::~DashBoardInterface()
 {
-    TRACE_IN;
-
+    
     header = nullptr;
     hubComponent = nullptr;
     gesturePanel = nullptr;
@@ -488,10 +485,10 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
 
 bool DashBoardInterface::perform (const InvocationInfo& info)
 {
-    TRACE_IN;
-
+    
     using namespace neova_dash::commands;
-    Logger::writeToLog ("Front performs : " + String (getCommandManager().getNameOfCommand (info.commandID)));
+
+    neova_dash::log::writeToLog ("Executing Frontend Command : " + String (getCommandManager().getNameOfCommand (info.commandID)), neova_dash::log::ui);
 
     switch (info.commandID)
     {

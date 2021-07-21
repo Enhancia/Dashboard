@@ -14,7 +14,6 @@
 HeaderComponent::HeaderComponent (OptionsPanel& options, HubConfiguration& config, DataReader& reader)
     : optionsPanel (options)
 {
-    TRACE_IN;
     batteryComponent = std::make_unique<BatteryComponent> (reader.getFloatValueReference (neova_dash::data::battery),
                                                            config);
     addAndMakeVisible (*batteryComponent);
@@ -24,8 +23,6 @@ HeaderComponent::HeaderComponent (OptionsPanel& options, HubConfiguration& confi
 
 HeaderComponent::~HeaderComponent()
 {
-    TRACE_IN;
-
 	batteryComponent = nullptr;
 }
 
@@ -47,9 +44,9 @@ void HeaderComponent::paint (Graphics& g)
 
 void HeaderComponent::resized()
 {
-	  auto area = getLocalBounds();
+	auto area = getLocalBounds();
 
-	  batteryComponent->setBounds (area.removeFromRight (jmax (area.getWidth()/10, 112)));
+	batteryComponent->setBounds (area.removeFromRight (jmax (area.getWidth()/10, 112)));
 
     optionsButton->setBounds (area.removeFromLeft (40));
 }

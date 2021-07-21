@@ -18,8 +18,6 @@ GesturePanel::GesturePanel (HubConfiguration& data, DataReader& reader,
                               newGesturePanel (newGest),commandManager (manager),
                               freq (freqHz)
 {
-    TRACE_IN;
-
     setComponentID ("gesturePanel");
 
     gestureSettings = std::make_unique<GestureSettingsComponent> (int (hubConfig.getGestureData
@@ -35,8 +33,7 @@ GesturePanel::GesturePanel (HubConfiguration& data, DataReader& reader,
 
 GesturePanel::~GesturePanel()
 {
-    TRACE_IN;
-
+    
     stopTimer();
     unselectCurrentGesture();
     newGesturePanel.hidePanel (true);

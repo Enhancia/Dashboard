@@ -210,6 +210,72 @@ namespace neova_dash
                                          110, 111, 112, 113, 114, 115, 116, 117, 118, 119 };
     }
 
+    namespace log
+    {
+        enum LogLevel
+        {
+            trace =0,
+            debug,
+            info,
+            warning,
+            error,
+            fatal
+        };
+
+        enum LogCategory
+        {
+            general =0,
+            gesture,
+            ui,
+            options,
+            update,
+            hubCommunication,
+            config
+        };
+        
+        const String levelStrings[] = {
+            "TRACE:  ",
+            "DEBUG:  ",
+            "INFO:   ",
+            "WARNING:",
+            "ERROR:  ",
+            "FATAL:  "
+        };
+
+        const String categoryStrings[] = {
+            "general         : ",
+            "gesture         : ",
+            "ui              : ",
+            "options         : ",
+            "update          : ",
+            "hubCommunication: ",
+            "configuration   : "
+        };
+
+        static void writeToLog (const String& message, const LogCategory category=general, const LogLevel level=info)
+        {
+          #if !JUCE_DEBUG
+            if (int (level) >= int (info)) // cuts TRACE and DEBUG entries on production build
+          #endif
+            {
+                String logString;
+                const Time logTime (Time::getCurrentTime());
+
+                logString += "[" + logTime.toISO8601(true) + "] ";
+
+                if (auto* currentThread = Thread::getCurrentThread())
+                {
+                    logString += "[" + currentThread->getThreadName() + "] ";
+                }
+                
+                logString += levelStrings[int(level)] + categoryStrings[int(category)]
+                          +  message;
+
+                Logger::writeToLog (logString);
+            }
+        }
+    }
+
     namespace auth
     {
         const String MACHINE_TOKEN ("50327c582d22471d2427faed42c9928dcd8b0e98 "); //std::getenv ("MACHINE_ENHANCIA_OAUTH");
