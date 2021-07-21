@@ -162,7 +162,7 @@ void MidiPanel::createComboBox()
 
     midiTypeBox->addItem ("Pitch", neova_dash::gesture::pitchMidi + 1);
     midiTypeBox->addItem ("CC", neova_dash::gesture::ccMidi + 1);
-    //midiTypeBox->addItem ("AfterTouch", neova_dash::gesture::afterTouchMidi + 1);
+    midiTypeBox->addItem ("AfterTouch", neova_dash::gesture::afterTouchMidi + 1);
 
     if (hubConfig.getGestureData (id).type == neova_dash::gesture::none)
     {
