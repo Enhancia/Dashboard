@@ -197,7 +197,7 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded (bool forceRepaint)
     }
 
     else if (forceRepaint
-             || lastConnectionState && ((battery != lastBattery && ((!lastChargeState && (newRawBattery - lastRawBattery) < 0.0f) ||
+             || lastConnectionState && ((battery != lastBattery && ((!lastChargeState && ((newRawBattery - lastRawBattery) < 0.0f) || lastBattery == 0.0f) ||
                                                                     (lastChargeState && (newRawBattery - lastRawBattery) > 0.01f)))
                                         || hubConfig.getRingIsCharging() != lastChargeState))
     {
