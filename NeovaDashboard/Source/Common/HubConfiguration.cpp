@@ -258,7 +258,7 @@ void HubConfiguration::setSavedGestureValues (const int gestureNumber, const neo
 
 void HubConfiguration::setPreset (const int presetNumberToSelect)
 {
-	setPreset (gestureNumberToSelect, true);
+	setPreset (presetNumberToSelect, true);
 }
 
 void HubConfiguration::setPreset (const int presetNumberToSelect, bool uploadToHub)

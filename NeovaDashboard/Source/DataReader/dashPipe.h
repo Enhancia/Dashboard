@@ -69,7 +69,7 @@ private:
 	//std::unique_ptr<uint8_t[]> dataBuffer;
 	
 	uint8_t dataBuffer[1024];
-    //ScopedPointer<StringArray> data;
+    //std::unique_ptr<StringArray> data;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DashPipe)
 };

@@ -76,7 +76,7 @@ private:
     int pipeNumber = -1;
     
     //==============================================================================
-    ScopedPointer<StringArray> data;
+    std::unique_ptr<StringArray> data;
     Array<float> floatData;
 
 	#if JUCE_MAC

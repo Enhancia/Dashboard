@@ -9,6 +9,8 @@
 */
 
 #pragma once
+#pragma warning(push)
+#pragma warning( disable: 4505 )    // unreferenced function has been removed
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "DashPath.h"
