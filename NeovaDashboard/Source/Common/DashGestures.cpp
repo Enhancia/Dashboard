@@ -67,19 +67,17 @@ namespace gesture
         else if (type == int (tilt))
         {
             midiVal = map (value, parameter0, parameter1, 0, 127);
-
-            if (reversed) midiVal = 127 - midiVal;
         }
         else if (type == int (roll))
         {
-            midiVal = map (value, parameter0, parameter1, 0, 127);
-            
-            if (reversed) midiVal = 127 - midiVal;
+            midiVal = map (value, parameter0, parameter1, 0, 127);            
         }
         else if (type == int (wave))
         {
             midiVal = 0;
         }
+
+        if (reversed) midiVal = 127 - midiVal;
 
         return mapInt (midiVal, 0, 127, rangeLow, rangeHigh);
     }
