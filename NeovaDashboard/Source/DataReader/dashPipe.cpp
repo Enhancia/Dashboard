@@ -57,6 +57,8 @@ bool DashPipe::readData (String s)
 
 const String DashPipe::getRawData (int index)
 {
+    ignoreUnused (index);
+
 	String test = "test";
 	return test;
 	//return (*data)[index];
@@ -72,6 +74,7 @@ void DashPipe::getDataBuffer(uint8_t * buffer, int bytesToRead)
 
 bool DashPipe::getRawDataAsFloatArray(Array<float>& arrayToFill)
 {
+    ignoreUnused (arrayToFill);
 		/*
 	// Checks that the array has the right amont and type of data
     if (arrayToFill.isEmpty() == false) return false;

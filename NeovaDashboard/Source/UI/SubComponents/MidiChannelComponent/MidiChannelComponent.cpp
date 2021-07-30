@@ -46,7 +46,7 @@ void MidiChannelComponent::resized()
 
 void MidiChannelComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 {
-	if (auto* comboBoxThatHasChanged = &midiChannelBox)
+	if (comboBoxThatHasChanged == &midiChannelBox)
 	{
 		hubConfig.setMidiChannelExclusive (midiChannelBox.getSelectedId() - 1);
 		repaint();
@@ -55,7 +55,7 @@ void MidiChannelComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 void MidiChannelComponent::update()
 {
-	uint16_t midiChannels = hubConfig.getMidiChannels();
+	uint16_t midiChannels = uint16_t (hubConfig.getMidiChannels());
 	double channelToSet = std::log2 (midiChannels);
 
 	// Check for legacy HUBs with multiple channels (-> multiple bytes at 1), and wrong channel values in general
@@ -88,11 +88,11 @@ void MidiChannelComponent::createComboBox()
 
 void MidiChannelComponent::setHUBToFirstActiveChannelOrChannel1()
 {
-	uint16_t midiChannels = hubConfig.getMidiChannels();
+	uint16_t midiChannels = uint16_t (hubConfig.getMidiChannels());
 
 	for (int channel = 0; channel<16; channel++)
 	{
-		if (midiChannels << channel & 1 == 1)
+		if (((midiChannels << channel) & 1) == 1)
 		{
 			hubConfig.setMidiChannelExclusive (channel);
 			midiChannelBox.setSelectedId (channel + 1);
