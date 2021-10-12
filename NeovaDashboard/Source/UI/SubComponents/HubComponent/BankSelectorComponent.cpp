@@ -75,11 +75,20 @@ void BankSelectorComponent::createBankMenu()
     bankMenu.addItem (neova_dash::gesture::NUM_PRESETS+1, "Clear bank", true);
     bankMenu.addSubMenu ("Duplicate to :", duplicateMenu, true);
     
-    handleMenuResult (bankMenu.showMenu (PopupMenu::Options().withParentComponent (getParentComponent())
+    bankMenu.showMenuAsync (PopupMenu::Options().withParentComponent (getParentComponent())
                                                                 //.withMaximumNumColumns (3)
                                                                 .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
                                                                 .withStandardItemHeight (20)
-                                                                .withTargetComponent (this)));
+                                                                .withTargetComponent (this),
+                            ModalCallbackFunction::forComponent (menuCallback, this));
+}
+
+void BankSelectorComponent::menuCallback (int result, BankSelectorComponent* bsComp)
+{
+    if (bsComp != nullptr)
+    {
+        bsComp->handleMenuResult(result);
+    }
 }
 
 void BankSelectorComponent::handleMenuResult (const int menuResult)

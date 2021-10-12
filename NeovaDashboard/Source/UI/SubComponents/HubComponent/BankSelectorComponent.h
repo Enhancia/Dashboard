@@ -46,6 +46,8 @@ private:
 
     //==============================================================================
     void createBankMenu();
+    static void menuCallback (int result, BankSelectorComponent* bsComp);
+
     void handleMenuResult (const int menuResult);
 
     //==============================================================================
