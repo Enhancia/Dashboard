@@ -106,6 +106,7 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * portCOM)
     String releasePath;
     char const * arr[5+7] = {nrfutilPath.getCharPointer()};
     int commandLineSize=0;
+
     
     //Recupère les path des fichiers release et la ligne de commande nrfutil en fonction du firm à upgrade
     if (FirmType == upgradeFirmRing)
@@ -135,6 +136,7 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * portCOM)
     pipe(out_pipe); //create a pipe to get stdout & stderr of the child
     pipe(err_pipe);
     
+
     //Launch nrfutil as a child process & set a callback to monitor its status
     signal(SIGCHLD, childProcessExitCallback);
     if(!(childPid = fork())) //spawn child
@@ -145,7 +147,10 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * portCOM)
         // redirect stdout and stderr to the write end of the pipe
         dup2(out_pipe[1], STDOUT_FILENO);
         dup2(err_pipe[1], STDERR_FILENO);
+        
+        setenv("LANG", "en_US.UTF-8",1);
         execv(arr[0], (char **)arr); //child will terminate here, replaced by nrfutil
+
     }
     //Only parent gets here. Close write end of the pipe
     close(out_pipe[1]);
