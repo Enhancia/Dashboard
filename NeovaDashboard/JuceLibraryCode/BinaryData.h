@@ -9,7 +9,7 @@
 namespace DashData
 {
     extern const char*   _200429__Enhancia_Software_Licence_txt;
-    const int            _200429__Enhancia_Software_Licence_txtSize = 4704;
+    const int            _200429__Enhancia_Software_Licence_txtSize = 4621;
 
     extern const char*   BRANDPopupgrey_png;
     const int            BRANDPopupgrey_pngSize = 15533;

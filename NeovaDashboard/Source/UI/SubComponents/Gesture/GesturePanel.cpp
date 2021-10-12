@@ -605,7 +605,8 @@ void GesturePanel::createMenuForGestureId (int id)
                                                                 .withMaximumNumColumns (3)
                                                                 .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
                                                                 .withStandardItemHeight (20)));
-}
+
+ }
 
 void GesturePanel::handleMenuResult (int gestureId, const int menuResult)
 {
