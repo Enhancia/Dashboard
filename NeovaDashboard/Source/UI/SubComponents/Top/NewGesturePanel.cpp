@@ -13,19 +13,15 @@
 NewGesturePanel::NewGesturePanel (HubConfiguration& config, ApplicationCommandManager& manager)
     : hubConfig (config), commandManager (manager)
 {
-    TRACE_IN;
-
-  	createCloseButton();
-  	createGestureSelectorButtons();
-  	createAndAddTextEditor();
+    createCloseButton();
+    createGestureSelectorButtons();
+    createAndAddTextEditor();
 }
 
 NewGesturePanel::~NewGesturePanel()
 {
-    TRACE_IN;
-
     closeButton = nullptr;
-	  descriptionTextEditor = nullptr;
+    descriptionTextEditor = nullptr;
 }
 
 //==============================================================================
@@ -72,7 +68,7 @@ void NewGesturePanel::paint (Graphics& g)
 
 void NewGesturePanel::resized()
 {
-	  using namespace neova_dash::ui;
+    using namespace neova_dash::ui;
 
     // Panel Area
     panelArea = getLocalBounds().reduced (getWidth()/4, getHeight()/6);
@@ -81,15 +77,15 @@ void NewGesturePanel::resized()
                                                          .withY (panelArea.getY() + MARGIN_SMALL)
                                                          .reduced (3));
 
-	  auto area = panelArea.reduced (2*MARGIN);
+      auto area = panelArea.reduced (2*MARGIN);
 
     resizeGestureSelectorButtons (area.removeFromTop (area.getHeight()/2)
-    								  .reduced (MARGIN, 2*MARGIN));
+                                      .reduced (MARGIN, 2*MARGIN));
 
     descriptionTextEditor->setBounds (area.reduced (2*MARGIN, MARGIN));
     if (area.getHeight() > 80)
     descriptionTextEditor->setBounds (area.withSizeKeepingCentre (area.reduced (2*MARGIN, MARGIN).getWidth(),
-    																  80));
+                                                                      80));
 }
 
 //==============================================================================
@@ -102,29 +98,29 @@ void NewGesturePanel::mouseEnter (const MouseEvent &event)
 {
     using namespace neova_dash::gesture;
 
-  	if (auto* gestureSelector = dynamic_cast<GestureTypeSelector*> (event.eventComponent))
-  	{
-    		descriptionTextEditor->setText ("", false);
+    if (auto* gestureSelector = dynamic_cast<GestureTypeSelector*> (event.eventComponent))
+    {
+            descriptionTextEditor->setText ("", false);
 
-    		// Gesture Type
-    		descriptionTextEditor->setFont (neova_dash::font::dashFont.withHeight (15.0f).boldened());
-    		descriptionTextEditor->insertTextAtCaret (getTypeString (intToGestureType (gestureSelector->gestureType), true)
-    												  	                  + " :\n");
-    		// Gesture Description
-    		descriptionTextEditor->setFont (neova_dash::font::dashFont.withHeight (14.0f));
-    		descriptionTextEditor->insertTextAtCaret (getDescriptionString (intToGestureType (gestureSelector->gestureType)));
-    	
-    		descriptionTextEditor->setCaretPosition (0);
-  	}
+            // Gesture Type
+            descriptionTextEditor->setFont (neova_dash::font::dashFont.withHeight (15.0f).boldened());
+            descriptionTextEditor->insertTextAtCaret (getTypeString (intToGestureType (gestureSelector->gestureType), true)
+                                                                          + " :\n");
+            // Gesture Description
+            descriptionTextEditor->setFont (neova_dash::font::dashFont.withHeight (14.0f));
+            descriptionTextEditor->insertTextAtCaret (getDescriptionString (intToGestureType (gestureSelector->gestureType)));
+        
+            descriptionTextEditor->setCaretPosition (0);
+    }
 }
 void NewGesturePanel::mouseUp (const MouseEvent &event)
 {
-  	if (auto* gestureSelector = dynamic_cast<GestureTypeSelector*> (event.eventComponent))
-  	{
-    		selectGestureType (gestureSelector);
-    		createNewGesture();
-    		gestureSelector->setHighlighted (false);
-  	}
+    if (auto* gestureSelector = dynamic_cast<GestureTypeSelector*> (event.eventComponent))
+    {
+            selectGestureType (gestureSelector);
+            createNewGesture();
+            gestureSelector->setHighlighted (false);
+    }
     else
     {
         if (!panelArea.contains (event.getPosition()))
@@ -135,10 +131,10 @@ void NewGesturePanel::mouseUp (const MouseEvent &event)
 }
 void NewGesturePanel::buttonClicked (Button* bttn)
 {
-  	if (bttn == closeButton)
-  	{
-  		  hidePanel (true);
-  	}
+    if (bttn == closeButton.get())
+    {
+          hidePanel (true);
+    }
 }
 
 void NewGesturePanel::createNewGesture()
@@ -146,7 +142,7 @@ void NewGesturePanel::createNewGesture()
     using namespace neova_dash::gesture;
 
     hubConfig.setSavedGestureValues (selectedGestureSlot, intToGestureType (selectedGestureType));
-  	updateInterface();
+    updateInterface();
 }
 
 void NewGesturePanel::labelTextChanged (Label* lbl)
@@ -159,18 +155,18 @@ void NewGesturePanel::editorShown (Label* lbl, TextEditor& ed)
 //==============================================================================
 void NewGesturePanel::showPanelForGestureID (const int gestureID)
 {
-  	if (gestureID < 0 || gestureID >= neova_dash::gesture::NUM_GEST)
-  	{
-    		// Dash tries to create a gesture for an id that can't exist
-    		jassertfalse;
-    		return;
-  	}
-  	else if (hubConfig.getGestureData (gestureID).type != int (neova_dash::gesture::none))
-  	{
-    		// Dash tries to create a gesture for an id that already has a gesture!!
-    		jassertfalse;
-    		return;
-  	}
+    if (gestureID < 0 || gestureID >= neova_dash::gesture::NUM_GEST)
+    {
+            // Dash tries to create a gesture for an id that can't exist
+            jassertfalse;
+            return;
+    }
+    else if (hubConfig.getGestureData (gestureID).type != int (neova_dash::gesture::none))
+    {
+            // Dash tries to create a gesture for an id that already has a gesture!!
+            jassertfalse;
+            return;
+    }
 
     if (isVisible())
     {
@@ -198,28 +194,28 @@ void NewGesturePanel::updateInterface()
 
 const int NewGesturePanel::getLastSelectedSlot()
 {
-	  return selectedGestureSlot;
+      return selectedGestureSlot;
 }
 
 void NewGesturePanel::setVisible (bool shouldBeVisible)
 {
-	  Component::setVisible (shouldBeVisible);
+      Component::setVisible (shouldBeVisible);
 }
 
 void NewGesturePanel::selectGestureType (const GestureTypeSelector* gestureTypeToSelect)
 {
-	  selectedGestureType = gestureTypeToSelect->gestureType;
+      selectedGestureType = gestureTypeToSelect->gestureType;
 }
 void NewGesturePanel::unselectGestureType()
 {
-	  selectedGestureType = -1;
+      selectedGestureType = -1;
 }
 
 //==============================================================================
 void NewGesturePanel::createCloseButton()
 {
-    addAndMakeVisible (closeButton = new DashShapeButton ("Close Settings Button", Colour(0),
-                                                                                   neova_dash::colour::mainText));
+    addAndMakeVisible (*(closeButton = std::make_unique<DashShapeButton> ("Close Settings Button", Colour(0),
+                                                                                   neova_dash::colour::mainText)));
 
     Path p;
     p.startNewSubPath (0, 0);
@@ -234,35 +230,35 @@ void NewGesturePanel::createCloseButton()
 
 void NewGesturePanel::createGestureSelectorButtons()
 {
-  	jassert (gestureSelectors.isEmpty());
+    jassert (gestureSelectors.isEmpty());
 
-  	for (int i=0; i < neova_dash::gesture::numTypes; i++)
-  	{
-  		gestureSelectors.add (new GestureTypeSelector (i));
-  		addAndMakeVisible (gestureSelectors.getLast());
-  		gestureSelectors.getLast()->addMouseListener (this, false);
-  	}
+    for (int i=0; i < neova_dash::gesture::numTypes; i++)
+    {
+        gestureSelectors.add (new GestureTypeSelector (i));
+        addAndMakeVisible (gestureSelectors.getLast());
+        gestureSelectors.getLast()->addMouseListener (this, false);
+    }
 }
 void NewGesturePanel::resizeGestureSelectorButtons (juce::Rectangle<int> buttonsArea)
 {
     using namespace neova_dash::ui;
 
-  	int N = neova_dash::gesture::numTypes;
+    int N = neova_dash::gesture::numTypes;
 
-  	int selectorWidth = (buttonsArea.getWidth() - (N - 1 - 1)*MARGIN) / (N - 1); // TODO WAVE remove -1 when wave is implemented
+    int selectorWidth = (buttonsArea.getWidth() - (N - 1 - 1)*MARGIN) / (N - 1); // TODO WAVE remove -1 when wave is implemented
 
-  	for (int i=0; i < N; i++)
-  	{
-    		if (i == (int) neova_dash::gesture::wave) continue; // TODO WAVE remove when wave is implemented
+    for (int i=0; i < N; i++)
+    {
+            if (i == (int) neova_dash::gesture::wave) continue; // TODO WAVE remove when wave is implemented
 
-    		gestureSelectors[i]->setBounds (buttonsArea.removeFromLeft (selectorWidth));
-    		buttonsArea.removeFromLeft (MARGIN);
-  	}
+            gestureSelectors[i]->setBounds (buttonsArea.removeFromLeft (selectorWidth));
+            buttonsArea.removeFromLeft (MARGIN);
+    }
 }
 
 void NewGesturePanel::createAndAddTextEditor()
 {
-	  addAndMakeVisible (descriptionTextEditor = new TextEditor ("Gesture Description Text Editor"));
+    addAndMakeVisible (*(descriptionTextEditor = std::make_unique<TextEditor> ("Gesture Description Text Editor")));
     descriptionTextEditor->setMultiLine (true, true);
     descriptionTextEditor->setReturnKeyStartsNewLine (true);
     descriptionTextEditor->setReadOnly (true);
@@ -287,29 +283,29 @@ NewGesturePanel::GestureTypeSelector::~GestureTypeSelector()
 
 void NewGesturePanel::GestureTypeSelector::paint (Graphics& g)
 {
-  	if (highlighted)
-  	{
-    		// Fill
-    		g.setColour (neova_dash::gesture::getHighlightColour (gestureType).withAlpha (0.15f));
-    		g.fillRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f);
+    if (highlighted)
+    {
+            // Fill
+            g.setColour (neova_dash::gesture::getHighlightColour (gestureType).withAlpha (0.15f));
+            g.fillRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f);
 
-    		// Outline
-    		g.setColour (neova_dash::gesture::getHighlightColour (gestureType));
-    		g.drawRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f, 1.0f);
-  	}
-  	else
-  	{
+            // Outline
+            g.setColour (neova_dash::gesture::getHighlightColour (gestureType));
+            g.drawRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f, 1.0f);
+    }
+    else
+    {
         // Fill
-    		g.setColour (neova_dash::colour::gestureBackground);
-    		g.fillRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f);
+            g.setColour (neova_dash::colour::gestureBackground);
+            g.fillRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f);
 
         // Outline
         g.setColour (neova_dash::gesture::getHighlightColour (gestureType).withAlpha (0.2f));
         g.drawRoundedRectangle (getLocalBounds().reduced (2).toFloat(), 10.0f, 1.0f);
-  	}
+    }
 
-  	g.setColour (neova_dash::colour::mainText);
-  	drawGesturePath (g, getLocalBounds().reduced(2));
+    g.setColour (neova_dash::colour::mainText);
+    drawGesturePath (g, getLocalBounds().reduced(2));
 }
 void NewGesturePanel::GestureTypeSelector::resized()
 {
@@ -317,22 +313,22 @@ void NewGesturePanel::GestureTypeSelector::resized()
 
 void NewGesturePanel::GestureTypeSelector::mouseEnter (const MouseEvent &event)
 {
-  	setHighlighted (true);
-  	repaint();
+    setHighlighted (true);
+    repaint();
 }
 void NewGesturePanel::GestureTypeSelector::mouseExit (const MouseEvent &event)
 {
-  	setHighlighted (false);
-  	repaint();
+    setHighlighted (false);
+    repaint();
 }
 
 void NewGesturePanel::GestureTypeSelector::setHighlighted (bool shouldBeHighlighted)
 {
-  	if (shouldBeHighlighted != highlighted)
-  	{
-    		highlighted = shouldBeHighlighted;
-    		repaint();
-  	}
+    if (shouldBeHighlighted != highlighted)
+    {
+            highlighted = shouldBeHighlighted;
+            repaint();
+    }
 }
 
 void NewGesturePanel::GestureTypeSelector::drawGesturePath (Graphics& g, juce::Rectangle<int> area)

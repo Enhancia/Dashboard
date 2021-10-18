@@ -71,6 +71,7 @@ private:
 
     //==============================================================================
     void createMenuForGestureId (int id);
+    static void menuCallback (int result, GesturePanel* gPanel, int id);
     void handleMenuResult (int gestureId, const int menuResult);
     void handleLeftClickUp (const MouseEvent &event);
     void handleLeftClickDrag (const MouseEvent &event);

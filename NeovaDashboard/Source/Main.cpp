@@ -45,18 +45,14 @@ public:
     //==============================================================================
     void initialise (const String& commandLine) override
     {
-        dashboardLogger = FileLogger::createDefaultAppLogger ("Enhancia/NeovaDashboard/Logs/",
+        dashboardLogger.reset (FileLogger::createDefaultAppLogger ("Enhancia/NeovaDashboard/Logs/",
                                                               "neovaDashLog.txt",
-                                                              "Neova Dashboard Log | OS :"
-                                                            #if JUCE_MAC
-                                                              " MAC "
-                                                            #elif JUCE_WINDOWS
-                                                              " Windows "
-                                                            #endif
-                                                              "| Neova Dashboard v" + getApplicationVersion()
-                                                                                    + " \n");
+                                                              "Neova Dashboard Log | OS : " + SystemStats::getOperatingSystemName() +
+                                                              " | Neova Dashboard v" + getApplicationVersion()
+                                                                                    + " \n"));
     
-        Logger::setCurrentLogger (dashboardLogger);
+		
+        Logger::setCurrentLogger (dashboardLogger.get());
 
 		dataReader = std::make_unique<DataReader>(commandManager, hubConfig);
 		dataReader->addChangeListener(this);
@@ -301,6 +297,8 @@ public:
                                     DocumentWindow::allButtons),
               dashboardInterface (*dashInterface), hubConfig (config)
         {
+        	neova_dash::log::writeToLog ("Creating Dashboard main window.", neova_dash::log::general);
+
             setUsingNativeTitleBar (true);
             setContentOwned (dashInterface, true);
             
@@ -388,7 +386,9 @@ public:
     bool perform (const InvocationInfo& info) override
     {
         using namespace neova_dash::commands;
-        Logger::writeToLog ("Back performs : " + String (commandManager.getNameOfCommand (info.commandID)));
+
+        if (info.commandID != updatePresetModeState)
+        	neova_dash::log::writeToLog ("Executing Backend Command : " + String (commandManager.getNameOfCommand (info.commandID)), neova_dash::log::general);
 
         switch (info.commandID)
         {
@@ -451,7 +451,7 @@ private:
 	std::unique_ptr<DashUpdater> updater;
 	std::unique_ptr<FirmDownloader> firmDownloader;
 
-    ScopedPointer<FileLogger> dashboardLogger;
+    std::unique_ptr<FileLogger> dashboardLogger;
 
     //==============================================================================
 	uint8_t hubPowerState = POWER_OFF;

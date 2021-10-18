@@ -23,7 +23,7 @@
 #include "SubComponents/HubComponent/HubComponent.h"
 #include "SubComponents/MidiChannelComponent/MidiChannelComponent.h"
 #include "SubComponents/UploadButton.h"
-#include "SubComponents/HubComponent/PresetSelectorComponent.h"
+#include "SubComponents/HubComponent/BankSelectorComponent.h"
 #include "SubComponents/Top/DashAlertPanel.h"
 
 ApplicationCommandManager& getCommandManager();
@@ -256,7 +256,7 @@ private:
     std::unique_ptr<GesturePanel> gesturePanel; /**< \brief Interface's gesture panel. */
     std::unique_ptr<NewGesturePanel> newGesturePanel; /**< \brief Interface's gesture creator panel. */
     std::unique_ptr<UploadButton> uploadButton; /**< \brief Interface's upload button. */
-    std::unique_ptr<PresetSelectorComponent> presetSelector; /**< \brief Interface's preset selector component. */
+    std::unique_ptr<BankSelectorComponent> bankSelector; /**< \brief Interface's preset selector component. */
     std::unique_ptr<OptionsPanel> optionsPanel; /**< \brief Interface's option menu. */
     std::unique_ptr<FirmUpgradePanel> firmUpgradePanel; /**< \brief Interface's firmware upgrade alert panel. */
     std::unique_ptr<UpdaterPanel> updaterPanel; /**< \brief Interface's update menu. */

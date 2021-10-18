@@ -12,8 +12,6 @@
 DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& reader, DashUpdater& updtr, UpgradeHandler& upgrdHandler)
     : hubConfig (data), dataReader (reader), updater (updtr), upgradeHandler (upgrdHandler)
 {
-    TRACE_IN;
-
     setLookAndFeel (&dashBoardLookAndFeel);
 
     // Creates Components
@@ -49,9 +47,9 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     midiChannelComponent = std::make_unique<MidiChannelComponent> (hubConfig);
     addAndMakeVisible (*midiChannelComponent);
 
-    presetSelector = std::make_unique<PresetSelectorComponent> (hubConfig, getCommandManager());
-    addAndMakeVisible (*presetSelector);
-    presetSelector->addMouseListener (this, true);
+    bankSelector = std::make_unique<BankSelectorComponent> (hubConfig, getCommandManager());
+    addAndMakeVisible (*bankSelector);
+    bankSelector->addMouseListener (this, true);
 
     // Top panel properties
     newGesturePanel->hidePanel();
@@ -88,8 +86,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
 
 DashBoardInterface::~DashBoardInterface()
 {
-    TRACE_IN;
-
+    
     header = nullptr;
     hubComponent = nullptr;
     gesturePanel = nullptr;
@@ -222,7 +219,7 @@ void DashBoardInterface::resized()
 
     auto presetAndMidiArea = area.removeFromBottom (15);
 
-    presetSelector->setBounds (presetAndMidiArea.withSizeKeepingCentre (area.getWidth()/6, 30));
+    bankSelector->setBounds (presetAndMidiArea.withSizeKeepingCentre (area.getWidth()/6, 30));
     midiChannelComponent->setBounds (presetAndMidiArea.withLeft (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/3 + MARGIN * 2)
                                                       .withRight (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/16)
                                                       .reduced (4*MARGIN, 0)
@@ -251,7 +248,7 @@ void DashBoardInterface::resized()
 void DashBoardInterface::mouseUp (const MouseEvent& event)
 {
 	if (hubComponent->getControlButtonDown()
-        && event.eventComponent->getParentComponent() == presetSelector.get())
+        && event.eventComponent->getParentComponent() == bankSelector.get())
     {
         hubComponent->setControlButtonDown (false);
     }
@@ -259,8 +256,8 @@ void DashBoardInterface::mouseUp (const MouseEvent& event)
 
 void DashBoardInterface::mouseEnter (const MouseEvent& event)
 {
-    if ((event.eventComponent == presetSelector.get() ||
-         event.eventComponent->getParentComponent() == presetSelector.get())
+    if ((event.eventComponent == bankSelector.get() ||
+         event.eventComponent->getParentComponent() == bankSelector.get())
         && presetModeState == normalState)
     {
         hubComponent->setPresetStateToPresetMode();
@@ -269,8 +266,8 @@ void DashBoardInterface::mouseEnter (const MouseEvent& event)
 
 void DashBoardInterface::mouseExit (const MouseEvent& event)
 {
-    if ((event.eventComponent == presetSelector.get() ||
-         event.eventComponent->getParentComponent() == presetSelector.get())
+    if ((event.eventComponent == bankSelector.get() ||
+         event.eventComponent->getParentComponent() == bankSelector.get())
         && presetModeState == presetState
         && !commandKeyDown && !hubComponent->getControlButtonDown())
     {
@@ -287,9 +284,9 @@ void DashBoardInterface::modifierKeysChanged (const ModifierKeys& modifiers)
     }
     else if (!modifiers.isCommandDown() && commandKeyDown
                                         && presetModeState == presetState
-                                        && !presetSelector->isMouseOver()
-                                        && !presetSelector->getChildComponent (0)->isMouseOver()
-                                        && !presetSelector->getChildComponent (1)->isMouseOver())
+                                        && !bankSelector->isMouseOver()
+                                        && !bankSelector->getChildComponent (0)->isMouseOver()
+                                        && !bankSelector->getChildComponent (1)->isMouseOver())
     {
         hubComponent->setPresetStateToNormalMode();
     }
@@ -488,10 +485,10 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
 
 bool DashBoardInterface::perform (const InvocationInfo& info)
 {
-    TRACE_IN;
-
+    
     using namespace neova_dash::commands;
-    Logger::writeToLog ("Front performs : " + String (getCommandManager().getNameOfCommand (info.commandID)));
+
+    neova_dash::log::writeToLog ("Executing Frontend Command : " + String (getCommandManager().getNameOfCommand (info.commandID)), neova_dash::log::ui);
 
     switch (info.commandID)
     {
@@ -578,7 +575,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         gesturePanel->update();
         newGesturePanel->hidePanel();
         uploadButton->setVisible (true);
-        presetSelector->setVisible (true);
+        bankSelector->setVisible (true);
         midiChannelComponent->setVisible (true);
         hubComponent->setInterceptsMouseClicks (true, true);
         hubConfig.selectFirstExistingGesture();
@@ -606,7 +603,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
             header->setBatteryVisible (false);
         }
         
-        presetSelector->setVisible (false);
+        bankSelector->setVisible (false);
         hubComponent->setInterceptsMouseClicks (false, false);
     }
 
@@ -669,9 +666,9 @@ void DashBoardInterface::hubChangedPreset()
 {
     if (presetModeState == int (presetState))
     {
-        if (!commandKeyDown && !presetSelector->isMouseOver()
-                            && !presetSelector->getChildComponent (0)->isMouseOver()
-                            && !presetSelector->getChildComponent (1)->isMouseOver())
+        if (!commandKeyDown && !bankSelector->isMouseOver()
+                            && !bankSelector->getChildComponent (0)->isMouseOver()
+                            && !bankSelector->getChildComponent (1)->isMouseOver())
         {
             // Should go back to Normal mode and notify backend
             setPresetStateToNormalMode();
@@ -798,7 +795,7 @@ void DashBoardInterface::update()
     {
         hubComponent->update();
         gesturePanel->update();
-        presetSelector->update();
+        bankSelector->update();
         header->update();
         optionsPanel->update();
         midiChannelComponent->update();

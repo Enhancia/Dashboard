@@ -13,14 +13,11 @@
 UploadButton::UploadButton (HubConfiguration& config, ApplicationCommandManager& cm, const bool shouldBeActive)
 	: Button ("Upload Button"), commandManager (cm), hubConfig (config), active (shouldBeActive)
 {
-	TRACE_IN;
-
-	setInterceptsMouseClicks (active, false);
+	  setInterceptsMouseClicks (active, false);
 }
 
 UploadButton::~UploadButton()
 {
-	TRACE_IN;
 }
 
 void UploadButton::resized()

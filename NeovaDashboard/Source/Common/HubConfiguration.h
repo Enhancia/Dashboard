@@ -48,6 +48,9 @@ public:
 
     struct PresetData
     {
+        PresetData() = default;
+        PresetData (PresetData& other);
+
         uint16_t align_to_word;
 
         uint16_t midiChannels = 1;
@@ -133,9 +136,11 @@ public:
     void swapGestures (const int id1, const int id2);
     
     //==============================================================================
-    void setPreset (const int gestureNumberToSelect);
-	void setPreset (const int gestureNumberToSelect, bool uploadToHub);
+    void setPreset (const int presetNumberToSelect);
+	void setPreset (const int presetNumberToSelect, bool uploadToHub);
     const int getSelectedPreset();
+    void clearPreset (const int presetNumberToClear, const bool uploadToHub = true);
+    void duplicatePreset (const int idToDuplicateFrom, const int idToDuplicateTo,  const bool uploadToHub = true);
 
     PresetData& getPresetData (const int presetNumber);
     PresetData& getPresetData();
@@ -211,7 +216,7 @@ private:
 
     int findClosestIdToDuplicate (int idToDuplicateFrom, bool prioritizeHigherId);
     bool isIdAvailable (const int idToCheck);
-    const int findAvailableUndefinedCC();
+    const int findNextAvailableCC();
 
     //==============================================================================
 	ApplicationCommandManager& commandManager = getCommandManager();

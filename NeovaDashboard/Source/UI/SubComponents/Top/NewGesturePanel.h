@@ -109,8 +109,8 @@ private:
     ApplicationCommandManager& commandManager;
     
     //==============================================================================
-    ScopedPointer<DashShapeButton> closeButton;
-    ScopedPointer<TextEditor> descriptionTextEditor;
+    std::unique_ptr<DashShapeButton> closeButton;
+    std::unique_ptr<TextEditor> descriptionTextEditor;
     OwnedArray<GestureTypeSelector> gestureSelectors;
 
     //==============================================================================

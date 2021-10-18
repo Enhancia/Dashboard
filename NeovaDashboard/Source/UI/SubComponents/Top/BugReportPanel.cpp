@@ -387,6 +387,8 @@ void BugReportPanel::getFilestoAttach (Array<File>& fileArrayToFill)
 	// NRFUTIL Log File
 	fileStrings.add (File::getSpecialLocation (File::userApplicationDataDirectory).getFullPathName()
 							+ "\\Enhancia\\NeovaDashboard\\Logs\\nrfutilErr.log");
+	fileStrings.add (File::getSpecialLocation (File::userApplicationDataDirectory).getFullPathName()
+							+ "\\Enhancia\\NeovaDashboard\\Logs\\nrfutilOut.log");
 	// Daemon Log File
 	fileStrings.add (File::getSpecialLocation (File::globalApplicationsDirectoryX86).getFullPathName()
 							+ "\\Enhancia\\Enhancia_Service_Reader\\Enhancia_Service_Reader_Log.txt");
@@ -399,9 +401,13 @@ void BugReportPanel::getFilestoAttach (Array<File>& fileArrayToFill)
 	// NRFUTIL Log File
 	fileStrings.add (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName()
 							+ "/Logs/Enhancia/NeovaDashboard/Logs/nrfutilErr.txt");
+	fileStrings.add (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName()
+							+ "/Logs/Enhancia/NeovaDashboard/Logs/nrfutilOut.txt");
 	// Daemon Log File
 	fileStrings.add (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName()
 							+ "/Caches/DaemonSeriaPort_MacOS/EnhanciaDaemonlog.txt");
+	fileStrings.add (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName()
+							+ "/Caches/DaemonSeriaPort_MacOS/EnhanciaDaemonlog_previous.txt");
 
 	#endif
 

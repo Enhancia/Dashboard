@@ -19,7 +19,7 @@ DataReader::DataReader (ApplicationCommandManager& manager, HubConfiguration& co
     connected = false;
     
     // Data initialization
-    data = new StringArray (StringArray::fromTokens ("0 0 0 0 0 0", " ", String()));
+    data = std::make_unique<StringArray> (StringArray::fromTokens ("0 0 0 0 0 0", " ", String()));
 
     for (int i=0; i<neova_dash::data::numDatas; i++)
     {
@@ -186,6 +186,7 @@ bool DataReader::connectToExistingPipe(int nbPipe)
     //create namedpipe  with currentUID to enable multi user session
     return connectToPipe("mynamedpipe" + String (currentUID) + String(nbPipe), -1);
   #elif JUCE_WINDOWS
+    ignoreUnused (nbPipe);
 	return false;
   #endif
 }
@@ -237,6 +238,8 @@ void DataReader::changeListenerCallback (ChangeBroadcaster * source)
     connectToExistingPipe(nbPipeToConnect);
     statutPipe->disconnect();
     statutPipe.reset();
+  #else
+    ignoreUnused (source);
   #endif
 }
 

@@ -115,6 +115,8 @@ void FirmDownloader::progress (URL::DownloadTask* task,
                             int64 bytesDownloaded,
                             int64 totalLength )
 {
+    ignoreUnused(task);
+
     DBG ("Downloading ... " << float (bytesDownloaded)/1000 << " / "
                             << float (totalLength)/1000 << " Ko\n");
 

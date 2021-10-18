@@ -110,12 +110,12 @@ private:
     //==============================================================================
     const Range<float> parameterMax;
     
-    ScopedPointer<Slider> lowSlider;
-    ScopedPointer<Slider> highSlider;
-    ScopedPointer<Label> rangeLabelMin;
-    ScopedPointer<Label> rangeLabelMax;
-    ScopedPointer<TextButton> minAngleButton;
-    ScopedPointer<TextButton> maxAngleButton;
+    std::unique_ptr<Slider> lowSlider;
+    std::unique_ptr<Slider> highSlider;
+    std::unique_ptr<Label> rangeLabelMin;
+    std::unique_ptr<Label> rangeLabelMax;
+    std::unique_ptr<TextButton> minAngleButton;
+    std::unique_ptr<TextButton> maxAngleButton;
     
     //==============================================================================
     TunerStyle tunerStyle;

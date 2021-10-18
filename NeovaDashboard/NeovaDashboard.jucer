@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="SIAvrc" name="NeovaDashboard" projectType="guiapp" binaryDataNamespace="DashData"
-              version="1.0.2" jucerFormatVersion="1">
+              version="101.0.3" jucerFormatVersion="1">
   <MAINGROUP id="KvQWjZ" name="NeovaDashboard">
     <GROUP id="{20075F30-04A5-410B-6952-3C63688FBF54}" name="Resources">
       <FILE id="Z37IRj" name="200429 - Enhancia Software Licence.txt" compile="0"
@@ -130,10 +130,10 @@
             <FILE id="yYEgXE" name="HubComponent.cpp" compile="1" resource="0"
                   file="Source/UI/SubComponents/HubComponent/HubComponent.cpp"/>
             <FILE id="OYBkeL" name="HubComponent.h" compile="0" resource="0" file="Source/UI/SubComponents/HubComponent/HubComponent.h"/>
-            <FILE id="WGVhYh" name="PresetSelectorComponent.cpp" compile="1" resource="0"
-                  file="Source/UI/SubComponents/HubComponent/PresetSelectorComponent.cpp"/>
-            <FILE id="XWegKq" name="PresetSelectorComponent.h" compile="0" resource="0"
-                  file="Source/UI/SubComponents/HubComponent/PresetSelectorComponent.h"/>
+            <FILE id="WGVhYh" name="BankSelectorComponent.cpp" compile="1" resource="0"
+                  file="Source/UI/SubComponents/HubComponent/BankSelectorComponent.cpp"/>
+            <FILE id="XWegKq" name="BankSelectorComponent.h" compile="0" resource="0"
+                  file="Source/UI/SubComponents/HubComponent/BankSelectorComponent.h"/>
           </GROUP>
           <GROUP id="{C3C9C5C6-A208-BD22-0C60-7A9873D9B26E}" name="MidiChannelComponent">
             <FILE id="SlPkck" name="MidiChannelComponent.cpp" compile="1" resource="0"

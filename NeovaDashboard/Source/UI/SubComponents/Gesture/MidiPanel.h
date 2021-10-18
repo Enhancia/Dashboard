@@ -90,10 +90,10 @@ private:
     int lastValue = -1;
 
     //==============================================================================
-    ScopedPointer<Label> rangeLabelMin;
-    ScopedPointer<Label> rangeLabelMax;
-    ScopedPointer<Slider> lowSlider;
-    ScopedPointer<Slider> highSlider;
+    std::unique_ptr<Label> rangeLabelMin;
+    std::unique_ptr<Label> rangeLabelMax;
+    std::unique_ptr<Slider> lowSlider;
+    std::unique_ptr<Slider> highSlider;
 
     DraggableObject objectBeingDragged = none;
     Colour highlightColour;
@@ -141,11 +141,9 @@ private:
     void setComponentsVisibility();
     
     //==============================================================================
-    ScopedPointer<ComboBox> midiTypeBox;
-    ScopedPointer<Label> ccLabel;
-    ScopedPointer<Label> rangeLabelMin;
-    ScopedPointer<Label> rangeLabelMax;
-    ScopedPointer<MidiRangeTuner> midiRangeTuner;
+    std::unique_ptr<ComboBox> midiTypeBox;
+    std::unique_ptr<Label> ccLabel;
+    std::unique_ptr<MidiRangeTuner> midiRangeTuner;
     std::unique_ptr<TextButton> reverseButton;
 
     //==============================================================================

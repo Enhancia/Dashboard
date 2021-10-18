@@ -9,6 +9,8 @@
 */
 
 #pragma once
+#pragma warning(push)
+#pragma warning( disable: 4505 )    // unreferenced function has been removed
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "DashPath.h"
@@ -205,9 +207,75 @@ namespace neova_dash
 
         //extern String getCCString();
 
-        const uint8_t undefinedCCs[] = { /*3, 9, 14, 15, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31,
-                                         85, 86, 87, 89, 90,*/102, 103, 104, 105, 106, 107, 108, 109,
-                                         110, 111, 112, 113, 114, 115, 116, 117, 118, 119 };
+        const uint8_t defaultCCs[] = { 1, 2, 3, 4 /*3, 9, 14, 15, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31,
+                                         85, 86, 87, 89, 90, 102, 103, 104, 105, 106, 107, 108, 109,
+                                         110, 111, 112, 113, 114, 115, 116, 117, 118, 119 */};
+    }
+
+    namespace log
+    {
+        enum LogLevel
+        {
+            trace =0,
+            debug,
+            info,
+            warning,
+            error,
+            fatal
+        };
+
+        enum LogCategory
+        {
+            general =0,
+            gesture,
+            ui,
+            options,
+            update,
+            hubCommunication,
+            config
+        };
+        
+        const String levelStrings[] = {
+            "TRACE:  ",
+            "DEBUG:  ",
+            "INFO:   ",
+            "WARNING:",
+            "ERROR:  ",
+            "FATAL:  "
+        };
+
+        const String categoryStrings[] = {
+            "general         : ",
+            "gesture         : ",
+            "ui              : ",
+            "options         : ",
+            "update          : ",
+            "hubCommunication: ",
+            "configuration   : "
+        };
+
+        static void writeToLog (const String& message, const LogCategory category=general, const LogLevel level=info)
+        {
+          #if !JUCE_DEBUG
+            if (int (level) >= int (info)) // cuts TRACE and DEBUG entries on production build
+          #endif
+            {
+                String logString;
+                const Time logTime (Time::getCurrentTime());
+
+                logString += "[" + logTime.toISO8601(true) + "] ";
+
+                if (auto* currentThread = Thread::getCurrentThread())
+                {
+                    logString += "[" + currentThread->getThreadName() + "] ";
+                }
+                
+                logString += levelStrings[int(level)] + categoryStrings[int(category)]
+                          +  message;
+
+                Logger::writeToLog (logString);
+            }
+        }
     }
 
     namespace auth
