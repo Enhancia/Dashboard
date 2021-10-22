@@ -432,6 +432,12 @@ void HubConfiguration::setHubIsConnected (bool isConnected)
     if (isConnected)
     {
         checkHUBCompatibility();
+        neova_dash::log::writeToLog ("Hub connected : v" + getHubFirmwareVersionString(),
+                                     neova_dash::log::hubCommunication);
+    }
+    else
+    {
+        neova_dash::log::writeToLog ("Hub disconnected", neova_dash::log::hubCommunication);
     }
 }
 
@@ -447,6 +453,12 @@ void HubConfiguration::setRingIsConnected (bool isConnected)
     if (isConnected)
     {
         checkHUBCompatibility();
+        neova_dash::log::writeToLog ("Ring connected : v" + getRingFirmwareVersionString(),
+                                     neova_dash::log::hubCommunication);
+    }
+    else
+    {
+        neova_dash::log::writeToLog ("Ring disconnected", neova_dash::log::hubCommunication);
     }
 }
 
