@@ -51,9 +51,8 @@ public:
         PresetData() = default;
         PresetData (PresetData& other);
 
-        uint16_t align_to_word;
-
-        uint16_t midiChannels = 1;
+        uint16_t midiChannelsIn = 0xffff;
+        uint16_t midiChannelsOut = 1;
 
     	GestureData gestureData0;
     	GestureData gestureData1;
@@ -69,7 +68,7 @@ public:
 		uint16_t ring_firmware_version;
 
 		uint8_t active_preset = 0; //Ne sert à rien pour l'instant juste pour s'aligner au buffer du zub
-		uint8_t midiChannel = 0;
+		uint8_t midi_thru = int (thruOff);
 
     	PresetData presetData0;
     	PresetData presetData1;
@@ -99,6 +98,13 @@ public:
     	gestureParam4,
     	gestureParam5
     };
+
+    enum midiThruId
+    {
+        thruOff =0,
+        thruPure,
+        thruAdd
+    }
 
     //==============================================================================
 	HubConfiguration();
