@@ -17,6 +17,7 @@ namespace neova_dash
     {
         const int NUM_GEST = 4;
         const int NUM_PRESETS = 4;
+        //const int NUM_MAX_MIDI_CHANNELS = 4;
 
         enum GestureType
         {

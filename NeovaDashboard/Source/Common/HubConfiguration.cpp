@@ -101,7 +101,13 @@ void HubConfiguration::setMidiChannelExclusive (const int channelNumber, bool up
 
 void HubConfiguration::toggleMidiChannel (const int channelNumber, bool uploadToHub)
 {
-    getPresetData().midiChannels ^= (1 << channelNumber);
+	if (getNumActiveMidiChannels() == 1 && std::log2 (getMidiChannels()) == channelNumber)
+	{
+		// TODO ajout message d'erreur log (décommenter & tester)
+		// neova_dash::log::writeToLog ("Cannot have 0 active midi channels.", neova_dash::log::hubConfiguration);
+		return;
+	}
+	getPresetData().midiChannels ^= (1 << channelNumber);
 
     if (uploadToHub)
     {
@@ -114,6 +120,19 @@ void HubConfiguration::toggleMidiChannel (const int channelNumber, bool uploadTo
 int HubConfiguration::getMidiChannels()
 {
     return getPresetData().midiChannels;
+}
+
+const int HubConfiguration::getNumActiveMidiChannels()
+{
+	const uint16_t midiChannels =  getPresetData().midiChannels;
+	int count = 0;
+
+	for (int numChannel = 0; numChannel < 16; numChannel++)
+	{
+		count += (midiChannels >> numChannel) & 1;
+	}
+
+	return count;
 }
 
 void HubConfiguration::setUint8Value (const int gestureNumber, const uint8DataId dataId,
