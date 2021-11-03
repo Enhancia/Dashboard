@@ -68,15 +68,18 @@ void HubConfiguration::resetConfigWasChanged()
     }
 }
 
-void HubConfiguration::setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool uploadToHub)
+void HubConfiguration::setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool isMidiInput, bool uploadToHub)
 {
+    uint16_t& midiChannels = isMidiInput ? getPresetData().midiChannelsIn
+                                         : getPresetData().midiChannelsOut;
+
     if (shouldChannelBeOn)
     {
-        getPresetData().midiChannels |= (1 << channelNumber);
+        midiChannels |= (1 << channelNumber);
     }
     else
     {
-        getPresetData().midiChannels &= ~(1 << channelNumber);
+        midiChannels &= ~(1 << channelNumber);
     }
 
     if (uploadToHub)
@@ -87,9 +90,12 @@ void HubConfiguration::setMidiChannel (const int channelNumber, bool shouldChann
 
 }
 
-void HubConfiguration::setMidiChannelExclusive (const int channelNumber, bool uploadToHub)
+void HubConfiguration::setMidiChannelExclusive (const int channelNumber, bool isMidiInput, bool uploadToHub)
 {
-    getPresetData().midiChannels = (1 << channelNumber);
+    uint16_t& midiChannels = isMidiInput ? getPresetData().midiChannelsIn
+                                         : getPresetData().midiChannelsOut;
+    
+    midiChannels = (1 << channelNumber);
     
     if (uploadToHub)
     {
@@ -99,15 +105,19 @@ void HubConfiguration::setMidiChannelExclusive (const int channelNumber, bool up
 
 }
 
-void HubConfiguration::toggleMidiChannel (const int channelNumber, bool uploadToHub)
+void HubConfiguration::toggleMidiChannel (const int channelNumber, bool isMidiInput, bool uploadToHub)
 {
-	if (getNumActiveMidiChannels() == 1 && std::log2 (getMidiChannels()) == channelNumber)
+    uint16_t& midiChannels = isMidiInput ? getPresetData().midiChannelsIn
+                                         : getPresetData().midiChannelsOut;
+
+	if (getNumActiveMidiChannels (isMidiInput) == 1 && std::log2 (midiChannels) == channelNumber)
 	{
 		// TODO ajout message d'erreur log (décommenter & tester)
 		// neova_dash::log::writeToLog ("Cannot have 0 active midi channels.", neova_dash::log::hubConfiguration);
 		return;
 	}
-	getPresetData().midiChannels ^= (1 << channelNumber);
+    
+    midiChannels ^= (1 << channelNumber);
 
     if (uploadToHub)
     {
@@ -117,15 +127,18 @@ void HubConfiguration::toggleMidiChannel (const int channelNumber, bool uploadTo
 
 }
 
-int HubConfiguration::getMidiChannels()
+int HubConfiguration::getMidiChannels (bool isMidiInput)
 {
-    return getPresetData().midiChannels;
+    return isMidiInput ? getPresetData().midiChannelsIn
+                       : getPresetData().midiChannelsOut;
+    
 }
 
-const int HubConfiguration::getNumActiveMidiChannels()
+const int HubConfiguration::getNumActiveMidiChannels (bool isMidiInput)
 {
-	const uint16_t midiChannels =  getPresetData().midiChannels;
-	int count = 0;
+    const uint16_t midiChannels = isMidiInput ? getPresetData().midiChannelsIn
+                                              : getPresetData().midiChannelsOut;
+    int count = 0;
 
 	for (int numChannel = 0; numChannel < 16; numChannel++)
 	{
@@ -575,7 +588,8 @@ HubConfiguration::GestureData::GestureData (GestureData& other)
 
 HubConfiguration::PresetData::PresetData (PresetData& other)
 {
-    midiChannels = other.midiChannels;
+    midiChannelsIn  = other.midiChannelsIn;
+    midiChannelsOut = other.midiChannelsOut;
 
     gestureData0 = other.gestureData0; gestureData1 = other.gestureData1;
     gestureData2 = other.gestureData2; gestureData3 = other.gestureData3;

@@ -101,10 +101,10 @@ public:
 
     enum midiThruId
     {
-        thruOff =0,
+        thruOff = 0,
         thruPure,
         thruAdd
-    }
+    };
 
     //==============================================================================
 	HubConfiguration();
@@ -169,11 +169,11 @@ public:
     const int getSelectedGesture();
 
     //==============================================================================
-    void setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool uploadToHub = true);
-    void setMidiChannelExclusive (const int channelNumber, bool uploadToHub = true);
-    void toggleMidiChannel (const int channelNumber, bool uploadToHub = true);
-    int getMidiChannels();
-    const int getNumActiveMidiChannels();
+    void setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool isMidiInput = false, bool uploadToHub = true);
+    void setMidiChannelExclusive (const int channelNumber, bool isMidiInput = false, bool uploadToHub = true);
+    void toggleMidiChannel (const int channelNumber, bool isMidiInput = false, bool uploadToHub = true);
+    int getMidiChannels (bool isMidiInput = false);
+    const int getNumActiveMidiChannels (bool isMidiInput = false);
 
     //==============================================================================
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber, const int presetNumber);
