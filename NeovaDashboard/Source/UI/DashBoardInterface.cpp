@@ -50,6 +50,9 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     midiInputChannelComponent = std::make_unique<MidiChannelComponent> (hubConfig, true);
     addAndMakeVisible (*midiInputChannelComponent);
 
+    midiThroughComponent = std::make_unique<MidiThroughComponent> (hubConfig);
+    addAndMakeVisible (*midiThroughComponent);
+
     bankSelector = std::make_unique<BankSelectorComponent> (hubConfig, getCommandManager());
     addAndMakeVisible (*bankSelector);
     bankSelector->addMouseListener (this, true);
@@ -245,6 +248,10 @@ void DashBoardInterface::resized()
 
     uploadButton->setBounds (area.withSize (jmax (140, area.getWidth()/7 + 40), area.getHeight()*6/10)
                                  .withSizeKeepingCentre (jmax (140, area.getWidth()/7 + 40), HEADER_HEIGHT));
+
+    midiThroughComponent->setBounds (area.withSize (jmax (140, area.getWidth()/7 + 40), area.getHeight()*6/10)
+                                 .withSizeKeepingCentre (jmax (140, area.getWidth()/7 + 40), HEADER_HEIGHT)
+                                 .withRightX (getWidth()));
 
     notificationArea = juce::Rectangle<int> (18, 18).withCentre (getLocalPoint (header->findChildWithID ("optionsButton"),
                                                                                 header->findChildWithID ("optionsButton")
@@ -793,7 +800,7 @@ void DashBoardInterface::executePanelAction (const int panelReturnValue)
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;
         default: // modalResult 0 or unknown
-            break;
+            break; 
     }
 }
 

@@ -262,7 +262,8 @@ private:
     std::unique_ptr<UpdaterPanel> updaterPanel; /**< \brief Interface's update menu. */
     std::unique_ptr<BugReportPanel> bugReportPanel; /**< \brief Interface's bug report menu. */
     std::unique_ptr<MidiChannelComponent> midiOutputChannelComponent; /**< \brief Interface's output MIDI channel selector */
-    std::unique_ptr<MidiChannelComponent> midiInputChannelComponent; /**< \brief Interface's output MIDI channel selector */
+    std::unique_ptr<MidiChannelComponent> midiInputChannelComponent; /**< \brief Interface's input MIDI channel selector */
+    std::unique_ptr<MidiThroughComponent> midiThroughComponent; /**< \brief Interface's input MIDI THRU selector */
     std::unique_ptr<DashAlertPanel> alertPanel; /**< \brief Interface's modal alert panel. */
 
     DashBoardLookAndFeel dashBoardLookAndFeel; /**< \brief Interface's look and feel. */

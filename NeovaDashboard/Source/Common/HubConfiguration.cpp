@@ -124,7 +124,6 @@ void HubConfiguration::toggleMidiChannel (const int channelNumber, bool isMidiIn
         commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
         notifyConfigWasChanged();
     }
-
 }
 
 int HubConfiguration::getMidiChannels (bool isMidiInput)
@@ -146,6 +145,17 @@ const int HubConfiguration::getNumActiveMidiChannels (bool isMidiInput)
 	}
 
 	return count;
+}
+
+void HubConfiguration::setMidiThrough (bool shouldUseThrough, bool uploadToHub)
+{
+    config.midi_thru = (shouldUseThrough ? int (thruAdd) : int (thruOff));
+
+    if (uploadToHub)
+    {
+        commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+        notifyConfigWasChanged();
+    }
 }
 
 void HubConfiguration::setUint8Value (const int gestureNumber, const uint8DataId dataId,

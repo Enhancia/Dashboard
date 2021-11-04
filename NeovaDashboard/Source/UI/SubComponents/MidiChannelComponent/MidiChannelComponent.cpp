@@ -120,3 +120,30 @@ void MidiChannelComponent::handleMenuResult (const int menuResult)
             break;
     }
 }
+
+MidiThroughComponent::MidiThroughComponent (HubConfiguration& data) :  hubConfig (data)
+{
+    throughButton.setButtonText ("MIDI THRU");
+    throughButton.setColour (ToggleButton::textColourId, neova_dash::colour::mainText);
+    throughButton.addListener (this);
+    addAndMakeVisible (throughButton);
+}
+
+MidiThroughComponent::~MidiThroughComponent()
+{
+    throughButton.removeListener (this);
+}
+
+void MidiThroughComponent::paint (Graphics& g)
+{
+}
+
+void MidiThroughComponent::resized()
+{
+    throughButton.setBounds (getLocalBounds());
+}
+
+void MidiThroughComponent::buttonClicked (Button* bttn)
+{
+    hubConfig.setMidiThrough (bttn->getToggleState());
+}

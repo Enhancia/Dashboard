@@ -51,3 +51,33 @@ private:
     //==========================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiChannelComponent)
 };
+
+
+class MidiThroughComponent : public Component,
+                             public Button::Listener
+{
+public:
+    //==========================================================================
+    MidiThroughComponent (HubConfiguration& data);
+    ~MidiThroughComponent();
+
+    //==========================================================================
+    void paint (Graphics&) override;
+    void resized() override;
+
+    //==========================================================================
+    void buttonClicked (Button* bttn) override;
+
+    //==========================================================================
+    //void mouseEnter (const MouseEvent& event) override;
+    //void mouseExit (const MouseEvent& event) override;
+    //void mouseUp (const MouseEvent& event) override;
+
+private:
+    //==========================================================================
+    HubConfiguration& hubConfig;
+    ToggleButton throughButton;
+
+    //==========================================================================
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiThroughComponent)
+};
