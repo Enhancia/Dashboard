@@ -39,7 +39,7 @@ void HeaderComponent::paint (Graphics& g)
     g.drawText ("NEOVA", area.removeFromTop (area.getHeight()/2).withTrimmedBottom (spacing/4), Justification::centredBottom, false);
 
   	g.setFont(neova_dash::font::dashFontLight.withHeight (9.5f).withExtraKerningFactor (0.38f));
-  	g.drawText("DASHBOARD", area.withTrimmedTop (spacing*3/4), Justification::centredTop, false);
+  	g.drawText("DASH TESTS", area.withTrimmedTop (spacing*3/4), Justification::centredTop, false);
 }
 
 void HeaderComponent::resized()

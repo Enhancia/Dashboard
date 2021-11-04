@@ -242,7 +242,7 @@ void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> ar
   								   Justification::centred);
 
     g.setFont(neova_dash::font::dashFontLight.withHeight (13.5f).withExtraKerningFactor (0.5f));
-    g.drawText ("DASHBOARD", dashTextArea.removeFromTop (dashTextArea.getHeight()*2/3),
+    g.drawText ("DASH TESTS", dashTextArea.removeFromTop (dashTextArea.getHeight()*2/3),
                                          //.withTrimmedTop (10),
                      Justification::centred);
 
