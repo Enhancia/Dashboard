@@ -44,8 +44,11 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
                                                    getCommandManager(), presetModeState, state);
     addAndMakeVisible (*hubComponent);
 
-    midiChannelComponent = std::make_unique<MidiChannelComponent> (hubConfig);
-    addAndMakeVisible (*midiChannelComponent);
+    midiOutputChannelComponent = std::make_unique<MidiChannelComponent> (hubConfig, false);
+    addAndMakeVisible (*midiOutputChannelComponent);
+
+    midiInputChannelComponent = std::make_unique<MidiChannelComponent> (hubConfig, true);
+    addAndMakeVisible (*midiInputChannelComponent);
 
     bankSelector = std::make_unique<BankSelectorComponent> (hubConfig, getCommandManager());
     addAndMakeVisible (*bankSelector);
@@ -220,8 +223,14 @@ void DashBoardInterface::resized()
     auto presetAndMidiArea = area.removeFromBottom (15);
 
     bankSelector->setBounds (presetAndMidiArea.withSizeKeepingCentre (area.getWidth()/6, 30));
-    midiChannelComponent->setBounds (presetAndMidiArea.withLeft (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/3 + MARGIN * 2)
+    
+    midiOutputChannelComponent->setBounds (presetAndMidiArea.withLeft (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/3 + MARGIN * 2)
                                                       .withRight (presetAndMidiArea.getRight() - presetAndMidiArea.getWidth()/16)
+                                                      .reduced (4*MARGIN, 0)
+                                                      .expanded (0, 2));
+
+    midiInputChannelComponent->setBounds (presetAndMidiArea.withRight (presetAndMidiArea.getX() + presetAndMidiArea.getWidth()/3 - MARGIN * 2)
+                                                      .withLeft (presetAndMidiArea.getX() + presetAndMidiArea.getWidth()/16)
                                                       .reduced (4*MARGIN, 0)
                                                       .expanded (0, 2));
 
@@ -576,7 +585,8 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         newGesturePanel->hidePanel();
         uploadButton->setVisible (true);
         bankSelector->setVisible (true);
-        midiChannelComponent->setVisible (true);
+        midiOutputChannelComponent->setVisible (true);
+        midiInputChannelComponent->setVisible (true);
         hubComponent->setInterceptsMouseClicks (true, true);
         hubConfig.selectFirstExistingGesture();
         header->setBatteryVisible (true);
@@ -585,8 +595,6 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         {
             firmUpgradePanel->updateAfterHubConnection();
         }
-        
-        midiChannelComponent->setVisible (true);
     }
 
     else
@@ -594,7 +602,8 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         gesturePanel->setVisible (false);
         newGesturePanel->hidePanel();
         uploadButton->setVisible (false);
-        midiChannelComponent->setVisible (false);
+        midiOutputChannelComponent->setVisible (false);
+        midiInputChannelComponent->setVisible (false);
 
         if (state != int (pause))
         {
@@ -798,7 +807,8 @@ void DashBoardInterface::update()
         bankSelector->update();
         header->update();
         optionsPanel->update();
-        midiChannelComponent->update();
+        midiOutputChannelComponent->update();
+        midiInputChannelComponent->update();
         uploadButton->update();
         repaint (notificationArea);
     }

@@ -19,7 +19,7 @@ class MidiChannelComponent : public Component
 {
 public:
     //==========================================================================
-    MidiChannelComponent (HubConfiguration& data);
+    MidiChannelComponent (HubConfiguration& data, const bool controlsInputMidi);
     ~MidiChannelComponent();
 
     //==========================================================================
@@ -41,10 +41,12 @@ private:
     //==========================================================================
     void createPopupMenu();
     void drawArrowPath (Graphics& g, juce::Rectangle<float> area);
+    static void menuCallback (int result, MidiChannelComponent* mcComp);
     void handleMenuResult (const int menuResult);
     
     //==========================================================================
     HubConfiguration& hubConfig;
+    const bool isInput;
 
     //==========================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiChannelComponent)

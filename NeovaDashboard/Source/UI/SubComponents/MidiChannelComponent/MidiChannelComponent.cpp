@@ -14,8 +14,8 @@
 #include "MidiChannelComponent.h"
 
 //==============================================================================
-MidiChannelComponent::MidiChannelComponent (HubConfiguration& data)
-    : hubConfig (data)
+MidiChannelComponent::MidiChannelComponent (HubConfiguration& data, const bool controlsInputMidi)
+    : hubConfig (data), isInput (controlsInputMidi)
 {
 }
 
@@ -32,7 +32,9 @@ void MidiChannelComponent::paint (Graphics& g)
 
     g.setColour (neova_dash::colour::mainText);
     g.setFont (neova_dash::font::dashFont.withHeight (15.0f));
-    g.drawText ("MIDI Channels", getLocalBounds(), Justification::centred);
+    g.drawText (String (isInput ? "MIDI IN"
+                                : "MIDI OUT"),
+                getLocalBounds(), Justification::centred);
 }
 
 void MidiChannelComponent::drawArrowPath (Graphics& g, juce::Rectangle<float> area)
@@ -80,19 +82,28 @@ void MidiChannelComponent::update()
 void MidiChannelComponent::createPopupMenu()
 {
     PopupMenu channelsMenu;
-    const uint16_t midiChannels = hubConfig.getMidiChannels();
+    const uint16_t midiChannels = hubConfig.getMidiChannels (isInput);
 
     for (int channelNum =0; channelNum < 16; channelNum++)
     {
         channelsMenu.addItem (channelNum + 1, String (channelNum + 1), true, midiChannels >> channelNum & 1 == 1);
     }
     
-    handleMenuResult (channelsMenu.showMenu (PopupMenu::Options().withParentComponent (getParentComponent())
+    channelsMenu.showMenuAsync (PopupMenu::Options().withParentComponent (getParentComponent())
                                                                  .withTargetComponent (this)
                                                                  .withMinimumWidth (getWidth())
                                                                  .withMinimumNumColumns (2)
                                                                  .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
-                                                                 .withStandardItemHeight (20)));
+                                                                 .withStandardItemHeight (20),
+                                ModalCallbackFunction::forComponent (menuCallback, this));
+}
+
+void MidiChannelComponent::menuCallback (int result, MidiChannelComponent* mcComp)
+{
+    if (mcComp != nullptr)
+    {
+        mcComp->handleMenuResult (result);
+    }
 }
 
 void MidiChannelComponent::handleMenuResult (const int menuResult)
@@ -104,7 +115,7 @@ void MidiChannelComponent::handleMenuResult (const int menuResult)
             repaint();
             break;
         default:
-            hubConfig.toggleMidiChannel (menuResult-1);
+            hubConfig.toggleMidiChannel (menuResult-1, isInput);
             createPopupMenu();
             break;
     }
