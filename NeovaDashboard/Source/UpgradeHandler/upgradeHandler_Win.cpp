@@ -26,6 +26,7 @@ void UpgradeHandler::timerCallback()
 {
 	set_upgradeCommandReceived(false);
 	setUpgradeState(err_waitingForUpgradeFirmTimeOut);
+	neova_dash::log::writeToLog("Failed upgrade: timeout..", neova_dash::log::hubCommunication);
 
 	stopTimer();
 }
@@ -170,7 +171,7 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * numCOM)
 		&pi)           // Pointer to PROCESS_INFORMATION structure
 		)
 	{
-		Logger::writeToLog("CreateProcess failed (%d).\n" + String(GetLastError()));
+		neova_dash::log::writeToLog("Failed to launch upgrade process..", neova_dash::log::hubCommunication);
 		setUpgradeState(err_upgradeLaunchFailed);
 		return;
 	}
@@ -197,11 +198,14 @@ void UpgradeHandler::closeNrfutil()
 	{
 		DBG(out_f.loadFileAsString());
 		setUpgradeState(upgradeSuccessfull);
+        neova_dash::log::writeToLog("Neova Upgraded succesfully !", neova_dash::log::hubCommunication);
+
 	}
 	else if (err_size > 0)
 	{
 		DBG(err_f.loadFileAsString());
 		setUpgradeState(err_upgradefailed);
+		neova_dash::log::writeToLog("Failed to upgrade Neova..", neova_dash::log::hubCommunication);
     }
     else
     {
@@ -290,6 +294,8 @@ void UpgradeHandler::startRingUpgrade()
 	if (!hubConfig.getRingIsConnected())
 	{
 		setUpgradeState(err_ringIsNotConnected);
+        Logger::writeToLog("CreateProcess failed (%d).\n" + String(GetLastError()));
+
 	}
 	else
 	{

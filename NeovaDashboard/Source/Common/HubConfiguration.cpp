@@ -474,6 +474,12 @@ void HubConfiguration::setHubIsConnected (bool isConnected)
     if (isConnected)
     {
         checkHUBCompatibility();
+        neova_dash::log::writeToLog ("Hub connected : " + getHubFirmwareVersionString(),
+                                     neova_dash::log::hubCommunication);
+    }
+    else
+    {
+        neova_dash::log::writeToLog ("Hub disconnected", neova_dash::log::hubCommunication);
     }
 }
 

@@ -28,6 +28,8 @@ void UpgradeHandler::timerCallback()
 {
 	set_upgradeCommandReceived(false);
 	setUpgradeState(err_waitingForUpgradeFirmTimeOut);
+    neova_dash::log::writeToLog("Failed upgrade: timeout..", neova_dash::log::hubCommunication);
+
 	stopTimer();
 }
 
@@ -186,10 +188,13 @@ void UpgradeHandler::closeNrfutil()
         if (exit_status==0)
         {
             setUpgradeState(upgradeSuccessfull);
+            neova_dash::log::writeToLog("Neova Upgraded succesfully !", neova_dash::log::hubCommunication);
+
         }
         else
         {
             setUpgradeState(err_upgradefailed);
+            neova_dash::log::writeToLog("Failed to upgrade Neova..", neova_dash::log::hubCommunication);
         }
     }
 
