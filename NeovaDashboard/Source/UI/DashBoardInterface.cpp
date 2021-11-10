@@ -594,6 +594,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         bankSelector->setVisible (true);
         midiOutputChannelComponent->setVisible (true);
         midiInputChannelComponent->setVisible (true);
+        midiThroughComponent->setVisible (true);
         hubComponent->setInterceptsMouseClicks (true, true);
         hubConfig.selectFirstExistingGesture();
         header->setBatteryVisible (true);
@@ -611,6 +612,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         uploadButton->setVisible (false);
         midiOutputChannelComponent->setVisible (false);
         midiInputChannelComponent->setVisible (false);
+        midiThroughComponent->setVisible (false);
 
         if (state != int (pause))
         {
