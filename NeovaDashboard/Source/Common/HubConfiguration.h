@@ -101,8 +101,8 @@ public:
 
     enum midiThruId
     {
-        thruOff = 0,
-        thruAdd,
+        thruAdd= 0,
+        thruOff,
         thruPure
     };
 
