@@ -54,7 +54,7 @@ void UpdaterPanel::resized()
     titleLabel->setBounds (area.removeFromTop (area.getHeight()/5));
 
     auto buttonArea = area.removeFromBottom (jmin (area.getHeight()/5, 40));
-    if
+    if (currentProgress == downloadAvailable)
     {
         bottomButton->setBounds (buttonArea.removeFromRight (buttonArea.getWidth()/2)
                                            .withSizeKeepingCentre (bottomButton->getBestWidthForHeight (buttonArea.getHeight()),

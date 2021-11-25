@@ -202,7 +202,7 @@ void OptionsPanel::createButtons()
     updateButton->addListener (this);
 
     //Send Report button
-    sendReportButton = std::make_unique <TextButton> ("Send Bug Report");
+    sendReportButton = std::make_unique <TextButton> ("Send");
     sendReportButton->addListener (this);
 }
 
@@ -539,9 +539,14 @@ OptionsPanel::TabbedOptions::Tab* OptionsPanel::TabbedOptions::getTabByName (con
 ContactPanel::ContactPanel (TextButton& bugReportButton) : sendReportButton (bugReportButton)
 {
     //Contact button
-    contactButton = std::make_unique <TextButton> ("Contact Enhancia");
+    contactButton = std::make_unique <TextButton> ("Contact");
     addAndMakeVisible (*contactButton);
     contactButton->addListener (this);
+    
+    //Contact button
+    viewNotesButton = std::make_unique <TextButton> ("View");
+    addAndMakeVisible (*viewNotesButton);
+    viewNotesButton->addListener (this);
 
     addAndMakeVisible (sendReportButton);
 }
@@ -552,54 +557,36 @@ ContactPanel::~ContactPanel()
 
 void ContactPanel::paint (Graphics& g)
 {
-    g.setFont (neova_dash::font::dashFont.withHeight (17));
+    g.setFont (neova_dash::font::dashFont.withHeight (14));
     g.setColour (neova_dash::colour::subText);
 
-    String osString;
-    #if JUCE_WINDOWS
-    osString = "Win x64";
-    #elif JUCE_MAC
-    osString = "MacOS";
-    #endif
-
-    g.drawText ("Dashboard - Neova " + JUCEApplication::getInstance()->getApplicationVersion()
-                                            + " " + osString
-                                            + "  |  Copyright 2020 Enhancia, inc.",
-                      aboutArea,
-                      Justification::centred);
-
-    g.setColour (neova_dash::colour::mainText);
-
-    /*g.drawText ("Dashboard Credits :\n\n",
-                creditsArea,
-                Justification::topLeft);*/
-
-    g.setFont (neova_dash::font::dashFont.withHeight (13));
-    g.setColour (neova_dash::colour::subText);
-    g.drawFittedText ("Dev : Alex LEVACHER, Mathieu HERBELOT | UI : Mario VIOLA | UX : Damien LE BOULAIRE\n",
-                      creditsArea,
-                      Justification::centred,
-                      1);
-
-    /*g.setFont (neova_dash::font::dashFont.withHeight (15));
-    g.setColour (neova_dash::colour::mainText);
-    g.drawText ("Contact ENHANCIA :\n\n", contactArea, Justification::topLeft);*/
+    g.drawText ("Contact Enhancia :", contactArea, Justification::centredRight);
+    g.drawText ("Send bug report :", reportArea, Justification::centredRight);
+    g.drawText ("Dashboard release notes :", viewNotesArea, Justification::centredRight);
 }
 
 void ContactPanel::resized()
 {
-    auto area = getLocalBounds().reduced (2*neova_dash::ui::MARGIN, 0).withTrimmedTop (neova_dash::ui::MARGIN);
+    auto area = getLocalBounds().reduced (6*neova_dash::ui::MARGIN,
+                                          2*neova_dash::ui::MARGIN)
+                                .withTrimmedTop (neova_dash::ui::MARGIN);
 
-    aboutArea = area.removeFromTop (area.getHeight()/3);
-    contactArea = area.removeFromTop (area.getHeight()/2);
-    creditsArea = area;
+    //aboutArea =     area.removeFromTop (20);
+    contactArea =   area.removeFromTop (area.getHeight()/3);
+    reportArea =    area.removeFromTop (area.getHeight()/2);
+    viewNotesArea = area;
 
-    auto contactAreaTemp = contactArea;
+    auto resizeButtonToArea = [this](juce::Rectangle<int>& areaRef, Button& bttnRef)
+    {
+        bttnRef.setBounds (areaRef.removeFromRight (areaRef.getWidth()/2 + 2*neova_dash::ui::MARGIN)
+                                  .withTrimmedLeft (4*neova_dash::ui::MARGIN)
+                                  .withWidth (110)
+                                  .withSizeKeepingCentre (110, 22));
+    };
 
-    contactButton->setBounds (contactAreaTemp.removeFromLeft (contactAreaTemp.getWidth()/2)
-                                             .withSizeKeepingCentre (contactButton->getBestWidthForHeight (30), 30));
-    
-    sendReportButton.setBounds (contactAreaTemp.withSizeKeepingCentre (contactButton->getBestWidthForHeight (30), 30));
+    resizeButtonToArea (contactArea, *contactButton);
+    resizeButtonToArea (reportArea, sendReportButton);
+    resizeButtonToArea (viewNotesArea, *viewNotesButton);
 }
 
 void ContactPanel::buttonClicked (Button* bttn)
@@ -607,6 +594,11 @@ void ContactPanel::buttonClicked (Button* bttn)
     if (bttn == contactButton.get())
     {
         URL ("https://www.enhancia-music.com/contact/").launchInDefaultBrowser();
+    }
+
+    else if (bttn == viewNotesButton.get())
+    {
+        URL ("https://www.enhancia-music.com/dashboard-release-notes/").launchInDefaultBrowser();
     }
 }
 

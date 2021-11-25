@@ -181,12 +181,14 @@ public:
 private:
     //==============================================================================
     std::unique_ptr<TextButton> contactButton;
+    std::unique_ptr<TextButton> viewNotesButton;
     TextButton& sendReportButton;
 
     //==============================================================================
     juce::Rectangle<int> aboutArea;
     juce::Rectangle<int> contactArea;
-    juce::Rectangle<int> creditsArea;
+    juce::Rectangle<int> reportArea;
+    juce::Rectangle<int> viewNotesArea;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ContactPanel)
