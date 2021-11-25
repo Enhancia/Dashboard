@@ -125,6 +125,7 @@ MidiThroughComponent::MidiThroughComponent (HubConfiguration& data) :  hubConfig
 {
     throughButton.setButtonText ("MIDI THRU");
     throughButton.setColour (ToggleButton::textColourId, neova_dash::colour::mainText);
+    throughButton.setToggleState (hubConfig.getMidiThrough() == 0, dontSendNotification);
     throughButton.addListener (this);
     addAndMakeVisible (throughButton);
 }
@@ -136,6 +137,11 @@ MidiThroughComponent::~MidiThroughComponent()
 
 void MidiThroughComponent::paint (Graphics& g)
 {
+}
+
+void MidiThroughComponent::update()
+{
+    throughButton.setToggleState (hubConfig.getMidiThrough() == 0, dontSendNotification);
 }
 
 void MidiThroughComponent::resized()

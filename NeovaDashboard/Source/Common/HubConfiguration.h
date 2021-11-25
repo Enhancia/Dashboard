@@ -175,6 +175,7 @@ public:
     int getMidiChannels (bool isMidiInput = false);
     const int getNumActiveMidiChannels (bool isMidiInput = false);
     void setMidiThrough (bool shouldUseThrough, bool uploadToHub = true);
+    int getMidiThrough();
 
 
     //==============================================================================

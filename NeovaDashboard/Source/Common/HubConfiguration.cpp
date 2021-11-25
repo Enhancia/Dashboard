@@ -158,6 +158,12 @@ void HubConfiguration::setMidiThrough (bool shouldUseThrough, bool uploadToHub)
     }
 }
 
+
+int HubConfiguration::getMidiThrough()
+{
+    return config.midi_thru;
+}
+
 void HubConfiguration::setUint8Value (const int gestureNumber, const uint8DataId dataId,
                                                                const uint8 newUint8Value,
                                                                bool uploadToHub)

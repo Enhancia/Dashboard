@@ -818,6 +818,7 @@ void DashBoardInterface::update()
         optionsPanel->update();
         midiOutputChannelComponent->update();
         midiInputChannelComponent->update();
+        midiThroughComponent->update();
         uploadButton->update();
         repaint (notificationArea);
     }
