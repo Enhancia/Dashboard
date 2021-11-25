@@ -126,7 +126,7 @@ void OptionsPanel::buttonClicked (Button* bttn)
         commandManager.invokeDirectly (neova_dash::commands::checkDashboardUpdate, true);
     }
 
-    if (bttn == sendReportButton.get())
+    else if (bttn == sendReportButton.get())
     {
         commandManager.invokeDirectly (neova_dash::commands::openBugReportPanel, true);
     }
