@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="SIAvrc" name="NeovaDashboard" projectType="guiapp" binaryDataNamespace="DashData"
-              version="101.0.4" jucerFormatVersion="1">
+              version="101.0.5" jucerFormatVersion="1">
   <MAINGROUP id="KvQWjZ" name="NeovaDashboard">
     <GROUP id="{20075F30-04A5-410B-6952-3C63688FBF54}" name="Resources">
       <FILE id="Z37IRj" name="200429 - Enhancia Software Licence.txt" compile="0"

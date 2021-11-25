@@ -561,8 +561,8 @@ void ContactPanel::paint (Graphics& g)
     g.setColour (neova_dash::colour::subText);
 
     g.drawText ("Contact Enhancia :", contactArea, Justification::centredRight);
-    g.drawText ("Send bug report :", reportArea, Justification::centredRight);
-    g.drawText ("Dashboard release notes :", viewNotesArea, Justification::centredRight);
+    g.drawText ("Send Bug Report :", reportArea, Justification::centredRight);
+    g.drawText ("Dashboard Release Notes :", viewNotesArea, Justification::centredRight);
 }
 
 void ContactPanel::resized()
