@@ -15,7 +15,7 @@ OptionsPanel::OptionsPanel (HubConfiguration& config, DashUpdater& updtr, Upgrad
     : hubConfig (config), commandManager (manager), updater (updtr), upgradeHandler (handler)
 {
     createButtons();
-    options.addTab (new ContactPanel (*sendReportButton.get()), "About");
+    options.addTab (new GeneralPanel (*sendReportButton.get(), *midiThruToggle.get()), "General");
     options.addTab (new UpdateAndUpgradePanel (hubConfig, updater, upgradeHandler,
 											   *upgradeButton.get(), *updateButton.get()), "Updates");
     options.addTab (new LegalPanel(), "Legal");
@@ -130,6 +130,11 @@ void OptionsPanel::buttonClicked (Button* bttn)
     {
         commandManager.invokeDirectly (neova_dash::commands::openBugReportPanel, true);
     }
+
+    else if (bttn == midiThruToggle.get())
+    {
+        hubConfig.setMidiThrough (midiThruToggle->getToggleState());
+    }
 }
 
 void OptionsPanel::mouseUp (const MouseEvent& event)
@@ -173,6 +178,7 @@ void OptionsPanel::update()
         updateButton->setAlpha (1.0f);
     }
 
+    midiThruToggle->setToggleState (hubConfig.getMidiThrough() == 0, dontSendNotification);
     setUpdateTabAlertCount();
 }
 
@@ -204,6 +210,11 @@ void OptionsPanel::createButtons()
     //Send Report button
     sendReportButton = std::make_unique <TextButton> ("Send");
     sendReportButton->addListener (this);
+    
+    //Send Report button
+    midiThruToggle = std::make_unique <ToggleButton> ();
+    midiThruToggle->setToggleState (hubConfig.getMidiThrough() == 0, dontSendNotification);
+    midiThruToggle->addListener (this);
 }
 
 void OptionsPanel::paintProductInformations(Graphics& g, juce::Rectangle<int> area)
@@ -534,9 +545,10 @@ OptionsPanel::TabbedOptions::Tab* OptionsPanel::TabbedOptions::getTabByName (con
 }
 
 
-// ====================== ContactPanel =========================
+// ====================== GeneralPanel =========================
 
-ContactPanel::ContactPanel (TextButton& bugReportButton) : sendReportButton (bugReportButton)
+GeneralPanel::GeneralPanel (TextButton& bugReportButton, ToggleButton& thruToggle)
+    : sendReportButton (bugReportButton), midiThruToggle (thruToggle)
 {
     //Contact button
     contactButton = std::make_unique <TextButton> ("Contact");
@@ -549,13 +561,14 @@ ContactPanel::ContactPanel (TextButton& bugReportButton) : sendReportButton (bug
     viewNotesButton->addListener (this);
 
     addAndMakeVisible (sendReportButton);
+    addAndMakeVisible (midiThruToggle);
 }
 
-ContactPanel::~ContactPanel()
+GeneralPanel::~GeneralPanel()
 {
 }
 
-void ContactPanel::paint (Graphics& g)
+void GeneralPanel::paint (Graphics& g)
 {
     g.setFont (neova_dash::font::dashFont.withHeight (14));
     g.setColour (neova_dash::colour::subText);
@@ -563,18 +576,19 @@ void ContactPanel::paint (Graphics& g)
     g.drawText ("Contact Enhancia :", contactArea, Justification::centredRight);
     g.drawText ("Send Bug Report :", reportArea, Justification::centredRight);
     g.drawText ("Dashboard Release Notes :", viewNotesArea, Justification::centredRight);
+    g.drawText ("Use MIDI THRU :", thruArea, Justification::centredRight);
 }
 
-void ContactPanel::resized()
+void GeneralPanel::resized()
 {
     auto area = getLocalBounds().reduced (6*neova_dash::ui::MARGIN,
                                           2*neova_dash::ui::MARGIN)
                                 .withTrimmedTop (neova_dash::ui::MARGIN);
 
-    //aboutArea =     area.removeFromTop (20);
-    contactArea =   area.removeFromTop (area.getHeight()/3);
-    reportArea =    area.removeFromTop (area.getHeight()/2);
-    viewNotesArea = area;
+    contactArea =   area.removeFromTop (area.getHeight()/4);
+    reportArea =    area.removeFromTop (area.getHeight()/3);
+    viewNotesArea = area.removeFromTop (area.getHeight()/2);
+    thruArea = area;
 
     auto resizeButtonToArea = [this](juce::Rectangle<int>& areaRef, Button& bttnRef)
     {
@@ -587,9 +601,10 @@ void ContactPanel::resized()
     resizeButtonToArea (contactArea, *contactButton);
     resizeButtonToArea (reportArea, sendReportButton);
     resizeButtonToArea (viewNotesArea, *viewNotesButton);
+    resizeButtonToArea (thruArea, midiThruToggle);
 }
 
-void ContactPanel::buttonClicked (Button* bttn)
+void GeneralPanel::buttonClicked (Button* bttn)
 {
     if (bttn == contactButton.get())
     {

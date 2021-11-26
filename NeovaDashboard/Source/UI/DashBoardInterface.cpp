@@ -50,9 +50,6 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     midiInputChannelComponent = std::make_unique<MidiChannelComponent> (hubConfig, true);
     addAndMakeVisible (*midiInputChannelComponent);
 
-    midiThroughComponent = std::make_unique<MidiThroughComponent> (hubConfig);
-    addAndMakeVisible (*midiThroughComponent);
-
     bankSelector = std::make_unique<BankSelectorComponent> (hubConfig, getCommandManager());
     addAndMakeVisible (*bankSelector);
     bankSelector->addMouseListener (this, true);
@@ -248,10 +245,6 @@ void DashBoardInterface::resized()
 
     uploadButton->setBounds (area.withSize (jmax (140, area.getWidth()/7 + 40), area.getHeight()*6/10)
                                  .withSizeKeepingCentre (jmax (140, area.getWidth()/7 + 40), HEADER_HEIGHT));
-
-    midiThroughComponent->setBounds (area.withSize (jmax (140, area.getWidth()/7 + 40), area.getHeight()*6/10)
-                                 .withSizeKeepingCentre (jmax (140, area.getWidth()/7 + 40), HEADER_HEIGHT)
-                                 .withRightX (getWidth()));
 
     notificationArea = juce::Rectangle<int> (18, 18).withCentre (getLocalPoint (header->findChildWithID ("optionsButton"),
                                                                                 header->findChildWithID ("optionsButton")
@@ -594,7 +587,6 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         bankSelector->setVisible (true);
         midiOutputChannelComponent->setVisible (true);
         midiInputChannelComponent->setVisible (true);
-        midiThroughComponent->setVisible (true);
         hubComponent->setInterceptsMouseClicks (true, true);
         hubConfig.selectFirstExistingGesture();
         header->setBatteryVisible (true);
@@ -612,7 +604,6 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         uploadButton->setVisible (false);
         midiOutputChannelComponent->setVisible (false);
         midiInputChannelComponent->setVisible (false);
-        midiThroughComponent->setVisible (false);
 
         if (state != int (pause))
         {
@@ -818,7 +809,6 @@ void DashBoardInterface::update()
         optionsPanel->update();
         midiOutputChannelComponent->update();
         midiInputChannelComponent->update();
-        midiThroughComponent->update();
         uploadButton->update();
         repaint (notificationArea);
     }
