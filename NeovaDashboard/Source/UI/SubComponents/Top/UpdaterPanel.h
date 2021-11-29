@@ -60,6 +60,7 @@ private:
     std::unique_ptr<Label> titleLabel;
     std::unique_ptr<DashShapeButton> closeButton;
     std::unique_ptr<TextButton> bottomButton;
+    std::unique_ptr<TextButton> viewNotesButton;
 
     //==============================================================================
     downloadProgress currentProgress = downloadAvailable;

@@ -66,6 +66,9 @@ void DataReader::timerCallback()
     {
         hubConfig.setRingIsConnected (false);
         commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
+
+        neova_dash::log::writeToLog ("Ring disconnected",
+                                     neova_dash::log::hubCommunication);
     }
 
     stopTimer();
@@ -86,6 +89,10 @@ bool DataReader::readData (String s)
         {
             hubConfig.setRingIsConnected (true);
             commandManager.invokeDirectly (neova_dash::commands::setStateAndUpdateDashInterface, true);
+            
+            Timer::callAfterDelay (300,
+                                   [this]() { neova_dash::log::writeToLog ("Ring connected : " + hubConfig.getRingFirmwareVersionString(),
+                                                                        neova_dash::log::hubCommunication);});
         }
         // Ring was in chargeMode
         else if (hubConfig.getRingIsCharging())
@@ -120,6 +127,10 @@ bool DataReader::readData (String s)
             hubConfig.setRingIsCharging (true);
             commandManager.invokeDirectly (neova_dash::commands::setStateAndUpdateDashInterface, true);
             commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
+
+            Timer::callAfterDelay (300,
+                                   [this]() { neova_dash::log::writeToLog ("Ring connected : " + hubConfig.getRingFirmwareVersionString(),
+                                                                        neova_dash::log::hubCommunication);});
         }
 
         // Notifies Ring wasn't charging

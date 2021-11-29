@@ -51,9 +51,8 @@ public:
         PresetData() = default;
         PresetData (PresetData& other);
 
-        uint16_t align_to_word;
-
-        uint16_t midiChannels = 1;
+        uint16_t midiChannelsIn = 0xffff;
+        uint16_t midiChannelsOut = 1;
 
     	GestureData gestureData0;
     	GestureData gestureData1;
@@ -69,7 +68,7 @@ public:
 		uint16_t ring_firmware_version;
 
 		uint8_t active_preset = 0; //Ne sert à rien pour l'instant juste pour s'aligner au buffer du zub
-		uint8_t midiChannel = 0;
+		uint8_t midi_thru = int (thruOff);
 
     	PresetData presetData0;
     	PresetData presetData1;
@@ -98,6 +97,13 @@ public:
     	gestureParam3,
     	gestureParam4,
     	gestureParam5
+    };
+
+    enum midiThruId
+    {
+        thruAdd= 0,
+        thruOff,
+        thruPure
     };
 
     //==============================================================================
@@ -163,10 +169,14 @@ public:
     const int getSelectedGesture();
 
     //==============================================================================
-    void setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool uploadToHub = true);
-    void setMidiChannelExclusive (const int channelNumber, bool uploadToHub = true);
-    void toggleMidiChannel (const int channelNumber, bool uploadToHub = true);
-    int getMidiChannels();
+    void setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool isMidiInput = false, bool uploadToHub = true);
+    void setMidiChannelExclusive (const int channelNumber, bool isMidiInput = false, bool uploadToHub = true);
+    void toggleMidiChannel (const int channelNumber, bool isMidiInput = false, bool uploadToHub = true);
+    int getMidiChannels (bool isMidiInput = false);
+    const int getNumActiveMidiChannels (bool isMidiInput = false);
+    void setMidiThrough (bool shouldUseThrough, bool uploadToHub = true);
+    int getMidiThrough();
+
 
     //==============================================================================
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber, const int presetNumber);
