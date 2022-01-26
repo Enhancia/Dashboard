@@ -84,10 +84,44 @@ void MidiChannelComponent::createPopupMenu()
     PopupMenu channelsMenu;
     const uint16_t midiChannels = hubConfig.getMidiChannels (isInput);
 
+    if(firstInit && !isInput)
+		listMidiOut.clear();
+
     for (int channelNum =0; channelNum < 16; channelNum++)
     {
         channelsMenu.addItem (channelNum + 1, String (channelNum + 1), true, midiChannels >> channelNum & 1 == 1);
+
+        if(midiChannels >> channelNum & 1 == 1)
+        {
+            if(firstInit && !isInput)
+            {
+				if(listMidiOut.size() >= 5)
+				{
+					hubConfig.toggleMidiChannel (channelNum, isInput);
+				} else
+				{
+					listMidiOut.add(channelNum + 1);
+				}
+            }
+        }
     }
+
+    if(firstInit && !isInput)
+		std::reverse(std::begin(listMidiOut), std::end(listMidiOut));
+
+    if(!isInput)
+		firstInit = false;
+
+
+    DBG("first: " << listMidiOut.getFirst());
+    DBG("last: " << listMidiOut.getLast());
+    DBG("-------------------------");
+	for (int midiOutNum : listMidiOut)
+	{
+		DBG(midiOutNum);
+	}
+    DBG("-------------------------");
+    
     
     channelsMenu.showMenuAsync (PopupMenu::Options().withParentComponent (getParentComponent())
                                                                  .withTargetComponent (this)
@@ -108,15 +142,75 @@ void MidiChannelComponent::menuCallback (int result, MidiChannelComponent* mcCom
 
 void MidiChannelComponent::handleMenuResult (const int menuResult)
 {
-    switch (menuResult)
-    {
-        case 0: // no choice
-            highlighted = false;
-            repaint();
-            break;
-        default:
-            hubConfig.toggleMidiChannel (menuResult-1, isInput);
-            createPopupMenu();
-            break;
-    }
+	//DBG("listMidiOut size: " << listMidiOut.size());
+
+	auto itr = std::find (std::begin (listMidiOut), std::end (listMidiOut), menuResult);
+    bool exist = itr != std::end (listMidiOut);
+    auto index = std::distance( std::begin( listMidiOut ), itr );
+
+	switch (menuResult)
+	{
+	case 0: // no choice
+		highlighted = false;
+		repaint ();
+		break;
+	default:
+		if (isInput) // midi in
+		{
+			hubConfig.toggleMidiChannel (menuResult - 1, isInput);
+		}
+		else // midi out
+		{
+			// limit the selection to 5
+			if (listMidiOut.size () >= 5)
+			{
+				//check if selection already exist in listMidiOut array
+				if (exist) // deselect
+				{
+					hubConfig.toggleMidiChannel (menuResult - 1, isInput);
+					listMidiOut.remove (index);
+				}
+				else // select and remove the oldest
+				{
+					hubConfig.toggleMidiChannel (menuResult - 1, isInput);
+					listMidiOut.add (menuResult);
+
+					hubConfig.toggleMidiChannel (listMidiOut.getFirst () - 1, isInput);
+					listMidiOut.remove (0);
+				}
+
+			}
+			else //limit to 5 not reached
+			{
+				if (exist) // deselect
+				{
+					if (listMidiOut.size () == 1) // prevent remove in listMidiOut if there is only one left
+					{
+						hubConfig.toggleMidiChannel (menuResult - 1, isInput);
+					}
+					else
+					{
+						hubConfig.toggleMidiChannel (menuResult - 1, isInput);
+						listMidiOut.remove (index);
+					}
+				}
+				else // select
+				{
+					hubConfig.toggleMidiChannel (menuResult - 1, isInput);
+					listMidiOut.add (menuResult);
+				}
+			}
+		}
+		createPopupMenu ();
+		break;
+	}
+
+	DBG ("first: " << listMidiOut.getFirst ());
+	DBG ("last: " << listMidiOut.getLast ());
+	DBG ("-------------------------");
+	for (int midiOutNum : listMidiOut)
+	{
+		DBG (midiOutNum);
+	}
+	DBG ("-------------------------");
 }

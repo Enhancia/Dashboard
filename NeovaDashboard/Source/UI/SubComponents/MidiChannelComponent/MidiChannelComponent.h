@@ -47,6 +47,8 @@ private:
     //==========================================================================
     HubConfiguration& hubConfig;
     const bool isInput;
+    bool firstInit = true;
+    Array<int> listMidiOut;
 
     //==========================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiChannelComponent)
