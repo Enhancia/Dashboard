@@ -89,8 +89,16 @@ void MidiChannelComponent::createPopupMenu()
 
     for (int channelNum =0; channelNum < 16; channelNum++)
     {
-        channelsMenu.addItem (channelNum + 1, String (channelNum + 1), true, midiChannels >> channelNum & 1 == 1);
+		// prevent old configuration filling
+		if(firstInit && listMidiOut.size() >= 5)
+		{
+			channelsMenu.addItem (channelNum + 1, String (channelNum + 1), true, false);
+		} else
+		{
+			channelsMenu.addItem (channelNum + 1, String (channelNum + 1), true, midiChannels >> channelNum & 1 == 1);
+		}
 
+		// fill saved configuration
         if(midiChannels >> channelNum & 1 == 1)
         {
             if(firstInit && !isInput)
@@ -106,23 +114,9 @@ void MidiChannelComponent::createPopupMenu()
         }
     }
 
-    if(firstInit && !isInput)
-		std::reverse(std::begin(listMidiOut), std::end(listMidiOut));
-
     if(!isInput)
 		firstInit = false;
 
-
-    DBG("first: " << listMidiOut.getFirst());
-    DBG("last: " << listMidiOut.getLast());
-    DBG("-------------------------");
-	for (int midiOutNum : listMidiOut)
-	{
-		DBG(midiOutNum);
-	}
-    DBG("-------------------------");
-    
-    
     channelsMenu.showMenuAsync (PopupMenu::Options().withParentComponent (getParentComponent())
                                                                  .withTargetComponent (this)
                                                                  .withMinimumWidth (getWidth())
@@ -142,8 +136,6 @@ void MidiChannelComponent::menuCallback (int result, MidiChannelComponent* mcCom
 
 void MidiChannelComponent::handleMenuResult (const int menuResult)
 {
-	//DBG("listMidiOut size: " << listMidiOut.size());
-
 	auto itr = std::find (std::begin (listMidiOut), std::end (listMidiOut), menuResult);
     bool exist = itr != std::end (listMidiOut);
     auto index = std::distance( std::begin( listMidiOut ), itr );
@@ -172,13 +164,13 @@ void MidiChannelComponent::handleMenuResult (const int menuResult)
 				}
 				else // select and remove the oldest
 				{
+					hubConfig.toggleMidiChannel (listMidiOut.getLast () - 1, isInput);
+					listMidiOut.removeLast ();
+					//listMidiOut.remove (0);
+
 					hubConfig.toggleMidiChannel (menuResult - 1, isInput);
 					listMidiOut.add (menuResult);
-
-					hubConfig.toggleMidiChannel (listMidiOut.getFirst () - 1, isInput);
-					listMidiOut.remove (0);
 				}
-
 			}
 			else //limit to 5 not reached
 			{
@@ -204,13 +196,4 @@ void MidiChannelComponent::handleMenuResult (const int menuResult)
 		createPopupMenu ();
 		break;
 	}
-
-	DBG ("first: " << listMidiOut.getFirst ());
-	DBG ("last: " << listMidiOut.getLast ());
-	DBG ("-------------------------");
-	for (int midiOutNum : listMidiOut)
-	{
-		DBG (midiOutNum);
-	}
-	DBG ("-------------------------");
 }
