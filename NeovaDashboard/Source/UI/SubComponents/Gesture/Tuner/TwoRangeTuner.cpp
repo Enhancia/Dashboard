@@ -429,6 +429,32 @@ void TwoRangeTuner::buttonClicked (Button* bttn)
     }
 }
 
+void TwoRangeTuner::buttonStateChanged (Button* btn) {
+
+    if (btn->isOver ()) {
+
+        if (btn->getName () == "MaxLeft Angle Button")
+            maxLeftAngleBtnIsHover = true;
+        else if (btn->getName () == "MinLeft Angle Button")
+            minLeftAngleBtnIsHover = true;
+        else if (btn->getName () == "MaxRight Angle Button")
+            maxRightAngleBtnIsHover = true;
+        else if (btn->getName () == "MinRight Angle Button")
+            minRightAngleBtnIsHover = true;
+        else
+            return;
+
+        repaint ();
+    }
+    else {
+        maxLeftAngleBtnIsHover = false;
+        minLeftAngleBtnIsHover = false;
+        maxRightAngleBtnIsHover = false;
+        minRightAngleBtnIsHover = false;
+        repaint ();
+    }
+}
+
 void TwoRangeTuner::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isLeftButtonDown())
@@ -939,6 +965,27 @@ void TwoRangeTuner::drawTunerSliderBackground (Graphics& g)
                                  float (sliderCentre.y) + arcRadius * std::sin (angle - MathConstants<float>::halfPi));
 
         g.setColour (tunerColour.withAlpha (0.6f));
+        g.fillEllipse (juce::Rectangle<float> (25.0f, 25.0f).withCentre (thumbPoint));
+    }
+
+    // Add highlight on tuner thumb when min/max button are hoverred
+    if (maxLeftAngleBtnIsHover || minLeftAngleBtnIsHover || maxRightAngleBtnIsHover || minRightAngleBtnIsHover) {
+
+        double angle;
+
+        if (maxLeftAngleBtnIsHover)
+            angle = getThumbAngleRadians (leftLowThumb);
+        else if (minLeftAngleBtnIsHover)
+            angle = getThumbAngleRadians (leftHighThumb);
+        else if (maxRightAngleBtnIsHover)
+            angle = getThumbAngleRadians (rightHighThumb);
+        else
+            angle = getThumbAngleRadians (rightLowThumb);
+
+        juce::Point<float> thumbPoint (sliderCentre.x + arcRadius * std::cos (angle - MathConstants<float>::halfPi),
+            sliderCentre.y + arcRadius * std::sin (angle - MathConstants<float>::halfPi));
+
+        g.setColour (tunerColour.withAlpha (0.3f));
         g.fillEllipse (juce::Rectangle<float> (25.0f, 25.0f).withCentre (thumbPoint));
     }
 }

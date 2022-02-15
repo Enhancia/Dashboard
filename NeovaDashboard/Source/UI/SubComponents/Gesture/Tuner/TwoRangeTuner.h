@@ -56,6 +56,7 @@ public:
     void editorHidden (Label* lbl, TextEditor& ted) override;
     void sliderValueChanged (Slider* sldr) override;
     void buttonClicked (Button* bttn) override;
+    void buttonStateChanged (Button* btn) override;
     
     //==============================================================================
     void mouseDown (const MouseEvent& e) override;
@@ -136,6 +137,10 @@ private:
     juce::Point<int> sliderCentre;
     float startAngle;
     float endAngle;
+    bool maxLeftAngleBtnIsHover = false;
+    bool minLeftAngleBtnIsHover = false;
+    bool maxRightAngleBtnIsHover = false;
+    bool minRightAngleBtnIsHover = false;
 
     //==============================================================================
     HubConfiguration& hubConfig;

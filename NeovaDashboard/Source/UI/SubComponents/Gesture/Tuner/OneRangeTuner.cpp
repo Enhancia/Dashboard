@@ -318,6 +318,26 @@ void OneRangeTuner::buttonClicked (Button* bttn)
     }
 }
 
+void OneRangeTuner::buttonStateChanged (Button* btn) {
+
+    if (btn->isOver ()) {
+
+        if (btn->getName () == "Max Angle Button")
+            maxAngleBtnIsHover = true;
+        else if (btn->getName () == "Min Angle Button")
+            minAngleBtnIsHover = true;
+        else
+            return;
+
+        repaint ();
+    }
+    else {
+        maxAngleBtnIsHover = false;
+        minAngleBtnIsHover = false;
+        repaint ();
+    }
+}
+
 void OneRangeTuner::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isLeftButtonDown())
@@ -691,6 +711,23 @@ void OneRangeTuner::drawTunerSliderBackground (Graphics& g)
                                            thumbPoint.translated (12.0f, 0),
                                            true));*/
 
+        g.fillEllipse (juce::Rectangle<float> (25.0f, 25.0f).withCentre (thumbPoint));
+    }
+
+    // Add highlight on tuner thumb when min/max button are hoverred
+    if (maxAngleBtnIsHover || minAngleBtnIsHover) {
+
+        double angle;
+
+        if (maxAngleBtnIsHover)
+            angle = getThumbAngleRadians (highThumb);
+        else
+            angle = getThumbAngleRadians (lowThumb);
+
+        juce::Point<float> thumbPoint (sliderCentre.x + arcRadius * std::cos (angle - MathConstants<float>::halfPi),
+            sliderCentre.y + arcRadius * std::sin (angle - MathConstants<float>::halfPi));
+
+        g.setColour (fill.withAlpha (0.3f));
         g.fillEllipse (juce::Rectangle<float> (25.0f, 25.0f).withCentre (thumbPoint));
     }
 }
