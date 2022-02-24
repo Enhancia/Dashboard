@@ -137,10 +137,10 @@ private:
     juce::Point<int> sliderCentre;
     float startAngle;
     float endAngle;
-    bool maxLeftAngleBtnIsHover = false;
-    bool minLeftAngleBtnIsHover = false;
-    bool maxRightAngleBtnIsHover = false;
-    bool minRightAngleBtnIsHover = false;
+    bool maxLeftAngleBtnIsHovered = false;
+    bool minLeftAngleBtnIsHovered = false;
+    bool maxRightAngleBtnIsHovered = false;
+    bool minRightAngleBtnIsHovered = false;
 
     //==============================================================================
     HubConfiguration& hubConfig;

@@ -433,24 +433,24 @@ void TwoRangeTuner::buttonStateChanged (Button* btn) {
 
     if (btn->isOver ()) {
 
-        if (btn->getName () == "MaxLeft Angle Button")
-            maxLeftAngleBtnIsHover = true;
-        else if (btn->getName () == "MinLeft Angle Button")
-            minLeftAngleBtnIsHover = true;
-        else if (btn->getName () == "MaxRight Angle Button")
-            maxRightAngleBtnIsHover = true;
-        else if (btn->getName () == "MinRight Angle Button")
-            minRightAngleBtnIsHover = true;
+        if (btn == maxLeftAngleButton.get())
+            maxLeftAngleBtnIsHovered = true;
+        else if (btn == minLeftAngleButton.get())
+            minLeftAngleBtnIsHovered = true;
+        else if (btn == maxRightAngleButton.get())
+            maxRightAngleBtnIsHovered = true;
+        else if (btn == minRightAngleButton.get())
+            minRightAngleBtnIsHovered = true;
         else
             return;
 
         repaint ();
     }
     else {
-        maxLeftAngleBtnIsHover = false;
-        minLeftAngleBtnIsHover = false;
-        maxRightAngleBtnIsHover = false;
-        minRightAngleBtnIsHover = false;
+        maxLeftAngleBtnIsHovered = false;
+        minLeftAngleBtnIsHovered = false;
+        maxRightAngleBtnIsHovered = false;
+        minRightAngleBtnIsHovered = false;
         repaint ();
     }
 }
@@ -969,15 +969,15 @@ void TwoRangeTuner::drawTunerSliderBackground (Graphics& g)
     }
 
     // Add highlight on tuner thumb when min/max button are hoverred
-    if (maxLeftAngleBtnIsHover || minLeftAngleBtnIsHover || maxRightAngleBtnIsHover || minRightAngleBtnIsHover) {
+    if (maxLeftAngleBtnIsHovered || minLeftAngleBtnIsHovered || maxRightAngleBtnIsHovered || minRightAngleBtnIsHovered) {
 
         double angle;
 
-        if (maxLeftAngleBtnIsHover)
+        if (maxLeftAngleBtnIsHovered)
             angle = getThumbAngleRadians (leftLowThumb);
-        else if (minLeftAngleBtnIsHover)
+        else if (minLeftAngleBtnIsHovered)
             angle = getThumbAngleRadians (leftHighThumb);
-        else if (maxRightAngleBtnIsHover)
+        else if (maxRightAngleBtnIsHovered)
             angle = getThumbAngleRadians (rightHighThumb);
         else
             angle = getThumbAngleRadians (rightLowThumb);

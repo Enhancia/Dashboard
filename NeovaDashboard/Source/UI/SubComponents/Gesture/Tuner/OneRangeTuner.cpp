@@ -322,18 +322,18 @@ void OneRangeTuner::buttonStateChanged (Button* btn) {
 
     if (btn->isOver ()) {
 
-        if (btn->getName () == "Max Angle Button")
-            maxAngleBtnIsHover = true;
-        else if (btn->getName () == "Min Angle Button")
-            minAngleBtnIsHover = true;
+        if (btn == maxAngleButton.get())
+            maxAngleBtnIsHovered = true;
+        else if (btn == minAngleButton.get())
+            minAngleBtnIsHovered = true;
         else
             return;
 
         repaint ();
     }
     else {
-        maxAngleBtnIsHover = false;
-        minAngleBtnIsHover = false;
+        maxAngleBtnIsHovered = false;
+        minAngleBtnIsHovered = false;
         repaint ();
     }
 }
@@ -715,11 +715,11 @@ void OneRangeTuner::drawTunerSliderBackground (Graphics& g)
     }
 
     // Add highlight on tuner thumb when min/max button are hoverred
-    if (maxAngleBtnIsHover || minAngleBtnIsHover) {
+    if (maxAngleBtnIsHovered || minAngleBtnIsHovered) {
 
         double angle;
 
-        if (maxAngleBtnIsHover)
+        if (maxAngleBtnIsHovered)
             angle = getThumbAngleRadians (highThumb);
         else
             angle = getThumbAngleRadians (lowThumb);
