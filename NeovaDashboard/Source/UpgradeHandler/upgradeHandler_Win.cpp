@@ -12,8 +12,8 @@
 
 #include "upgradeHandler_Win.h"
 //==============================================================================
-UpgradeHandler::UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config, ApplicationCommandManager& manager)
-	: dPipe (dashPipe), hubConfig(config), commandManager (manager)
+UpgradeHandler::UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config, ApplicationCommandManager& manager, DataReader& dataReaderRef)
+	: dPipe (dashPipe), hubConfig(config), commandManager (manager), dataReader(dataReaderRef)
 
 {
 	checkReleasesVersion();
@@ -336,5 +336,20 @@ void UpgradeHandler::checkForSuccessiveUpgrade()
 		startHubUpgrade();
 	}
 }
+
+/**
+ * @brief check battery level before upgrade
+ * @return true if battery level is greater than 20%.
+*/
+bool UpgradeHandler::checkBatteryForUpgrade () const
+{
+	const auto percentBattery = dataReader.getBatteryLevel(false);
+
+	if(percentBattery >= 0.2f)
+		return true;
+	else
+		return false;
+}
+
 //==============================================================================
 #endif //JUCE_WINDOWS

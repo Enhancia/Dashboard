@@ -58,6 +58,7 @@ public:
     const String getRawData (int index);
     bool getRawDataAsFloatArray (Array<float>& arrayToFill);
     const float& getFloatValueReference (const neova_dash::data::HubData dataId);
+    float getBatteryLevel (bool rawOrPercent);
     
     //==============================================================================
     bool connectToExistingPipe();

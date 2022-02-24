@@ -60,7 +60,7 @@ public:
 		dashPipe = std::make_unique<DashPipe>();
 		dashPipe->addChangeListener(this);
 
-		upgradeHandler = std::make_unique<UpgradeHandler>(*dashPipe, hubConfig, commandManager);
+		upgradeHandler = std::make_unique<UpgradeHandler>(*dashPipe, hubConfig, commandManager, *dataReader);
 		updater = std::make_unique<DashUpdater>();
 		firmDownloader = std::make_unique<FirmDownloader> (commandManager);
 

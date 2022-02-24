@@ -90,9 +90,17 @@ bool DataReader::readData (String s)
             hubConfig.setRingIsConnected (true);
             commandManager.invokeDirectly (neova_dash::commands::setStateAndUpdateDashInterface, true);
             
-            Timer::callAfterDelay (300,
-                                   [this]() { neova_dash::log::writeToLog ("Ring connected : " + hubConfig.getRingFirmwareVersionString(),
-                                                                        neova_dash::log::hubCommunication);});
+			Timer::callAfterDelay (300, [this]() {
+				neova_dash::log::writeToLog ("Ring connected : " + hubConfig.getRingFirmwareVersionString (), neova_dash::log::hubCommunication);
+				});
+
+			Timer::callAfterDelay (10000, [this]()
+				{
+					neova_dash::log::writeToLog ("Battery level : raw " +
+						std::to_string (this->getBatteryLevel (true)) +
+						" - percent " + std::to_string (this->getBatteryLevel (false)), neova_dash::log::hubCommunication);
+				});
+
         }
         // Ring was in chargeMode
         else if (hubConfig.getRingIsCharging())
@@ -128,9 +136,17 @@ bool DataReader::readData (String s)
             commandManager.invokeDirectly (neova_dash::commands::setStateAndUpdateDashInterface, true);
             commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
 
-            Timer::callAfterDelay (300,
-                                   [this]() { neova_dash::log::writeToLog ("Ring connected : " + hubConfig.getRingFirmwareVersionString(),
-                                                                        neova_dash::log::hubCommunication);});
+
+			Timer::callAfterDelay (300, [this]() {
+				neova_dash::log::writeToLog ("Ring connected : " + hubConfig.getRingFirmwareVersionString (), neova_dash::log::hubCommunication);
+				});
+
+			Timer::callAfterDelay (10000, [this]()
+				{
+					neova_dash::log::writeToLog ("Battery level : raw " +
+						std::to_string (this->getBatteryLevel (true)) +
+						" - percent " + std::to_string (this->getBatteryLevel (false)), neova_dash::log::hubCommunication);
+				});
         }
 
         // Notifies Ring wasn't charging
@@ -161,6 +177,22 @@ const float& DataReader::getFloatValueReference (const neova_dash::data::HubData
     if (dataId == neova_dash::data::numDatas) return floatData.getReference (int (neova_dash::data::battery));
 
     return floatData.getReference (int (dataId));
+}
+
+/**
+ * @brief Return battery level
+ * @param rawOrPercent 
+ * @return if param is true return raw, else return percent
+*/
+float DataReader::getBatteryLevel (bool rawOrPercent)
+{
+	auto rawBattery = getFloatValueReference (neova_dash::data::battery);
+	auto percentBattery = neova_dash::data::convertRawBatteryToPercentage(rawBattery, hubConfig.getRingIsCharging());
+
+    if(rawOrPercent)
+	    return rawBattery;
+    else
+        return percentBattery;
 }
 
 bool DataReader::getRawDataAsFloatArray(Array<float>& arrayToFill)
