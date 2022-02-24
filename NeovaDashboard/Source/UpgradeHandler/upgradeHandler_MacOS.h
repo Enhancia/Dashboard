@@ -21,6 +21,7 @@
 #include "../Common/DashCommon.h"
 #include "../DataReader/dashPipe.h"
 #include "../Common/HubConfiguration.h"
+#include "../DataReader/DataReader.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,7 +59,7 @@ public:
     };
     
     //==============================================================================
-    UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config, ApplicationCommandManager& cmdManager);
+    UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config, ApplicationCommandManager& cmdManager, DataReader& dataReaderRef);
     ~UpgradeHandler();
 
     //==============================================================================
@@ -93,6 +94,7 @@ public:
     
     void checkReleasesVersion();
 
+    bool checkBatteryForUpgrade() const;
     void launchUpgradeProcedure();
     
     void startUpgrade();
@@ -124,6 +126,7 @@ private:
     DashPipe& dPipe;
     HubConfiguration& hubConfig;
     ApplicationCommandManager& commandManager;
+    DataReader& dataReader;
     
     static UpgradeHandler * instanceUp;
     //==============================================================================

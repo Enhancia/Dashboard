@@ -11,8 +11,8 @@
 #include "FirmUpgradePanel.h"
 
 //==============================================================================
-FirmUpgradePanel::FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler, ApplicationCommandManager& manager)
-	: hubConfig (config), upgradeHandler (handler), commandManager (manager)
+FirmUpgradePanel::FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler, ApplicationCommandManager& manager, DataReader& dataReaderRef)
+	: hubConfig (config), upgradeHandler (handler), commandManager (manager), dataReader(dataReaderRef)
 {
     createLabels();
     createButtons();
@@ -122,6 +122,10 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 			jassert (currentUpgrade != none);
 			if (upgradeHandler.getUpgradeState() != int (checkingReleases))
 				updateComponentsForSpecificState (upgradeHandler.getUpgradeState());
+			
+			neova_dash::log::writeToLog ("Battery level before upgrade : raw " +
+				std::to_string (dataReader.getBatteryLevel (true)) +
+				" - percent " + std::to_string (dataReader.getBatteryLevel (false)), neova_dash::log::hubCommunication);
 
 			upgradeHandler.startUpgrade();
 
@@ -310,6 +314,13 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 						if (ringAvailable)
 						{
 							bodyTextString += "Upgrade Available : (v" + getFormattedVersionString (upgradeHandler.getRingReleaseVersion()) + ")";
+
+							if(!upgradeHandler.checkBatteryForUpgrade())
+							{
+								bodyTextString += "\n\nInsufficient battery level to perform upgrade, please charge it and retry !";
+								upgradeButton->setAlpha(0.5f);
+								upgradeButton->setEnabled(false);
+							}
 						}
 						else
 						{
