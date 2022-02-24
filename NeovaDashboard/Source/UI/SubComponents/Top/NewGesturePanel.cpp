@@ -64,6 +64,8 @@ void NewGesturePanel::paint (Graphics& g)
 
     g.setGradientFill (gradOut);
     g.drawRoundedRectangle (panelArea.toFloat(), 10.0f, 1.0f);
+
+    grabKeyboardFocus ();
 }
 
 void NewGesturePanel::resized()
@@ -135,6 +137,16 @@ void NewGesturePanel::buttonClicked (Button* bttn)
     {
           hidePanel (true);
     }
+}
+
+bool NewGesturePanel::keyPressed (const KeyPress& key)
+{
+    if (key == neova_dash::keyboard_shortcut::closeWindow)
+    {
+        hidePanel (true);
+    }
+
+    return false;
 }
 
 void NewGesturePanel::createNewGesture()

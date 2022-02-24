@@ -71,6 +71,7 @@ public:
 
     //==============================================================================
     void buttonClicked (Button* bttn) override;
+    bool keyPressed (const KeyPress& key) override;
 
     //==============================================================================
     void setAndOpenPanel();

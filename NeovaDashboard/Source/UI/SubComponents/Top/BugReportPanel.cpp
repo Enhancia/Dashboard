@@ -58,6 +58,8 @@ void BugReportPanel::paint (Graphics& g)
 	    					  Justification::centred, 3);
     	}
     }
+
+    grabKeyboardFocus ();
 }
 
 void BugReportPanel::resized()
@@ -123,6 +125,16 @@ void BugReportPanel::buttonClicked (Button* bttn)
 			closeAndResetPanel();
 		}
 	}
+}
+
+bool BugReportPanel::keyPressed (const KeyPress& key)
+{
+    if (key == neova_dash::keyboard_shortcut::closeWindow)
+    {
+        closeAndResetPanel ();
+    }
+
+    return false;
 }
 
 void BugReportPanel::labelTextChanged (Label* lbl)

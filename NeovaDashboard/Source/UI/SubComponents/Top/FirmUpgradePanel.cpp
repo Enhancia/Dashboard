@@ -37,6 +37,8 @@ void FirmUpgradePanel::paint (Graphics& g)
     	g.drawFittedText ("Do not disconnect Neova during the upgrade.\n\nPlease keep your ring charging during the process.", panelArea.reduced (neova_dash::ui::MARGIN),
     				Justification::centredBottom, 3);
     }
+
+    grabKeyboardFocus ();
 }
 
 void FirmUpgradePanel::resized()
@@ -141,6 +143,16 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 		currentUpgrade = (!ringAvailable && hubAvailable) ? hub : ring;
 		updateComponentsForSpecificState (preInstallationWarning);
 	}
+}
+
+bool FirmUpgradePanel::keyPressed (const KeyPress& key)
+{
+    if (key == neova_dash::keyboard_shortcut::closeWindow)
+    {
+        closeAndResetPanel ();
+    }
+
+    return false;
 }
 
 void FirmUpgradePanel::setAndOpenPanel()
