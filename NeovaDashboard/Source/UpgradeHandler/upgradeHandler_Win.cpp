@@ -102,7 +102,7 @@ void UpgradeHandler::createChildOutputHandlers()
 	String out_f = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childOutFileName;
 	String err_f = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childErrFileName;
 
-    childOut = CreateFile(_T(out_f.getCharPointer()),
+    childOut = CreateFileW((LPCWSTR)out_f.toWideCharPointer(),
         FILE_GENERIC_READ | FILE_GENERIC_WRITE,
         FILE_SHARE_WRITE | FILE_SHARE_READ,
         &sa,
@@ -110,7 +110,7 @@ void UpgradeHandler::createChildOutputHandlers()
         FILE_ATTRIBUTE_HIDDEN,
         NULL);
 
-    childErr= CreateFile(_T(err_f.getCharPointer()),
+    childErr= CreateFileW((LPCWSTR)err_f.toWideCharPointer(),
         FILE_GENERIC_READ | FILE_GENERIC_WRITE,
         FILE_SHARE_WRITE | FILE_SHARE_READ,
         &sa,
@@ -150,25 +150,25 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * numCOM)
 	}
 
 	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
-	ZeroMemory(&si, sizeof(STARTUPINFO));
-	si.cb = sizeof(STARTUPINFO);
+	ZeroMemory(&si, sizeof(STARTUPINFOW));
+
+	si.cb = sizeof(STARTUPINFOW);
 	si.dwFlags |= STARTF_USESTDHANDLES;
 	si.hStdInput = NULL;
 	si.hStdError = childErr;
 	si.hStdOutput = childOut;
-
-
+	
 	// Start the child process. 
-	if (!CreateProcess((LPCSTR)nrfutilPath.getCharPointer(),   // No module name (use command line)
-		(LPSTR)commandLine.toStdString().c_str(),     // Command line (LPSTR)commandLine.toWideCharPointer()
-		NULL,           // Process handle not inheritable
-		NULL,           // Thread handle not inheritable
-		TRUE,          // Set handle inheritance to FALSE
-		CREATE_NO_WINDOW,              // No creation flags CREATE_NO_WINDOW
-		NULL,           // Use parent's environment block
-		NULL,           // Use parent's starting directory 
-		&si,            // Pointer to STARTUPINFO structure
-		&pi)           // Pointer to PROCESS_INFORMATION structure
+	if (!CreateProcessW((LPCWSTR)nrfutilPath.toWideCharPointer(),	// No module name (use command line)
+		(LPWSTR)commandLine.toWideCharPointer(),	// Command line (LPSTR)commandLine.toWideCharPointer()
+		NULL,	// Process handle not inheritable
+		NULL,	// Thread handle not inheritable
+		TRUE,	// Set handle inheritance to FALSE	
+		CREATE_NO_WINDOW,	// No creation flags CREATE_NO_WINDOW
+		NULL,	// Use parent's environment block
+		NULL,	// Use parent's starting directory 
+		&si,	// Pointer to STARTUPINFO structure
+		&pi)	// Pointer to PROCESS_INFORMATION structure
 		)
 	{
 		neova_dash::log::writeToLog("Failed to launch upgrade process..", neova_dash::log::hubCommunication);
@@ -188,9 +188,10 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * numCOM)
 
 void UpgradeHandler::closeNrfutil()
 {
-    File out_f = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childOutFileName;
-	File err_f = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childErrFileName;
+	File out_f = (LPCWSTR)(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childOutFileName).toWideCharPointer();
+	File err_f = (LPCWSTR)(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childErrFileName).toWideCharPointer();
 
+	
 	int ouf_size = out_f.loadFileAsString().length();
 	int err_size = err_f.loadFileAsString().length();
 	
