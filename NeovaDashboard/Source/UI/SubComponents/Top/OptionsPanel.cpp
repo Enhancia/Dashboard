@@ -66,6 +66,8 @@ void OptionsPanel::paint (Graphics& g)
     auto area = optionsArea.reduced (neova_dash::ui::MARGIN*2);
 
     paintProductInformations (g, area.removeFromTop (area.getHeight()/3).reduced (neova_dash::ui::MARGIN));
+
+    grabKeyboardFocus();
 }
 
 void OptionsPanel::resized()
@@ -135,6 +137,16 @@ void OptionsPanel::buttonClicked (Button* bttn)
     {
         hubConfig.setMidiThrough (midiThruToggle->getToggleState());
     }
+}
+
+bool OptionsPanel::keyPressed (const KeyPress &key)
+{
+    if (key == neova_dash::keyboard_shortcut::closeWindow)
+    {
+        setVisible (false);
+    }
+
+	return false;
 }
 
 void OptionsPanel::mouseUp (const MouseEvent& event)

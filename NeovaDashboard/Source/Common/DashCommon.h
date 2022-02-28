@@ -285,6 +285,8 @@ namespace neova_dash
 
     namespace keyboard_shortcut
     {
+        const KeyPress closeWindow           (KeyPress::escapeKey);
+
         const KeyPress selectGestureLeft     (KeyPress::leftKey);
         const KeyPress selectGestureRight    (KeyPress::rightKey);
         const KeyPress selectGestureUp       (KeyPress::upKey);

@@ -136,6 +136,17 @@ void UpdaterPanel::buttonClicked (Button* bttn)
         }
     }
 }
+
+bool UpdaterPanel::keyPressed (const KeyPress& key)
+{
+    if (key == neova_dash::keyboard_shortcut::closeWindow)
+    {
+        closeAndResetPanel();
+    }
+
+    return false;
+}
+
 void UpdaterPanel::resetAndOpenPanel (bool updateIsRequired)
 {
     if (currentProgress != inProgress)
