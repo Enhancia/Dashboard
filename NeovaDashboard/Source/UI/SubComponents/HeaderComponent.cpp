@@ -56,6 +56,7 @@ void HeaderComponent::buttonClicked (Button* bttn)
     if (bttn == optionsButton.get())
     {
         optionsPanel.setVisible (true);
+        optionsPanel.grabKeyboardFocus();
     }
 }
 

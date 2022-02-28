@@ -119,6 +119,7 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 
 	else if (bttn == okButton.get())
 	{
+		unfocusAllComponents();
 		if (currentState == preInstallationWarning)
 		{
 			jassert (currentUpgrade != none);

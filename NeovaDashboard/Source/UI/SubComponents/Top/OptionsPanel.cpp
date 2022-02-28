@@ -66,8 +66,6 @@ void OptionsPanel::paint (Graphics& g)
     auto area = optionsArea.reduced (neova_dash::ui::MARGIN*2);
 
     paintProductInformations (g, area.removeFromTop (area.getHeight()/3).reduced (neova_dash::ui::MARGIN));
-
-    grabKeyboardFocus();
 }
 
 void OptionsPanel::resized()
