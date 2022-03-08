@@ -18,7 +18,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     optionsPanel = std::make_unique<OptionsPanel> (hubConfig, updater, upgradeHandler, getCommandManager());
     addAndMakeVisible (*optionsPanel);
 
-    firmUpgradePanel = std::make_unique<FirmUpgradePanel> (hubConfig, upgrdHandler, getCommandManager());
+    firmUpgradePanel = std::make_unique<FirmUpgradePanel> (hubConfig, upgrdHandler, getCommandManager(), dataReader);
     addAndMakeVisible (*firmUpgradePanel);
 
     updaterPanel = std::make_unique<UpdaterPanel> (updater, getCommandManager(), updater.getDownloadProgressReference());

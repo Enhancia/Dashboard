@@ -429,6 +429,32 @@ void TwoRangeTuner::buttonClicked (Button* bttn)
     }
 }
 
+void TwoRangeTuner::buttonStateChanged (Button* btn) {
+
+    if (btn->isOver ()) {
+
+        if (btn == maxLeftAngleButton.get())
+            maxLeftAngleBtnIsHovered = true;
+        else if (btn == minLeftAngleButton.get())
+            minLeftAngleBtnIsHovered = true;
+        else if (btn == maxRightAngleButton.get())
+            maxRightAngleBtnIsHovered = true;
+        else if (btn == minRightAngleButton.get())
+            minRightAngleBtnIsHovered = true;
+        else
+            return;
+
+        repaint ();
+    }
+    else {
+        maxLeftAngleBtnIsHovered = false;
+        minLeftAngleBtnIsHovered = false;
+        maxRightAngleBtnIsHovered = false;
+        minRightAngleBtnIsHovered = false;
+        repaint ();
+    }
+}
+
 void TwoRangeTuner::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isLeftButtonDown())
@@ -939,6 +965,27 @@ void TwoRangeTuner::drawTunerSliderBackground (Graphics& g)
                                  float (sliderCentre.y) + arcRadius * std::sin (angle - MathConstants<float>::halfPi));
 
         g.setColour (tunerColour.withAlpha (0.6f));
+        g.fillEllipse (juce::Rectangle<float> (25.0f, 25.0f).withCentre (thumbPoint));
+    }
+
+    // Add highlight on tuner thumb when min/max button are hoverred
+    if (maxLeftAngleBtnIsHovered || minLeftAngleBtnIsHovered || maxRightAngleBtnIsHovered || minRightAngleBtnIsHovered) {
+
+        double angle;
+
+        if (maxLeftAngleBtnIsHovered)
+            angle = getThumbAngleRadians (leftLowThumb);
+        else if (minLeftAngleBtnIsHovered)
+            angle = getThumbAngleRadians (leftHighThumb);
+        else if (maxRightAngleBtnIsHovered)
+            angle = getThumbAngleRadians (rightHighThumb);
+        else
+            angle = getThumbAngleRadians (rightLowThumb);
+
+        juce::Point<float> thumbPoint (sliderCentre.x + arcRadius * std::cos (angle - MathConstants<float>::halfPi),
+            sliderCentre.y + arcRadius * std::sin (angle - MathConstants<float>::halfPi));
+
+        g.setColour (tunerColour.withAlpha (0.3f));
         g.fillEllipse (juce::Rectangle<float> (25.0f, 25.0f).withCentre (thumbPoint));
     }
 }
