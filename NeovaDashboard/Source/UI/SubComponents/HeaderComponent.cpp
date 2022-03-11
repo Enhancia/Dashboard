@@ -264,7 +264,7 @@ void HeaderComponent::BatteryComponent::update()
 {
     if (hubConfig.getRingIsConnected() != lastConnectionState)
     {
-        repaintIfNeeded();
+        repaintIfNeeded(true);
     }
 
     if (hubConfig.getRingIsCharging() != lastChargeState)

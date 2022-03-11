@@ -59,7 +59,9 @@ void BugReportPanel::paint (Graphics& g)
     	}
     }
 
-    grabKeyboardFocus ();
+    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+        grabKeyboardFocus ();
+    }
 }
 
 void BugReportPanel::resized()

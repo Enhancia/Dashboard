@@ -45,7 +45,9 @@ void DashAlertPanel::paint (Graphics& g)
     g.setGradientFill (gradOut);
     g.drawRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f, 1.0f);
 
-    grabKeyboardFocus ();
+    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+        grabKeyboardFocus ();
+    }
 }
 
 void DashAlertPanel::resized()

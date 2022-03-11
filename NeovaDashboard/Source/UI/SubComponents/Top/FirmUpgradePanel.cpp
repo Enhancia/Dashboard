@@ -38,7 +38,9 @@ void FirmUpgradePanel::paint (Graphics& g)
     				Justification::centredBottom, 3);
     }
 
-    grabKeyboardFocus ();
+	if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+		grabKeyboardFocus ();
+	}
 }
 
 void FirmUpgradePanel::resized()

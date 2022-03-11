@@ -65,7 +65,9 @@ void NewGesturePanel::paint (Graphics& g)
     g.setGradientFill (gradOut);
     g.drawRoundedRectangle (panelArea.toFloat(), 10.0f, 1.0f);
 
-    grabKeyboardFocus ();
+    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+        grabKeyboardFocus ();
+    }
 }
 
 void NewGesturePanel::resized()

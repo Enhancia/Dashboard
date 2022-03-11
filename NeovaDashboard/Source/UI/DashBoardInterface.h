@@ -282,6 +282,8 @@ private:
     //==============================================================================
     Image backgroundImage = ImageFileFormat::loadFrom (DashData::HUBBG_png, DashData::HUBBG_pngSize); /**< Interface's background image. */
     juce::Rectangle<int> notificationArea;
+    Image neovaHubImage;
+    bool privateNav = false;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DashBoardInterface)
