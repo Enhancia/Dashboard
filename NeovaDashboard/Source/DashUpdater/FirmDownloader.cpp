@@ -85,7 +85,7 @@ void FirmDownloader::getCurrentInstalledVersions()
 	}
 }
 
-void FirmDownloader::finished (URL::DownloadTask* task, bool success)
+void FirmDownloader::finished (URL::DownloadTask*, bool success)
 {
     state = downloadFinished;
     successful = success;
@@ -272,15 +272,15 @@ bool FirmDownloader::fetchFilesURLAndVersions (DynamicObject& jsonRef)
     return hubExists || ringExists;
 }
 
-bool FirmDownloader::deleteCurrentFileforDevice (deviceFirmware& device)
+bool FirmDownloader::deleteCurrentFileforDevice (deviceFirmware& deviceArg)
 {
 	File fileToDelete;
 
-	if (device == hub && !currentVersionHub.isEmpty())
+	if (deviceArg == hub && !currentVersionHub.isEmpty())
 	{
 		fileToDelete = currentHubFile;
 	}
-	else if (device == ring && !currentVersionRing.isEmpty())
+	else if (deviceArg == ring && !currentVersionRing.isEmpty())
 	{
 		fileToDelete = currentRingFile;
 	}

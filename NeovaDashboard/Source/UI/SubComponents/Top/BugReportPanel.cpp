@@ -129,9 +129,9 @@ void BugReportPanel::buttonClicked (Button* bttn)
 	}
 }
 
-bool BugReportPanel::keyPressed (const KeyPress& key)
+bool BugReportPanel::keyPressed (const KeyPress& keyArg)
 {
-    if (key == neova_dash::keyboard_shortcut::closeWindow)
+    if (keyArg == neova_dash::keyboard_shortcut::closeWindow)
     {
         closeAndResetPanel ();
     }
@@ -139,7 +139,7 @@ bool BugReportPanel::keyPressed (const KeyPress& key)
     return false;
 }
 
-void BugReportPanel::labelTextChanged (Label* lbl)
+void BugReportPanel::labelTextChanged (Label*)
 {
 	checkFormEntry();
 

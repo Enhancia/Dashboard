@@ -43,7 +43,7 @@ public:
     bool moreThanOneInstanceAllowed() override       { return false; }
 
     //==============================================================================
-    void initialise (const String& commandLine) override
+    void initialise (const String&) override
     {
         dashboardLogger.reset (FileLogger::createDefaultAppLogger ("Enhancia/NeovaDashboard/Logs/",
                                                               "neovaDashLog.txt",
@@ -107,7 +107,7 @@ public:
         quit();
     }
 
-    void anotherInstanceStarted (const String& commandLine) override
+    void anotherInstanceStarted (const String&) override
     {
     }
 

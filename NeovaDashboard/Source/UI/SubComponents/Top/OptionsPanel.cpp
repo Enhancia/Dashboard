@@ -694,16 +694,16 @@ void UpdateAndUpgradePanel::paintFirmwareArea (Graphics& g)
     Path ringPath = neova_dash::path::createPath (neova_dash::path::ring);
     Path hubPath = neova_dash::path::createPath (neova_dash::path::hub);
 
-    ringPath.scaleToFit (ringArea.reduced (ringArea.getHeight()/4).getX(),
-                         ringArea.reduced (ringArea.getHeight()/4).getY(),
-                         ringArea.reduced (ringArea.getHeight()/4).getWidth(),
-                         ringArea.reduced (ringArea.getHeight()/4).getHeight(),
+    ringPath.scaleToFit (static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getX()),
+                         static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getY()),
+                         static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getWidth()),
+                         static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getHeight()),
                          true);
 
-    hubPath.scaleToFit (hubArea.reduced (hubArea.getHeight()/8).getX(),
-                        hubArea.reduced (hubArea.getHeight()/8).getY(),
-                        hubArea.reduced (hubArea.getHeight()/8).getWidth(),
-                        hubArea.reduced (hubArea.getHeight()/8).getHeight(),
+    hubPath.scaleToFit (static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getX()),
+                        static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getY()),
+                        static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getWidth()),
+                        static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getHeight()),
                         true);
 
     g.strokePath (ringPath, {1.0f, PathStrokeType::curved});
@@ -732,10 +732,10 @@ void UpdateAndUpgradePanel::paintSoftwareArea (Graphics& g)
 
     Path dashPath = neova_dash::path::createPath (neova_dash::path::dashIcon);
 
-    dashPath.scaleToFit (softAreaTemp.reduced (softAreaTemp.getHeight()/4).getX(),
-                         softAreaTemp.reduced (softAreaTemp.getHeight()/4).getY(),
-                         softAreaTemp.reduced (softAreaTemp.getHeight()/4).getWidth(),
-                         softAreaTemp.reduced (softAreaTemp.getHeight()/4).getHeight(),
+    dashPath.scaleToFit (static_cast<float>(softAreaTemp.reduced (softAreaTemp.getHeight()/4).getX()),
+                         static_cast<float>(softAreaTemp.reduced (softAreaTemp.getHeight()/4).getY()),
+                         static_cast<float>(softAreaTemp.reduced (softAreaTemp.getHeight()/4).getWidth()),
+                         static_cast<float>(softAreaTemp.reduced (softAreaTemp.getHeight()/4).getHeight()),
                          true);
 
     g.strokePath (dashPath, {1.0f, PathStrokeType::curved});
@@ -782,16 +782,16 @@ void LegalPanel::paint (Graphics& g)
     Path ringPath = neova_dash::path::createPath (neova_dash::path::ring);
     Path hubPath = neova_dash::path::createPath (neova_dash::path::hub);
 
-    ringPath.scaleToFit (ringArea.reduced (ringArea.getHeight()/4).getX(),
-                         ringArea.reduced (ringArea.getHeight()/4).getY(),
-                         ringArea.reduced (ringArea.getHeight()/4).getWidth(),
-                         ringArea.reduced (ringArea.getHeight()/4).getHeight(),
+    ringPath.scaleToFit (static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getX()),
+                         static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getY()),
+                         static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getWidth()),
+                         static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getHeight()),
                          true);
 
-    hubPath.scaleToFit (hubArea.reduced (hubArea.getHeight()/8).getX(),
-                        hubArea.reduced (hubArea.getHeight()/8).getY(),
-                        hubArea.reduced (hubArea.getHeight()/8).getWidth(),
-                        hubArea.reduced (hubArea.getHeight()/8).getHeight(),
+    hubPath.scaleToFit (static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getX()),
+                        static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getY()),
+                        static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getWidth()),
+                        static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getHeight()),
                         true);
 
     g.strokePath (ringPath, {1.0f, PathStrokeType::curved});
@@ -822,7 +822,7 @@ LicensePanel::~LicensePanel()
 {
 }
 
-void LicensePanel::paint (Graphics& g)
+void LicensePanel::paint (Graphics&)
 {
 }
 

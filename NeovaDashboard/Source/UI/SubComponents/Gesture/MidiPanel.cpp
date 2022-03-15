@@ -677,7 +677,7 @@ float MidiRangeTuner::getThumbX (DraggableObject thumb)
 }
 
 
-void MidiRangeTuner::handleSliderClick (const MouseEvent& e)
+void MidiRangeTuner::handleSliderClick (const MouseEvent&)
 {
 
 }

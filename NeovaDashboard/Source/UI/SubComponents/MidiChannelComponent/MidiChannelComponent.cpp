@@ -57,18 +57,18 @@ void MidiChannelComponent::resized()
 {
 }
 
-void MidiChannelComponent::mouseUp (const MouseEvent& event)
+void MidiChannelComponent::mouseUp (const MouseEvent&)
 {
     createPopupMenu();
 }
 
-void MidiChannelComponent::mouseEnter (const MouseEvent& event)
+void MidiChannelComponent::mouseEnter (const MouseEvent&)
 {
     highlighted = true;
     repaint();
 }
 
-void MidiChannelComponent::mouseExit (const MouseEvent& event)
+void MidiChannelComponent::mouseExit (const MouseEvent&)
 {
     highlighted = false;
     repaint();

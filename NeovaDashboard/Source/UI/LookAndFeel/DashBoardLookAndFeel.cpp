@@ -146,8 +146,6 @@ void DashBoardLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int widt
         auto isTwoVal   = (style == Slider::SliderStyle::TwoValueVertical   || style == Slider::SliderStyle::TwoValueHorizontal);
         auto isThreeVal = (style == Slider::SliderStyle::ThreeValueVertical || style == Slider::SliderStyle::ThreeValueHorizontal);
 
-        auto trackWidth = jmin (6.0f, slider.isHorizontal() ? height * 0.25f : width * 0.25f);
-
         juce::Point<float> startPoint (slider.isHorizontal() ? x : x + width * 0.5f,
                                  slider.isHorizontal() ? y + height * 0.5f : height + y);
 
@@ -158,8 +156,7 @@ void DashBoardLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int widt
         backgroundTrack.startNewSubPath (startPoint);
         backgroundTrack.lineTo (endPoint);
         g.setColour (slider.findColour (Slider::backgroundColourId));
-        g.strokePath (backgroundTrack, {  12.0f //Old: trackWidth
-                                          , PathStrokeType::curved, PathStrokeType::rounded }); // changed track width
+        g.strokePath (backgroundTrack, { 12.0f, PathStrokeType::curved, PathStrokeType::rounded }); // changed track width
 
         Path valueTrack;
         juce::Point<float> minPoint, maxPoint, thumbPoint;
@@ -190,8 +187,7 @@ void DashBoardLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int widt
         valueTrack.startNewSubPath (minPoint);
         valueTrack.lineTo (isThreeVal ? thumbPoint : maxPoint);
         g.setColour (slider.findColour (Slider::trackColourId));
-        g.strokePath(valueTrack, { 6.0f //Old: trackWidth
-                                   , PathStrokeType::curved, PathStrokeType::rounded });
+        g.strokePath (valueTrack, { 6.0f, PathStrokeType::curved, PathStrokeType::rounded });
         
 
         if (! isTwoVal)

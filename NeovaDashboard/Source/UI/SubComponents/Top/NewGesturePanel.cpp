@@ -159,10 +159,10 @@ void NewGesturePanel::createNewGesture()
     updateInterface();
 }
 
-void NewGesturePanel::labelTextChanged (Label* lbl)
+void NewGesturePanel::labelTextChanged (Label*)
 {
 }
-void NewGesturePanel::editorShown (Label* lbl, TextEditor& ed)
+void NewGesturePanel::editorShown (Label*, TextEditor&)
 {
 }
 
@@ -325,12 +325,12 @@ void NewGesturePanel::GestureTypeSelector::resized()
 {
 }
 
-void NewGesturePanel::GestureTypeSelector::mouseEnter (const MouseEvent &event)
+void NewGesturePanel::GestureTypeSelector::mouseEnter (const MouseEvent &)
 {
     setHighlighted (true);
     repaint();
 }
-void NewGesturePanel::GestureTypeSelector::mouseExit (const MouseEvent &event)
+void NewGesturePanel::GestureTypeSelector::mouseExit (const MouseEvent &)
 {
     setHighlighted (false);
     repaint();

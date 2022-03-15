@@ -56,7 +56,7 @@ void DashUpdater::checkForNewAvailableVersion()
     }
 }
 
-void DashUpdater::finished (URL::DownloadTask* task, bool success)
+void DashUpdater::finished (URL::DownloadTask*, bool success)
 {
     state = downloadFinished;
     successful = success;
@@ -69,7 +69,7 @@ void DashUpdater::finished (URL::DownloadTask* task, bool success)
 	DBG ("Download finished " << (successful ? "Successfully" : "Unsuccessfully"));
 }
 
-void DashUpdater::progress (URL::DownloadTask* task,
+void DashUpdater::progress (URL::DownloadTask*,
                             int64 bytesDownloaded,
                             int64 totalLength )
 {

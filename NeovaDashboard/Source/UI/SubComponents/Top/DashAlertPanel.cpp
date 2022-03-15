@@ -179,6 +179,5 @@ DashAlertPanel* DashAlertPanel::createSpecificAlertPanel (SpecificReturnValue pa
                                        0,
                                        false,
                                        "Ok");
-            return nullptr;
     }
 }

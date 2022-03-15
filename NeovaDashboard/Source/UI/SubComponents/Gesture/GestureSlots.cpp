@@ -112,15 +112,15 @@ void GestureComponent::resized()
                                      .withSizeKeepingCentre (18, 18));
 }
 
-void GestureComponent::mouseEnter (const MouseEvent &event)
+void GestureComponent::mouseEnter (const MouseEvent&)
 {
     setHighlighted (true);
 }
-void GestureComponent::mouseExit (const MouseEvent &event)
+void GestureComponent::mouseExit (const MouseEvent&)
 {
     setHighlighted (false);
 }
-void GestureComponent::mouseDrag (const MouseEvent &event)
+void GestureComponent::mouseDrag (const MouseEvent&)
 {
 }
 
@@ -321,16 +321,16 @@ void EmptyGestureSlotComponent::resized()
 {
 }
 
-void EmptyGestureSlotComponent::mouseEnter (const MouseEvent &event)
+void EmptyGestureSlotComponent::mouseEnter (const MouseEvent&)
 {
     highlighted = true;
     repaint();
 }
-void EmptyGestureSlotComponent::mouseExit (const MouseEvent &event)
+void EmptyGestureSlotComponent::mouseExit (const MouseEvent&)
 {
     highlighted = false;
     repaint();
 }
-void EmptyGestureSlotComponent::mouseDrag (const MouseEvent &event)
+void EmptyGestureSlotComponent::mouseDrag (const MouseEvent&)
 {
 }
