@@ -82,7 +82,7 @@ void MidiChannelComponent::update()
 void MidiChannelComponent::createPopupMenu()
 {
     PopupMenu channelsMenu;
-    const uint16_t midiChannels = hubConfig.getMidiChannels (isInput);
+    const auto midiChannels = static_cast<uint16_t>(hubConfig.getMidiChannels (isInput));
 
     if(firstInit && !isInput)
 		listMidiOut.clear();
@@ -160,7 +160,7 @@ void MidiChannelComponent::handleMenuResult (const int menuResult)
 				if (exist) // deselect
 				{
 					hubConfig.toggleMidiChannel (menuResult - 1, isInput);
-					listMidiOut.remove (index);
+					listMidiOut.remove (static_cast<int>(index));
 				}
 				else // select and remove the oldest
 				{
@@ -183,7 +183,7 @@ void MidiChannelComponent::handleMenuResult (const int menuResult)
 					else
 					{
 						hubConfig.toggleMidiChannel (menuResult - 1, isInput);
-						listMidiOut.remove (index);
+						listMidiOut.remove (static_cast<int>(index));
 					}
 				}
 				else // select

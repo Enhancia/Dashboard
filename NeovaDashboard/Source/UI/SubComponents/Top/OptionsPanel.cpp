@@ -652,8 +652,9 @@ void UpdateAndUpgradePanel::paint (Graphics& g)
     paintSoftwareArea (g);
 
     g.setColour (neova_dash::colour::subText);
-    g.drawVerticalLine (softwareArea.getX(), getHeight() * 1.0 / 8,
-                                             getHeight() * 6.0 / 8);
+    g.drawVerticalLine (softwareArea.getX (),
+        static_cast<float>(getHeight () * 1.0f / 8.0f),
+        static_cast<float>(getHeight () * 6.0f / 8.0f));
 }
 
 void UpdateAndUpgradePanel::paintFirmwareArea (Graphics& g)

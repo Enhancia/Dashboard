@@ -336,7 +336,7 @@ void BugReportPanel::sendTicketAndUpdate()
 	updateComponentsForSpecificStep (reportSentOk);
 }
 
-URL BugReportPanel::createURLForTicket (const String& boundary)
+URL BugReportPanel::createURLForTicket (const String&)
 {
     URL happyFoxURL;
     happyFoxURL = happyFoxURL.withNewDomainAndPath ("https://enhancia.happyfox.com/api/1.1/json/tickets/");

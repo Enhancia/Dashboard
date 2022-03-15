@@ -104,8 +104,8 @@ void UploadButton::paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted,
 	// Upload Path Draw
 	Path uploadPath = neova_dash::path::createPath (neova_dash::path::upload);
 	textArea = textArea.withSizeKeepingCentre (textArea.getWidth(), 16);
-	uploadPath.scaleToFit (textArea.getX(), textArea.getY(),
-                           textArea.getWidth(), textArea.getHeight(), true);
+	uploadPath.scaleToFit (static_cast<float>(textArea.getX()), static_cast<float>(textArea.getY()),
+                           static_cast<float>(textArea.getWidth()), static_cast<float>(textArea.getHeight()), true);
 
   	g.fillPath (uploadPath);
 

@@ -71,12 +71,12 @@ void GestureComponent::paint (Graphics& g)
 		                (hubConfig.getGestureData (draggedGesture).type,
                          hubConfig.isGestureActive (draggedGesture)));
 
-        g.drawRoundedRectangle (getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 3.0f);
+        g.drawRoundedRectangle (getLocalBounds().reduced (1).toFloat(), 10.0f, 3.0f);
     }
     else if (selected)
     {
         g.setColour (neova_dash::gesture::getHighlightColour (type, hubConfig.isGestureActive (id)));
-        g.drawRoundedRectangle (getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 1.0f);
+        g.drawRoundedRectangle (getLocalBounds().reduced (1).toFloat(), 10.0f, 1.0f);
     }
 
     auto area = getLocalBounds().withTrimmedTop (30);

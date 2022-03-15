@@ -100,7 +100,7 @@ void MidiPanel::labelTextChanged (Label* lbl)
         }
 
         lbl->setText (String(val), dontSendNotification);
-        hubConfig.setUint8Value (id, HubConfiguration::cc, val);
+        hubConfig.setUint8Value (id, HubConfiguration::cc, static_cast<uint8>(val));
 
         if (auto* gestPanel = getParentComponent()->getParentComponent())
         	gestPanel->repaint();
@@ -116,7 +116,7 @@ void MidiPanel::comboBoxChanged (ComboBox* box)
 {
     if (box == midiTypeBox.get())
     {
-        hubConfig.setUint8Value (id, HubConfiguration::midiType, midiTypeBox->getSelectedId()-1);
+        hubConfig.setUint8Value (id, HubConfiguration::midiType, static_cast<uint8>(midiTypeBox->getSelectedId () - 1));
 
         if (auto* gestPanel = getParentComponent()->getParentComponent())
             gestPanel->repaint();
@@ -657,20 +657,20 @@ void MidiRangeTuner::createSliders()
         slider.addListener (this);
     };
 
-    setSliderSettings (*lowSlider, (double) getRangeLow());
-    setSliderSettings (*highSlider, (double) getRangeHigh());
+    setSliderSettings (*lowSlider, getRangeLow());
+    setSliderSettings (*highSlider, getRangeHigh());
 }
 
 float MidiRangeTuner::getThumbX (DraggableObject thumb)
 {
     if (thumb == lowThumb)
     {
-        return lowSlider->getX() + 11.5f + (lowSlider->getWidth() - 23.0f) * lowSlider->getValue()/127.0f;
+        return static_cast<float>(lowSlider->getX() + 11.5f + (lowSlider->getWidth() - 23.0f) * lowSlider->getValue()/127.0f);
     }
 
     if (thumb == highThumb)
     {
-        return highSlider->getX() + 11.5f + (highSlider->getWidth() - 23.0f) * highSlider->getValue()/127.0f;
+        return static_cast<float>(highSlider->getX() + 11.5f + (highSlider->getWidth() - 23.0f) * highSlider->getValue()/127.0f);
     }
 
     return -1.0f;

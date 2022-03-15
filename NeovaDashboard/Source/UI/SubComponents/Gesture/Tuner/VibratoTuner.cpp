@@ -325,26 +325,26 @@ void VibratoTuner::updateLabelBounds (Label* labelToUpdate)
 {
 	if (labelToUpdate == gainLabel.get())
 	{
-		float angle = gainSlider->getRotaryParameters().startAngleRadians
+		float angle = static_cast<float>(gainSlider->getRotaryParameters().startAngleRadians
 		                  + ((gainSlider->getValue() - gainSlider->getMinimum())
 							     / gainSlider->getRange().getLength())
                              *std::abs (gainSlider->getRotaryParameters().endAngleRadians
-                             	- gainSlider->getRotaryParameters().startAngleRadians);
+                             	- gainSlider->getRotaryParameters().startAngleRadians));
 
         // Slider radius with a 10-pixels offset
         float radius = (jmin (gainSlider->getWidth(), gainSlider->getHeight()) - 10.0f) / 2.0f
         				   + 10.0f;
 
-		labelToUpdate->setCentrePosition (gainSlider->getBounds().getCentreX()
-											 + radius * std::cos (angle - MathConstants<float>::halfPi),
-                                          gainSlider->getBounds().getCentreY()
-                                          	 + radius * std::sin (angle - MathConstants<float>::halfPi));
+		labelToUpdate->setCentrePosition (static_cast<int>(gainSlider->getBounds().getCentreX()
+											 + radius * std::cos (angle - MathConstants<float>::halfPi)),
+                                          static_cast<int>(gainSlider->getBounds().getCentreY()
+                                          	 + radius * std::sin (angle - MathConstants<float>::halfPi)));
 	}
 	else if (labelToUpdate == thresholdLabel.get())
 	{
 		labelToUpdate->setCentrePosition (thresholdSlider->getBounds().getCentreX() - 25,
-										  thresholdSlider->getBottom() - 10
-			                                  - static_cast<int>(thresholdSlider->valueToProportionOfLength(thresholdSlider->getValue())
+										  static_cast<int>(thresholdSlider->getBottom() - 10
+			                                  - thresholdSlider->valueToProportionOfLength(thresholdSlider->getValue())
                                               * (thresholdSlider->getHeight() - 20)));
 	}
 }
@@ -376,8 +376,8 @@ void VibratoTuner::drawValueCursor (Graphics& g)
 	float convertedValue = gestureRange.convertTo0to1 (value);
 
 	int offset = (intensity < getThreshold()) ? 0
-	                                          : (convertedValue - 0.5f) * (gainSlider->getWidth() - 30)
-	                                                                    * ((int) getGain())/50;
+	                                          : static_cast<int>((convertedValue - 0.5f) * (gainSlider->getWidth() - 30)
+	                                                                    * (getGain())/50);
 
 	juce::Point<int> cursorPoint = {gainSlider->getBounds().getCentreX() + offset,
 							  gainSlider->getBounds().getCentreY()};
@@ -390,10 +390,11 @@ void VibratoTuner::drawIntensityCursor (Graphics& g)
 {
 	lastIntensity = intensity;
 
-    juce::Point<float> cursorPoint (thresholdSlider->getBounds().getCentreX() - 10,
-                              jmax (thresholdSlider->getBottom() - 10 - (thresholdSlider->getHeight() - 20)
-                              											    * smoothIntensity/maxIntensity,
-                              		(float) (thresholdSlider->getY() + 10)));
+    juce::Point<float> cursorPoint (
+        static_cast<float>(thresholdSlider->getBounds ().getCentreX () - 10),
+        static_cast<float>(jmax (thresholdSlider->getBottom () - 10 - (thresholdSlider->getHeight () - 20) * smoothIntensity / maxIntensity,
+            static_cast<float>(thresholdSlider->getY () + 10)))
+    );
 
 	Path cursorPath;
     cursorPath.addTriangle ({cursorPoint.x - 3.0f, cursorPoint.y - 3.0f},

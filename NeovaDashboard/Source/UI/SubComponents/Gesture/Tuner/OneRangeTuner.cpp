@@ -735,8 +735,8 @@ void OneRangeTuner::updateLabelBounds (Label* labelToUpdate)
         auto radius = sliderRadius + 15;
         auto angle = getThumbAngleRadians (lowThumb);
 
-        rangeLabelMin->setCentrePosition (sliderCentre.x + radius * std::cos (angle - MathConstants<float>::halfPi),
-                                          sliderCentre.y + radius * std::sin (angle - MathConstants<float>::halfPi));
+        rangeLabelMin->setCentrePosition (static_cast<int>(sliderCentre.x + radius * std::cos (angle - MathConstants<float>::halfPi)),
+                                          static_cast<int>(sliderCentre.y + radius * std::sin (angle - MathConstants<float>::halfPi)));
 
     }
     else if (labelToUpdate == rangeLabelMax.get())
@@ -744,8 +744,8 @@ void OneRangeTuner::updateLabelBounds (Label* labelToUpdate)
         auto radius = sliderRadius + 15;
         auto angle = getThumbAngleRadians (highThumb);
 
-        rangeLabelMax->setCentrePosition (sliderCentre.x + radius * std::cos (angle - MathConstants<float>::halfPi),
-                                          sliderCentre.y + radius * std::sin (angle - MathConstants<float>::halfPi));
+        rangeLabelMax->setCentrePosition (static_cast<int>(sliderCentre.x + radius * std::cos (angle - MathConstants<float>::halfPi)),
+                                          static_cast<int>(sliderCentre.y + radius * std::sin (angle - MathConstants<float>::halfPi)));
     }
 }
 
