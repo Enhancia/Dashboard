@@ -258,7 +258,7 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
 {
     Path outline, plusIcon;
 
-    outline.addRoundedRectangle (getLocalBounds().reduced (1.0f), 10.0f);
+    outline.addRoundedRectangle (getLocalBounds().reduced (1), 10.0f);
 
     plusIcon.startNewSubPath ({getWidth()/2.0f - 10.0f, getHeight()/2.0f});
     plusIcon.lineTo          ({getWidth()/2.0f + 10.0f, getHeight()/2.0f});

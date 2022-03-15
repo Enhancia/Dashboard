@@ -95,11 +95,11 @@ void MidiChannelComponent::createPopupMenu()
 			channelsMenu.addItem (channelNum + 1, String (channelNum + 1), true, false);
 		} else
 		{
-			channelsMenu.addItem (channelNum + 1, String (channelNum + 1), true, midiChannels >> channelNum & 1 == 1);
+			channelsMenu.addItem (channelNum + 1, String (channelNum + 1), true, midiChannels >> channelNum & true);
 		}
 
 		// fill saved configuration
-        if(midiChannels >> channelNum & 1 == 1)
+        if(midiChannels >> channelNum & true)
         {
             if(firstInit && !isInput)
             {
