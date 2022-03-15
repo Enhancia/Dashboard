@@ -48,8 +48,8 @@ void OneRangeTuner::paint (Graphics& g)
     g.setFont (neova_dash::font::dashFontLight.withHeight (13.0f).withExtraKerningFactor (0.08f));
     juce::Rectangle<int> textRect (100, 50);
     textRect.setCentre ({getLocalBounds().getCentreX(),
-                         sliderBounds.getCentreY() + int (jmin (sliderBounds.getWidth()/4.0f,
-                                                                sliderBounds.getHeight()/4.0f))});
+                         sliderBounds.getCentreY() + static_cast<int>(jmin(sliderBounds.getWidth() / 4.0f,
+                                                                           sliderBounds.getHeight() / 4.0f))});
 
     g.drawText ("RANGE", textRect, Justification::centredTop);
 }
@@ -73,25 +73,25 @@ void OneRangeTuner::resizeSliders()
     {
         case wave:
             sliderRadius = jmin (sliderBounds.getWidth()/2.0f, sliderBounds.getHeight()/2.0f);
-            sliderCentre = {getLocalBounds().getCentreX() - (int) sliderRadius/2,
+            sliderCentre = {getLocalBounds().getCentreX() - static_cast<int>(sliderRadius)/2,
                             sliderBounds.getCentreY()};
             break;
 
         case tilt:
             sliderRadius = jmin (sliderBounds.getWidth()*2/3.0f, sliderBounds.getHeight()*2/3.0f);
-            sliderCentre = {getLocalBounds().getCentreX() + (int) sliderRadius/2,
-                            sliderBounds.getCentreY() + (int) sliderRadius/2};
+            sliderCentre = {getLocalBounds().getCentreX() + static_cast<int>(sliderRadius)/2,
+                            sliderBounds.getCentreY() + static_cast<int>(sliderRadius)/2};
             break;
 
         case roll:
             sliderRadius = jmin (sliderBounds.getWidth()/2.0f, sliderBounds.getHeight()/2.0f);
             sliderCentre = {getLocalBounds().getCentreX(),
-                            sliderBounds.getCentreY() + (int) sliderRadius/2};
+                            sliderBounds.getCentreY() + static_cast<int>(sliderRadius)/2};
             break;
     }
 
-    juce::Rectangle<int> adjustedBounds = sliderBounds.withWidth (sliderRadius*2)
-                                                      .withHeight (sliderRadius*2)
+    juce::Rectangle<int> adjustedBounds = sliderBounds.withWidth (static_cast<int>(sliderRadius)*2)
+                                                      .withHeight (static_cast<int>(sliderRadius)*2)
                                                       .expanded (10)
                                                       .withCentre (sliderCentre);
 
@@ -116,23 +116,23 @@ void OneRangeTuner::updateComponents()
     // Sets slider value
     if (lowSlider->getThumbBeingDragged() == -1)
     {
-        lowSlider->setValue (double (getRangeLow()), dontSendNotification);
+        lowSlider->setValue (static_cast<double>(getRangeLow()), dontSendNotification);
     }
 
     if (highSlider->getThumbBeingDragged() == -1)
     {
-        highSlider->setValue (double (getRangeHigh()), dontSendNotification);
+        highSlider->setValue (static_cast<double>(getRangeHigh()), dontSendNotification);
     }
     
     // Sets label text
     if (!(rangeLabelMin->isBeingEdited()))
     {
-        rangeLabelMin->setText (String (int (getRangeLow())) + valueUnit, dontSendNotification);
+        rangeLabelMin->setText (String (static_cast<int>(getRangeLow())) + valueUnit, dontSendNotification);
     }
       
     if (!(rangeLabelMax->isBeingEdited()))
     {
-        rangeLabelMax->setText (String (int (getRangeHigh())) + valueUnit, dontSendNotification);
+        rangeLabelMax->setText (String (static_cast<int>(getRangeHigh())) + valueUnit, dontSendNotification);
     }
     
 }
@@ -205,8 +205,8 @@ void OneRangeTuner::labelTextChanged (Label* lbl)
     // checks that the string is numbers only (and unit)
     if (lbl->getText().containsOnly ("-0123456789"+valueUnit) == false)
     {
-        if (lbl == rangeLabelMin.get())       lbl->setText (String (int (getRangeLow())) + valueUnit, dontSendNotification);
-        else if (lbl == rangeLabelMax.get())  lbl->setText (String (int (getRangeHigh())) + valueUnit, dontSendNotification);
+        if (lbl == rangeLabelMin.get())       lbl->setText (String (static_cast<int>(getRangeLow())) + valueUnit, dontSendNotification);
+        else if (lbl == rangeLabelMax.get())  lbl->setText (String (static_cast<int>(getRangeHigh())) + valueUnit, dontSendNotification);
 
         return;
     }
@@ -228,10 +228,10 @@ void OneRangeTuner::labelTextChanged (Label* lbl)
         if ( val > getRangeHigh()) val = getRangeHigh();
             
         lowSlider->setValue (val, sendNotification);
-    	setRangeLow (float (lowSlider->getValue()), false);
-    	setRangeHigh (float (highSlider->getValue()));
+    	setRangeLow (static_cast<float>(lowSlider->getValue()), false);
+    	setRangeHigh (static_cast<float>(highSlider->getValue()));
         updateLabelBounds (rangeLabelMin.get());
-        lbl->setText (String (int (getRangeLow())) + valueUnit, dontSendNotification);
+        lbl->setText (String (static_cast<int>(getRangeLow())) + valueUnit, dontSendNotification);
     }
     
     else if (lbl == rangeLabelMax.get())
@@ -239,10 +239,10 @@ void OneRangeTuner::labelTextChanged (Label* lbl)
         if ( val < getRangeLow()) val = getRangeLow();
             
         highSlider->setValue (val, sendNotification);
-    	setRangeLow (float (lowSlider->getValue()), false);
-    	setRangeHigh (float (highSlider->getValue()));
+    	setRangeLow (static_cast<float>(lowSlider->getValue()), false);
+    	setRangeHigh (static_cast<float>(highSlider->getValue()));
         updateLabelBounds (rangeLabelMax.get());
-        lbl->setText (String (int (getRangeHigh())) + valueUnit, dontSendNotification);
+        lbl->setText (String (static_cast<int>(getRangeHigh())) + valueUnit, dontSendNotification);
     }
 }
 
@@ -264,14 +264,14 @@ void OneRangeTuner::sliderValueChanged (Slider* sldr)
     {
         // min value changed by user
         updateLabelBounds (rangeLabelMin.get());
-        rangeLabelMin->setText (String (int (sldr->getValue())) + valueUnit, dontSendNotification);
+        rangeLabelMin->setText (String (static_cast<int>(sldr->getValue())) + valueUnit, dontSendNotification);
         
         // in case the other thumb is dragged along..
         if (highSlider->getThumbBeingDragged() == -1 && lowSlider->getValue() > highSlider->getValue())
         {
             highSlider->setValue (sldr->getValue(), dontSendNotification);
             updateLabelBounds (rangeLabelMax.get());
-            rangeLabelMax->setText (String (float (sldr->getValue())) + valueUnit, dontSendNotification);
+            rangeLabelMax->setText (String (static_cast<float>(sldr->getValue())) + valueUnit, dontSendNotification);
         }
     }
 
@@ -279,14 +279,14 @@ void OneRangeTuner::sliderValueChanged (Slider* sldr)
     else if (sldr == highSlider.get())
     {
         updateLabelBounds (rangeLabelMax.get());
-        rangeLabelMax->setText (String (int (sldr->getValue())) + valueUnit, dontSendNotification);
+        rangeLabelMax->setText (String (static_cast<int>(sldr->getValue())) + valueUnit, dontSendNotification);
         
         // in case the other thumb is dragged along..
         if (lowSlider->getThumbBeingDragged() == -1 && lowSlider->getValue() > highSlider->getValue())
         {
             lowSlider->setValue (sldr->getValue(), dontSendNotification);
             updateLabelBounds (rangeLabelMin.get());
-            rangeLabelMin->setText (String (float (sldr->getValue())) + valueUnit, dontSendNotification);
+            rangeLabelMin->setText (String (static_cast<float>(sldr->getValue())) + valueUnit, dontSendNotification);
         }
     }
 }
@@ -298,11 +298,11 @@ void OneRangeTuner::buttonClicked (Button* bttn)
         if (value > getRangeHigh())
         {
             highSlider->setValue (value, sendNotification);
-            setRangeHigh (float (highSlider->getValue()));
+            setRangeHigh (static_cast<float>(highSlider->getValue()));
         }
 
         lowSlider->setValue (value, sendNotification);
-        setRangeLow (float (lowSlider->getValue()));
+        setRangeLow (static_cast<float>(lowSlider->getValue()));
     }
 
     else if (bttn == maxAngleButton.get())
@@ -310,11 +310,11 @@ void OneRangeTuner::buttonClicked (Button* bttn)
         if (value < getRangeLow())
         {
             lowSlider->setValue (value, sendNotification);
-            setRangeLow (float (lowSlider->getValue()));
+            setRangeLow (static_cast<float>(lowSlider->getValue()));
         }
 
         highSlider->setValue (value, sendNotification);
-        setRangeHigh (float (highSlider->getValue()));
+        setRangeHigh (static_cast<float>(highSlider->getValue()));
     }
 }
 
@@ -454,8 +454,8 @@ void OneRangeTuner::mouseUp (const MouseEvent& e)
 
     if (objectBeingDragged != none)
     {
-    	setRangeLow (float (lowSlider->getValue()), false);
-    	setRangeHigh (float (highSlider->getValue()));
+    	setRangeLow (static_cast<float>(lowSlider->getValue()), false);
+    	setRangeHigh (static_cast<float>(highSlider->getValue()));
         rangeLabelMin->setVisible (false);
         rangeLabelMax->setVisible (false);
         objectBeingDragged = none;
@@ -467,12 +467,6 @@ void OneRangeTuner::mouseUp (const MouseEvent& e)
 MouseCursor OneRangeTuner::getMouseCursor()
 {
     return MouseCursor::NormalCursor;
-
-    switch (objectBeingDragged)
-    {
-        case (none): return MouseCursor::NormalCursor; break;
-        default: return MouseCursor::NoCursor;
-    }
 }
 
 void OneRangeTuner::createSliders()
@@ -488,8 +482,8 @@ void OneRangeTuner::createSliders()
         slider.setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
         slider.setColour (Slider::rotarySliderFillColourId, Colour (0x00000000));
         slider.setColour (Slider::rotarySliderOutlineColourId, Colour (0x00000000));
-        slider.setRange (double (parameterMax.getStart()), double (parameterMax.getEnd()), 1.0);
-        slider.setValue (double (valueToSet));
+        slider.setRange (static_cast<double>(parameterMax.getStart()), static_cast<double>(parameterMax.getEnd()), 1.0);
+        slider.setValue (static_cast<double>(valueToSet));
         slider.addListener (this);
         slider.setInterceptsMouseClicks (false, false);
 	};
@@ -500,8 +494,8 @@ void OneRangeTuner::createSliders()
     
 void OneRangeTuner::createLabels()
 {
-    addAndMakeVisible (*(rangeLabelMin = std::make_unique<Label> ("Min Label", TRANS (String(int(getRangeLow())) + valueUnit))));
-    addAndMakeVisible (*(rangeLabelMax = std::make_unique<Label> ("Max Label", TRANS (String(int(getRangeHigh())) + valueUnit))));
+    addAndMakeVisible (*(rangeLabelMin = std::make_unique<Label> ("Min Label", TRANS (String(static_cast<int>(getRangeLow())) + valueUnit))));
+    addAndMakeVisible (*(rangeLabelMax = std::make_unique<Label> ("Max Label", TRANS (String(static_cast<int>(getRangeHigh())) + valueUnit))));
 
     auto setLabelSettings = [this] (Label& label)
     {
@@ -669,8 +663,8 @@ void OneRangeTuner::drawTunerSliderBackground (Graphics& g)
     auto arcRadius = sliderRadius - lineW * 0.5f;
 
     Path backgroundArc;
-    backgroundArc.addCentredArc (sliderCentre.x,
-                                 sliderCentre.y,
+    backgroundArc.addCentredArc (static_cast<float>(sliderCentre.x),
+                                 static_cast<float>(sliderCentre.y),
                                  arcRadius,
                                  arcRadius,
                                  0.0f,
@@ -684,13 +678,13 @@ void OneRangeTuner::drawTunerSliderBackground (Graphics& g)
     if (isEnabled())
     {
         Path valueArc;
-        valueArc.addCentredArc (sliderCentre.x,
-                                sliderCentre.y,
+        valueArc.addCentredArc (static_cast<float>(sliderCentre.x),
+                                static_cast<float>(sliderCentre.y),
                                 arcRadius,
                                 arcRadius,
                                 0.0f,
-                                lowAngle,
-                                highAngle,
+                                static_cast<float>(lowAngle),
+                                static_cast<float>(highAngle),
                                 true);
 
         g.setColour (fill);
@@ -701,8 +695,8 @@ void OneRangeTuner::drawTunerSliderBackground (Graphics& g)
     {
         auto angle = getThumbAngleRadians (objectBeingDragged);
 
-        juce::Point<float> thumbPoint (sliderCentre.x + arcRadius * std::cos (angle - MathConstants<float>::halfPi),
-                                 sliderCentre.y + arcRadius * std::sin (angle - MathConstants<float>::halfPi));
+        juce::Point<float> thumbPoint (static_cast<float>(sliderCentre.x) + arcRadius * std::cos (static_cast<float>(angle) - MathConstants<float>::halfPi),
+                                 static_cast<float>(sliderCentre.y) + arcRadius * std::sin (static_cast<float>(angle) - MathConstants<float>::halfPi));
 
         g.setColour (fill.withAlpha (0.6f));
         /*g.setGradientFill (ColourGradient (fill.withAlpha (0.9f),
@@ -724,8 +718,8 @@ void OneRangeTuner::drawTunerSliderBackground (Graphics& g)
         else
             angle = getThumbAngleRadians (lowThumb);
 
-        juce::Point<float> thumbPoint (sliderCentre.x + arcRadius * std::cos (angle - MathConstants<float>::halfPi),
-            sliderCentre.y + arcRadius * std::sin (angle - MathConstants<float>::halfPi));
+        juce::Point<float> thumbPoint (static_cast<float>(sliderCentre.x) + arcRadius * std::cos (static_cast<float>(angle) - MathConstants<float>::halfPi),
+            static_cast<float>(sliderCentre.y) + arcRadius * std::sin (static_cast<float>(angle) - MathConstants<float>::halfPi));
 
         g.setColour (fill.withAlpha (0.3f));
         g.fillEllipse (juce::Rectangle<float> (25.0f, 25.0f).withCentre (thumbPoint));
@@ -826,13 +820,13 @@ void OneRangeTuner::drawThumbsAndToleranceLines (Graphics& g)
                          / (lowSlider->getRange().getLength() * 5);
 
     g.setColour (Colour (0xffdedeff));
-    drawLineFromSliderCentre (g, getThumbAngleRadians (lowThumb));
-    drawLineFromSliderCentre (g, getThumbAngleRadians (highThumb));
+    drawLineFromSliderCentre (g, static_cast<float>(getThumbAngleRadians(lowThumb)));
+    drawLineFromSliderCentre (g, static_cast<float>(getThumbAngleRadians(highThumb)));
 
     g.setColour (Colour (0xff903030));
     bool invertTolerance = startAngle > endAngle;
-    drawLineFromSliderCentre (g, getThumbAngleRadians (lowThumb) + (invertTolerance ? -tolerance
-                                                                                    : tolerance));
-    drawLineFromSliderCentre (g, getThumbAngleRadians (highThumb) + (invertTolerance ? tolerance
-                                                                                     : -tolerance));
+    drawLineFromSliderCentre (g, static_cast<float>(getThumbAngleRadians(lowThumb)) + static_cast<float>((invertTolerance ? -tolerance
+                                  : tolerance)));
+    drawLineFromSliderCentre (g, static_cast<float>(getThumbAngleRadians(highThumb)) + static_cast<float>((invertTolerance ? tolerance
+                                  : -tolerance)));
 }
