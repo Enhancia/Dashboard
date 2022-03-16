@@ -37,10 +37,6 @@ void FirmUpgradePanel::paint (Graphics& g)
     	g.drawFittedText ("Do not disconnect Neova during the upgrade.\n\nPlease keep your ring charging during the process.", panelArea.reduced (neova_dash::ui::MARGIN),
     				Justification::centredBottom, 3);
     }
-
-	if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
-		grabKeyboardFocus ();
-	}
 }
 
 void FirmUpgradePanel::resized()
@@ -167,6 +163,9 @@ void FirmUpgradePanel::setAndOpenPanel()
 	currentUpgrade = none;
 	updateComponentsForSpecificState (checkingReleases);
 	setVisible (true);
+    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+        grabKeyboardFocus ();
+    }
 }
 
 void FirmUpgradePanel::closeAndResetPanel()

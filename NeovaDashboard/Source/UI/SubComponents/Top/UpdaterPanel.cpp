@@ -157,6 +157,9 @@ void UpdaterPanel::resetAndOpenPanel (bool updateIsRequired)
                                                                                              : noDownloadAvailable);
 
         setVisible (true);
+        if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+            grabKeyboardFocus ();
+        }
     }
 }
 

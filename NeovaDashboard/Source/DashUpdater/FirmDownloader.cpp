@@ -218,9 +218,13 @@ var FirmDownloader::fetchRepoJSON()
 {
     // Creating input stream to get file link
     int status;
-    std::unique_ptr<InputStream> urlInStream (REPO_URL.createInputStream (false, nullptr, nullptr,
-                                                                         "Authorization: token " + neova_dash::auth::MACHINE_TOKEN,
-                                                                         1000, nullptr, &status));
+    const std::unique_ptr<InputStream> urlInStream (REPO_URL.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+        .withProgressCallback (nullptr)
+        .withExtraHeaders ("Authorization: token " + neova_dash::auth::MACHINE_TOKEN)
+        .withConnectionTimeoutMs (1000)
+        .withResponseHeaders (nullptr)
+        .withStatusCode (&status)
+    ));
 
     if (urlInStream == nullptr || status != 200)
     {

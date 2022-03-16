@@ -67,9 +67,6 @@ void OptionsPanel::paint (Graphics& g)
 
     paintProductInformations (g, area.removeFromTop (area.getHeight()/3).reduced (neova_dash::ui::MARGIN));
 
-    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
-        grabKeyboardFocus ();
-    }
 }
 
 void OptionsPanel::resized()

@@ -58,10 +58,6 @@ void BugReportPanel::paint (Graphics& g)
 	    					  Justification::centred, 3);
     	}
     }
-
-    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
-        grabKeyboardFocus ();
-    }
 }
 
 void BugReportPanel::resized()
@@ -151,6 +147,9 @@ void BugReportPanel::resetAndOpenPanel()
 {
 	updateComponentsForSpecificStep (newReport);
 	setVisible (true);
+    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+        grabKeyboardFocus ();
+    }
 }
 
 void BugReportPanel::closeAndResetPanel()
@@ -299,15 +298,15 @@ void BugReportPanel::sendTicketAndUpdate()
     int statusCode;
     StringPairArray responseHeaders;
 
-    std::unique_ptr<InputStream> webStream (ticketURL.createInputStream (true,
-                                                                           nullptr,
-                                                                           nullptr,
-                                                                           headers,
-                                                                           10000,
-                                                                           &responseHeaders,
-                                                                           &statusCode,
-                                                                           5,
-                                                                           "POST"));
+    const std::unique_ptr<InputStream> webStream (ticketURL.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+        .withProgressCallback (nullptr)
+        .withExtraHeaders (headers)
+        .withConnectionTimeoutMs (10000)
+        .withResponseHeaders (&responseHeaders)
+        .withStatusCode (&statusCode)
+        .withNumRedirectsToFollow (5)
+        .withHttpRequestCmd("POST")
+    ));
 
 
     if (webStream == nullptr)
