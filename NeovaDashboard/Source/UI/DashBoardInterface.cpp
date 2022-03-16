@@ -451,7 +451,7 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
         }
     }
 
-    return false;
+    return true;
 }
 
 //==============================================================================
