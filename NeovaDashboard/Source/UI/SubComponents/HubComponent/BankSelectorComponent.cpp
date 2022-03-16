@@ -91,7 +91,7 @@ void BankSelectorComponent::menuCallback (int result, BankSelectorComponent* bsC
     }
 }
 
-void BankSelectorComponent::handleMenuResult (const int menuResult)
+void BankSelectorComponent::handleMenuResult (const int menuResult) const
 {
     switch (menuResult)
     {

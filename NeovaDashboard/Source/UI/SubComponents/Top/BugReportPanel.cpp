@@ -12,7 +12,7 @@
 
 //==============================================================================
 BugReportPanel::BugReportPanel (ApplicationCommandManager& manager)
-	: commandManager (manager), credentials (Base64::toBase64 (key + String(":") + code))
+	: credentials (Base64::toBase64 (key + String(":") + code)), commandManager (manager)
 {
     createLabels();
     createButtons();
@@ -71,16 +71,16 @@ void BugReportPanel::resized()
     closeButton->setBounds (juce::Rectangle<int> (25, 25).withRightX (panelArea.getRight() - MARGIN_SMALL)
                                                          .withY (panelArea.getY() + MARGIN_SMALL));
     #elif JUCE_MAC
-    closeButton->setBounds (juce::Rectangle<int> (25, 25).withPosition (panelArea.getTopLeft()
+    closeButton->setBounds (juce::juce::Rectangle<int> (25, 25).withPosition (panelArea.getTopLeft()
     																			 .translated (MARGIN_SMALL,
     																			   			  MARGIN_SMALL)));
     #endif
 
-    auto area = panelArea.reduced (neova_dash::ui::MARGIN);
+    auto area = panelArea.reduced (MARGIN);
 
     titleLabel->setBounds (area.removeFromTop (area.getHeight()/6));
 
-    auto buttonArea = area.removeFromBottom (jmin (area.getHeight()/6, 30));
+    const auto buttonArea = area.removeFromBottom (jmin (area.getHeight()/6, 30));
     area.removeFromTop (30);
     auto topLabelsArea = area.removeFromTop (jmin (area.getHeight()/5, 30));
 
@@ -265,7 +265,7 @@ void BugReportPanel::updateComponentsForSpecificStep (ReportStep stepToUpgradeTo
 }
 
 //==============================================================================
-bool BugReportPanel::formSeemsCorrect()
+bool BugReportPanel::formSeemsCorrect() const
 {
 	return nameIsCorrect && mailIsCorrect;
 }
@@ -275,22 +275,22 @@ void BugReportPanel::checkFormEntry()
 	nameIsCorrect = nameLabel->getText().isNotEmpty() && nameLabel->getText() != "Name*"
 													  && nameLabel->getText() != "Name";
 
-	mailIsCorrect = (mailLabel->getText().isNotEmpty() && mailLabel->getText() != "Email*"
-													   && mailLabel->getText() != "Email"
-													   && mailLabel->getText().containsChar ('@')
-													   && mailLabel->getText().upToLastOccurrenceOf ("@", false, false)
-														    				  .isNotEmpty()
-													   && mailLabel->getText().fromLastOccurrenceOf ("@", false, false)
-														    				  .containsChar('.')
-												       && mailLabel->getText().fromLastOccurrenceOf ("@", false, false)
-														   				      .removeCharacters(".")
-														   				      .isNotEmpty());
+	mailIsCorrect = mailLabel->getText().isNotEmpty() && mailLabel->getText() != "Email*"
+        && mailLabel->getText() != "Email"
+        && mailLabel->getText().containsChar ('@')
+        && mailLabel->getText().upToLastOccurrenceOf ("@", false, false)
+                    .isNotEmpty()
+        && mailLabel->getText().fromLastOccurrenceOf ("@", false, false)
+                    .containsChar('.')
+        && mailLabel->getText().fromLastOccurrenceOf ("@", false, false)
+                    .removeCharacters(".")
+                    .isNotEmpty();
 }
 
 //==============================================================================
 void BugReportPanel::sendTicketAndUpdate()
 {
-	URL ticketURL = createURLForTicket (mimeBoundary);
+    const URL ticketURL = createURLForTicket (mimeBoundary);
 
     // Gets response headers and display them
     const String headers ("\r\nAuthorization: Basic " + credentials + "\r\n"
@@ -345,13 +345,13 @@ URL BugReportPanel::createURLForTicket (const String&)
     getFilestoAttach (filesToAttach);
 
     // Creates POST data and attaches it to URL
-    String data = createMultipartData (mimeBoundary, filesToAttach);
+    const String data = createMultipartData (mimeBoundary, filesToAttach);
     happyFoxURL = happyFoxURL.withPOSTData (data);
 
 	return happyFoxURL;
 }
 
-String BugReportPanel::createMultipartData (const String& boundary, const Array<File>& txtFilesToAttach)
+String BugReportPanel::createMultipartData (const String& boundary, const Array<File>& txtFilesToAttach) const
 {
 	String multipartData;
 

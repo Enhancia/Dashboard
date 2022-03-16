@@ -25,7 +25,7 @@ class BankSelectorComponent    : public Component,
 public:
     //==============================================================================
     BankSelectorComponent (HubConfiguration& config, ApplicationCommandManager& manager);
-    ~BankSelectorComponent();
+    ~BankSelectorComponent() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -48,7 +48,7 @@ private:
     void createBankMenu();
     static void menuCallback (int result, BankSelectorComponent* bsComp);
 
-    void handleMenuResult (const int menuResult);
+    void handleMenuResult (int menuResult) const;
 
     //==============================================================================
     HubConfiguration& hubConfig;

@@ -40,7 +40,7 @@ public:
 
 	//==============================================================================
 	FirmDownloader (ApplicationCommandManager& manager);
-	~FirmDownloader();
+	~FirmDownloader() override;
 
     //==============================================================================
     void finished (URL::DownloadTask* task, bool success) override;
@@ -53,11 +53,11 @@ public:
 
 	//==============================================================================
 	void startDownloadProcess();
-    bool hasNewAvailableVersion();
+    bool hasNewAvailableVersion() const;
 
     //==============================================================================
-    downloadState getDownloadState();
-    bool wasSuccessful();
+    downloadState getDownloadState() const;
+    bool wasSuccessful() const;
     float& getDownloadProgressReference();
     String getLatestVersionString();
     File getDownloadedRingFile();
@@ -67,10 +67,10 @@ private:
     //==============================================================================
     void checkForNewAvailableVersion();
     void getCurrentInstalledVersions();
-    var fetchRepoJSON();
+    var fetchRepoJSON() const;
     bool fetchFilesURLAndVersions (DynamicObject& jsonRef);
     void downloadForDevice (deviceFirmware& device);
-    bool deleteCurrentFileforDevice (deviceFirmware& device);
+    bool deleteCurrentFileforDevice (deviceFirmware& device) const;
     
     //==============================================================================
 	const String currentRingVersion;

@@ -15,10 +15,10 @@ TwoRangeTuner::TwoRangeTuner (HubConfiguration& config, const int gestureId,
 				   			  const float& val, const NormalisableRange<float> gestRange,
                    			  const Range<float> paramMax, const String unit)
     :   Tuner (unit, neova_dash::gesture::getHighlightColour (config.getGestureData (gestureId).type,
-    														  config.isGestureActive (gestureId))),
-        hubConfig (config), id (gestureId),
-        value (val), gestureRange (gestRange),
-        parameterMax (paramMax)
+                                                              config.isGestureActive (gestureId))),
+        id (gestureId), value (val),
+        gestureRange (gestRange), parameterMax (paramMax),
+        hubConfig (config)
 {
     setLookAndFeel (&rangeTunerLookAndFeel);
 
@@ -80,7 +80,7 @@ void TwoRangeTuner::resizeSliders()
     sliderCentre = {getLocalBounds().getCentreX(),
                     sliderBounds.getCentreY() + static_cast<int>(sliderRadius)/2};
 
-    juce::Rectangle<int> adjustedBounds = sliderBounds.withWidth (static_cast<int>(sliderRadius)*2)
+    const juce::Rectangle<int> adjustedBounds = sliderBounds.withWidth (static_cast<int>(sliderRadius)*2)
                                                       .withHeight (static_cast<int>(sliderRadius)*2)
                                                       .expanded (10)
                                                       .withCentre (sliderCentre);
@@ -91,7 +91,7 @@ void TwoRangeTuner::resizeSliders()
     rightHighSlider->setBounds (adjustedBounds);
 }
 
-void TwoRangeTuner::resizeButtons()
+void TwoRangeTuner::resizeButtons() const
 {
     using namespace neova_dash::ui;
 
@@ -116,15 +116,15 @@ void TwoRangeTuner::updateComponents()
             && leftHighSlider->getThumbBeingDragged() == -1)
     {
         // Sets slider value
-        leftLowSlider->setValue (static_cast<double>(getRangeLeftLow()), dontSendNotification);
-        leftHighSlider->setValue (static_cast<double>(getRangeLeftHigh()), dontSendNotification);
+        leftLowSlider->setValue (getRangeLeftLow(), dontSendNotification);
+        leftHighSlider->setValue (getRangeLeftHigh(), dontSendNotification);
         
         // Sets label text
-        if (!(rangeLabelMinLeft->isBeingEdited()))
+        if (!rangeLabelMinLeft->isBeingEdited())
 		{
 		    rangeLabelMinLeft->setText (String (static_cast<int>(getRangeLeftLow())) + valueUnit, dontSendNotification);
 		}
-		if (!(rangeLabelMaxLeft->isBeingEdited()))
+		if (!rangeLabelMaxLeft->isBeingEdited())
 		{
             rangeLabelMaxLeft->setText (String (static_cast<int>(getRangeLeftHigh())) + valueUnit, dontSendNotification);
 		}
@@ -135,15 +135,15 @@ void TwoRangeTuner::updateComponents()
             && rightHighSlider->getThumbBeingDragged() == -1)
     {
         // Sets slider value
-        rightHighSlider->setValue (static_cast<double>(getRangeRightHigh()), dontSendNotification);
-        rightLowSlider->setValue (static_cast<double>(getRangeRightLow()), dontSendNotification);
+        rightHighSlider->setValue (getRangeRightHigh(), dontSendNotification);
+        rightLowSlider->setValue (getRangeRightLow(), dontSendNotification);
         
         // Sets label text
-        if (!(rangeLabelMinRight->isBeingEdited()))
+        if (!rangeLabelMinRight->isBeingEdited())
 		{
             rangeLabelMinRight->setText (String (static_cast<int>(getRangeRightLow())) + valueUnit, dontSendNotification);
 		}
-        if (!(rangeLabelMaxRight->isBeingEdited()))
+        if (!rangeLabelMaxRight->isBeingEdited())
 		{
             rangeLabelMaxRight->setText (String (static_cast<int>(getRangeRightHigh())) + valueUnit, dontSendNotification);
 		}
@@ -269,7 +269,7 @@ void TwoRangeTuner::sliderValueChanged (Slider* sldr)
         // Illegal attempt to get left range over right range
         if (sldr->getValue() > rightLowSlider->getValue())
         {
-            sldr->setValue (static_cast<double>(rightLowSlider->getValue()), dontSendNotification);
+            sldr->setValue (rightLowSlider->getValue(), dontSendNotification);
             updateLabelBounds (rangeLabelMinLeft.get());
             rangeLabelMinLeft->setText (String (static_cast<int>(getRangeLeftHigh())) + valueUnit, dontSendNotification);
             //return;
@@ -296,7 +296,7 @@ void TwoRangeTuner::sliderValueChanged (Slider* sldr)
         // Illegal attempt to get left range over right range
         if (leftHighSlider->getValue() > rightLowSlider->getValue())
         {
-            sldr->setValue (static_cast<double>(rightLowSlider->getValue()), dontSendNotification);
+            sldr->setValue (rightLowSlider->getValue(), dontSendNotification);
             updateLabelBounds (rangeLabelMaxLeft.get());
             rangeLabelMaxLeft->setText (String (static_cast<int>(getRangeRightLow())) + valueUnit, dontSendNotification);
             //return;
@@ -321,7 +321,7 @@ void TwoRangeTuner::sliderValueChanged (Slider* sldr)
         // Illegal attempt to get right range over left range
         if (leftHighSlider->getValue() > rightLowSlider->getValue())
         {
-            sldr->setValue (static_cast<double>(leftHighSlider->getValue()), dontSendNotification);
+            sldr->setValue (leftHighSlider->getValue(), dontSendNotification);
             updateLabelBounds (rangeLabelMinRight.get());
             rangeLabelMinRight->setText (String (static_cast<int>(getRangeLeftHigh())) + valueUnit, dontSendNotification);
             //return;
@@ -346,7 +346,7 @@ void TwoRangeTuner::sliderValueChanged (Slider* sldr)
         // Illegal attempt to get right range over left range
         if (leftHighSlider->getValue() > sldr->getValue())
         {
-            sldr->setValue (static_cast<double>(leftHighSlider->getValue()), dontSendNotification);
+            sldr->setValue (leftHighSlider->getValue(), dontSendNotification);
             updateLabelBounds (rangeLabelMaxRight.get());
             rangeLabelMaxRight->setText (String (static_cast<int>(getRangeLeftHigh())) + valueUnit, dontSendNotification);
             //return;
@@ -519,7 +519,7 @@ void TwoRangeTuner::handleSingleClick (const MouseEvent& e)
     repaint (sliderBounds);
 }
 
-void TwoRangeTuner::handleDoubleClick (const MouseEvent& e)
+void TwoRangeTuner::handleDoubleClick (const MouseEvent& e) const
 {
     if (getObjectToDrag (e) == leftLowThumb)
     {
@@ -627,10 +627,10 @@ void TwoRangeTuner::setAngles (float start, float end)
 
 void TwoRangeTuner::createSliders()
 {
-    Tuner::addAndMakeVisible (*(leftLowSlider = std::make_unique<Slider> ("Range Slider Left Low")));
-    Tuner::addAndMakeVisible (*(leftHighSlider = std::make_unique<Slider> ("Range Slider Left High")));
-    Tuner::addAndMakeVisible (*(rightLowSlider = std::make_unique<Slider> ("Range Slider Right Low")));
-    Tuner::addAndMakeVisible (*(rightHighSlider = std::make_unique<Slider> ("Range Slider Right High")));
+    addAndMakeVisible(*(leftLowSlider = std::make_unique<Slider> ("Range Slider Left Low")));
+    addAndMakeVisible(*(leftHighSlider = std::make_unique<Slider> ("Range Slider Left High")));
+    addAndMakeVisible(*(rightLowSlider = std::make_unique<Slider> ("Range Slider Right Low")));
+    addAndMakeVisible(*(rightHighSlider = std::make_unique<Slider> ("Range Slider Right High")));
         
     auto setSliderSettings = [this] (Slider& slider, float valueToSet)
     {
@@ -640,8 +640,8 @@ void TwoRangeTuner::createSliders()
         slider.setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
         slider.setColour (Slider::rotarySliderFillColourId, Colour (0x00000000));
         slider.setColour (Slider::rotarySliderOutlineColourId, Colour (0x00000000));
-        slider.setRange (static_cast<double>(parameterMax.getStart()), static_cast<double>(parameterMax.getEnd()), 1.0);
-        slider.setValue (static_cast<double>(valueToSet));
+        slider.setRange (parameterMax.getStart(), parameterMax.getEnd(), 1.0);
+        slider.setValue (valueToSet);
         slider.addListener (this);
         slider.setInterceptsMouseClicks (false, false);
         //slider.setLookAndFeel (&rangeTunerLookAndFeel);
@@ -711,47 +711,47 @@ void TwoRangeTuner::createButtons()
     setButtonSettings (*maxRightAngleButton);
 }
     
-void TwoRangeTuner::setRangeLeftLow (float val, bool uploadToHub)
+void TwoRangeTuner::setRangeLeftLow (float val, bool uploadToHub) const
 {
 	hubConfig.setFloatValue (id, HubConfiguration::gestureParam0, val, uploadToHub);
 }
     
-void TwoRangeTuner::setRangeLeftHigh (float val, bool uploadToHub)
+void TwoRangeTuner::setRangeLeftHigh (float val, bool uploadToHub) const
 {
 	hubConfig.setFloatValue (id, HubConfiguration::gestureParam1, val, uploadToHub);
 }
     
-void TwoRangeTuner::setRangeRightLow (float val, bool uploadToHub)
+void TwoRangeTuner::setRangeRightLow (float val, bool uploadToHub) const
 {
 	hubConfig.setFloatValue (id, HubConfiguration::gestureParam2, val, uploadToHub);
 }
     
-void TwoRangeTuner::setRangeRightHigh (float val, bool uploadToHub)
+void TwoRangeTuner::setRangeRightHigh (float val, bool uploadToHub) const
 {
 	hubConfig.setFloatValue (id, HubConfiguration::gestureParam3, val, uploadToHub);
 }
     
-float TwoRangeTuner::getRangeLeftLow()
+float TwoRangeTuner::getRangeLeftLow() const
 {
     return hubConfig.getGestureData (id).gestureParam0;
 }
     
-float TwoRangeTuner::getRangeLeftHigh()
+float TwoRangeTuner::getRangeLeftHigh() const
 {
     return hubConfig.getGestureData (id).gestureParam1;
 }
     
-float TwoRangeTuner::getRangeRightLow()
+float TwoRangeTuner::getRangeRightLow() const
 {
     return hubConfig.getGestureData (id).gestureParam2;
 }
     
-float TwoRangeTuner::getRangeRightHigh()
+float TwoRangeTuner::getRangeRightHigh() const
 {
     return hubConfig.getGestureData (id).gestureParam3;
 }
 
-double TwoRangeTuner::getAngleFromMouseEventRadians (const MouseEvent& e)
+double TwoRangeTuner::getAngleFromMouseEventRadians (const MouseEvent& e) const
 {
     double angle =  std::atan2 (e.getMouseDownX() - sliderCentre.x,
                                 -(e.getMouseDownY() - sliderCentre.y));
@@ -761,7 +761,7 @@ double TwoRangeTuner::getAngleFromMouseEventRadians (const MouseEvent& e)
     return angle;
 }
 
-double TwoRangeTuner::getThumbAngleRadians (const DraggableObject thumb)
+double TwoRangeTuner::getThumbAngleRadians (const DraggableObject thumb) const
 {
     if (thumb == none || thumb == middleAreaLeft || thumb == middleAreaRight) return -0.01;
     
@@ -776,17 +776,17 @@ double TwoRangeTuner::getThumbAngleRadians (const DraggableObject thumb)
         default: return -0.01;
     }
 
-    return startAngle + ((slider->getValue() - slider->getMinimum())/slider->getRange().getLength())
+    return startAngle + (slider->getValue() - slider->getMinimum())/slider->getRange().getLength()
                              *(endAngle - startAngle);
 }
 
-TwoRangeTuner::DraggableObject TwoRangeTuner::getObjectToDrag (const MouseEvent& e)
+TwoRangeTuner::DraggableObject TwoRangeTuner::getObjectToDrag (const MouseEvent& e) const
 {
     double mouseAngle = getAngleFromMouseEventRadians (e);
-    float twoPi =  MathConstants<float>::twoPi;
+    const float twoPi =  MathConstants<float>::twoPi;
 
     //================ Figures out the scenario surrounding the click ==============
-    bool inverted = startAngle > endAngle;
+    const bool inverted = startAngle > endAngle;
 
     // Computes "% 2*pi" if both angles are somehow greater that 2*pi
     float startAngleModulo = startAngle, endAngleModulo = endAngle;
@@ -815,15 +815,15 @@ TwoRangeTuner::DraggableObject TwoRangeTuner::getObjectToDrag (const MouseEvent&
     //================ Primary check: should we consider the left or right range? ==============
     bool leftNotRight = true;
 
-    float leftHighAngle = jmax (static_cast<float>(getThumbAngleRadians(leftLowThumb)), static_cast<float>(getThumbAngleRadians(leftHighThumb)));
-    float rightLowAngle = jmin (static_cast<float>(getThumbAngleRadians(rightLowThumb)), static_cast<float>(getThumbAngleRadians(rightHighThumb)));
-    
-    auto adjustedMouseAngle = !differentRef ? mouseAngle
-                                            : mouseAngle < startAngle ? mouseAngle + twoPi
-                                                                      : mouseAngle;
+    const float leftHighAngle = jmax (static_cast<float>(getThumbAngleRadians(leftLowThumb)), static_cast<float>(getThumbAngleRadians(leftHighThumb)));
+    const float rightLowAngle = jmin (static_cast<float>(getThumbAngleRadians(rightLowThumb)), static_cast<float>(getThumbAngleRadians(rightHighThumb)));
+
+    const auto adjustedMouseAngle = !differentRef ? mouseAngle
+                                        : mouseAngle < startAngle ? mouseAngle + twoPi
+                                        : mouseAngle;
 
     // case1: both middle thumbs in the same side (< 2pi)
-    if (!differentRef || (leftHighAngle < twoPi && rightLowAngle < twoPi))
+    if (!differentRef || leftHighAngle < twoPi && rightLowAngle < twoPi)
     {
         if (adjustedMouseAngle < (leftHighAngle + rightLowAngle)/2.0f) leftNotRight = true;
         else                                                           leftNotRight = false;
@@ -844,75 +844,72 @@ TwoRangeTuner::DraggableObject TwoRangeTuner::getObjectToDrag (const MouseEvent&
         else leftNotRight = false;
     }
 
-    DraggableObject lowThumb = leftNotRight ? leftLowThumb : rightLowThumb;
-    DraggableObject highThumb = leftNotRight ? leftHighThumb : rightHighThumb;
-    DraggableObject middleArea = leftNotRight ? middleAreaLeft : middleAreaRight;
-    Slider* lowSlider = leftNotRight ? leftLowSlider.get() : rightLowSlider.get();
-    Slider* highSlider = leftNotRight ? leftHighSlider.get() : rightHighSlider.get();
+    const DraggableObject lowThumb = leftNotRight ? leftLowThumb : rightLowThumb;
+    const DraggableObject highThumb = leftNotRight ? leftHighThumb : rightHighThumb;
+    const DraggableObject middleArea = leftNotRight ? middleAreaLeft : middleAreaRight;
+    const Slider* lowSlider = leftNotRight ? leftLowSlider.get() : rightLowSlider.get();
+    const Slider* highSlider = leftNotRight ? leftHighSlider.get() : rightHighSlider.get();
 
     //================ Finds the object to drag ==============
     if (e.mods.isShiftDown()) return middleArea;
 
-    DraggableObject thumb1 = inverted ? lowThumb : highThumb;
-    DraggableObject thumb2 = inverted ? highThumb : lowThumb;
+    const DraggableObject thumb1 = inverted ? lowThumb : highThumb;
+    const DraggableObject thumb2 = inverted ? highThumb : lowThumb;
 
     // Tolerance: area around which a thumb can be clicked, its value is the 5th of the angle between the two thumbs.
-    double tolerance = ((highSlider->getValue() - lowSlider->getValue())*(std::abs (endAngle - startAngle)))
+    const double tolerance = (highSlider->getValue() - lowSlider->getValue())*std::abs (endAngle - startAngle)
                                 /(lowSlider->getRange().getLength()*5);
 
     // Click within the slider range
-    if ((!differentRef && (mouseAngle > jmin (startAngleModulo, endAngleModulo)
-                       && mouseAngle < jmax (startAngleModulo, endAngleModulo)))
-        || (differentRef && (mouseAngle > jmin(startAngleModulo, endAngleModulo)
-                                || mouseAngle + twoPi
-                                   < jmax(startAngleModulo, endAngleModulo))))
+    if (!differentRef && (mouseAngle > jmin (startAngleModulo, endAngleModulo)
+            && mouseAngle < jmax (startAngleModulo, endAngleModulo))
+        || differentRef && (mouseAngle > jmin(startAngleModulo, endAngleModulo)
+            || mouseAngle + twoPi
+            < jmax(startAngleModulo, endAngleModulo)))
     {
         if (!differentRef)
         {
             if (mouseAngle > getThumbAngleRadians(thumb1) - tolerance)      return thumb1;
-            else if (mouseAngle < getThumbAngleRadians(thumb2) + tolerance) return thumb2;
-            else return middleArea;
+            if (mouseAngle < getThumbAngleRadians(thumb2) + tolerance) return thumb2;
+            return middleArea;
         }
-        else
-        {
-            if (mouseAngle < jmax(startAngleModulo, endAngleModulo) - twoPi)
-                mouseAngle += twoPi;
+        if (mouseAngle < jmax(startAngleModulo, endAngleModulo) - twoPi)
+            mouseAngle += twoPi;
 
-            if (mouseAngle > getThumbAngleRadians(thumb1) - tolerance)      return thumb1;
-            else if (mouseAngle < getThumbAngleRadians(thumb2) + tolerance) return thumb2;
-            else return middleArea;
-        }
+        if (mouseAngle > getThumbAngleRadians(thumb1) - tolerance)      return thumb1;
+        if (mouseAngle < getThumbAngleRadians(thumb2) + tolerance) return thumb2;
+        return middleArea;
     }
     
     return none;
 }
 
-void TwoRangeTuner::drawTunerSliderBackground (Graphics& g)
+void TwoRangeTuner::drawTunerSliderBackground (Graphics& g) const
 {
-    auto outline = neova_dash::colour::tunerSliderBackground;
-    auto fillLeft    = objectBeingDragged == middleAreaLeft ? tunerColour.interpolatedWith (Colour (0xffffffff), 0.8f)
-                                                            : tunerColour;
+    const auto outline = neova_dash::colour::tunerSliderBackground;
+    const auto fillLeft    = objectBeingDragged == middleAreaLeft ? tunerColour.interpolatedWith (Colour (0xffffffff), 0.8f)
+                                 : tunerColour;
 
-    auto fillRight    = objectBeingDragged == middleAreaRight ? tunerColour.interpolatedWith (Colour (0xffffffff), 0.8f)
-                                                              : tunerColour;
+    const auto fillRight    = objectBeingDragged == middleAreaRight ? tunerColour.interpolatedWith (Colour (0xffffffff), 0.8f)
+                                  : tunerColour;
 
 
-    auto leftLowAngle = startAngle
+    const auto leftLowAngle = startAngle
                         + (leftLowSlider->getValue() - leftLowSlider->getMinimum())
                             / leftLowSlider->getRange().getLength() * (endAngle - startAngle);
-    auto leftHighAngle = startAngle
+    const auto leftHighAngle = startAngle
                         + (leftHighSlider->getValue() - leftLowSlider->getMinimum())
                             / leftLowSlider->getRange().getLength() * (endAngle - startAngle);
 
-    auto rightLowAngle = startAngle
+    const auto rightLowAngle = startAngle
                         + (rightLowSlider->getValue() - rightLowSlider->getMinimum())
                             / rightLowSlider->getRange().getLength() * (endAngle - startAngle);
-    auto rightHighAngle = startAngle
+    const auto rightHighAngle = startAngle
                         + (rightHighSlider->getValue() - rightLowSlider->getMinimum())
                             / rightLowSlider->getRange().getLength() * (endAngle - startAngle);
 
-    auto lineW = jmin (8.0f, sliderRadius * 0.5f);
-    auto arcRadius = sliderRadius - lineW * 0.5f;
+    const auto lineW = jmin (8.0f, sliderRadius * 0.5f);
+    const auto arcRadius = sliderRadius - lineW * 0.5f;
 
     Path backgroundArc;
     backgroundArc.addCentredArc (static_cast<float>(sliderCentre.x),
@@ -959,10 +956,10 @@ void TwoRangeTuner::drawTunerSliderBackground (Graphics& g)
     if (objectBeingDragged != none && objectBeingDragged != middleAreaLeft
                                    && objectBeingDragged != middleAreaRight)
     {
-        auto angle = getThumbAngleRadians (objectBeingDragged);
+        const auto angle = getThumbAngleRadians (objectBeingDragged);
 
-        juce::Point<float> thumbPoint (static_cast<float>(sliderCentre.x) + arcRadius * std::cos (static_cast<float>(angle) - MathConstants<float>::halfPi),
-                                 static_cast<float>(sliderCentre.y) + arcRadius * std::sin (static_cast<float>(angle) - MathConstants<float>::halfPi));
+        const Point<float> thumbPoint (static_cast<float>(sliderCentre.x) + arcRadius * std::cos (static_cast<float>(angle) - MathConstants<float>::halfPi),
+                                       static_cast<float>(sliderCentre.y) + arcRadius * std::sin (static_cast<float>(angle) - MathConstants<float>::halfPi));
 
         g.setColour (tunerColour.withAlpha (0.6f));
         g.fillEllipse (juce::Rectangle<float> (25.0f, 25.0f).withCentre (thumbPoint));
@@ -982,14 +979,14 @@ void TwoRangeTuner::drawTunerSliderBackground (Graphics& g)
         else
             angle = getThumbAngleRadians (rightLowThumb);
 
-        juce::Point<float> thumbPoint (static_cast<float>(sliderCentre.x) + arcRadius * std::cos (static_cast<float>(angle) - MathConstants<float>::halfPi),
-            static_cast<float>(sliderCentre.y) + arcRadius * std::sin (static_cast<float>(angle) - MathConstants<float>::halfPi));
+        const Point<float> thumbPoint (static_cast<float>(sliderCentre.x) + arcRadius * std::cos (static_cast<float>(angle) - MathConstants<float>::halfPi),
+                                       static_cast<float>(sliderCentre.y) + arcRadius * std::sin (static_cast<float>(angle) - MathConstants<float>::halfPi));
 
         g.setColour (tunerColour.withAlpha (0.3f));
         g.fillEllipse (juce::Rectangle<float> (25.0f, 25.0f).withCentre (thumbPoint));
     }
 }
-void TwoRangeTuner::updateLabelBounds (Label* labelToUpdate)
+void TwoRangeTuner::updateLabelBounds (Label* labelToUpdate) const
 {
     if (labelToUpdate == nullptr) return;
 
@@ -1021,9 +1018,9 @@ void TwoRangeTuner::updateLabelBounds (Label* labelToUpdate)
                                       sliderCentre.y + static_cast<int>(radius * std::sin(angle - MathConstants<float>::halfPi)));
 }
 
-float TwoRangeTuner::getValueAngle()
+float TwoRangeTuner::getValueAngle() const
 {
-	float convertedValue = value;//gestureRange.convertFrom0to1 (value);
+    const float convertedValue = value;//gestureRange.convertFrom0to1 (value);
 
     float cursorAngle;
 
@@ -1055,45 +1052,45 @@ float TwoRangeTuner::getValueAngle()
 }
 void TwoRangeTuner::drawValueCursor (Graphics& g)
 {
-    float cursorAngle = getValueAngle();
+    const float cursorAngle = getValueAngle();
     previousCursorAngle = cursorAngle;
 
-    auto cursorRadius = sliderRadius + 7;
-    juce::Point<float> cursorPoint (sliderCentre.x + cursorRadius * std::cos (cursorAngle - MathConstants<float>::halfPi),
+    const auto cursorRadius = sliderRadius + 7;
+    Point<float> cursorPoint (sliderCentre.x + cursorRadius * std::cos (cursorAngle - MathConstants<float>::halfPi),
                               sliderCentre.y + cursorRadius * std::sin (cursorAngle - MathConstants<float>::halfPi));
 
     Path cursorPath;
     cursorPath.addTriangle ({cursorPoint.x - 3.0f, cursorPoint.y - 3.0f},
                             {cursorPoint.x + 3.0f, cursorPoint.y - 3.0f},
                             {cursorPoint.x,        cursorPoint.y + 3.0f});
-    
-    AffineTransform transform = AffineTransform::rotation (cursorAngle,
-                                                           cursorPath.getBounds().getCentreX(),
-                                                           cursorPath.getBounds().getCentreY());
 
-    g.setColour (   ((/*gestureRange.convertFrom0to1 (value)*/ value >= getRangeLeftLow())
-                        && (/*gestureRange.convertFrom0to1 (value)*/ value <= getRangeLeftHigh()))
-                 ||  ((/*gestureRange.convertFrom0to1 (value)*/ value >= getRangeRightLow())
-                        && (/*gestureRange.convertFrom0to1 (value)*/ value <= getRangeRightHigh()))
+    const AffineTransform transform = AffineTransform::rotation (cursorAngle,
+                                                                 cursorPath.getBounds().getCentreX(),
+                                                                 cursorPath.getBounds().getCentreY());
+
+    g.setColour (   /*gestureRange.convertFrom0to1 (value)*/ value >= getRangeLeftLow()
+                    && /*gestureRange.convertFrom0to1 (value)*/ value <= getRangeLeftHigh()
+                 ||  /*gestureRange.convertFrom0to1 (value)*/ value >= getRangeRightLow()
+                    && /*gestureRange.convertFrom0to1 (value)*/ value <= getRangeRightHigh()
                   ? tunerColour
                   : Colour (0x80808080));
     g.fillPath (cursorPath, transform);
 }
 
-void TwoRangeTuner::drawLineFromSliderCentre (Graphics& g, float angleRadian)
+void TwoRangeTuner::drawLineFromSliderCentre (Graphics& g, float angleRadian) const
 {
-    juce::Point<float> point (sliderCentre.x + sliderRadius * std::cos (angleRadian - MathConstants<float>::halfPi),
-                        sliderCentre.y + sliderRadius * std::sin (angleRadian - MathConstants<float>::halfPi));
+    const Point<float> point (sliderCentre.x + sliderRadius * std::cos (angleRadian - MathConstants<float>::halfPi),
+                              sliderCentre.y + sliderRadius * std::sin (angleRadian - MathConstants<float>::halfPi));
 
     g.drawLine (Line<float> (sliderCentre.toFloat(), point), 1.0f);
 }
 
 void TwoRangeTuner::drawThumbsAndToleranceLines (Graphics& g)
 {
-    double leftTolerance = ((leftHighSlider->getValue() - leftLowSlider->getValue())*(std::abs (endAngle - startAngle)))
+    const double leftTolerance = (leftHighSlider->getValue() - leftLowSlider->getValue())*std::abs (endAngle - startAngle)
                          / (leftLowSlider->getRange().getLength() * 5);
 
-    double rightTolerance = ((rightHighSlider->getValue() - rightLowSlider->getValue())*(std::abs (endAngle - startAngle)))
+    const double rightTolerance = (rightHighSlider->getValue() - rightLowSlider->getValue())*std::abs (endAngle - startAngle)
                          / (rightLowSlider->getRange().getLength() * 5);
 
     g.setColour (tunerColour.withAlpha (0.5f));
@@ -1103,7 +1100,7 @@ void TwoRangeTuner::drawThumbsAndToleranceLines (Graphics& g)
     drawLineFromSliderCentre (g, static_cast<float>(getThumbAngleRadians (rightHighThumb)));
 
     g.setColour (Colour (0xff903030));
-    bool invertTolerance = startAngle > endAngle;
+    const bool invertTolerance = startAngle > endAngle;
     drawLineFromSliderCentre (g, static_cast<float>(getThumbAngleRadians (leftLowThumb)) + static_cast<float>((invertTolerance ? -leftTolerance
         : leftTolerance)));
     drawLineFromSliderCentre (g, static_cast<float>(getThumbAngleRadians (leftHighThumb)) + static_cast<float>((invertTolerance ? leftTolerance

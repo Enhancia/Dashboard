@@ -26,7 +26,7 @@ class NewGesturePanel    : public Component,
 public:
     //==============================================================================
     explicit NewGesturePanel (HubConfiguration& config, ApplicationCommandManager& commandManager);
-    ~NewGesturePanel();
+    ~NewGesturePanel() override;
 
     //==============================================================================
     // Component Methods
@@ -44,18 +44,18 @@ public:
     void editorShown (Label* lbl, TextEditor& ed) override;
 
     //==============================================================================
-    void createNewGesture();
-    void showPanelForGestureID (const int gestureID);
-    void hidePanel (const bool resetSelectedSlot = false);
-    void updateInterface();
-    const int getLastSelectedSlot();
+    void createNewGesture() const;
+    void showPanelForGestureID (int gestureID);
+    void hidePanel (bool resetSelectedSlot = false);
+    void updateInterface() const;
+    const int getLastSelectedSlot() const;
 
 private:
     class GestureTypeSelector : public Component
     {
     public:
         GestureTypeSelector (int gestType);
-        ~GestureTypeSelector();
+        ~GestureTypeSelector() override;
 
         void paint (Graphics&) override;
         void resized() override;
@@ -70,7 +70,7 @@ private:
     private:
         //==============================================================================
         bool highlighted = false;
-        void drawGesturePath (Graphics& g, juce::Rectangle<int> area);
+        void drawGesturePath (Graphics& g, Rectangle<int> area) const;
 
         //==============================================================================
         /*Image vibratoImage = ImageFileFormat::loadFrom (DashData::VIBRATOicon_png,
@@ -98,10 +98,10 @@ private:
     void createCloseButton();
     void createAndAddTextEditor();
     void createGestureSelectorButtons();
-    void resizeGestureSelectorButtons (juce::Rectangle<int> buttonsArea);
+    void resizeGestureSelectorButtons (Rectangle<int> buttonsArea) const;
 
     //==============================================================================
-    juce::Rectangle<int> panelArea {0, 0, getWidth(), getHeight()};
+    Rectangle<int> panelArea {0, 0, getWidth(), getHeight()};
     int selectedGestureType = -1;
     int selectedGestureSlot = -1;
 

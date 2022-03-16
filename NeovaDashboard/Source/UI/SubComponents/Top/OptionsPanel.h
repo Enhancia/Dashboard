@@ -31,7 +31,7 @@ class OptionsPanel    : public Component,
 public:
     //==============================================================================
     explicit OptionsPanel (HubConfiguration& config, DashUpdater& updtr, UpgradeHandler& handler, ApplicationCommandManager& manager);
-    ~OptionsPanel();
+    ~OptionsPanel() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -48,7 +48,7 @@ public:
 
 private:
     class TabbedOptions    : public Component,
-                             private Button::Listener
+                             private Listener
     {
     public:
         enum TabbedPanelStyle
@@ -59,17 +59,17 @@ private:
 
         //==============================================================================
         TabbedOptions();
-        ~TabbedOptions();
+        ~TabbedOptions() override;
 
         //==============================================================================
         void addTab (Component* panel, String tabName);
-        void switchToTab (const int tabNumber);
-        void setTabAlertCount (const int tabNumber, const int alertCount);
-        void setTabAlertCount (const String tabName, const int alertCount);
+        void switchToTab (int tabNumber);
+        void setTabAlertCount (int tabNumber, int alertCount);
+        void setTabAlertCount (String tabName, int alertCount);
 
-        Component* getComponentFromTab (const int tabNumber);
-        Component* getComponentFromTab (const String tabName);
-        Component* getComponentFromSelectedTab();
+        Component* getComponentFromTab (int tabNumber) const;
+        Component* getComponentFromTab (String tabName);
+        Component* getComponentFromSelectedTab() const;
 
         //==============================================================================
         void setStyle (TabbedPanelStyle newStyle);
@@ -89,7 +89,7 @@ private:
 			{
 			public:
 				TabButton(String tabName) : Button(tabName + String("Button")) {}
-				~TabButton() {}
+				~TabButton() override {}
 
 				void paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
 				{
@@ -104,7 +104,7 @@ private:
 				JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TabButton)
 			};
 
-            Tab (Component* panelToUse, String tabName) : name (tabName), panel (panelToUse)
+            Tab (Component* panelToUse, String tabName) : panel (panelToUse), name (tabName)
             {
                 button.reset (new TabButton (name));
             }
@@ -121,7 +121,7 @@ private:
         };
 
         //==============================================================================
-        Tab* getTabByName (const String tabNameToSearch);
+        Tab* getTabByName (String tabNameToSearch);
 
         //==============================================================================
         juce::Rectangle<int> panelArea, tabsArea;
@@ -135,8 +135,8 @@ private:
 
     //==============================================================================
     void createButtons();
-    void paintProductInformations (Graphics& g, juce::Rectangle<int> area);
-    void paintFirmUpdateArea (Graphics& g, juce::Rectangle<int> area);
+    void paintProductInformations (Graphics& g, juce::Rectangle<int> area) const;
+    void paintFirmUpdateArea (Graphics& g, juce::Rectangle<int> area) const;
     void paintLegalAndRegulatoryArea (Graphics& g, juce::Rectangle<int> area);
 
     //==============================================================================
@@ -171,7 +171,7 @@ class GeneralPanel: public Component, Button::Listener
 public:
     //==============================================================================
     GeneralPanel (TextButton& bugReportButton, ToggleButton& trhuToggle);
-    ~GeneralPanel();
+    ~GeneralPanel() override;
 
     //==============================================================================
     void paint (Graphics& g) override;
@@ -203,7 +203,7 @@ class LegalPanel: public Component
 public:
     //==============================================================================
     LegalPanel();
-    ~LegalPanel();
+    ~LegalPanel() override;
 
     //==============================================================================
     void paint (Graphics& g) override;
@@ -219,15 +219,15 @@ public:
     //==============================================================================
     UpdateAndUpgradePanel (HubConfiguration& hubConfiguration, DashUpdater& updtr, UpgradeHandler& handler,
                            TextButton& firmButton, TextButton& softButton);
-    ~UpdateAndUpgradePanel();
+    ~UpdateAndUpgradePanel() override;
 
     //==============================================================================
     void paint (Graphics& g) override;
     void resized() override;
 private:
     //==============================================================================
-    void paintFirmwareArea (Graphics& g);
-    void paintSoftwareArea (Graphics& g);
+    void paintFirmwareArea (Graphics& g) const;
+    void paintSoftwareArea (Graphics& g) const;
 
     //==============================================================================
     HubConfiguration& hubConfig;
@@ -249,7 +249,7 @@ class LicensePanel: public Component
 public:
     //==============================================================================
     LicensePanel();
-    ~LicensePanel();
+    ~LicensePanel() override;
 
     //==============================================================================
     void paint (Graphics& g) override;

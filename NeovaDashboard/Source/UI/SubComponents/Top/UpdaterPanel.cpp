@@ -12,7 +12,7 @@
 
 //==============================================================================
 UpdaterPanel::UpdaterPanel (DashUpdater& updtr, ApplicationCommandManager& manager, float& updateProgress)
-    : updater (updtr), progress (updateProgress), commandManager (manager)
+    : updater (updtr), commandManager (manager), progress (updateProgress)
 {
     createLabels();
     createButtons();
@@ -49,7 +49,7 @@ void UpdaterPanel::resized()
                                                                                               MARGIN_SMALL)));
     #endif
 
-    auto area = panelArea.reduced (neova_dash::ui::MARGIN);
+    auto area = panelArea.reduced (MARGIN);
 
     titleLabel->setBounds (area.removeFromTop (area.getHeight()/5));
 
@@ -69,7 +69,7 @@ void UpdaterPanel::resized()
                                                                                                         buttonArea.getHeight()));
     }
 
-    bodyText->setBounds (area.reduced (neova_dash::ui::MARGIN));
+    bodyText->setBounds (area.reduced (MARGIN));
 }
 
 void UpdaterPanel::timerCallback()
@@ -85,7 +85,7 @@ void UpdaterPanel::timerCallback()
         return;
     }
 
-    bodyText->setText ("Progress :\n\n" + String (int (progress*100)) + " %", dontSendNotification);
+    bodyText->setText ("Progress :\n\n" + String (static_cast<int>(progress * 100)) + " %", dontSendNotification);
 }
 
 

@@ -22,14 +22,14 @@ class VibratoTuner:    public Tuner,
 {
 public:
     //==============================================================================
-    VibratoTuner (HubConfiguration& config, DataReader& reader, const int gestureId);
-    ~VibratoTuner();
+    VibratoTuner (HubConfiguration& config, DataReader& reader, int gestureId);
+    ~VibratoTuner() override;
     
     //==============================================================================
     void paint (Graphics& g) override;
     void resized() override;
-    void updateComponents();
-    void updateDisplay();
+    void updateComponents() override;
+    void updateDisplay() override;
     void updateColour() override;
     
     //==============================================================================
@@ -41,7 +41,7 @@ public:
     //==============================================================================
     void mouseDown (const MouseEvent& e) override;
     void mouseUp (const MouseEvent& e) override;
-    void setColour (const Colour newColour) override;
+    void setColour (Colour newColour) override;
 
     //==============================================================================
     const int id;
@@ -49,14 +49,14 @@ public:
 private:
     //==============================================================================
 	VibratoTuner (HubConfiguration& config, const float& val,
-	                                        NormalisableRange<float> gestRange, const int gestureId,
+	                                        NormalisableRange<float> gestRange, int gestureId,
 					                        const float& vibratoIntensity, float maxIntens,
-    				                        const Range<float> gainMax, const Range<float> threshMax);
+                                            Range<float> gainMax, Range<float> threshMax);
 
     //==============================================================================
     void createSliders();
     void createLabels();
-    void updateLabelBounds (Label* labelToUpdate);
+    void updateLabelBounds (Label* labelToUpdate) const;
 
     //==============================================================================
     void drawValueCursor (Graphics& g);
@@ -65,11 +65,11 @@ private:
     void computeSmoothIntensity (float smoothnessRamp);
 
     //==============================================================================
-    void setGain (float value);
-    void setThreshold (float value);
+    void setGain (float value) const;
+    void setThreshold (float value) const;
 
-    float getGain();
-    float getThreshold();
+    float getGain() const;
+    float getThreshold() const;
     
     //==============================================================================
     const float& value;

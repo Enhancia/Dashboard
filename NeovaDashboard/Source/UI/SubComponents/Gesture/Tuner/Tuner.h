@@ -23,21 +23,21 @@ class Tuner    : public Component
 public:
     //==============================================================================
 	Tuner (const String unit = String(), Colour colour = Colour (0xff7c80de))
-        : valueUnit(unit), tunerColour (colour)
+        : tunerColour (colour), valueUnit(unit)
     {}
 
-	~Tuner() {}
+	~Tuner() override {}
 
     //==============================================================================
-	virtual void paint(Graphics&) override {}
-	virtual void resized() override {}
+    void paint(Graphics&) override {}
+    void resized() override {}
     
     //==============================================================================
 	virtual void updateDisplay() {}
 	virtual void updateComponents() = 0;
 
     //==============================================================================
-    Colour getColour() { return tunerColour; }
+    Colour getColour() const { return tunerColour; }
     virtual void setColour (const Colour newColour) { tunerColour = newColour; }
     virtual void updateColour() {}
 

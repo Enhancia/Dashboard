@@ -66,7 +66,7 @@ public:
 
 		/* Test if hub is already connected */
 		/* For testing */
-		memcpy(data, "jeannine", sizeof("jeannine"));
+		memcpy(data, "jeannine", sizeof"jeannine");
 		ctrl = 0x01;
 		memcpy(data + 8, &ctrl, sizeof(uint32_t));
 		dashPipe->sendString(data, 12);
@@ -119,7 +119,7 @@ public:
 			//updateAllValues();
 			DBG("reception\n");
 			dashPipe->getDataBuffer(data, 1024);
-			uint32_t test = *(uint32_t*)(data + 8);
+            const uint32_t test = *(uint32_t*)(data + 8);
 			switch (test)
 			{
 			case 0x03:
@@ -128,7 +128,7 @@ public:
 				
 				if (hubPowerState != POWER_OFF)
 				{
-					if (hubConfig.isWaitingForRingCompatibility() && ((hubConfig.getRingFirmwareVersionUint16() & 0xFF00) >> 8) > 0)
+					if (hubConfig.isWaitingForRingCompatibility() && (hubConfig.getRingFirmwareVersionUint16() & 0xFF00) >> 8 > 0)
 					{
 						// Dash was waiting for a valid ring firmware version, which it got !
 						hubConfig.stopWaitingForRingCompatibility();
@@ -166,7 +166,7 @@ public:
 				break;
 			case 0x05:
 				DBG("preset_active_received\n");
-				hubConfig.setPreset(*(uint8_t*)(data + 12), false);
+				hubConfig.setPreset(*(data + 12), false);
 				if (dashInterface->getPresetModeState() == DashBoardInterface::presetState)
 				{
 					dashInterface->hubChangedPreset();
@@ -187,13 +187,13 @@ public:
 
 				DBG("KBD FOCUS ? " << (dashInterface->hasKeyboardFocus(true) ? "YES" : "NO"));
 
-				if (hubPowerState == POWER_OFF && *(uint8_t*)(data + 12) == POWER_ON)
+				if (hubPowerState == POWER_OFF && *(data + 12) == POWER_ON)
 				{
 					/*2 cas possibles :	- hub branché après lancement dashBoard et driver envoie POWER_ON CMD à sa connexion
 					/					- hub branché avant lancement dashBoard mais en pause (=> ne renvoie pas sa config) et hub envoie POWER_ON CMD à sa sortie de Pause	
 					/ => on demande la config et on laisse l'état actuel à POWER_OFF, il passera à POWER_ON une fois la config reçue 
 					*/
-					memcpy(data, "jeannine", sizeof("jeannine"));
+					memcpy(data, "jeannine", sizeof"jeannine");
 					ctrl = 0x01;
 					memcpy(data + 8, &ctrl, sizeof(uint32_t));
 					dashPipe->sendString(data, 12);
@@ -201,7 +201,7 @@ public:
 				}
 				else
 				{
-					hubPowerState = *(uint8_t*)(data + 12);
+					hubPowerState = *(data + 12);
 					//if (!dashInterface->hasKeyboardFocus(true)) dashInterface->grabKeyboardFocus();
 
 					if (hubPowerState == POWER_ON)
@@ -232,7 +232,7 @@ public:
 			case 0x07 : 
 			{
 				DBG("preset_state_received\n");
-				uint8_t state_received = *(uint8_t*)(data + 12);
+                const uint8_t state_received = *(data + 12);
 				if (state_received == 2)
 				{
 					dashInterface->setPresetModeState(DashBoardInterface::slaveState);
@@ -249,7 +249,7 @@ public:
 			}
 			case 0xFF:
 				DBG("upgrade firm appeared\n");
-				uint8_t type_of_firm = *(uint8_t*)(data + 12);
+                const uint8_t type_of_firm = *(data + 12);
 				
                 if (type_of_firm == UpgradeHandler::upgradeFirmHub && upgradeHandler->get_upgradeCommandReceived())
 				{
@@ -280,11 +280,11 @@ public:
 		}
 	}
 
-	bool isFirmwareUpgrading()
-	{
-		return (upgradeHandler->getUpgradeState() == UpgradeHandler::waitingForUpgradeFirm ||
-        		upgradeHandler->getUpgradeState() == UpgradeHandler::upgradeFirmConnected  ||
-        		upgradeHandler->getUpgradeState() == UpgradeHandler::upgradeInProgress);
+	bool isFirmwareUpgrading() const
+    {
+		return upgradeHandler->getUpgradeState() == UpgradeHandler::waitingForUpgradeFirm ||
+            upgradeHandler->getUpgradeState() == UpgradeHandler::upgradeFirmConnected  ||
+            upgradeHandler->getUpgradeState() == UpgradeHandler::upgradeInProgress;
 	}
 
     //==============================================================================
@@ -293,11 +293,11 @@ public:
     public:
         MainWindow (String name , DashBoardInterface* dashInterface, HubConfiguration& config)
             : DocumentWindow (name, Desktop::getInstance().getDefaultLookAndFeel()
-                                                          .findColour (ResizableWindow::backgroundColourId),
-                                    DocumentWindow::allButtons),
+                                                          .findColour (backgroundColourId),
+                              allButtons),
               dashboardInterface (*dashInterface), hubConfig (config)
         {
-        	neova_dash::log::writeToLog ("Creating Dashboard main window.", neova_dash::log::general);
+            writeToLog("Creating Dashboard main window.", neova_dash::log::general);
 
             setUsingNativeTitleBar (true);
             setContentOwned (dashInterface, true);
@@ -314,13 +314,13 @@ public:
         	{
         		dashboardInterface.createAndShowAlertPanel (DashAlertPanel::noUploadQuitting);
         	}
-        	else if (dynamic_cast<Neova_DashBoard_Interface*> (JUCEApplication::getInstance())->isFirmwareUpgrading())
+        	else if (dynamic_cast<Neova_DashBoard_Interface*> (getInstance())->isFirmwareUpgrading())
         	{
         		dashboardInterface.createAndShowAlertPanel (DashAlertPanel::upgradePending);
         	}
         	else
         	{
-            	JUCEApplication::getInstance()->systemRequestedQuit();
+                getInstance()->systemRequestedQuit();
         	}
         }
 
@@ -388,12 +388,12 @@ public:
         using namespace neova_dash::commands;
 
         if (info.commandID != updatePresetModeState)
-        	neova_dash::log::writeToLog ("Executing Backend Command : " + String (commandManager.getNameOfCommand (info.commandID)), neova_dash::log::general);
+            writeToLog("Executing Backend Command : " + String (commandManager.getNameOfCommand (info.commandID)), neova_dash::log::general);
 
         switch (info.commandID)
         {
             case flashHub:
-				memcpy(data, "jeannine", sizeof("jeannine"));
+				memcpy(data, "jeannine", sizeof"jeannine");
 				ctrl = 0x04;
 				memcpy(data + 8, &ctrl, sizeof(uint32_t));
 				dashPipe->sendString(data, 12);
@@ -401,8 +401,8 @@ public:
             case uploadConfigToHub:
             	if (hubConfig.getConfigWasInitialized())
             	{
-					hubConfig.getConfig(data+12, sizeof(data)-12);
-					memcpy(data, "jeannine", sizeof("jeannine"));
+					hubConfig.getConfig(data+12, sizeof data-12);
+					memcpy(data, "jeannine", sizeof"jeannine");
 					ctrl = 0x03;
 					memcpy(data + 8, &ctrl, sizeof(uint32_t));
 					dashPipe->sendString(data, 12 + hubConfig.CONFIGSIZE);
@@ -413,8 +413,8 @@ public:
                 return true;
 			case updatePresetModeState:
 			{
-				uint8_t newState = (uint8_t)dashInterface->getPresetModeState();
-				memcpy(data, "jeannine", sizeof("jeannine"));
+                const uint8_t newState = static_cast<uint8_t>(dashInterface->getPresetModeState());
+				memcpy(data, "jeannine", sizeof"jeannine");
 				ctrl = 0x07;
 				memcpy(data + 8, &ctrl, sizeof(uint32_t));
 				memcpy(data + 12, &newState, sizeof(uint8_t));
@@ -428,7 +428,7 @@ public:
             case checkDashboardUpdate:
             	updater->checkForNewAvailableVersion();
             	
-            	commandManager.invokeDirectly (neova_dash::commands::openDashboardUpdatePanel, true);
+            	commandManager.invokeDirectly (openDashboardUpdatePanel, true);
             	return true;
 
             default:

@@ -73,8 +73,8 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
 
     const juce::Rectangle<int> screenArea =  Desktop::getInstance().getDisplays().getPrimaryDisplay()->userArea;
 
-    int dashWidth = jmin (screenArea.getHeight()*63/60, // screenH * 9/10 * AspectRatio^-1 (= 7/6)
-                          screenArea.getWidth()*3/4);
+    const int dashWidth = jmin (screenArea.getHeight()*63/60, // screenH * 9/10 * AspectRatio^-1 (= 7/6)
+                                screenArea.getWidth()*3/4);
 
     //dashWidth = 600; // TO DELETE
 
@@ -130,18 +130,18 @@ void DashBoardInterface::paintOverChildren (Graphics& g)
 {
     if (!optionsPanel->isVisible())
     {    
-        const bool hubUpgradeAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16())  && hubConfig.getRingIsConnected();
-        const bool ringUpgradeAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected();
+        const bool hubUpgradeAvailable = upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16()  && hubConfig.getRingIsConnected();
+        const bool ringUpgradeAvailable = upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16() && hubConfig.getRingIsConnected();
      
         if (hubUpgradeAvailable || ringUpgradeAvailable || updater.hasNewAvailableVersion()) // if Dash Update or Firm Upgrade available
         {
             int alertCount = 0;
 
-            if ((upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16())
+            if (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16()
                     && hubConfig.getHubIsConnected())
                 alertCount++; // Hub upgrade
             
-            if ((upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16())
+            if (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()
                     && hubConfig.getRingIsConnected())
                 alertCount++; // Ring upgrade
 
@@ -159,19 +159,19 @@ void DashBoardInterface::paintOverChildren (Graphics& g)
         }
 
 	    if (alertPanel != nullptr && alertPanel->isVisible () && privateNav)
-		    g.drawImageAt (neovaHubImage, alertPanel->getX () + ((alertPanel->getWidth () - neovaHubImage.getWidth ()) / 2), alertPanel->getY () + ((alertPanel->getHeight () - neovaHubImage.getHeight ()) / 2));
+		    g.drawImageAt (neovaHubImage, alertPanel->getX () + (alertPanel->getWidth () - neovaHubImage.getWidth ()) / 2, alertPanel->getY () + (alertPanel->getHeight () - neovaHubImage.getHeight ()) / 2);
 	    else
 		    privateNav = false;
     }
 }
 
-void DashBoardInterface::paintShadows (Graphics& g)
+void DashBoardInterface::paintShadows (Graphics& g) const
 {
     Path shadowPath;
 
     // Header Shadow
     {
-        auto headerShadowBounds = header->getBounds();
+        const auto headerShadowBounds = header->getBounds();
 
         shadowPath.addRoundedRectangle (headerShadowBounds.toFloat(), 3.0f);
     }
@@ -187,29 +187,29 @@ void DashBoardInterface::paintShadows (Graphics& g)
         shadowPath.addRoundedRectangle (uploadShadowBounds.toFloat(), 8.0f);
     }
 
-    DropShadow shadow (Colour (0x40000000), 10, {2, 3});
+    const DropShadow shadow (Colour (0x40000000), 10, {2, 3});
     shadow.drawForPath (g, shadowPath);
 }
 
-void DashBoardInterface::drawStateMessage (Graphics& g)
+void DashBoardInterface::drawStateMessage (Graphics& g) const
 {
-    auto area = getLocalBounds().withTop (hubComponent->getBounds().getBottom())
-                                .reduced (neova_dash::ui::MARGIN*2);
+    const auto area = getLocalBounds().withTop (hubComponent->getBounds().getBottom())
+                                      .reduced (neova_dash::ui::MARGIN*2);
     g.setColour (neova_dash::colour::mainText);
     g.setFont (neova_dash::font::dashFontNorms.withHeight (35.0f));
 
     String stateMessage;
 
-    if (state == int (waitingForConnection))
+    if (state == static_cast<int>(waitingForConnection))
     {
         stateMessage = "Welcome to NEOVA DASHBOARD"
                        "\n\nPlease connect your HUB.";
     }
-    else if (state == int (pause))
+    else if (state == static_cast<int>(pause))
     {
         stateMessage = "PAUSE";
     }
-    else if (state == int (incompatible))
+    else if (state == static_cast<int>(incompatible))
     {
         g.setFont (neova_dash::font::dashFontNorms.withHeight (30.0f));
 
@@ -232,14 +232,14 @@ void DashBoardInterface::resized()
     updaterPanel->setBounds (area);
     bugReportPanel->setBounds (area);
 
-	auto gPanelArea = area.removeFromBottom (area.getHeight() / 2 - 35);
+    const auto gPanelArea = area.removeFromBottom (area.getHeight() / 2 - 35);
 
     gesturePanel->setBounds (gPanelArea.reduced (0, MARGIN));
     newGesturePanel->setBounds (gPanelArea);
 
     header->setBounds (area.removeFromTop (HEADER_HEIGHT).reduced (MARGIN_SMALL, MARGIN));
 
-    auto presetAndMidiArea = area.removeFromBottom (15);
+    const auto presetAndMidiArea = area.removeFromBottom (15);
 
     bankSelector->setBounds (presetAndMidiArea.withSizeKeepingCentre (area.getWidth()/6, 30));
     
@@ -348,7 +348,7 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
             {
                 hubConfig.setUint8Value (hubConfig.getSelectedGesture(),
                                          HubConfiguration::on,
-                                         (hubConfig.getGestureData (hubConfig.getSelectedGesture()).on == 1) ? 0 : 1);
+                                         hubConfig.getGestureData (hubConfig.getSelectedGesture()).on == 1 ? 0 : 1);
                 update();
             }
         }
@@ -356,28 +356,28 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
         {
             hubConfig.setUint8Value (0,
                                      HubConfiguration::on,
-                                     (hubConfig.getGestureData (0).on == 1) ? 0 : 1);
+                                     hubConfig.getGestureData (0).on == 1 ? 0 : 1);
             update();
         }
         else if (key == neova_dash::keyboard_shortcut::muteGesture2)
         {
             hubConfig.setUint8Value (1,
                                      HubConfiguration::on,
-                                     (hubConfig.getGestureData (1).on == 1) ? 0 : 1);
+                                     hubConfig.getGestureData (1).on == 1 ? 0 : 1);
             update();
         }
         else if (key == neova_dash::keyboard_shortcut::muteGesture3)
         {
             hubConfig.setUint8Value (2,
                                      HubConfiguration::on,
-                                     (hubConfig.getGestureData (2).on == 1) ? 0 : 1);
+                                     hubConfig.getGestureData (2).on == 1 ? 0 : 1);
             update();
         }
         else if (key == neova_dash::keyboard_shortcut::muteGesture4)
         {
             hubConfig.setUint8Value (3,
                                      HubConfiguration::on,
-                                     (hubConfig.getGestureData (3).on == 1) ? 0 : 1);
+                                     hubConfig.getGestureData (3).on == 1 ? 0 : 1);
             update();
         }
     }
@@ -519,7 +519,7 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
     
     using namespace neova_dash::commands;
 
-    neova_dash::log::writeToLog ("Executing Frontend Command : " + String (getCommandManager().getNameOfCommand (info.commandID)), neova_dash::log::ui);
+    writeToLog("Executing Frontend Command : " + String (getCommandManager().getNameOfCommand (info.commandID)), neova_dash::log::ui);
 
     switch (info.commandID)
     {
@@ -532,12 +532,12 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             return true;
 			
         case updateBatteryDisplay:
-            if ((state == int (connected) || state == int (pause)) && hubConfig.getHubIsCompatibleInt() < 0)
+            if ((state == static_cast<int>(connected) || state == static_cast<int>(pause)) && hubConfig.getHubIsCompatibleInt() < 0)
             {
                 setInterfaceStateAndUpdate (incompatible);
             }
 
-            if (state == int (connected))
+            if (state == static_cast<int>(connected))
             {
                 header->update();
                 hubComponent->repaint();
@@ -602,14 +602,14 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
 
 void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newState)
 {
-    if (state == int (newState)) return update();
+    if (state == static_cast<int>(newState)) return update();
 
-    state = int (newState);
+    state = static_cast<int>(newState);
 
     optionsPanel->update();
     hubComponent->update();
 
-    if (state == int (connected))
+    if (state == static_cast<int>(connected))
     {
         gesturePanel->setVisible (true);
         gesturePanel->update();
@@ -636,7 +636,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
         midiOutputChannelComponent->setVisible (false);
         midiInputChannelComponent->setVisible (false);
 
-        if (state != int (pause))
+        if (state != static_cast<int>(pause))
         {
             uploadButton->setActive (false);
             hubConfig.resetConfigWasChanged();
@@ -650,7 +650,7 @@ void DashBoardInterface::setInterfaceStateAndUpdate (const InterfaceState newSta
     resized();
     repaint();
 
-    if (state == int (incompatible))
+    if (state == static_cast<int>(incompatible))
     {
         if (hubConfig.getHubIsCompatibleInt() > 0)
         {
@@ -697,14 +697,14 @@ void DashBoardInterface::setInterfaceStateAndUpdate()
     }
 }
 
-int DashBoardInterface::getPresetModeState()
+int DashBoardInterface::getPresetModeState() const
 {
     return presetModeState;
 }
 
 void DashBoardInterface::hubChangedPreset()
 {
-    if (presetModeState == int (presetState))
+    if (presetModeState == static_cast<int>(presetState))
     {
         if (!commandKeyDown && !bankSelector->isMouseOver()
                             && !bankSelector->getChildComponent (0)->isMouseOver()
@@ -728,24 +728,24 @@ void DashBoardInterface::hubChangedPreset()
 
 void DashBoardInterface::setPresetModeState (const PresetModeState newState)
 {
-    if (presetModeState == int (newState)) return;
+    if (presetModeState == static_cast<int>(newState)) return;
 
-    if (newState == int (slaveState))
+    if (newState == static_cast<int>(slaveState))
     {
         hubComponent->lockHubToPresetMode (true);
     }
-    else if (newState == int (normalState))
+    else if (newState == static_cast<int>(normalState))
     {
-        if (presetModeState == int (presetState))
+        if (presetModeState == static_cast<int>(presetState))
         {
             hubComponent->setPresetStateToNormalMode (false);
         }
-        else if (presetModeState == int (slaveState))
+        else if (presetModeState == static_cast<int>(slaveState))
         {
             hubComponent->lockHubToPresetMode (false);
         }
     }
-    else if (newState == int (presetState))
+    else if (newState == static_cast<int>(presetState))
     {
         /* No external object can set the interface to preset mode,
            this change is only allowed internally, through the user's
@@ -755,15 +755,15 @@ void DashBoardInterface::setPresetModeState (const PresetModeState newState)
         return;
     }
 
-    presetModeState = int (newState);
+    presetModeState = static_cast<int>(newState);
 }   
 
-void DashBoardInterface::setPresetStateToPresetMode()
+void DashBoardInterface::setPresetStateToPresetMode() const
 {
     hubComponent->setPresetStateToPresetMode();
 }
 
-void DashBoardInterface::setPresetStateToNormalMode()
+void DashBoardInterface::setPresetStateToNormalMode() const
 {
     hubComponent->setPresetStateToNormalMode();
 }

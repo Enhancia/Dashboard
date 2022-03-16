@@ -11,7 +11,7 @@
 #include "UploadButton.h"
 
 UploadButton::UploadButton (HubConfiguration& config, ApplicationCommandManager& cm, const bool shouldBeActive)
-	: Button ("Upload Button"), commandManager (cm), hubConfig (config), active (shouldBeActive)
+	: Button ("Upload Button"), active (shouldBeActive), commandManager (cm), hubConfig (config)
 {
 	  setInterceptsMouseClicks (active, false);
 }
@@ -51,7 +51,7 @@ void UploadButton::setActive (const bool shouldBeActive)
 	repaint();
 }
 
-bool UploadButton::isActive()
+bool UploadButton::isActive() const
 {
 	return active;
 }
@@ -102,7 +102,7 @@ void UploadButton::paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted,
 	g.drawText ("Upload", textArea.removeFromRight (textArea.getWidth()*2/3), Justification::centred);
 
 	// Upload Path Draw
-	Path uploadPath = neova_dash::path::createPath (neova_dash::path::upload);
+	Path uploadPath = createPath(neova_dash::path::upload);
 	textArea = textArea.withSizeKeepingCentre (textArea.getWidth(), 16);
 	uploadPath.scaleToFit (static_cast<float>(textArea.getX()), static_cast<float>(textArea.getY()),
                            static_cast<float>(textArea.getWidth()), static_cast<float>(textArea.getHeight()), true);
@@ -137,9 +137,9 @@ void UploadButton::stopAnimating()
 	stopTimer();
 }
 
-void UploadButton::drawUploadFeedback (Graphics& g, juce::Rectangle<int> area)
+void UploadButton::drawUploadFeedback (Graphics& g, juce::Rectangle<int> area) const
 {
-	const float animationProgress = animationCounter/float (ANIM_MAX);
+	const float animationProgress = animationCounter/static_cast<float>(ANIM_MAX);
 	const float alpha = animationProgress < 0.5f ? 1.0f
 												 : 1.0f - std::pow (animationProgress*2 - 1.0f, 2.0f);
 

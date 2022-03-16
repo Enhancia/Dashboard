@@ -64,7 +64,7 @@ const String DashPipe::getRawData (int index)
 	//return (*data)[index];
 }
 
-void DashPipe::getDataBuffer(uint8_t * buffer, int bytesToRead)
+void DashPipe::getDataBuffer(uint8_t * buffer, int bytesToRead) const
 {
 	if (bytesToRead <= DATABUFFERSIZE)
 	{
@@ -93,7 +93,7 @@ bool DashPipe::getRawDataAsFloatArray(Array<float>& arrayToFill)
 //==============================================================================
 void  DashPipe::sendString(uint8_t * data, int data_size)
 {
-		bool test = sendMessage(MemoryBlock(data, data_size));
+    const bool test = sendMessage(MemoryBlock(data, data_size));
     DBG("Send string return :" + String(int(test)));
 }
 
@@ -113,7 +113,7 @@ bool DashPipe::connectToExistingPipe()
 }
 
 
-bool DashPipe::isConnected()
+bool DashPipe::isConnected() const
 {
 	return connected;
 }
@@ -143,7 +143,7 @@ void DashPipe::connectionLost()
 
 void DashPipe::messageReceived (const MemoryBlock &message)
 {
-	uint64_t jeannine = *(uint64_t*)message.getData();
+    const uint64_t jeannine = *(uint64_t*)message.getData();
 	if (jeannine == 0x656E696E6E61656A && message.getSize() < DATABUFFERSIZE)
 	{
 		memcpy(dataBuffer, message.getData(), message.getSize());

@@ -74,12 +74,12 @@ namespace neova_dash
         const float WAVE_DEFAULT_MAX =  50.0f;
 
         // Helper methods for gestures
-        extern GestureType intToGestureType (const int typeInt);
-        extern bool isValidGestureType (const int typeInt);
-        extern bool isValidGestureType (const GestureType type);
-        extern const String getTypeString (const GestureType type, const bool withSpacingAndCase);
-        extern const String getTypeString (const int typeInt, const bool withSpacingAndCase);
-        extern const String getDescriptionString (const GestureType type);
+        extern GestureType intToGestureType (int typeInt);
+        extern bool isValidGestureType (int typeInt);
+        extern bool isValidGestureType (GestureType type);
+        extern const String getTypeString (GestureType type, bool withSpacingAndCase);
+        extern const String getTypeString (int typeInt, bool withSpacingAndCase);
+        extern const String getDescriptionString (GestureType type);
 
         extern int computeMidiValue (int type, float value, int rangeLow,
                                                             int rangeHigh,

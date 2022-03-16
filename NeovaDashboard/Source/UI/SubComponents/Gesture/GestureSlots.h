@@ -20,11 +20,11 @@ class GestureComponent : public Component
 public:
     //==============================================================================
     GestureComponent (HubConfiguration& hubCfg, ApplicationCommandManager& manager,
-                                                const int gestNum,
+                      int gestNum,
                                                 const bool& dragModeReference,
                                                 const int& draggedGestureReference,
                                                 const int& draggedOverSlotReference);
-    ~GestureComponent();
+    ~GestureComponent() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -48,7 +48,7 @@ public:
 private:
     //==============================================================================
     void createButton();
-    void drawGesturePath (Graphics& g, juce::Rectangle<int> area);
+    void drawGesturePath (Graphics& g, juce::Rectangle<int> area) const;
 
     //==============================================================================
     HubConfiguration& hubConfig;
@@ -67,7 +67,7 @@ private:
                                                  DashData::ROLLicon_pngSize);*/
 
     //==============================================================================
-    bool on = bool (hubConfig.getGestureData (id).on);
+    bool on = static_cast<bool>(hubConfig.getGestureData(id).on);
     bool selected = false, highlighted = false, solo = false;
 
     //==============================================================================
@@ -84,11 +84,11 @@ class EmptyGestureSlotComponent : public Component
 {
 public:
     //==============================================================================
-    EmptyGestureSlotComponent (HubConfiguration& hubCfg, const int slotId,
+    EmptyGestureSlotComponent (HubConfiguration& hubCfg, int slotId,
                                                          const bool& dragModeReference,
                                                          const int& draggedGestureReference,
                                                          const int& draggedOverSlotReference);
-    ~EmptyGestureSlotComponent();
+    ~EmptyGestureSlotComponent() override;
 
     //==============================================================================
     void paint (Graphics&) override;

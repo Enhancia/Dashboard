@@ -32,7 +32,7 @@ public:
 
 	//==============================================================================
 	DashUpdater();
-	~DashUpdater();
+	~DashUpdater() override;
 
     //==============================================================================
     void finished (URL::DownloadTask* task, bool success) override;
@@ -44,11 +44,11 @@ public:
 	//==============================================================================
     void checkForNewAvailableVersion();
 	void startDownloadProcess();
-    bool hasNewAvailableVersion();
+    bool hasNewAvailableVersion() const;
 
     //==============================================================================
-    downloadState getDownloadState();
-    bool wasSuccessful();
+    downloadState getDownloadState() const;
+    bool wasSuccessful() const;
     float& getDownloadProgressReference();
     String getLatestVersionString();
     File getDownloadedFile();
@@ -59,7 +59,7 @@ public:
 private:
     //==============================================================================
     void initializeFileToDownloadString();
-    var fetchRepoJSON();
+    var fetchRepoJSON() const;
     bool fetchFileURL (DynamicObject& jsonRef);
     
     //==============================================================================

@@ -11,7 +11,7 @@
 #include "MidiPanel.h"
 
 MidiPanel::MidiPanel (HubConfiguration& config, DataReader& reader, const int gestId)
-    : hubConfig (config), dataReader (reader), id (gestId)
+    : id (gestId), hubConfig (config), dataReader (reader)
 {
     createComboBox();
     createLabels();
@@ -134,7 +134,7 @@ void MidiPanel::buttonClicked (Button* bttn)
     }
 }
 
-void MidiPanel::updateComponents()
+void MidiPanel::updateComponents() const
 {
     ccLabel->setText (String (hubConfig.getGestureData (id).cc), dontSendNotification);
 
@@ -145,12 +145,12 @@ void MidiPanel::updateComponents()
     midiRangeTuner->updateHighlightColour();
 }
 
-void MidiPanel::updateDisplay()
+void MidiPanel::updateDisplay() const
 {
     midiRangeTuner->updateDisplay();
 }
 
-MidiRangeTuner& MidiPanel::getTuner()
+MidiRangeTuner& MidiPanel::getTuner() const
 {
     return *midiRangeTuner;
 }
@@ -170,7 +170,7 @@ void MidiPanel::createComboBox()
     }
     else
     {
-        midiTypeBox->setSelectedId (int (hubConfig.getGestureData (id).midiType) + 1, dontSendNotification);
+        midiTypeBox->setSelectedId (static_cast<int>(hubConfig.getGestureData(id).midiType) + 1, dontSendNotification);
     }
     
     // ComboBox look
@@ -188,7 +188,7 @@ void MidiPanel::createLabels()
     
     // CC label
     addAndMakeVisible (*(ccLabel = std::make_unique<Label> ("CC Label", TRANS (String(hubConfig.getGestureData (id).cc)))));
-    ccLabel->setEditable ((midiTypeBox->getSelectedId() == 1), false, false);
+    ccLabel->setEditable (midiTypeBox->getSelectedId() == 1, false, false);
     ccLabel->setFont (neova_dash::font::dashFont.withHeight (13.0f));
     ccLabel->setJustificationType (Justification::centred);
 
@@ -216,12 +216,12 @@ void MidiPanel::createButton()
     reverseButton->addListener (this);
 }
 
-void MidiPanel::setComponentsVisibility()
+void MidiPanel::setComponentsVisibility() const
 {
-    bool shouldGrayOutBox =   (hubConfig.getGestureData (id).type == neova_dash::gesture::none);
+    const bool shouldGrayOutBox =   hubConfig.getGestureData (id).type == neova_dash::gesture::none;
 
-    bool shouldGrayOutTuner = (hubConfig.getGestureData (id).midiType == neova_dash::gesture::pitchMidi||
-                               hubConfig.getGestureData (id).type == neova_dash::gesture::none);
+    const bool shouldGrayOutTuner = hubConfig.getGestureData (id).midiType == neova_dash::gesture::pitchMidi||
+        hubConfig.getGestureData (id).type == neova_dash::gesture::none;
 
     midiTypeBox->setAlpha (shouldGrayOutBox ? 0.3f : 1.0f);
     midiTypeBox->setInterceptsMouseClicks (!shouldGrayOutBox, false);
@@ -247,7 +247,7 @@ void MidiPanel::setComponentsVisibility()
 // Midi Range Tuner
 
 MidiRangeTuner::MidiRangeTuner (HubConfiguration& config, DataReader& reader, const int gestId)
-    : hubConfig (config), dataReader (reader), id (gestId)
+    : id (gestId), hubConfig (config), dataReader (reader)
 {
     highlightColour = neova_dash::gesture::getHighlightColour (hubConfig.getGestureData (id).type,
     														   hubConfig.isGestureActive (id));
@@ -483,8 +483,8 @@ void MidiRangeTuner::mouseUp (const MouseEvent& e)
                 rangeLabelMax->setVisible (false);
             }
 
-        	setRangeLow (float (lowSlider->getValue()), false);
-        	setRangeHigh (float (highSlider->getValue()));
+        	setRangeLow (static_cast<float>(lowSlider->getValue()), false);
+        	setRangeHigh (static_cast<float>(highSlider->getValue()));
 
             objectBeingDragged = none;
             repaint();
@@ -496,15 +496,15 @@ void MidiRangeTuner::updateDisplay()
 {
     using namespace neova_dash::gesture;
 
-    HubConfiguration::GestureData& gestureData = hubConfig.getGestureData (id);
+    const HubConfiguration::GestureData& gestureData = hubConfig.getGestureData (id);
     const int type = gestureData.type;
 
     if (type == neova_dash::gesture::none || !isEnabled()) return;
 
-    const float& value =  (type == vibrato) ? dataReader.getFloatValueReference (neova_dash::data::variance)
-                         :(type == pitchBend) ? dataReader.getFloatValueReference (neova_dash::data::roll)
-                         :(type == roll) ? dataReader.getFloatValueReference (neova_dash::data::roll)
-                         :(type == tilt) ? dataReader.getFloatValueReference (neova_dash::data::tilt)
+    const float& value =  type == vibrato ? dataReader.getFloatValueReference (neova_dash::data::variance)
+                         :type == pitchBend ? dataReader.getFloatValueReference (neova_dash::data::roll)
+                         :type == roll ? dataReader.getFloatValueReference (neova_dash::data::roll)
+                         :type == tilt ? dataReader.getFloatValueReference (neova_dash::data::tilt)
                          : dataReader.getFloatValueReference (neova_dash::data::tilt); // default: tilt value
 
     const bool valueIsInRange = !isValueOutOfGestureRange (type, value);
@@ -514,8 +514,8 @@ void MidiRangeTuner::updateDisplay()
                                                                  gestureData.reverse,
                                                                  gestureData.gestureParam0,
                                                                  gestureData.gestureParam1,
-                                                                 (type != vibrato ? gestureData.gestureParam2
-                                                                                  : dataReader.getFloatValueReference (neova_dash::data::acceleration)),
+                                                                 type != vibrato ? gestureData.gestureParam2
+                                                                     : dataReader.getFloatValueReference (neova_dash::data::acceleration),
                                                                  gestureData.gestureParam3,
                                                                  gestureData.gestureParam4,
                                                                  gestureData.gestureParam5);
@@ -534,23 +534,23 @@ void MidiRangeTuner::updateComponents()
     // Sets slider value
     if (lowSlider->getThumbBeingDragged() == -1)
     {
-        lowSlider->setValue (double (getRangeLow()), dontSendNotification);
+        lowSlider->setValue (getRangeLow(), dontSendNotification);
     }
 
     if (highSlider->getThumbBeingDragged() == -1)
     {
-        highSlider->setValue (double (getRangeHigh()), dontSendNotification);
+        highSlider->setValue (getRangeHigh(), dontSendNotification);
     }
     
     // Sets label text
-    if (!(rangeLabelMin->isBeingEdited()))
+    if (!rangeLabelMin->isBeingEdited())
     {
-        rangeLabelMin->setText (String (int (getRangeLow())), dontSendNotification);
+        rangeLabelMin->setText (String (static_cast<int>(getRangeLow())), dontSendNotification);
     }
       
-    if (!(rangeLabelMax->isBeingEdited()))
+    if (!rangeLabelMax->isBeingEdited())
     {
-        rangeLabelMax->setText (String (int (getRangeHigh())), dontSendNotification);
+        rangeLabelMax->setText (String (static_cast<int>(getRangeHigh())), dontSendNotification);
     }
 
     //reverseButton->setToggleState (true); TO CHANGE
@@ -578,22 +578,22 @@ void MidiRangeTuner::updateHighlightColour()
     repaint();
 }
 
-void MidiRangeTuner::setRangeLow (float val, bool uploadToHub)
+void MidiRangeTuner::setRangeLow (float val, bool uploadToHub) const
 {
-	hubConfig.setUint8Value (id, HubConfiguration::midiLow, uint8 (val), uploadToHub);
+	hubConfig.setUint8Value (id, HubConfiguration::midiLow, static_cast<uint8>(val), uploadToHub);
 }
-void MidiRangeTuner::setRangeHigh (float val, bool uploadToHub)
+void MidiRangeTuner::setRangeHigh (float val, bool uploadToHub) const
 {
-	hubConfig.setUint8Value (id, HubConfiguration::midiHigh, uint8 (val), uploadToHub);
+	hubConfig.setUint8Value (id, HubConfiguration::midiHigh, static_cast<uint8>(val), uploadToHub);
 }
 
-float MidiRangeTuner::getRangeLow()
+float MidiRangeTuner::getRangeLow() const
 {
-    return float (hubConfig.getGestureData (id).midiLow);
+    return hubConfig.getGestureData(id).midiLow;
 }
-float MidiRangeTuner::getRangeHigh()
+float MidiRangeTuner::getRangeHigh() const
 {
-    return float (hubConfig.getGestureData (id).midiHigh);
+    return hubConfig.getGestureData(id).midiHigh;
 }
 
 void MidiRangeTuner::createLabels()
@@ -624,17 +624,17 @@ void MidiRangeTuner::createLabels()
     setLabelAttributes (*rangeLabelMax);
 }
 
-void MidiRangeTuner::setLabelBounds (Label& labelToResize)
+void MidiRangeTuner::setLabelBounds (Label& labelToResize) const
 {
     if (&labelToResize == rangeLabelMin.get())
     {
-        rangeLabelMin->setCentrePosition (jmin (jmax ((int) getThumbX (lowThumb), rangeLabelMin->getWidth()/2),
+        rangeLabelMin->setCentrePosition (jmin (jmax (static_cast<int>(getThumbX(lowThumb)), rangeLabelMin->getWidth()/2),
                                                 getWidth() - rangeLabelMin->getWidth()/2),
                                           lowSlider->getBounds().getCentreY() - 16);
     }
     else if (&labelToResize == rangeLabelMax.get())
     {
-        rangeLabelMax->setCentrePosition (jmin (jmax ((int) getThumbX (highThumb), rangeLabelMax->getWidth()/2),
+        rangeLabelMax->setCentrePosition (jmin (jmax (static_cast<int>(getThumbX(highThumb)), rangeLabelMax->getWidth()/2),
                                                 getWidth() - rangeLabelMax->getWidth()/2),
                                           highSlider->getBounds().getCentreY() - 16);
     }
@@ -661,7 +661,7 @@ void MidiRangeTuner::createSliders()
     setSliderSettings (*highSlider, getRangeHigh());
 }
 
-float MidiRangeTuner::getThumbX (DraggableObject thumb)
+float MidiRangeTuner::getThumbX (DraggableObject thumb) const
 {
     if (thumb == lowThumb)
     {
@@ -682,7 +682,7 @@ void MidiRangeTuner::handleSliderClick (const MouseEvent&)
 
 }
 
-MidiRangeTuner::DraggableObject MidiRangeTuner::getObjectToDrag (const MouseEvent& e)
+MidiRangeTuner::DraggableObject MidiRangeTuner::getObjectToDrag (const MouseEvent& e) const
 {
     if (e.x < 0 || e.x > highSlider->getWidth())
         return none;
@@ -692,25 +692,25 @@ MidiRangeTuner::DraggableObject MidiRangeTuner::getObjectToDrag (const MouseEven
 
     const float tolerance = (getThumbX (highThumb) - getThumbX (lowThumb))/5.0f;
 
-    if ((float) e.x <= getThumbX (lowThumb) + tolerance)
+    if (static_cast<float>(e.x) <= getThumbX (lowThumb) + tolerance)
         return lowThumb;
     
-    if ((float) e.x < getThumbX (highThumb) - tolerance)
+    if (static_cast<float>(e.x) < getThumbX (highThumb) - tolerance)
         return middleArea;
 
     return highThumb;
 }
 
-void MidiRangeTuner::drawCursor (Graphics& g)
+void MidiRangeTuner::drawCursor (Graphics& g) const
 {
     if (lastValue == -1) return;
 
-    float maxMidiFloat = 127.0f;
+    const float maxMidiFloat = 127.0f;
 
     Path cursorPath;
-    float cursorX = 11.5f + (lowSlider->getWidth() - 23.0f) * (lastValue / maxMidiFloat);
+    const float cursorX = 11.5f + (lowSlider->getWidth() - 23.0f) * (lastValue / maxMidiFloat);
 
-    juce::Point<float> cursorPoint = {cursorX, lowSlider->getBounds().getCentreY() + 9.0f};
+    Point<float> cursorPoint = {cursorX, lowSlider->getBounds().getCentreY() + 9.0f};
 
     cursorPath.addTriangle ({cursorPoint.x - 3.0f, cursorPoint.y + 3.0f},
                             {cursorPoint.x + 3.0f, cursorPoint.y + 3.0f},
@@ -720,16 +720,16 @@ void MidiRangeTuner::drawCursor (Graphics& g)
     g.fillPath (cursorPath);
 }
 
-void MidiRangeTuner::drawSliderBackground (Graphics& g)
+void MidiRangeTuner::drawSliderBackground (Graphics& g) const
 {
     g.setColour (neova_dash::colour::tunerSliderBackground);
     g.fillRoundedRectangle (lowSlider->getBounds().withSizeKeepingCentre (lowSlider->getWidth() - 10, 12)
                                                   .toFloat(),
                             3.0f);
 
-    juce::Point<float> startPoint (getThumbX (lowThumb), lowSlider->getY() + lowSlider->getHeight() * 0.5f);
+    const Point<float> startPoint (getThumbX (lowThumb), lowSlider->getY() + lowSlider->getHeight() * 0.5f);
 
-    juce::Point<float> endPoint (getThumbX (highThumb), highSlider->getY() + highSlider->getHeight() * 0.5f);
+    const Point<float> endPoint (getThumbX (highThumb), highSlider->getY() + highSlider->getHeight() * 0.5f);
 
     Path valueTrack;
     valueTrack.startNewSubPath (startPoint);

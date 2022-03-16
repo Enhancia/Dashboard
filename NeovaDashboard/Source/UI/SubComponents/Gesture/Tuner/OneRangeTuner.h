@@ -38,10 +38,10 @@ public:
     };
 
     //==============================================================================
-    OneRangeTuner (HubConfiguration& config, const int gestureId,
+    OneRangeTuner (HubConfiguration& config, int gestureId,
 				   const float& val, NormalisableRange<float> gestureRange,
-                   const Range<float> paramMax, const String unit = "", TunerStyle style = tilt);
-    ~OneRangeTuner();
+                   Range<float> paramMax, String unit = "", TunerStyle style = tilt);
+    ~OneRangeTuner() override;
     
     //==============================================================================
     void paint (Graphics& g) override;
@@ -50,7 +50,7 @@ public:
     void updateComponents() override;
     void updateDisplay() override;
 
-    void setColour (const Colour newColour) override;
+    void setColour (Colour newColour) override;
     void updateColour() override;
     
     //==============================================================================
@@ -80,28 +80,28 @@ private:
     void resizeSliders();
     void createLabels();
     void createButtons();
-    void resizeButtons();
+    void resizeButtons() const;
     
     //==============================================================================
-    void setRangeLow (float value, bool uploadToHub = true);
-    void setRangeHigh (float value, bool uploadToHub = true);
+    void setRangeLow (float value, bool uploadToHub = true) const;
+    void setRangeHigh (float value, bool uploadToHub = true) const;
     
-    float getRangeLow();
-    float getRangeHigh();
+    float getRangeLow() const;
+    float getRangeHigh() const;
 
-    double getAngleFromMouseEventRadians (const MouseEvent& e);
-    double getThumbAngleRadians (const DraggableObject thumb);
+    double getAngleFromMouseEventRadians (const MouseEvent& e) const;
+    double getThumbAngleRadians (DraggableObject thumb) const;
 
-    DraggableObject getObjectToDrag (const MouseEvent& e);
+    DraggableObject getObjectToDrag (const MouseEvent& e) const;
     void handleSingleClick (const MouseEvent& e);
-    void handleDoubleClick (const MouseEvent& e);
+    void handleDoubleClick (const MouseEvent& e) const;
 
-    void drawTunerSliderBackground (Graphics& g);
-    void updateLabelBounds (Label* labelToUpdate);
+    void drawTunerSliderBackground (Graphics& g) const;
+    void updateLabelBounds (Label* labelToUpdate) const;
 
-    float getValueAngle();
+    float getValueAngle() const;
     void drawValueCursor (Graphics& g);
-    void drawLineFromSliderCentre (Graphics&, float angleRadian);
+    void drawLineFromSliderCentre (Graphics&, float angleRadian) const;
     void drawThumbsAndToleranceLines (Graphics& g);
     
     //==============================================================================
@@ -126,7 +126,7 @@ private:
 
     juce::Rectangle<int> sliderBounds;
     float sliderRadius;
-    juce::Point<int> sliderCentre;
+    Point<int> sliderCentre;
     float startAngle;
     float endAngle;
     bool maxAngleBtnIsHovered = false;

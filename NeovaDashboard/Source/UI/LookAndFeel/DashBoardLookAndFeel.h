@@ -18,7 +18,7 @@ class DashBoardLookAndFeel : public LookAndFeel_V4
 public:
     //==============================================================================
 	  DashBoardLookAndFeel();
-	  ~DashBoardLookAndFeel();
+	  ~DashBoardLookAndFeel() override;
 	
     //==============================================================================
 	  void setColours();
@@ -27,11 +27,11 @@ public:
     void drawRotarySlider (Graphics &,
                            int x, int y, int width, int height,
                            float sliderPosProportional, float rotaryStartAngle, float rotaryEndAngle,
-                           Slider &);
+                           Slider &) override;
     
     void drawLinearSlider (Graphics&, int x, int y, int width, int height,
                            float sliderPos, float minSliderPos, float maxSliderPos,
-                           const Slider::SliderStyle, Slider&) override;
+                           Slider::SliderStyle, Slider&) override;
 	  
     //==============================================================================
     int getDefaultScrollbarWidth() override;
@@ -58,7 +58,7 @@ public:
     //==============================================================================
     //void drawPopupMenuBackground (Graphics&, int width, int height) override;
 	  /*
-    void drawPopupMenuItem (Graphics&, const Rectangle<int>& area,
+    void drawPopupMenuItem (Graphics&, const juce::Rectangle<int>& area,
                             bool isSeparator, bool isActive, bool isHighlighted, bool isTicked, bool hasSubMenu,
                             const String& text, const String& shortcutKeyText,
                             const Drawable* icon, const Colour* textColour) override;
@@ -73,7 +73,7 @@ class RangeTunerLookAndFeel : public DashBoardLookAndFeel
 {
 public:
     RangeTunerLookAndFeel() {}
-    ~RangeTunerLookAndFeel() {}
+    ~RangeTunerLookAndFeel() override {}
 
     void drawRotarySlider (Graphics &,
                            int x, int y, int width, int height,

@@ -33,9 +33,9 @@ public:
     //==============================================================================
     DashAlertPanel (const String& title, const String& message,
                                          int returnValue = 0,
-                                         const bool hasCloseButton = true,
+                                         bool hasCloseButton = true,
                                          const String& buttonText = String());
-    ~DashAlertPanel();
+    ~DashAlertPanel() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -52,7 +52,7 @@ private:
     //==============================================================================
     void createAndAddTextEditor (const String& textToSet);
     void createAndAddLabel (const String& textToSet);
-    void createAndAddButtons (const String& buttonText, const bool addCloseButton = true);
+    void createAndAddButtons (const String& buttonText, bool addCloseButton = true);
 
     //==============================================================================
     juce::Rectangle<int> panelArea;

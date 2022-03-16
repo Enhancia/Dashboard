@@ -43,8 +43,8 @@ void GestureSettingsComponent::paint (Graphics& g)
     const int stringWidth = neova_dash::font::dashFontLight.withHeight (11.0f)
                                                            .getStringWidth ("ADVANCED PANEL");
 
-    float advTextHeight = advTextAreaWidth > stringWidth ? 11.0f
-                                                         : 11.0f*advTextAreaWidth/stringWidth;
+    const float advTextHeight = advTextAreaWidth > stringWidth ? 11.0f
+                                    : 11.0f*advTextAreaWidth/stringWidth;
 
     g.setFont (neova_dash::font::dashFontLight.withHeight (advTextHeight));
     g.drawText ("ADVANCED PANEL",
@@ -62,10 +62,10 @@ void GestureSettingsComponent::paint (Graphics& g)
                 Justification::centred, false);
 }
 
-void GestureSettingsComponent::paintBackground (Graphics& g)
+void GestureSettingsComponent::paintBackground (Graphics& g) const
 {
     using namespace neova_dash::ui;
-    auto area = getLocalBounds().withBottom (midiPanel != nullptr ? midiPanel->getBottom() : getHeight());
+    const auto area = getLocalBounds().withBottom (midiPanel != nullptr ? midiPanel->getBottom() : getHeight());
 
     // Tuner backGround
     g.setColour (neova_dash::colour::gestureBackground);
@@ -83,10 +83,10 @@ void GestureSettingsComponent::paintBackground (Graphics& g)
         Path tile;
         tile.addEllipse (0, 0, 2, 2);
 
-        neova_dash::ui::paintTiledPath (g, tile,
-                                        area.withBottom (midiPanel->getY())
-                                        .toFloat(),
-                                        15.0f, 15.0f, neova_dash::colour::gestureBackground2, Colour (0), 0.0f);
+        paintTiledPath(g, tile,
+                       area.withBottom (midiPanel->getY())
+                           .toFloat(),
+                       15.0f, 15.0f, neova_dash::colour::gestureBackground2, Colour (0), 0.0f);
 
         g.saveState();
         
@@ -129,31 +129,31 @@ void GestureSettingsComponent::updateDisplay()
 
 void GestureSettingsComponent::disableIfGestureWasDeleted()
 {
-    if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::none))
+    if (hubConfig.getGestureData (gestureId).type == static_cast<uint8>(neova_dash::gesture::none))
     {
         disabled = true;
     }
 }
 
-void GestureSettingsComponent::updateComponents()
+void GestureSettingsComponent::updateComponents() const
 {
 	if (gestTuner != nullptr) gestTuner->updateColour();
 }
 
 void GestureSettingsComponent::createTuner()
 {
-	if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::vibrato))
+	if (hubConfig.getGestureData (gestureId).type == static_cast<uint8>(neova_dash::gesture::vibrato))
     {
         gestTuner = std::make_unique <VibratoTuner> (hubConfig, dataReader, gestureId);
         addAndMakeVisible (*gestTuner);
     }
-    else if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::pitchBend))
+    else if (hubConfig.getGestureData (gestureId).type == static_cast<uint8>(neova_dash::gesture::pitchBend))
     {
         gestTuner = std::make_unique <PitchBendTuner> (hubConfig, dataReader, gestureId);
         addAndMakeVisible (*gestTuner);
     }
     
-    else if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::tilt))
+    else if (hubConfig.getGestureData (gestureId).type == static_cast<uint8>(neova_dash::gesture::tilt))
     {
         gestTuner = std::make_unique <TiltTuner> (hubConfig, dataReader, gestureId);
         addAndMakeVisible (*gestTuner);
@@ -165,7 +165,7 @@ void GestureSettingsComponent::createTuner()
         addAndMakeVisible (*gestTuner);
     }
     */
-    else if (hubConfig.getGestureData (gestureId).type == uint8 (neova_dash::gesture::roll))
+    else if (hubConfig.getGestureData (gestureId).type == static_cast<uint8>(neova_dash::gesture::roll))
     {
         gestTuner = std::make_unique <RollTuner> (hubConfig, dataReader, gestureId);
         addAndMakeVisible (*gestTuner);
@@ -189,14 +189,14 @@ void GestureSettingsComponent::createToggles()
                                                                                                       .type, false));
     addAndMakeVisible (*muteButton);
 
-    muteButton->setShape (neova_dash::path::createPath (neova_dash::path::onOff), false, true, false);
+    muteButton->setShape (createPath(neova_dash::path::onOff), false, true, false);
     muteButton->setToggleState (!hubConfig.isGestureActive (gestureId), dontSendNotification);
     muteButton->setClickingTogglesState (true);
     muteButton->onClick = [this] ()
     {
-        if (hubConfig.getGestureData (gestureId).type != uint8 (neova_dash::gesture::none))
+        if (hubConfig.getGestureData (gestureId).type != static_cast<uint8>(neova_dash::gesture::none))
         {
-            hubConfig.setUint8Value (gestureId, HubConfiguration::on, uint8 (muteButton->getToggleState() ? 0 : 1));
+            hubConfig.setUint8Value (gestureId, HubConfiguration::on, static_cast<uint8>(muteButton->getToggleState() ? 0 : 1));
             commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
         }
     };
@@ -212,7 +212,7 @@ void GestureSettingsComponent::createMidiPanel()
     midiPanel->setVisible (neova_dash::gesture::isValidGestureType (hubConfig.getGestureData (gestureId).type));
 }
 
-Tuner& GestureSettingsComponent::getTuner()
+Tuner& GestureSettingsComponent::getTuner() const
 {
 	return *gestTuner;
 }

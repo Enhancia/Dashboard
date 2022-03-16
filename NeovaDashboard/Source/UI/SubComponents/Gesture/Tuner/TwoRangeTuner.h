@@ -34,10 +34,10 @@ public:
     };
 
     //==============================================================================
-    TwoRangeTuner (HubConfiguration& config, const int gestureId,
-				   const float& val, const NormalisableRange<float> gestureRange,
-                   const Range<float> paramMax, const String unit = "");
-    ~TwoRangeTuner();
+    TwoRangeTuner (HubConfiguration& config, int gestureId,
+				   const float& val, NormalisableRange<float> gestureRange,
+                   Range<float> paramMax, String unit = "");
+    ~TwoRangeTuner() override;
     
     //==============================================================================
     void paint (Graphics& g) override;
@@ -47,7 +47,7 @@ public:
     void updateComponents (DraggableObject thumbThatShouldUpdate);
     void updateDisplay() override;
 
-    void setColour (const Colour newColour) override;
+    void setColour (Colour newColour) override;
     void updateColour() override;
     
     //==============================================================================
@@ -76,33 +76,33 @@ private:
     void resizeSliders();
     void createLabels();
     void createButtons();
-    void resizeButtons();
+    void resizeButtons() const;
     
     //==============================================================================
-    void setRangeLeftLow (float value, bool uploadToHub = true);
-    void setRangeLeftHigh (float value, bool uploadToHub = true);
-    void setRangeRightLow (float value, bool uploadToHub = true);
-    void setRangeRightHigh (float value, bool uploadToHub = true);
+    void setRangeLeftLow (float value, bool uploadToHub = true) const;
+    void setRangeLeftHigh (float value, bool uploadToHub = true) const;
+    void setRangeRightLow (float value, bool uploadToHub = true) const;
+    void setRangeRightHigh (float value, bool uploadToHub = true) const;
     
-    float getRangeLeftLow();
-    float getRangeLeftHigh();
-    float getRangeRightLow();
-    float getRangeRightHigh();
+    float getRangeLeftLow() const;
+    float getRangeLeftHigh() const;
+    float getRangeRightLow() const;
+    float getRangeRightHigh() const;
     
     //==============================================================================
-    double getAngleFromMouseEventRadians (const MouseEvent& e);
-    double getThumbAngleRadians (const DraggableObject thumb);
+    double getAngleFromMouseEventRadians (const MouseEvent& e) const;
+    double getThumbAngleRadians (DraggableObject thumb) const;
 
-    DraggableObject getObjectToDrag (const MouseEvent& e);
+    DraggableObject getObjectToDrag (const MouseEvent& e) const;
     void handleSingleClick (const MouseEvent& e);
-    void handleDoubleClick (const MouseEvent& e);
+    void handleDoubleClick (const MouseEvent& e) const;
 
-    void drawTunerSliderBackground (Graphics& g);
-    void updateLabelBounds (Label* labelToUpdate);
+    void drawTunerSliderBackground (Graphics& g) const;
+    void updateLabelBounds (Label* labelToUpdate) const;
 
-    float getValueAngle();
+    float getValueAngle() const;
     void drawValueCursor (Graphics& g);
-    void drawLineFromSliderCentre (Graphics& g, float angleRadian);
+    void drawLineFromSliderCentre (Graphics& g, float angleRadian) const;
     void drawThumbsAndToleranceLines (Graphics& g);
     
     //==============================================================================
@@ -134,7 +134,7 @@ private:
 
     juce::Rectangle<int> sliderBounds;
     float sliderRadius;
-    juce::Point<int> sliderCentre;
+    Point<int> sliderCentre;
     float startAngle;
     float endAngle;
     bool maxLeftAngleBtnIsHovered = false;

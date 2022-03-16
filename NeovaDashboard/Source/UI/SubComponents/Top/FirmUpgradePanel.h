@@ -60,7 +60,7 @@ public:
 
     //==============================================================================
     FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler, ApplicationCommandManager& manager, DataReader& dataReaderRef);
-    ~FirmUpgradePanel();
+    ~FirmUpgradePanel() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -77,7 +77,7 @@ public:
     void setAndOpenPanel();
     void closeAndResetPanel();
     void updateAfterHubConnection();
-    bool isWaitingForHubReconnect();
+    bool isWaitingForHubReconnect() const;
 
 private:
     //==============================================================================

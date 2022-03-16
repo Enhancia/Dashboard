@@ -30,7 +30,7 @@ public:
     GesturePanel (HubConfiguration& data, DataReader& reader,
                   NewGesturePanel& newGest, ApplicationCommandManager& manager,
                   int freqHz = 60);
-    ~GesturePanel();
+    ~GesturePanel() override;
 
     //==============================================================================
     void update();
@@ -54,15 +54,15 @@ public:
     void initialiseGestureSlots();
     void updateGestureSlots();
     void resizeSlotsAndTrimAreaAccordingly (juce::Rectangle<int>& area, int marginX = neova_dash::ui::MARGIN,
-                                                                        int marginY = neova_dash::ui::MARGIN);
+                                            int marginY = neova_dash::ui::MARGIN) const;
     void removeGestureAndGestureComponent (int gestureId);
-    bool hasSelectedGesture();
-    void renameGestureInSlot (int slotNumber);
+    bool hasSelectedGesture() const;
+    void renameGestureInSlot (int slotNumber) const;
 
 private:
     //==============================================================================
     void switchGestureSelectionState (GestureComponent& gestureComponentToSwitch);
-    void selectGestureExclusive (const int idToSelect);
+    void selectGestureExclusive (int idToSelect);
     void selectGestureExclusive (GestureComponent& gestureComponentToSelect);
     void unselectCurrentGesture ();
     void updateSlotIfNeeded (int slotToCheck);
@@ -72,7 +72,7 @@ private:
     //==============================================================================
     void createMenuForGestureId (int id);
     static void menuCallback (int result, GesturePanel* gPanel, int id);
-    void handleMenuResult (int gestureId, const int menuResult);
+    void handleMenuResult (int gestureId, int menuResult);
     void handleLeftClickUp (const MouseEvent &event);
     void handleLeftClickDrag (const MouseEvent &event);
 
@@ -81,7 +81,7 @@ private:
     void endDragMode();
 
     //==============================================================================
-    void paintShadows (Graphics& g);
+    void paintShadows (Graphics& g) const;
     
     //==============================================================================
     OwnedArray<Component> gestureSlots;

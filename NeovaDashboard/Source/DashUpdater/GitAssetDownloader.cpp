@@ -30,7 +30,7 @@ std::unique_ptr<URL::DownloadTask> GitAssetDownloader::downloadAsset (const URL&
 bool GitAssetDownloader::getRedirectURL (const URL& assetURL, URL& redirectURL)
 {
 	redirectURL = URL();
-	String headers = "\r\nAuthorization: token " + neova_dash::auth::MACHINE_TOKEN + "\r\nAccept: application/octet-stream\r\n";
+    const String headers = "\r\nAuthorization: token " + neova_dash::auth::MACHINE_TOKEN + "\r\nAccept: application/octet-stream\r\n";
 
 	int status;
 	StringPairArray responseHeaders;
@@ -61,7 +61,7 @@ bool GitAssetDownloader::getRedirectURL (const URL& assetURL, URL& redirectURL)
 	{
 		std::cout << "\nRedirect! New location : \n" << responseHeaders.getValue ("location", "");
 
-		URL serverURL (responseHeaders.getValue ("location", String()));
+        const URL serverURL (responseHeaders.getValue ("location", String()));
 
 		if (serverURL.isWellFormed())
 		{

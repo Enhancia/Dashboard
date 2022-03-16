@@ -33,7 +33,7 @@ public:
             tiltValue (reader.getFloatValueReference (neova_dash::data::tilt))
     {}
     
-    ~PitchBendTuner()
+    ~PitchBendTuner() override
     {}
 
 private:
@@ -50,12 +50,12 @@ public:
         :   OneRangeTuner (config, gestureId, reader.getFloatValueReference (neova_dash::data::tilt), 
         				   NormalisableRange<float> (neova_dash::gesture::TILT_MIN, neova_dash::gesture::TILT_MAX),
 			               Range<float> (neova_dash::ui::TILT_DISPLAY_MIN, neova_dash::ui::TILT_DISPLAY_MAX),
-                           String (CharPointer_UTF8 ("\xc2\xb0")), OneRangeTuner::tilt),
+                           String (CharPointer_UTF8 ("\xc2\xb0")), tilt),
 
             rollValue (reader.getFloatValueReference (neova_dash::data::roll))
     {}
     
-    ~TiltTuner()
+    ~TiltTuner() override
     {}
 
 private:
@@ -91,11 +91,11 @@ public:
         :   OneRangeTuner (config, gestureId, reader.getFloatValueReference (neova_dash::data::roll), 
         				   NormalisableRange<float> (neova_dash::gesture::ROLL_MIN, neova_dash::gesture::ROLL_MAX),
 			               Range<float> (neova_dash::ui::ROLL_DISPLAY_MIN, neova_dash::ui::ROLL_DISPLAY_MAX),
-                           String (CharPointer_UTF8 ("\xc2\xb0")), OneRangeTuner::roll),
+                           String (CharPointer_UTF8 ("\xc2\xb0")), roll),
             tiltValue (reader.getFloatValueReference (neova_dash::data::tilt))
     {}
     
-    ~RollTuner()
+    ~RollTuner() override
     {}
 
 private:

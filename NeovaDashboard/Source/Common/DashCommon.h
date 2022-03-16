@@ -74,9 +74,9 @@ namespace neova_dash
         const int FRAMERATE = 60; // Display frequency in Hz
 
         extern void paintTiledPath (Graphics&, Path&, juce::Rectangle<float>,
-                                               const float, const float,
-                                               const Colour, const Colour,
-                                               const float);
+                                    float, float,
+                                    Colour, Colour,
+                                    float);
     };
 
     namespace colour
@@ -126,7 +126,7 @@ namespace neova_dash
         static float convertRawBatteryToPercentage (float rawBatteryValue, bool isCharging)
         {
             if (rawBatteryValue < 3.46f && !isCharging) return 0.0f;
-            else if (rawBatteryValue > 4.12 && isCharging) return 1.0f;
+            if (rawBatteryValue > 4.12 && isCharging) return 1.0f;
 
             Array<float> batteryTiers ( {3.52f, 3.58f, 3.61f, 3.64f,
                                          3.69f, 3.76f, 3.84f, 3.92f, 4.01f, 4.12f});
@@ -134,7 +134,7 @@ namespace neova_dash
             // Standard behaviour
             float battery = 0.0f;
 
-            for (float batteryTier : batteryTiers)
+            for (const float batteryTier : batteryTiers)
             {
                 if (isCharging && batteryTier == batteryTiers[0]) continue; // Skips 1st check if ring is charging, 1st level is 2nd battery tier
 
@@ -189,8 +189,8 @@ namespace neova_dash
 
     namespace gesture
     {
-        extern const Colour getHighlightColour (const GestureType type, const bool active = true);
-        extern const Colour getHighlightColour (const int typeInt, const bool active = true);
+        extern const Colour getHighlightColour (GestureType type, bool active = true);
+        extern const Colour getHighlightColour (int typeInt, bool active = true);
     }
 
     namespace midi
@@ -264,12 +264,12 @@ namespace neova_dash
 
                 logString += "[" + logTime.toISO8601(true) + "] ";
 
-                if (auto* currentThread = Thread::getCurrentThread())
+                if (const auto* currentThread = Thread::getCurrentThread())
                 {
                     logString += "[" + currentThread->getThreadName() + "] ";
                 }
                 
-                logString += levelStrings[int(level)] + categoryStrings[int(category)]
+                logString += levelStrings[static_cast<int>(level)] + categoryStrings[static_cast<int>(category)]
                           +  message;
 
                 Logger::writeToLog (logString);

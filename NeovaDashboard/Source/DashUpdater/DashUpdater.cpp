@@ -21,7 +21,7 @@ DashUpdater::~DashUpdater()
 
 void DashUpdater::checkForNewAvailableVersion()
 {
-    auto json (fetchRepoJSON());
+    const auto json (fetchRepoJSON());
     auto* repo (json.getDynamicObject());
 
     if (repo != nullptr)
@@ -73,10 +73,10 @@ void DashUpdater::progress (URL::DownloadTask*,
                             int64 bytesDownloaded,
                             int64 totalLength )
 {
-    DBG ("Downloading ... " << float (bytesDownloaded)/1000 << " / "
+    DBG ("Downloading ... " << static_cast<float>(bytesDownloaded)/1000 << " / "
                             << float (totalLength)/1000 << " Ko\n");
 
-    if (totalLength != 0) downloadProgress = float (bytesDownloaded)/totalLength;
+    if (totalLength != 0) downloadProgress = static_cast<float>(bytesDownloaded)/totalLength;
 }
 
 void DashUpdater::startDownloadProcess()
@@ -88,7 +88,7 @@ void DashUpdater::startDownloadProcess()
         return;
     }
 
-    URL assetURL (fileToDownloadURL);
+    const URL assetURL (fileToDownloadURL);
     DBG ("Attempting to download file : " << assetURL.getFileName());
 
     state = inProgress;
@@ -115,17 +115,17 @@ void DashUpdater::startDownloadProcess()
     downloadTask = GitAssetDownloader::downloadAsset (fileToDownloadURL, downloadedFile, this);
 }
 
-bool DashUpdater::hasNewAvailableVersion()
+bool DashUpdater::hasNewAvailableVersion() const
 {
     return availableVersion;
 }
 
-DashUpdater::downloadState DashUpdater::getDownloadState()
+DashUpdater::downloadState DashUpdater::getDownloadState() const
 {
     return state;
 }
 
-bool DashUpdater::wasSuccessful()
+bool DashUpdater::wasSuccessful() const
 {
     return successful;
 }
@@ -186,7 +186,7 @@ void DashUpdater::initializeFileToDownloadString()
     #endif
 }
 
-var DashUpdater::fetchRepoJSON()
+var DashUpdater::fetchRepoJSON() const
 {
     // Creating input stream to get file link
     int status;
@@ -205,7 +205,7 @@ var DashUpdater::fetchRepoJSON()
     }
 
     // Converting into JSON to get properties
-    String streamString = urlInStream->readEntireStreamAsString();
+    const String streamString = urlInStream->readEntireStreamAsString();
     return JSON::parse (streamString);
 }
 

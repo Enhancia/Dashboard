@@ -30,12 +30,12 @@ public:
 
         Creates the button with its default attributes' values.
     */
-    UploadButton (HubConfiguration& config, ApplicationCommandManager& cm, const bool shouldBeActive = false);
+    UploadButton (HubConfiguration& config, ApplicationCommandManager& cm, bool shouldBeActive = false);
 
     /**
         \brief Destructor.
     */
-    ~UploadButton();
+    ~UploadButton() override;
 
     //==============================================================================
     void resized() override;
@@ -51,7 +51,7 @@ public:
 
         \param shouldBeActive Boolean to choose whether the button should be active or not.
     */
-    void setActive (const bool shouldBeActive = true);
+    void setActive (bool shouldBeActive = true);
 
     /**
         \brief Setter that triggers a visual feedback.
@@ -63,7 +63,7 @@ public:
     /**
         \brief Getter for the active attribute.
     */
-    bool isActive();
+    bool isActive() const;
     
     void update();
 
@@ -92,7 +92,7 @@ private:
 
         Tracks the animating counter to draw the "Uploaded!" text accordingly, and increments it until reaching ANIM_MAX value.
     */
-    void drawUploadFeedback (Graphics& g, juce::Rectangle<int> area);
+    void drawUploadFeedback (Graphics& g, juce::Rectangle<int> area) const;
 
 
     //==============================================================================

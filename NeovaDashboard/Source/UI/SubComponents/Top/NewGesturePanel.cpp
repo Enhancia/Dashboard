@@ -32,10 +32,10 @@ void NewGesturePanel::paint (Graphics& g)
 
     // transparent area
     auto gradTransp = ColourGradient::vertical (Colour (0x00000000),
-                                                float (getX()), 
+                                                static_cast<float>(getX()), 
                                                 Colour (neova_dash::colour::topPanelTransparentArea),
-                                                float(getLocalBounds().getBottom()));
-    gradTransp.addColour (0.05f, neova_dash::colour::topPanelTransparentArea);
+                                                static_cast<float>(getLocalBounds().getBottom()));
+    gradTransp.addColour (static_cast<double>(0.05f), neova_dash::colour::topPanelTransparentArea);
 
     g.setGradientFill (gradTransp);
     g.fillRect (getLocalBounds());
@@ -43,11 +43,11 @@ void NewGesturePanel::paint (Graphics& g)
     // panel area
     ColourGradient gradFill (neova_dash::colour::topPanelBackground
                                          .overlaidWith (Colour (0x10000000)),
-                             float (panelArea.getCentreX()),
-                             float (panelArea.getBottom()),
+                             (static_cast<float>(panelArea.getCentreX())),
+                             (static_cast<float>(panelArea.getBottom())),
                              neova_dash::colour::topPanelBackground,
-                             float (panelArea.getCentreX()),
-                             float (panelArea.getY()),
+                             (static_cast<float>(panelArea.getCentreX())),
+                             (static_cast<float>(panelArea.getY())),
                              true);
     gradFill.addColour (0.7, neova_dash::colour::topPanelBackground
                                          .overlaidWith (Colour (0x10000000)));
@@ -57,9 +57,9 @@ void NewGesturePanel::paint (Graphics& g)
     
     // panel outline
     auto gradOut = ColourGradient::horizontal (Colour (0x10ffffff),
-                                               float(panelArea.getX()), 
+                                               static_cast<float>(panelArea.getX()), 
                                                Colour (0x10ffffff),
-                                               float(panelArea.getRight()));
+                                               static_cast<float>(panelArea.getRight()));
     gradOut.addColour (0.5, Colour (0x50ffffff));
 
     g.setGradientFill (gradOut);
@@ -102,7 +102,7 @@ void NewGesturePanel::mouseEnter (const MouseEvent &event)
 {
     using namespace neova_dash::gesture;
 
-    if (auto* gestureSelector = dynamic_cast<GestureTypeSelector*> (event.eventComponent))
+    if (const auto* gestureSelector = dynamic_cast<GestureTypeSelector*> (event.eventComponent))
     {
             descriptionTextEditor->setText ("", false);
 
@@ -151,7 +151,7 @@ bool NewGesturePanel::keyPressed (const KeyPress& key)
     return false;
 }
 
-void NewGesturePanel::createNewGesture()
+void NewGesturePanel::createNewGesture() const
 {
     using namespace neova_dash::gesture;
 
@@ -175,11 +175,11 @@ void NewGesturePanel::showPanelForGestureID (const int gestureID)
             jassertfalse;
             return;
     }
-    else if (hubConfig.getGestureData (gestureID).type != int (neova_dash::gesture::none))
+    if (hubConfig.getGestureData (gestureID).type != static_cast<int>(neova_dash::gesture::none))
     {
-            // Dash tries to create a gesture for an id that already has a gesture!!
-            jassertfalse;
-            return;
+        // Dash tries to create a gesture for an id that already has a gesture!!
+        jassertfalse;
+        return;
     }
 
     if (isVisible())
@@ -201,12 +201,12 @@ void NewGesturePanel::hidePanel (const bool resetSelectedSlot)
     setVisible (false);
 }
 
-void NewGesturePanel::updateInterface()
+void NewGesturePanel::updateInterface() const
 {
     commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
 }
 
-const int NewGesturePanel::getLastSelectedSlot()
+const int NewGesturePanel::getLastSelectedSlot() const
 {
       return selectedGestureSlot;
 }
@@ -253,17 +253,17 @@ void NewGesturePanel::createGestureSelectorButtons()
         gestureSelectors.getLast()->addMouseListener (this, false);
     }
 }
-void NewGesturePanel::resizeGestureSelectorButtons (juce::Rectangle<int> buttonsArea)
+void NewGesturePanel::resizeGestureSelectorButtons (juce::Rectangle<int> buttonsArea) const
 {
     using namespace neova_dash::ui;
 
-    int N = neova_dash::gesture::numTypes;
+    const int N = neova_dash::gesture::numTypes;
 
-    int selectorWidth = (buttonsArea.getWidth() - (N - 1 - 1)*MARGIN) / (N - 1); // TODO WAVE remove -1 when wave is implemented
+    const int selectorWidth = (buttonsArea.getWidth() - (N - 1 - 1)*MARGIN) / (N - 1); // TODO WAVE remove -1 when wave is implemented
 
     for (int i=0; i < N; i++)
     {
-            if (i == (int) neova_dash::gesture::wave) continue; // TODO WAVE remove when wave is implemented
+            if (i == static_cast<int>(neova_dash::gesture::wave)) continue; // TODO WAVE remove when wave is implemented
 
             gestureSelectors[i]->setBounds (buttonsArea.removeFromLeft (selectorWidth));
             buttonsArea.removeFromLeft (MARGIN);
@@ -345,7 +345,7 @@ void NewGesturePanel::GestureTypeSelector::setHighlighted (bool shouldBeHighligh
     }
 }
 
-void NewGesturePanel::GestureTypeSelector::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
+void NewGesturePanel::GestureTypeSelector::drawGesturePath (Graphics& g, juce::Rectangle<int> area) const
 {
     using namespace neova_dash::gesture;
 
@@ -356,20 +356,20 @@ void NewGesturePanel::GestureTypeSelector::drawGesturePath (Graphics& g, juce::R
     Path gesturePath;
     switch (gestureType)
     {
-        case (neova_dash::gesture::tilt):
-            gesturePath = neova_dash::path::createPath (neova_dash::path::tilt);
+        case tilt:
+            gesturePath = createPath(neova_dash::path::tilt);
             break;
 
-        case (neova_dash::gesture::vibrato):
-            gesturePath = neova_dash::path::createPath (neova_dash::path::vibrato);
+        case vibrato:
+            gesturePath = createPath(neova_dash::path::vibrato);
             break;
 
-        case (neova_dash::gesture::pitchBend):
-            gesturePath = neova_dash::path::createPath (neova_dash::path::pitchBend);
+        case pitchBend:
+            gesturePath = createPath(neova_dash::path::pitchBend);
             break;
 
-        case (neova_dash::gesture::roll):
-            gesturePath = neova_dash::path::createPath (neova_dash::path::roll);
+        case roll:
+            gesturePath = createPath(neova_dash::path::roll);
             break;
 
         default:
@@ -383,7 +383,7 @@ void NewGesturePanel::GestureTypeSelector::drawGesturePath (Graphics& g, juce::R
                             area.toFloat().getHeight(),
                         false);
 
-    Colour pathColour (0xff808080);
+    const Colour pathColour (0xff808080);
     ColourGradient gesturePathGradient (pathColour.withAlpha (0.2f),
                                         {area.toFloat().getX(),
                                          area.toFloat().getY() + area.toFloat().getHeight()},

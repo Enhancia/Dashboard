@@ -32,7 +32,7 @@ public:
 
     //==============================================================================
     UpdaterPanel (DashUpdater& updtr, ApplicationCommandManager& manager, float& updateProgress);
-    ~UpdaterPanel();
+    ~UpdaterPanel() override;
 
     //==============================================================================
     void paint (Graphics&) override;

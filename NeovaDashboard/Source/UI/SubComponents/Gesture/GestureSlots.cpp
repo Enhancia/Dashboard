@@ -18,8 +18,8 @@ GestureComponent::GestureComponent (HubConfiguration& hubCfg, ApplicationCommand
                                                               const bool& dragModeReference,
                                                               const int& draggedGestureReference,
                                                               const int& draggedOverSlotReference)
-    : hubConfig (hubCfg), commandManager (manager),
-      id (gestNum), type (hubCfg.getGestureData (id).type),
+    : id (gestNum), type (hubCfg.getGestureData (id).type),
+      hubConfig (hubCfg), commandManager (manager),
       dragMode (dragModeReference),
       draggedGesture (draggedGestureReference),
       draggedOverSlot (draggedOverSlotReference)
@@ -61,7 +61,7 @@ void GestureComponent::paint (Graphics& g)
     // Gesture Name
     g.setColour (neova_dash::colour::mainText);
     g.setFont (neova_dash::font::dashFont.withHeight (17.0f).withExtraKerningFactor (0.06f));
-    g.drawText (neova_dash::gesture::getTypeString (neova_dash::gesture::intToGestureType(type), true).toUpperCase(),
+    g.drawText (getTypeString(neova_dash::gesture::intToGestureType(type), true).toUpperCase(),
                 getLocalBounds(), Justification::centred);
 
     // Outline
@@ -82,8 +82,8 @@ void GestureComponent::paint (Graphics& g)
     auto area = getLocalBounds().withTrimmedTop (30);
 
     // Bottom display
-    auto stateArea = area.removeFromBottom (25)
-                         .reduced (neova_dash::ui::MARGIN*3, neova_dash::ui::MARGIN_SMALL);
+    const auto stateArea = area.removeFromBottom (25)
+                               .reduced (neova_dash::ui::MARGIN*3, neova_dash::ui::MARGIN_SMALL);
 
     g.setFont (neova_dash::font::dashFont.withHeight (13.0f));
     g.setColour (neova_dash::colour::subText);
@@ -156,27 +156,27 @@ void GestureComponent::createButton()
 
 	using namespace neova_dash;
 
-    muteButton->setShape (path::createPath (path::onOff), false, true, false);
+    muteButton->setShape (createPath(path::onOff), false, true, false);
     muteButton->setOutline (gesture::getHighlightColour (type, hubConfig.isGestureActive (id)),
                             1.5f);
     muteButton->setToggleState (!hubConfig.isGestureActive (id), dontSendNotification);
     muteButton->setClickingTogglesState (true);
     muteButton->onClick = [this] ()
     {
-        hubConfig.setUint8Value (id, HubConfiguration::on, uint8 (muteButton->getToggleState() ? 0 : 1));
+        hubConfig.setUint8Value (id, HubConfiguration::on, static_cast<uint8>(muteButton->getToggleState() ? 0 : 1));
 
         if (hubConfig.getSelectedGesture() != id)
         {
             hubConfig.setSelectedGesture (id);
         }
 
-        commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
+        commandManager.invokeDirectly (commands::updateDashInterface, true);
     };
 
     muteButton->setVisible (gesture::isValidGestureType (type));
 }
 
-void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
+void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area) const
 {
     /*
     Image gestureImage;
@@ -195,20 +195,20 @@ void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
 
     switch (type)
     {
-        case (neova_dash::gesture::tilt):
-            gesturePath = neova_dash::path::createPath (neova_dash::path::tilt);
+        case neova_dash::gesture::tilt:
+            gesturePath = createPath(neova_dash::path::tilt);
             break;
 
-        case (neova_dash::gesture::vibrato):
-            gesturePath = neova_dash::path::createPath (neova_dash::path::vibrato);
+        case neova_dash::gesture::vibrato:
+            gesturePath = createPath(neova_dash::path::vibrato);
             break;
 
-        case (neova_dash::gesture::pitchBend):
-            gesturePath = neova_dash::path::createPath (neova_dash::path::pitchBend);
+        case neova_dash::gesture::pitchBend:
+            gesturePath = createPath(neova_dash::path::pitchBend);
             break;
 
-        case (neova_dash::gesture::roll):
-            gesturePath = neova_dash::path::createPath (neova_dash::path::roll);
+        case neova_dash::gesture::roll:
+            gesturePath = createPath(neova_dash::path::roll);
             break;
 
         default:
@@ -221,7 +221,7 @@ void GestureComponent::drawGesturePath (Graphics& g, juce::Rectangle<int> area)
                             area.toFloat().getHeight(),
 		                    false);
 
-    Colour pathColour (0xff808080);
+    const Colour pathColour (0xff808080);
     ColourGradient gesturePathGradient (pathColour.withAlpha (0.4f),
                                         {area.toFloat().getX(),
                                          area.toFloat().getY() + area.toFloat().getHeight() },
@@ -307,7 +307,7 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
     else
     {
         g.setColour (neova_dash::colour::emptySlotOutline);
-        PathStrokeType outlineStroke (1.0f, PathStrokeType::mitered, PathStrokeType::butt);
+        const PathStrokeType outlineStroke (1.0f, PathStrokeType::mitered, PathStrokeType::butt);
         Path dashedOutline;
 		const float dashLengths[] = {5.0f, 5.0f};
 

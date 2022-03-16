@@ -37,9 +37,9 @@ void DashAlertPanel::paint (Graphics& g)
     
     // options panel outline
     auto gradOut = ColourGradient::horizontal (Colour (0x10ffffff),
-                                               float (panelArea.getX()), 
+                                               static_cast<float>(panelArea.getX()), 
                                                Colour (0x10ffffff),
-                                               float(panelArea.getRight()));
+                                               static_cast<float>(panelArea.getRight()));
     gradOut.addColour (0.5, Colour (0x50ffffff));
 
     g.setGradientFill (gradOut);
@@ -57,7 +57,7 @@ void DashAlertPanel::resized()
 
     if (showButton)
     {
-        int buttonHeight = area.getHeight()/8;
+        const int buttonHeight = area.getHeight()/8;
 
         okButton->setBounds (area.removeFromBottom (buttonHeight)
                                     .withSizeKeepingCentre
@@ -165,21 +165,21 @@ DashAlertPanel* DashAlertPanel::createSpecificAlertPanel (SpecificReturnValue pa
             return new DashAlertPanel ("Your Neova firmware is outdated!",
                                        "Please upgrade your Neova firmware "
                                        "to use it with this Dashboard Version.",
-                                       int (panelType),
+                                       static_cast<int>(panelType),
                                        true,
                                        "Upgrade Firmware");
         case noUploadQuitting:
             return new DashAlertPanel ("Upload changes to Neova?",
                                        "You have configuration changes that have not "
                                        "been uploaded to Neova.\n\nAre you sure you want to quit?",
-                                       int (panelType),
+                                       static_cast<int>(panelType),
                                        true,
                                        "Quit Anyways");
         case upgradePending:
             return new DashAlertPanel ("Interrupt Upgrade ?",
                                        "Your Neova firmware is currently upgrading.\n\n"
                                        "Are you sure you want to quit?",
-                                       int (panelType),
+                                       static_cast<int>(panelType),
                                        true,
                                        "Quit Anyways");
         default:

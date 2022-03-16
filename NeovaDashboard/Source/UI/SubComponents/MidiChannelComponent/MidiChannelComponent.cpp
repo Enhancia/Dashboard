@@ -136,9 +136,9 @@ void MidiChannelComponent::menuCallback (int result, MidiChannelComponent* mcCom
 
 void MidiChannelComponent::handleMenuResult (const int menuResult)
 {
-	auto itr = std::find (std::begin (listMidiOut), std::end (listMidiOut), menuResult);
-    bool exist = itr != std::end (listMidiOut);
-    auto index = std::distance( std::begin( listMidiOut ), itr );
+    const auto itr = std::find (std::begin (listMidiOut), std::end (listMidiOut), menuResult);
+    const bool exist = itr != std::end (listMidiOut);
+    const auto index = std::distance( std::begin( listMidiOut ), itr );
 
 	switch (menuResult)
 	{

@@ -27,7 +27,7 @@ class HeaderComponent    : public Component,
 public:
     //==============================================================================
     HeaderComponent (OptionsPanel& options, HubConfiguration& config, DataReader& reader);
-    ~HeaderComponent();
+    ~HeaderComponent() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -37,8 +37,8 @@ public:
     void buttonClicked (Button* bttn) override;
 
     //==============================================================================
-    void update();
-    void setBatteryVisible (bool shouldBeVisible);
+    void update() const;
+    void setBatteryVisible (bool shouldBeVisible) const;
 
 private:
 	class BatteryComponent : public Component,
@@ -54,7 +54,7 @@ private:
 
 		//==========================================================================
 		BatteryComponent (const float& batteryValRef, HubConfiguration& config);
-		~BatteryComponent();
+		~BatteryComponent() override;
 
 		//==========================================================================
 		void paint(Graphics&) override;
@@ -74,10 +74,10 @@ private:
 	private:
 
         //==========================================================================
-        void launchDelayedRepaint (const int delayMs, bool forceRepaint = false);
+        void launchDelayedRepaint (int delayMs, bool forceRepaint = false);
         void drawLightningPath (Path& path, juce::Rectangle<float> area);
-        void drawBatteryPath (Graphics& g, juce::Rectangle<float> area);
-        void drawConnectedPath (Graphics& g, juce::Rectangle<float> area);
+        void drawBatteryPath (Graphics& g, juce::Rectangle<float> area) const;
+        void drawConnectedPath (Graphics& g, juce::Rectangle<float> area) const;
         void drawRingPath (Graphics& g, juce::Rectangle<float> area);
 
         bool waitForRepaint = false;

@@ -14,15 +14,15 @@
 GesturePanel::GesturePanel (HubConfiguration& data, DataReader& reader,
                             NewGesturePanel& newGest, ApplicationCommandManager& manager,
                             int freqHz)
-                            : hubConfig (data), dataReader (reader),
+                            : freq (freqHz), hubConfig (data),
                               newGesturePanel (newGest),commandManager (manager),
-                              freq (freqHz)
+                              dataReader (reader)
 {
     setComponentID ("gesturePanel");
 
-    gestureSettings = std::make_unique<GestureSettingsComponent> (int (hubConfig.getGestureData
-                                                                    (hubConfig.getSelectedGesture())
-                                                                                     .type),
+    gestureSettings = std::make_unique<GestureSettingsComponent> (static_cast<int>(hubConfig.getGestureData
+                                                                      (hubConfig.getSelectedGesture())
+                                                                      .type),
                                                                   hubConfig, commandManager, dataReader);
     addAndMakeVisible (*gestureSettings);
 
@@ -44,7 +44,7 @@ void GesturePanel::update()
 {
     if (newGesturePanel.isVisible())
     {
-        int lastSlot = newGesturePanel.getLastSelectedSlot();
+        const int lastSlot = newGesturePanel.getLastSelectedSlot();
 
         updateSlotIfNeeded (lastSlot);
         newGesturePanel.hidePanel();
@@ -77,13 +77,13 @@ void GesturePanel::paint (Graphics& g)
 }
 
 
-void GesturePanel::paintShadows (Graphics& g)
+void GesturePanel::paintShadows (Graphics& g) const
 {
     Path shadowPath;
 
     {
         // Gesture Settings
-        auto gestureSettingsArea = gestureSettings->getBounds();
+        const auto gestureSettingsArea = gestureSettings->getBounds();
 
         shadowPath.addRoundedRectangle (gestureSettingsArea.toFloat(), 10.0f);
     }
@@ -93,14 +93,14 @@ void GesturePanel::paintShadows (Graphics& g)
 
         for (int slot=0; slot < neova_dash::gesture::NUM_GEST; slot++)
         {
-            if (auto* gestureComp = dynamic_cast<GestureComponent*> (gestureSlots[slot]))
+            if (const auto* gestureComp = dynamic_cast<GestureComponent*> (gestureSlots[slot]))
             {
                 shadowPath.addRoundedRectangle (gestureComp->getBounds().toFloat(), 10.0f);
             }
         }
     }
 
-    DropShadow shadow (Colour (0x40000000), 10, {2, 3});
+    const DropShadow shadow (Colour (0x40000000), 10, {2, 3});
     shadow.drawForPath (g, shadowPath);
 }
 
@@ -161,7 +161,7 @@ void GesturePanel::mouseUp (const MouseEvent &event)
 
         else if (event.mods.isPopupMenu())
         {
-            if (auto* gestureComponent = dynamic_cast<GestureComponent*> (event.eventComponent))
+            if (const auto* gestureComponent = dynamic_cast<GestureComponent*> (event.eventComponent))
             {
                 createMenuForGestureId (gestureComponent->id);
             }
@@ -171,18 +171,18 @@ void GesturePanel::mouseUp (const MouseEvent &event)
 
 void GesturePanel::mouseDrag (const MouseEvent& event)
 {
-    auto relativeEvent = event.getEventRelativeTo (this);
+    const auto relativeEvent = event.getEventRelativeTo (this);
 
     if (relativeEvent.mods.isLeftButtonDown())
     {
-        if (auto* gestureComponent = dynamic_cast<GestureComponent*> (relativeEvent.originalComponent))
+        if (const auto* gestureComponent = dynamic_cast<GestureComponent*> (relativeEvent.originalComponent))
         {
             if (!dragMode)
             {
                 startDragMode (gestureComponent->id);
             }
 
-			int formerDraggedOverId = draggedOverSlotId;
+            const int formerDraggedOverId = draggedOverSlotId;
 
             if (Component* componentUnderMouse = getComponentAt (relativeEvent.getPosition()))
             {
@@ -227,7 +227,7 @@ void GesturePanel::mouseDrag (const MouseEvent& event)
 
 void GesturePanel::handleLeftClickUp (const MouseEvent& event)
 {
-    if (auto* gestureComponent = dynamic_cast<GestureComponent*> (event.eventComponent))
+    if (const auto* gestureComponent = dynamic_cast<GestureComponent*> (event.eventComponent))
     {
         /*
         // Mouse didn't leave the component it clicked in the first place
@@ -243,11 +243,11 @@ void GesturePanel::handleLeftClickUp (const MouseEvent& event)
         {
             if (Component* componentUnderMouse = getComponentAt (event.getEventRelativeTo (this).getPosition()))
             {
-                if (auto* slotUnderMouse = dynamic_cast<EmptyGestureSlotComponent*> (componentUnderMouse))
+                if (const auto* slotUnderMouse = dynamic_cast<EmptyGestureSlotComponent*> (componentUnderMouse))
                 {
                     moveGestureToId (gestureComponent->id, slotUnderMouse->id);
                 }
-                else if (auto* gestureComponentUnderMouse = dynamic_cast<GestureComponent*> (componentUnderMouse))
+                else if (const auto* gestureComponentUnderMouse = dynamic_cast<GestureComponent*> (componentUnderMouse))
                 {
                     swapGestures (gestureComponent->id, gestureComponentUnderMouse->id);
                 }
@@ -255,7 +255,7 @@ void GesturePanel::handleLeftClickUp (const MouseEvent& event)
         }
     }
 
-    else if (auto* emptySlot = dynamic_cast<EmptyGestureSlotComponent*> (event.eventComponent))
+    else if (const auto* emptySlot = dynamic_cast<EmptyGestureSlotComponent*> (event.eventComponent))
     {
         newGesturePanel.showPanelForGestureID (emptySlot->id);
     }
@@ -291,7 +291,7 @@ void GesturePanel::initialiseGestureSlots()
 
     for (int i=0; i<neova_dash::gesture::NUM_GEST; i++)
     {
-        if (hubConfig.getGestureData (i).type != uint8 (neova_dash::gesture::none))
+        if (hubConfig.getGestureData (i).type != static_cast<uint8>(neova_dash::gesture::none))
         {
             gestureSlots.add (new GestureComponent (hubConfig, commandManager, i,
                                                     dragMode, draggedGestureComponentId, draggedOverSlotId));
@@ -319,7 +319,7 @@ void GesturePanel::updateGestureSlots()
     {
 		gestureSlots[i]->removeMouseListener(this);
 
-        if (hubConfig.getGestureData (i).type != uint8 (neova_dash::gesture::none))
+        if (hubConfig.getGestureData (i).type != static_cast<uint8>(neova_dash::gesture::none))
         {
             if (auto* emptySlot = dynamic_cast<EmptyGestureSlotComponent*> (gestureSlots[i]))
             {
@@ -347,22 +347,22 @@ void GesturePanel::updateGestureSlots()
     }
 }
 
-void GesturePanel::resizeSlotsAndTrimAreaAccordingly (juce::Rectangle<int>& area, int marginX, int marginY)
+void GesturePanel::resizeSlotsAndTrimAreaAccordingly (juce::Rectangle<int>& area, int marginX, int marginY) const
 {
     using namespace neova_dash::ui;
-    if (neova_dash::gesture::NUM_GEST == 0 || gestureSlots.size() == 0) return;
+    if (gestureSlots.size() == 0) return;
 
     // There should be an even number of gestures for the grid of gesture slots to make sense...
     jassert (neova_dash::gesture::NUM_GEST%2 == 0);
-    int numRows = neova_dash::gesture::NUM_GEST/2;
+    const int numRows = neova_dash::gesture::NUM_GEST/2;
 
-    int tempWidth = area.getWidth()/4;
+    const int tempWidth = area.getWidth()/4;
     area.reduce (tempWidth/4, 0);
 
     auto column1 = area.removeFromLeft (tempWidth);
     auto column2 = area.removeFromRight (tempWidth);
 
-    int slotHeight = area.getHeight()/numRows;
+    const int slotHeight = area.getHeight()/numRows;
 
     // sets bounds depending on the value in the array
     for (int i=0; i<gestureSlots.size(); i++)
@@ -379,7 +379,7 @@ void GesturePanel::updateSlotIfNeeded (int slotToCheck)
     // 1st check, if a gesture was deleted (slot is GestureComponent but should be empty)
     if (auto* gestureComponent = dynamic_cast<GestureComponent*> (gestureSlots[slotToCheck]))
     {
-        if (hubConfig.getGestureData (slotToCheck).type == uint8 (neova_dash::gesture::none))
+        if (hubConfig.getGestureData (slotToCheck).type == static_cast<uint8>(neova_dash::gesture::none))
         {
             gestureSlots.set (slotToCheck, new EmptyGestureSlotComponent (hubConfig,
                                                                           slotToCheck,
@@ -397,7 +397,7 @@ void GesturePanel::updateSlotIfNeeded (int slotToCheck)
     // 2nd check, if a gesture was created (slot is empty but should be a gestureComponent)
     else if (auto* emptySlot = dynamic_cast<EmptyGestureSlotComponent*> (gestureSlots[slotToCheck]))
     {
-        if (hubConfig.getGestureData (slotToCheck).type != uint8 (neova_dash::gesture::none))
+        if (hubConfig.getGestureData (slotToCheck).type != static_cast<uint8>(neova_dash::gesture::none))
         {
             gestureSlots.set (slotToCheck, new GestureComponent (hubConfig,
                                                                  commandManager,
@@ -425,7 +425,7 @@ void GesturePanel::updateSlotIfNeeded (int slotToCheck)
 
 void GesturePanel::moveGestureToId (int idToMoveFrom, int idToMoveTo)
 {
-    bool mustChangeSelection = (hubConfig.getSelectedGesture() == idToMoveFrom);
+    const bool mustChangeSelection = hubConfig.getSelectedGesture() == idToMoveFrom;
     
     if (mustChangeSelection) unselectCurrentGesture();
 
@@ -441,13 +441,13 @@ void GesturePanel::moveGestureToId (int idToMoveFrom, int idToMoveTo)
 
 void GesturePanel::swapGestures (int firstId, int secondId)
 {
-    bool mustChangeSelection = (hubConfig.getSelectedGesture() == firstId
-                                || hubConfig.getSelectedGesture() == secondId);
+    const bool mustChangeSelection = hubConfig.getSelectedGesture() == firstId
+        || hubConfig.getSelectedGesture() == secondId;
     int idToSelect = 0;
 
     if (mustChangeSelection)
     {
-        idToSelect = (hubConfig.getSelectedGesture() == firstId ? secondId : firstId);
+        idToSelect = hubConfig.getSelectedGesture() == firstId ? secondId : firstId;
         unselectCurrentGesture();
     }
 
@@ -467,7 +467,7 @@ void GesturePanel::swapGestures (int firstId, int secondId)
     if (mustChangeSelection) selectGestureExclusive (idToSelect);
 }
 
-void GesturePanel::renameGestureInSlot (int slotNumber)
+void GesturePanel::renameGestureInSlot (int slotNumber) const
 {
     if (auto* gestureComponent = dynamic_cast<GestureComponent*> (gestureSlots[slotNumber]))
     {
@@ -506,7 +506,7 @@ void GesturePanel::removeGestureAndGestureComponent (int gestureId)
     update();
 }
 
-bool GesturePanel::hasSelectedGesture()
+bool GesturePanel::hasSelectedGesture() const
 {
     return hubConfig.getSelectedGesture() != -1;
 }
@@ -595,7 +595,7 @@ void GesturePanel::createMenuForGestureId (int id)
 
     gestureMenu.addItem (1, "Duplicate", hubConfig.canDuplicate());
     gestureMenu.addItem (2, "Delete", true);
-    gestureMenu.addItem (3, (hubConfig.getGestureData (id).on == 1) ? "Mute" : "Unmute", true);
+    gestureMenu.addItem (3, hubConfig.getGestureData (id).on == 1 ? "Mute" : "Unmute", true);
     
     gestureMenu.showMenuAsync (PopupMenu::Options().withParentComponent (getParentComponent())
                                                                 .withMaximumNumColumns (3)
@@ -630,7 +630,7 @@ void GesturePanel::handleMenuResult (int gestureId, const int menuResult)
             removeGestureAndGestureComponent (gestureId);
 
         case 3: // Mute gesture
-            hubConfig.setUint8Value (gestureId, HubConfiguration::on, (hubConfig.getGestureData (gestureId).on == 1) ? 0 : 1);
+            hubConfig.setUint8Value (gestureId, HubConfiguration::on, hubConfig.getGestureData (gestureId).on == 1 ? 0 : 1);
             commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
     }
 }

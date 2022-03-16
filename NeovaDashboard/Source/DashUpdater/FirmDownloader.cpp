@@ -25,7 +25,7 @@ void FirmDownloader::checkForNewAvailableVersion()
 {
 	getCurrentInstalledVersions();
 
-    auto json (fetchRepoJSON());
+    const auto json (fetchRepoJSON());
     auto* repo (json.getDynamicObject());
 
     if (repo != nullptr)
@@ -117,10 +117,10 @@ void FirmDownloader::progress (URL::DownloadTask* task,
 {
     ignoreUnused(task);
 
-    DBG ("Downloading ... " << float (bytesDownloaded)/1000 << " / "
+    DBG ("Downloading ... " << static_cast<float>(bytesDownloaded)/1000 << " / "
                             << float (totalLength)/1000 << " Ko\n");
 
-    if (totalLength != 0) downloadProgress = float (bytesDownloaded)/totalLength;
+    if (totalLength != 0) downloadProgress = static_cast<float>(bytesDownloaded)/totalLength;
 }
 
 void FirmDownloader::timerCallback()
@@ -189,17 +189,17 @@ void FirmDownloader::downloadForDevice (deviceFirmware& deviceToDownloadFor)
     downloadTask = GitAssetDownloader::downloadAsset (fileToDownloadURL, downloadedFile, this);
 }
 
-bool FirmDownloader::hasNewAvailableVersion()
+bool FirmDownloader::hasNewAvailableVersion() const
 {
     return availableRing || availableHub;
 }
 
-FirmDownloader::downloadState FirmDownloader::getDownloadState()
+FirmDownloader::downloadState FirmDownloader::getDownloadState() const
 {
     return state;
 }
 
-bool FirmDownloader::wasSuccessful()
+bool FirmDownloader::wasSuccessful() const
 {
     return successful;
 }
@@ -214,7 +214,7 @@ String FirmDownloader::getLatestVersionString()
     return latestVersion;
 }
 
-var FirmDownloader::fetchRepoJSON()
+var FirmDownloader::fetchRepoJSON() const
 {
     // Creating input stream to get file link
     int status;
@@ -233,7 +233,7 @@ var FirmDownloader::fetchRepoJSON()
     }
 
     // Converting into JSON to get properties
-    String streamString = urlInStream->readEntireStreamAsString();
+    const String streamString = urlInStream->readEntireStreamAsString();
     return JSON::parse (streamString);
 }
 
@@ -276,7 +276,7 @@ bool FirmDownloader::fetchFilesURLAndVersions (DynamicObject& jsonRef)
     return hubExists || ringExists;
 }
 
-bool FirmDownloader::deleteCurrentFileforDevice (deviceFirmware& deviceArg)
+bool FirmDownloader::deleteCurrentFileforDevice (deviceFirmware& deviceArg) const
 {
 	File fileToDelete;
 

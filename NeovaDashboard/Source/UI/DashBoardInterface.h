@@ -78,7 +78,7 @@ public:
     /**
         \brief  Destructor.
     */
-    ~DashBoardInterface();
+    ~DashBoardInterface() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -108,7 +108,7 @@ public:
 
         \param newState Value from the InterfaceState enum, telling which state the interface should be set to.
     */
-    void setInterfaceStateAndUpdate (const InterfaceState newState);
+    void setInterfaceStateAndUpdate (InterfaceState newState);
 
     /** 
         \brief  Interface state setter.
@@ -126,7 +126,7 @@ public:
         This method will return an in value that corresponds to the presetModeState enum, telling
         which preset mode state is currently in use.
     */
-    int getPresetModeState();
+    int getPresetModeState() const;
 
     /** 
         \brief  Preset mode state setter.
@@ -137,7 +137,7 @@ public:
 
         \param newState Value from the PresetModeState enum, telling which preset mode state the interface should be set to.
     */
-    void setPresetModeState (const PresetModeState newState);
+    void setPresetModeState (PresetModeState newState);
     /** 
         \brief  Callback on hub changing preset from outside sources.
 
@@ -177,7 +177,7 @@ public:
     */
     void createAndShowAlertPanel (const String& title, const String& message,
                                                        const String& buttonText = String(),
-                                                       const bool hasCloseButton = true,
+                                                       bool hasCloseButton = true,
                                                        int returnValue = 0);
 
     void createAndShowAlertPanel (DashAlertPanel::SpecificReturnValue returnValue);
@@ -209,7 +209,7 @@ private:
 
         \param panelReturnValue Result from the modal loop.
     */
-    void executePanelAction (const int panelReturnValue);
+    void executePanelAction (int panelReturnValue);
 
     /** 
         \brief  Helper method to paint simplified shadows under main components.
@@ -221,7 +221,7 @@ private:
 
         \param g  Reference to the Graphics class used to paint this component.
     */
-    void paintShadows (Graphics& g);
+    void paintShadows (Graphics& g) const;
 
     /** 
         \brief  Helper method to paint a message depending on the current interface state.
@@ -231,7 +231,7 @@ private:
 
         \param g  Reference to the Graphics class used to paint this component.
     */
-    void drawStateMessage (Graphics& g);
+    void drawStateMessage (Graphics& g) const;
 
     //==============================================================================
     /** 
@@ -240,7 +240,7 @@ private:
         This method will set preset mode state to presetMode. This setter is private which ensures that no
         external object can set the preset mode to preset.
     */
-    void setPresetStateToPresetMode();
+    void setPresetStateToPresetMode() const;
 
     /** 
         \brief  Private setter for preset mode state.
@@ -248,7 +248,7 @@ private:
         This method will set preset mode state to normalMode. This setter is private which ensures that no
         external object can set the preset mode to preset.
     */
-    void setPresetStateToNormalMode();
+    void setPresetStateToNormalMode() const;
 
     //==============================================================================
     std::unique_ptr<HeaderComponent> header; /**< \brief Interface's header. */
@@ -276,8 +276,8 @@ private:
 
     bool commandKeyDown = ModifierKeys::currentModifiers.isCommandDown(); /**< \brief Boolean tracking the user's command key presses. */
     
-    int state = int (connected); /**< Interface's current state. Corresponds to a InterfaceState enum value. */
-    int presetModeState = int (normalState); /**< Interface's current preset mode state. Corresponds to a PresetModeState enum value. */
+    int state = static_cast<int>(connected); /**< Interface's current state. Corresponds to a InterfaceState enum value. */
+    int presetModeState = static_cast<int>(normalState); /**< Interface's current preset mode state. Corresponds to a PresetModeState enum value. */
 
     //==============================================================================
     Image backgroundImage = ImageFileFormat::loadFrom (DashData::HUBBG_png, DashData::HUBBG_pngSize); /**< Interface's background image. */

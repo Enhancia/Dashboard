@@ -28,7 +28,7 @@ public:
 	DashShapeButton (const String &name, Colour backgroundColour,
 		              Colour pathColourOff, Colour pathColourOn);
 
-	~DashShapeButton();
+	~DashShapeButton() override;
 
     //==============================================================================
 	void resized() override;
@@ -37,26 +37,26 @@ public:
 	void resetBorderSize();
 
     //==============================================================================
-	void setBackgroundColour (const Colour newColour);
+	void setBackgroundColour (Colour newColour);
 
     //==============================================================================
-	void setStrokeColours (const Colour newStrokeNormalColour,
-						   const Colour newStrokeOverColour,
-						   const Colour newStrokeDownColour);
+	void setStrokeColours (Colour newStrokeNormalColour,
+                           Colour newStrokeOverColour,
+                           Colour newStrokeDownColour);
 
-	void setStrokeOnColours (const Colour newStrokeOnNormalColour,
-						     const Colour newStrokeOnOverColour,
-						     const Colour newStrokeOnDownColour);
+	void setStrokeOnColours (Colour newStrokeOnNormalColour,
+                             Colour newStrokeOnOverColour,
+                             Colour newStrokeOnDownColour);
 
-	void setStrokeOffAndOnColours (const Colour newStrokeOffNormalColour,
-						   		   const Colour newStrokeOffOverColour,
-						   		   const Colour newStrokeOffDownColour,
-						   		   const Colour newStrokeOnNormalColour,
-						   		   const Colour newStrokeOnOverColour,
-						   		   const Colour newStrokeOnDownColour);
+	void setStrokeOffAndOnColours (Colour newStrokeOffNormalColour,
+                                   Colour newStrokeOffOverColour,
+                                   Colour newStrokeOffDownColour,
+                                   Colour newStrokeOnNormalColour,
+                                   Colour newStrokeOnOverColour,
+                                   Colour newStrokeOnDownColour);
 
-	void setStrokeOffAndOnColours (const Colour newStrokeOffColour,
-						           const Colour newStrokeOnColour);
+	void setStrokeOffAndOnColours (Colour newStrokeOffColour,
+                                   Colour newStrokeOnColour);
 
     //==============================================================================
     enum PaintMode
@@ -66,8 +66,8 @@ public:
     	fillAndStroke
     };
 
-    void setPaintMode (const PaintMode newPaintMode);
-    void setStrokeThickness (const float newThickness);
+    void setPaintMode (PaintMode newPaintMode);
+    void setStrokeThickness (float newThickness);
 
 private:
 	Colour backgroundFill;

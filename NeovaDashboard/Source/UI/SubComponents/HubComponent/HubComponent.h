@@ -32,7 +32,7 @@ public:
     //==============================================================================
     HubComponent (HubConfiguration& data, NewGesturePanel& newGest,
                   ApplicationCommandManager& manager, int& presetState, int& dashState);
-    ~HubComponent();
+    ~HubComponent() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -40,20 +40,20 @@ public:
 
     //==============================================================================
     void buttonClicked (Button* bttn) override;
-    void handleHubButtonClick (const int buttonId);
+    void handleHubButtonClick (int buttonId);
 
     //==========================================================================
-    void update();
-    void repaintLEDs();
+    void update() const;
+    void repaintLEDs() const;
 
     //==============================================================================
-    void lockHubToPresetMode (const bool shouldLockHub);
-    void setPresetStateToPresetMode (bool notifyChange = true);
-    void setPresetStateToNormalMode (bool notifyChange = true);
+    void lockHubToPresetMode (bool shouldLockHub);
+    void setPresetStateToPresetMode (bool notifyChange = true) const;
+    void setPresetStateToNormalMode (bool notifyChange = true) const;
 
     //==========================================================================
-    bool getControlButtonDown();
-    void setControlButtonDown (const bool shouldBeDown);
+    bool getControlButtonDown() const;
+    void setControlButtonDown (bool shouldBeDown);
 
 private:
     //==============================================================================
@@ -61,8 +61,8 @@ private:
     {
     public:
         //==========================================================================
-        HubButton (const int buttonNum);
-        ~HubButton();
+        HubButton (int buttonNum);
+        ~HubButton() override;
 
         //==========================================================================
         void resized() override;
@@ -82,8 +82,8 @@ private:
     {
     public:
         //==========================================================================
-        GestureLED (const int ledNum, HubConfiguration& config, const int& presetState);
-        ~GestureLED();
+        GestureLED (int ledNum, HubConfiguration& config, const int& presetState);
+        ~GestureLED() override;
 
         //==========================================================================
         void paint (Graphics&) override;

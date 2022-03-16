@@ -30,7 +30,7 @@ public:
 
     //==============================================================================
     BugReportPanel (ApplicationCommandManager& manager);
-    ~BugReportPanel();
+    ~BugReportPanel() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -53,12 +53,12 @@ private:
 
     //==============================================================================
     void checkFormEntry();
-    bool formSeemsCorrect();
+    bool formSeemsCorrect() const;
 
     //==============================================================================
     void sendTicketAndUpdate();
     URL createURLForTicket (const String& boundary);
-    String createMultipartData (const String& boundary, const Array<File>& txtFilesToAttach);
+    String createMultipartData (const String& boundary, const Array<File>& txtFilesToAttach) const;
     void getFilestoAttach (Array<File>& fileArrayToFill);
 
     //==============================================================================

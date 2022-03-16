@@ -82,24 +82,24 @@ namespace font
         if (type == regular)
             return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRRegular_otf,
                                                             DashData::Ahmet_Altun__HalisGRRegular_otfSize));
-        else if (type == bold)
+        if (type == bold)
             return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRBold_otf,
                                                             DashData::Ahmet_Altun__HalisGRBold_otfSize));
-        else if (type == light)
+        if (type == light)
             return Font (Typeface::createSystemTypefaceFor (DashData::Ahmet_Altun__HalisGRLight_otf,
-                                                            DashData::Ahmet_Altun__HalisGRLight_otfSize)); 
-        else if (type == ttNorms)
+                                                            DashData::Ahmet_Altun__HalisGRLight_otfSize));
+        if (type == ttNorms)
             return Font (Typeface::createSystemTypefaceFor (DashData::TTNormsRegular_otf,
                                                             DashData::TTNormsRegular_otfSize));
-        // Enhancia logo (capital only)
-        else if (type == enhanciaLogo)
+            // Enhancia logo (capital only)
+        if (type == enhanciaLogo)
             return Font (Typeface::createSystemTypefaceFor (DashData::NOOADemiSerifDEMO_ttf,
                                                             DashData::NOOADemiSerifDEMO_ttfSize));
-        // Neova logo (capital only)
-        else if (type == neovaLogo)
+            // Neova logo (capital only)
+        if (type == neovaLogo)
             return Font (Typeface::createSystemTypefaceFor (DashData::Neovafont_otf,
                                                             DashData::Neovafont_otfSize));
-          
+
         return Font();
     }
 
@@ -114,35 +114,35 @@ namespace font
 
 namespace gesture
 {
-	const Colour getHighlightColour (const neova_dash::gesture::GestureType type, const bool active)
+	const Colour getHighlightColour (const GestureType type, const bool active)
 	{
 		//if (!active) return neova_dash::colour::inactiveGesture;
 		Colour highlightColour;
 
 		switch (type)
 		{
-			case neova_dash::gesture::vibrato:
-				highlightColour = neova_dash::colour::vibrato;
+			case vibrato:
+				highlightColour = colour::vibrato;
         break;
 			
-			case neova_dash::gesture::pitchBend:
-				highlightColour = neova_dash::colour::pitchBend;
+			case pitchBend:
+				highlightColour = colour::pitchBend;
         break;
 			
-			case neova_dash::gesture::tilt:
-				highlightColour = neova_dash::colour::tilt;
+			case tilt:
+				highlightColour = colour::tilt;
         break;
 			
-			case neova_dash::gesture::roll:
-				highlightColour = neova_dash::colour::roll;
+			case roll:
+				highlightColour = colour::roll;
         break;
 			
-			case neova_dash::gesture::wave:
-				highlightColour = neova_dash::colour::wave;
+			case wave:
+				highlightColour = colour::wave;
         break;
 
 			default:
-				highlightColour = neova_dash::colour::inactiveGesture;
+				highlightColour = colour::inactiveGesture;
 		}
 
 		if (!active) highlightColour = highlightColour.withAlpha (0.4f);

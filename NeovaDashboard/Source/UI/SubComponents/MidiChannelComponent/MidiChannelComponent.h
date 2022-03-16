@@ -19,8 +19,8 @@ class MidiChannelComponent : public Component
 {
 public:
     //==========================================================================
-    MidiChannelComponent (HubConfiguration& data, const bool controlsInputMidi);
-    ~MidiChannelComponent();
+    MidiChannelComponent (HubConfiguration& data, bool controlsInputMidi);
+    ~MidiChannelComponent() override;
 
     //==========================================================================
     void paint (Graphics&) override;
@@ -42,7 +42,7 @@ private:
     void createPopupMenu();
     void drawArrowPath (Graphics& g, juce::Rectangle<float> area);
     static void menuCallback (int result, MidiChannelComponent* mcComp);
-    void handleMenuResult (const int menuResult);
+    void handleMenuResult (int menuResult);
     
     //==========================================================================
     HubConfiguration& hubConfig;

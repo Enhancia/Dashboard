@@ -35,8 +35,9 @@ public:
 		uint8_t midiLow = 0;
 		uint8_t midiHigh = 127;
 		uint8_t cc = 0;
-		uint8_t midiType = uint8_t ((type == neova_dash::gesture::vibrato || type == neova_dash::gesture::pitchBend)
-                                    ? neova_dash::gesture::pitchMidi : neova_dash::gesture::ccMidi);
+		uint8_t midiType = static_cast<uint8_t>((type == neova_dash::gesture::vibrato || type == neova_dash::gesture::pitchBend)
+                                                    ? neova_dash::gesture::pitchMidi
+                                                    : neova_dash::gesture::ccMidi);
 
         float gestureParam0 = 0.0f;
         float gestureParam1 = 0.0f;
@@ -68,7 +69,7 @@ public:
 		uint16_t ring_firmware_version;
 
 		uint8_t active_preset = 0; //Ne sert à rien pour l'instant juste pour s'aligner au buffer du zub
-		uint8_t midi_thru = int (thruOff);
+		uint8_t midi_thru = static_cast<int>(thruOff);
 
     	PresetData presetData0;
     	PresetData presetData1;
@@ -112,70 +113,70 @@ public:
 
     //==============================================================================
 	void setConfig(uint8_t * data);
-	void getConfig(uint8_t * data, int buffer_size);
+	void getConfig(uint8_t * data, int buffer_size) const;
 
     //==============================================================================
     void flashHub();
-    bool wasConfigChangedSinceLastFlash();
-    bool getConfigWasInitialized();
+    bool wasConfigChangedSinceLastFlash() const;
+    bool getConfigWasInitialized() const;
     void notifyConfigWasChanged();
     void resetConfigWasChanged();
 
     //==============================================================================
-    void setUint8Value (const int gestureNumber, const uint8DataId dataId,
-                                                 const uint8 newUint8Value,
-                                                 bool uploadToHub = true);
+    void setUint8Value (int gestureNumber, uint8DataId dataId,
+                        uint8 newUint8Value,
+                        bool uploadToHub = true);
 
-    void setFloatValue (const int gestureNumber, const floatDataId dataId,
-                                                 const float newFloatValue,
-                                                 bool uploadToHub = true);
+    void setFloatValue (int gestureNumber, floatDataId dataId,
+                        float newFloatValue,
+                        bool uploadToHub = true);
 
-    void setDefaultGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType, const int presetNumber);
-    void setDefaultGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType);
+    void setDefaultGestureValues (int gestureNumber, neova_dash::gesture::GestureType, int presetNumber);
+    void setDefaultGestureValues (int gestureNumber, neova_dash::gesture::GestureType);
     
-    void setSavedGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType, const int presetNumber);
-    void setSavedGestureValues (const int gestureNumber, const neova_dash::gesture::GestureType);
+    void setSavedGestureValues (int gestureNumber, neova_dash::gesture::GestureType, int presetNumber);
+    void setSavedGestureValues (int gestureNumber, neova_dash::gesture::GestureType);
 
-    void moveGestureToId (const int idToMoveFrom, const int idToMoveTo);
-    void duplicateGesture (const int idToDuplicateFrom, const bool prioritizeHigherId = true);
+    void moveGestureToId (int idToMoveFrom, int idToMoveTo);
+    void duplicateGesture (int idToDuplicateFrom, bool prioritizeHigherId = true);
     bool canDuplicate();
-    void swapGestures (const int id1, const int id2);
+    void swapGestures (int id1, int id2);
     
     //==============================================================================
-    void setPreset (const int presetNumberToSelect);
-	void setPreset (const int presetNumberToSelect, bool uploadToHub);
-    const int getSelectedPreset();
-    void clearPreset (const int presetNumberToClear, const bool uploadToHub = true);
-    void duplicatePreset (const int idToDuplicateFrom, const int idToDuplicateTo,  const bool uploadToHub = true);
+    void setPreset (int presetNumberToSelect);
+	void setPreset (int presetNumberToSelect, bool uploadToHub);
+    const int getSelectedPreset() const;
+    void clearPreset (int presetNumberToClear, bool uploadToHub = true);
+    void duplicatePreset (int idToDuplicateFrom, int idToDuplicateTo, bool uploadToHub = true);
 
-    PresetData& getPresetData (const int presetNumber);
+    PresetData& getPresetData (int presetNumber);
     PresetData& getPresetData();
 
     //==============================================================================
-    GestureData& getGestureData (const int gestureNumber, const int presetNumber);
-	GestureData& getGestureData (const int gestureNumber);
+    GestureData& getGestureData (int gestureNumber, int presetNumber);
+	GestureData& getGestureData (int gestureNumber);
 
-    bool isGestureActive (const int gestureNumber, const int presetNumber);
-    bool isGestureActive (const int gestureNumber);
+    bool isGestureActive (int gestureNumber, int presetNumber);
+    bool isGestureActive (int gestureNumber);
 
     //==============================================================================
-    void setSelectedGesture (const int gestureToSelect);
+    void setSelectedGesture (int gestureToSelect);
     int selectFirstExistingGesture();
     int selectLastExistingGesture();
     int selectGestureLeft  (bool loop = false);
     int selectGestureRight (bool loop = false);
     int selectGestureUp    (bool loop = false);
     int selectGestureDown  (bool loop = false);
-    const int getSelectedGesture();
+    const int getSelectedGesture() const;
 
     //==============================================================================
-    void setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool isMidiInput = false, bool uploadToHub = true);
-    void setMidiChannelExclusive (const int channelNumber, bool isMidiInput = false, bool uploadToHub = true);
-    void toggleMidiChannel (const int channelNumber, bool isMidiInput = false, bool uploadToHub = true);
+    void setMidiChannel (int channelNumber, bool shouldChannelBeOn, bool isMidiInput = false, bool uploadToHub = true);
+    void setMidiChannelExclusive (int channelNumber, bool isMidiInput = false, bool uploadToHub = true);
+    void toggleMidiChannel (int channelNumber, bool isMidiInput = false, bool uploadToHub = true);
     int getMidiChannels (bool isMidiInput = false);
     const int getNumActiveMidiChannels (bool isMidiInput = false);
     void setMidiThrough (bool shouldUseThrough, bool uploadToHub = true);
-    int getMidiThrough();
+    int getMidiThrough() const;
 
 
     //==============================================================================
@@ -185,21 +186,21 @@ public:
     const String getFirmwareVersionString();
     const String getHubFirmwareVersionString();
     const String getRingFirmwareVersionString();
-    uint16_t getHubFirmwareVersionUint16();
-    uint16_t getRingFirmwareVersionUint16();
+    uint16_t getHubFirmwareVersionUint16() const;
+    uint16_t getRingFirmwareVersionUint16() const;
 
     //==============================================================================
     void setHubIsConnected (bool isConnected);
-    bool getHubIsConnected();
+    bool getHubIsConnected() const;
     void setRingIsCharging (bool isCharging);
-    bool getRingIsCharging();
+    bool getRingIsCharging() const;
     void setRingIsConnected (bool isConnected);
-    bool getRingIsConnected();
+    bool getRingIsConnected() const;
 
-    bool getHubIsCompatible();
-    int  getHubIsCompatibleInt();
+    bool getHubIsCompatible() const;
+    int  getHubIsCompatibleInt() const;
     
-    bool isWaitingForRingCompatibility();
+    bool isWaitingForRingCompatibility() const;
     void stopWaitingForRingCompatibility();
 
 private:
@@ -225,7 +226,7 @@ private:
                                                               bool uploadToHub = false);
 
     int findClosestIdToDuplicate (int idToDuplicateFrom, bool prioritizeHigherId);
-    bool isIdAvailable (const int idToCheck);
+    bool isIdAvailable (int idToCheck);
     const int findNextAvailableCC();
 
     //==============================================================================
@@ -246,7 +247,7 @@ private:
 	ConfigData config;
     OwnedArray<GestureData> lastGestureConfig;
     void initialiseLastGestureConfigs();
-    void saveGestureConfig (const GestureData& gestureDataToSave);
+    void saveGestureConfig (const GestureData& gestureDataToSave) const;
     bool configWasChangedSinceLastFlash = false;
     bool configWasInitialized = false;
 

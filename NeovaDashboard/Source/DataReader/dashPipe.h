@@ -38,7 +38,7 @@ public:
     
     //==============================================================================
 	DashPipe();
-    ~DashPipe();
+    ~DashPipe() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -47,7 +47,7 @@ public:
     //==============================================================================
     bool readData(String s);
     const String getRawData(int index);
-	void getDataBuffer(uint8_t * buffer, int bytesToRead);
+	void getDataBuffer(uint8_t * buffer, int bytesToRead) const;
     bool getRawDataAsFloatArray(Array<float>& arrayToFill);
 
 	//==============================================================================
@@ -55,7 +55,7 @@ public:
     
     //==============================================================================
     bool connectToExistingPipe();
-    bool isConnected();
+    bool isConnected() const;
     
     //==============================================================================
     void connectionMade() override;

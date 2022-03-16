@@ -57,29 +57,29 @@ public:
     
     //==============================================================================
     UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config, ApplicationCommandManager& cmdManager, DataReader& dataReaderRef);
-    ~UpgradeHandler();
+    ~UpgradeHandler() override;
     //==============================================================================
     void timerCallback() override;
 
     //==============================================================================
     void set_upgradeCommandReceived(bool st);
 
-    bool get_upgradeCommandReceived();
+    bool get_upgradeCommandReceived() const;
 
     void setHubReleaseVersion(uint16_t version);
 
-    uint16_t getHubReleaseVersion();
+    uint16_t getHubReleaseVersion() const;
 
     void setRingReleaseVersion(uint16_t version);
 
-    uint16_t getRingReleaseVersion();
+    uint16_t getRingReleaseVersion() const;
 
     void setUpgradeState(int state);
 
-    int getUpgradeState();
+    int getUpgradeState() const;
 
-    bool waitsForSuccessiveUpgrade();
-    bool isUpgrading();
+    bool waitsForSuccessiveUpgrade() const;
+    bool isUpgrading() const;
 
     //==============================================================================
     static VOID CALLBACK childProcessExitCallback(PVOID lpParameter, BOOLEAN TimerOrWaitFired);
@@ -102,8 +102,8 @@ public:
     void checkForSuccessiveUpgrade();
     //==============================================================================
 private:
-    HANDLE childOut = NULL;
-    HANDLE childErr = NULL;
+    HANDLE childOut = nullptr;
+    HANDLE childErr = nullptr;
     PROCESS_INFORMATION pi;
     STARTUPINFOW si;
     String childOutFileName = "nrfutilOut.log";

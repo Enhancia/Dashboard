@@ -44,7 +44,7 @@ public:
     
     //==============================================================================
     DataReader (ApplicationCommandManager& manager, HubConfiguration& config);
-    ~DataReader();
+    ~DataReader() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -55,15 +55,15 @@ public:
 
     //==============================================================================
     bool readData (String s);
-    const String getRawData (int index);
-    bool getRawDataAsFloatArray (Array<float>& arrayToFill);
-    const float& getFloatValueReference (const neova_dash::data::HubData dataId);
+    const String getRawData (int index) const;
+    bool getRawDataAsFloatArray (Array<float>& arrayToFill) const;
+    const float& getFloatValueReference (neova_dash::data::HubData dataId);
     float getBatteryLevel (bool rawOrPercent);
     
     //==============================================================================
     bool connectToExistingPipe();
     bool connectToExistingPipe(int nbPipe);
-    bool isConnected();
+    bool isConnected() const;
     
     //==============================================================================
     void connectionMade() override;

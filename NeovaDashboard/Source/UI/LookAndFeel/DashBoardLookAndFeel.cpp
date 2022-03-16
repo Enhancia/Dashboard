@@ -64,26 +64,26 @@ void DashBoardLookAndFeel::setColours()
 
 Font DashBoardLookAndFeel::getTextButtonFont (TextButton&, int buttonHeight)
 {
-    return neova_dash::font::dashFontNorms.withHeight ((buttonHeight * 5.0f) / 10.0f);
+    return neova_dash::font::dashFontNorms.withHeight (buttonHeight * 5.0f / 10.0f);
 }
 
 Font DashBoardLookAndFeel::getComboBoxFont (ComboBox& cb)
 {
-	return neova_dash::font::dashFont.withHeight (jmax (11.0f, jmin (14.0f, (cb.getHeight() * 6.0f) / 10.0f)));
+	return neova_dash::font::dashFont.withHeight (jmax (11.0f, jmin (14.0f, cb.getHeight() * 6.0f / 10.0f)));
 }
 
 void DashBoardLookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int width, int height, float sliderPos,
                                              const float rotaryStartAngle, const float rotaryEndAngle, Slider& slider)
 {
-    auto outline = slider.findColour (Slider::rotarySliderOutlineColourId);
-    auto fill    = slider.findColour (Slider::rotarySliderFillColourId);
+    const auto outline = slider.findColour (Slider::rotarySliderOutlineColourId);
+    const auto fill    = slider.findColour (Slider::rotarySliderFillColourId);
 
-    auto bounds = juce::Rectangle<int> (x, y, width, height).toFloat().reduced (10);
+    const auto bounds = juce::Rectangle<int> (x, y, width, height).toFloat().reduced (10);
 
-    auto radius = jmin (bounds.getWidth(), bounds.getHeight()) / 2.0f;
-    auto toAngle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
-    auto lineW = jmin (8.0f, radius * 0.5f);
-    auto arcRadius = radius - lineW * 0.5f;
+    const auto radius = jmin (bounds.getWidth(), bounds.getHeight()) / 2.0f;
+    const auto toAngle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
+    const auto lineW = jmin (8.0f, radius * 0.5f);
+    const auto arcRadius = radius - lineW * 0.5f;
 
     Path backgroundArc;
     backgroundArc.addCentredArc (bounds.getCentreX(),
@@ -114,9 +114,9 @@ void DashBoardLookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int widt
         g.strokePath (valueArc, PathStrokeType (6.0f, PathStrokeType::curved, PathStrokeType::rounded));
     }
 
-    auto thumbWidth = 6.0f;
-    juce::Point<float> thumbPoint (bounds.getCentreX() + arcRadius * std::cos (toAngle - MathConstants<float>::halfPi),
-                             bounds.getCentreY() + arcRadius * std::sin (toAngle - MathConstants<float>::halfPi));
+    const auto thumbWidth = 6.0f;
+    const Point<float> thumbPoint (bounds.getCentreX() + arcRadius * std::cos (toAngle - MathConstants<float>::halfPi),
+                                   bounds.getCentreY() + arcRadius * std::sin (toAngle - MathConstants<float>::halfPi));
   if (slider.getThumbBeingDragged() != -1)
   {
     g.setColour (fill.withAlpha(0.6f));
@@ -143,14 +143,14 @@ void DashBoardLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int widt
     }
     else
     {
-        auto isTwoVal   = (style == Slider::SliderStyle::TwoValueVertical   || style == Slider::SliderStyle::TwoValueHorizontal);
-        auto isThreeVal = (style == Slider::SliderStyle::ThreeValueVertical || style == Slider::SliderStyle::ThreeValueHorizontal);
+        const auto isTwoVal   = style == Slider::SliderStyle::TwoValueVertical   || style == Slider::SliderStyle::TwoValueHorizontal;
+        const auto isThreeVal = style == Slider::SliderStyle::ThreeValueVertical || style == Slider::SliderStyle::ThreeValueHorizontal;
 
-        juce::Point<float> startPoint (slider.isHorizontal() ? x : x + width * 0.5f,
-                                 slider.isHorizontal() ? y + height * 0.5f : height + y);
+        const Point<float> startPoint (slider.isHorizontal() ? x : x + width * 0.5f,
+                                       slider.isHorizontal() ? y + height * 0.5f : height + y);
 
-        juce::Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
-                               slider.isHorizontal() ? startPoint.y : y);
+        const Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
+                                     slider.isHorizontal() ? startPoint.y : y);
 
         Path backgroundTrack;
         backgroundTrack.startNewSubPath (startPoint);
@@ -159,7 +159,7 @@ void DashBoardLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int widt
         g.strokePath (backgroundTrack, { 12.0f, PathStrokeType::curved, PathStrokeType::rounded }); // changed track width
 
         Path valueTrack;
-        juce::Point<float> minPoint, maxPoint, thumbPoint;
+        Point<float> minPoint, maxPoint, thumbPoint;
 
         if (isTwoVal || isThreeVal)
         {
@@ -175,14 +175,14 @@ void DashBoardLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int widt
         }
         else
         {
-            auto kx = slider.isHorizontal() ? sliderPos : (x + width * 0.5f);
-            auto ky = slider.isHorizontal() ? (y + height * 0.5f) : sliderPos;
+            auto kx = slider.isHorizontal() ? sliderPos : x + width * 0.5f;
+            auto ky = slider.isHorizontal() ? y + height * 0.5f : sliderPos;
 
             minPoint = startPoint;
             maxPoint = { kx, ky };
         }
 
-        auto thumbWidth = 6.0f;
+        const auto thumbWidth = 6.0f;
 
         valueTrack.startNewSubPath (minPoint);
         valueTrack.lineTo (isThreeVal ? thumbPoint : maxPoint);
@@ -200,8 +200,8 @@ void DashBoardLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int widt
       }
 
             g.setColour (slider.findColour (Slider::thumbColourId));
-            g.fillEllipse (juce::Rectangle<float> (static_cast<float> (thumbWidth),
-                                                   static_cast<float> (thumbWidth)).withCentre (maxPoint));
+            g.fillEllipse (juce::Rectangle<float> (thumbWidth,
+                                                   thumbWidth).withCentre (maxPoint));
         }
 
         if (isTwoVal || isThreeVal)
@@ -216,10 +216,10 @@ void DashBoardLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, int widt
             }
 
             g.setColour (slider.findColour (Slider::thumbColourId));
-            g.fillEllipse (juce::Rectangle<float> (static_cast<float> (thumbWidth),
-                                                   static_cast<float> (thumbWidth)).withCentre (maxPoint));
-            g.fillEllipse (juce::Rectangle<float> (static_cast<float> (thumbWidth),
-                                                   static_cast<float> (thumbWidth)).withCentre (minPoint));
+            g.fillEllipse (juce::Rectangle<float> (thumbWidth,
+                                                   thumbWidth).withCentre (maxPoint));
+            g.fillEllipse (juce::Rectangle<float> (thumbWidth,
+                                                   thumbWidth).withCentre (minPoint));
         }
     }
 }
@@ -246,7 +246,7 @@ void DashBoardLookAndFeel::drawScrollbar (Graphics& g, ScrollBar& scrollbar,
     else
         thumbBounds = { thumbStartPosition, y, thumbSize, height };
 
-    auto c = scrollbar.findColour (ScrollBar::ColourIds::thumbColourId);
+    const auto c = scrollbar.findColour (ScrollBar::ColourIds::thumbColourId);
     g.setColour (isMouseOver ? c.brighter (0.25f) : c);
     g.fillRect (thumbBounds.reduced (1).toFloat());
 }
@@ -260,7 +260,7 @@ void DashBoardLookAndFeel::drawButtonBackground (Graphics& g,
     const int width = button.getWidth();
     const int height = button.getHeight();
 
-    const float outlineThickness = button.isEnabled() ? ((shouldDrawButtonAsDown || shouldDrawButtonAsHighlighted) ? 1.2f : 0.7f) : 0.4f;
+    const float outlineThickness = button.isEnabled() ? (shouldDrawButtonAsDown || shouldDrawButtonAsHighlighted ? 1.2f : 0.7f) : 0.4f;
     const float halfThickness = outlineThickness * 0.5f;
 
     const float indentL = button.isConnectedOnLeft()   ? 0.1f : halfThickness;
@@ -301,15 +301,15 @@ void DashBoardLookAndFeel::drawButtonBackground (Graphics& g,
 void RangeTunerLookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int width, int height, float sliderPos,
                                        const float rotaryStartAngle, const float rotaryEndAngle, Slider& slider)
 {
-    auto outline = slider.findColour (Slider::rotarySliderOutlineColourId);
-    auto fill    = slider.findColour (Slider::rotarySliderFillColourId);
+    const auto outline = slider.findColour (Slider::rotarySliderOutlineColourId);
+    const auto fill    = slider.findColour (Slider::rotarySliderFillColourId);
 
-    auto bounds = juce::Rectangle<int> (x, y, width, height).toFloat().reduced (10);
+    const auto bounds = juce::Rectangle<int> (x, y, width, height).toFloat().reduced (10);
 
-    auto radius = jmin (bounds.getWidth(), bounds.getHeight()) / 2.0f;
-    auto toAngle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
-    auto lineW = jmin (8.0f, radius * 0.5f);
-    auto arcRadius = radius - lineW * 0.5f;
+    const auto radius = jmin (bounds.getWidth(), bounds.getHeight()) / 2.0f;
+    const auto toAngle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
+    const auto lineW = jmin (8.0f, radius * 0.5f);
+    const auto arcRadius = radius - lineW * 0.5f;
 
     Path backgroundArc;
     backgroundArc.addCentredArc (bounds.getCentreX(),
@@ -340,9 +340,9 @@ void RangeTunerLookAndFeel::drawRotarySlider (Graphics& g, int x, int y, int wid
         g.strokePath (valueArc, PathStrokeType (1.5f /*lineW*/, PathStrokeType::curved, PathStrokeType::rounded));
     }
 
-    auto thumbWidth = 6.0f;
-    juce::Point<float> thumbPoint (bounds.getCentreX() + arcRadius * std::cos (toAngle - MathConstants<float>::halfPi),
-                             bounds.getCentreY() + arcRadius * std::sin (toAngle - MathConstants<float>::halfPi));
+    const auto thumbWidth = 6.0f;
+    const Point<float> thumbPoint (bounds.getCentreX() + arcRadius * std::cos (toAngle - MathConstants<float>::halfPi),
+                                   bounds.getCentreY() + arcRadius * std::sin (toAngle - MathConstants<float>::halfPi));
 
     g.setColour (slider.findColour (Slider::thumbColourId));
     g.fillEllipse (juce::Rectangle<float> (thumbWidth, thumbWidth).withCentre (thumbPoint));

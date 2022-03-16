@@ -23,9 +23,9 @@ class GestureSettingsComponent : public Component
 {
 public:
     //==============================================================================
-    GestureSettingsComponent (const int gestId, HubConfiguration& config,
+    GestureSettingsComponent (int gestId, HubConfiguration& config,
                               ApplicationCommandManager& manager, DataReader& reader);
-    ~GestureSettingsComponent();
+    ~GestureSettingsComponent() override;
     
     //==============================================================================
     // Component
@@ -33,15 +33,15 @@ public:
     void resized() override;
     
     //==============================================================================
-    Tuner& getTuner();
+    Tuner& getTuner() const;
     void updateDisplay();
-    void updateComponents();
+    void updateComponents() const;
     
     const int gestureId;
 
 private:
     //==============================================================================
-    void paintBackground (Graphics&);
+    void paintBackground (Graphics&) const;
     
     //==============================================================================
     void createTuner();

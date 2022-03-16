@@ -12,7 +12,7 @@
 
 //==============================================================================
 FirmUpgradePanel::FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler, ApplicationCommandManager& manager, DataReader& dataReaderRef)
-	: hubConfig (config), upgradeHandler (handler), commandManager (manager), dataReader(dataReaderRef)
+	: upgradeHandler (handler), hubConfig (config), commandManager (manager), dataReader(dataReaderRef)
 {
     createLabels();
     createButtons();
@@ -52,32 +52,32 @@ void FirmUpgradePanel::resized()
     closeButton->setBounds (juce::Rectangle<int> (25, 25).withRightX (panelArea.getRight() - MARGIN_SMALL)
                                                          .withY (panelArea.getY() + MARGIN_SMALL));
     #elif JUCE_MAC
-    closeButton->setBounds (juce::Rectangle<int> (25, 25).withPosition (panelArea.getTopLeft()
+    closeButton->setBounds (juce::juce::Rectangle<int> (25, 25).withPosition (panelArea.getTopLeft()
     																			 .translated (MARGIN_SMALL,
     																			   			  MARGIN_SMALL)));
     #endif
 
-    auto area = panelArea.reduced (neova_dash::ui::MARGIN);
+    auto area = panelArea.reduced (MARGIN);
 
     titleLabel->setBounds (area.removeFromTop (area.getHeight()/5));
 
-    auto buttonArea = area.removeFromBottom (jmin (area.getHeight()/5, 40));
+    const auto buttonArea = area.removeFromBottom (jmin (area.getHeight()/5, 40));
     okButton->setBounds (buttonArea.withSizeKeepingCentre (okButton->getBestWidthForHeight (buttonArea.getHeight()),
                                      						buttonArea.getHeight()));
 
     upgradeButton->setBounds (buttonArea.withSizeKeepingCentre (upgradeButton->getBestWidthForHeight (buttonArea.getHeight()),
                                      						    buttonArea.getHeight()));
 
-    bodyText->setBounds (area.reduced (area.getWidth()/4, neova_dash::ui::MARGIN));
+    bodyText->setBounds (area.reduced (area.getWidth()/4, MARGIN));
 }
 
 void FirmUpgradePanel::timerCallback()
 {
-	DBG ("Upgrade timer : state " + String (int (currentState)) + " - Internal " + String (upgradeHandler.getUpgradeState()));
-	if (upgradeHandler.getUpgradeState() == int (checkingReleases) && currentState == preInstallationWarning) return;
+	DBG ("Upgrade timer : state " + String ( currentState) + " - Internal " + String (upgradeHandler.getUpgradeState()));
+	if (upgradeHandler.getUpgradeState() == static_cast<int>(checkingReleases) && currentState == preInstallationWarning) return;
 
 	// The timer is checking backend state and updates interface accordingly
-	if (upgradeHandler.getUpgradeState() != int (currentState))
+	if (upgradeHandler.getUpgradeState() != static_cast<int>(currentState))
 	{
 		if (upgradeHandler.getUpgradeState() != UpgradeHandler::upgradeSuccessfull)
 		{
@@ -121,12 +121,12 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 		if (currentState == preInstallationWarning)
 		{
 			jassert (currentUpgrade != none);
-			if (upgradeHandler.getUpgradeState() != int (checkingReleases))
+			if (upgradeHandler.getUpgradeState() != static_cast<int>(checkingReleases))
 				updateComponentsForSpecificState (upgradeHandler.getUpgradeState());
-			
-			neova_dash::log::writeToLog ("Battery level before upgrade : raw " +
-				std::to_string (dataReader.getBatteryLevel (true)) +
-				" - percent " + std::to_string (dataReader.getBatteryLevel (false)), neova_dash::log::hubCommunication);
+
+            writeToLog("Battery level before upgrade : raw " +
+                       std::to_string (dataReader.getBatteryLevel (true)) +
+                       " - percent " + std::to_string (dataReader.getBatteryLevel (false)), neova_dash::log::hubCommunication);
 
 			upgradeHandler.startUpgrade();
 
@@ -140,10 +140,10 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 
 	else if (bttn == upgradeButton.get())
 	{
-		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16() && hubConfig.getHubIsConnected());
-		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16() && hubConfig.getRingIsConnected());
+        const bool hubAvailable = upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16() && hubConfig.getHubIsConnected();
+        const bool ringAvailable = upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16() && hubConfig.getRingIsConnected();
 
-		currentUpgrade = (!ringAvailable && hubAvailable) ? hub : ring;
+		currentUpgrade = !ringAvailable && hubAvailable ? hub : ring;
 		updateComponentsForSpecificState (preInstallationWarning);
 	}
 }
@@ -203,7 +203,7 @@ void FirmUpgradePanel::updateAfterHubConnection()
 	}
 }
 
-bool FirmUpgradePanel::isWaitingForHubReconnect()
+bool FirmUpgradePanel::isWaitingForHubReconnect() const
 {
 	return currentState == waitingForHubReconnect;
 }
@@ -254,20 +254,20 @@ void FirmUpgradePanel::updateComponentsForSpecificState (int upgradeStateToUpdat
 	switch (upgradeStateToUpdateTo)
 	{
 		// Errors
-		case (int (err_ringIsNotConnected))           : updateComponentsForError (err_ringIsNotConnected);           break;
-		case (int (err_waitingForUpgradeFirmTimeOut)) : updateComponentsForError (err_waitingForUpgradeFirmTimeOut); break;
-		case (int (err_upgradeLaunchFailed))          : updateComponentsForError (err_upgradeLaunchFailed);          break;
-		case (int (err_upgradefailed))                : updateComponentsForError (err_upgradefailed);                break;
-		case (int (err_unknow))                       : updateComponentsForError (err_unknow);                       break;
+		case static_cast<int>(err_ringIsNotConnected)           : updateComponentsForError (err_ringIsNotConnected);           break;
+		case static_cast<int>(err_waitingForUpgradeFirmTimeOut) : updateComponentsForError (err_waitingForUpgradeFirmTimeOut); break;
+		case static_cast<int>(err_upgradeLaunchFailed)          : updateComponentsForError (err_upgradeLaunchFailed);          break;
+		case static_cast<int>(err_upgradefailed)                : updateComponentsForError (err_upgradefailed);                break;
+		case static_cast<int>(err_unknow)                       : updateComponentsForError (err_unknow);                       break;
 
 		// States
-		case (int (checkingReleases))       : updateComponentsForSpecificState (checkingReleases);       break;
-		case (int (waitingForUpgradeFirm))  : updateComponentsForSpecificState (waitingForUpgradeFirm);  break;
-		case (int (upgradeFirmConnected))   : updateComponentsForSpecificState (upgradeFirmConnected);   break;
-		case (int (upgradeInProgress))      : updateComponentsForSpecificState (upgradeInProgress);      break;
-		case (int (upgradeSuccessfull))     : updateComponentsForSpecificState (upgradeSuccessfull);     break;
-		case (int (preInstallationWarning)) : updateComponentsForSpecificState (preInstallationWarning); break;
-		case (int (waitingForHubReconnect)) : updateComponentsForSpecificState (waitingForHubReconnect); break;
+		case static_cast<int>(checkingReleases)       : updateComponentsForSpecificState (checkingReleases);       break;
+		case static_cast<int>(waitingForUpgradeFirm)  : updateComponentsForSpecificState (waitingForUpgradeFirm);  break;
+		case static_cast<int>(upgradeFirmConnected)   : updateComponentsForSpecificState (upgradeFirmConnected);   break;
+		case static_cast<int>(upgradeInProgress)      : updateComponentsForSpecificState (upgradeInProgress);      break;
+		case static_cast<int>(upgradeSuccessfull)     : updateComponentsForSpecificState (upgradeSuccessfull);     break;
+		case static_cast<int>(preInstallationWarning) : updateComponentsForSpecificState (preInstallationWarning); break;
+		case static_cast<int>(waitingForHubReconnect) : updateComponentsForSpecificState (waitingForHubReconnect); break;
 	}
 }
 
@@ -275,14 +275,14 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 {
 	currentState = upgradeStateToUpdateTo;
 
-	if (int (upgradeStateToUpdateTo) < 0)
+	if (static_cast<int>(upgradeStateToUpdateTo) < 0)
 	{
 		updateComponentsForError (upgradeStateToUpdateTo);
 	}
 	else
 	{
-		bool hubAvailable = (upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16()) && hubConfig.getHubIsConnected();
-		bool ringAvailable = (upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected();
+        const bool hubAvailable = upgradeHandler.getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16() && hubConfig.getHubIsConnected();
+        const bool ringAvailable = upgradeHandler.getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16() && hubConfig.getRingIsConnected();
 
 		closeButton->setVisible (false);
 		okButton->setVisible (false);
@@ -477,8 +477,8 @@ void FirmUpgradePanel::updateComponentsForError (UpgradeState upgradeStateToUpda
 
 String FirmUpgradePanel::getFormattedVersionString (uint16_t version)
 {
-	uint8_t minor = uint8_t (version & 0xff);
-	uint8_t major = uint8_t (version >> 8 & 0xff);
+    const uint8_t minor = static_cast<uint8_t>(version & 0xff);
+    const uint8_t major = static_cast<uint8_t>(version >> 8 & 0xff);
 
 	return String (major) + "." + String (minor); 
 }

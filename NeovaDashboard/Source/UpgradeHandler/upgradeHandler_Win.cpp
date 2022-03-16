@@ -26,7 +26,7 @@ void UpgradeHandler::timerCallback()
 {
 	set_upgradeCommandReceived(false);
 	setUpgradeState(err_waitingForUpgradeFirmTimeOut);
-	neova_dash::log::writeToLog("Failed upgrade: timeout..", neova_dash::log::hubCommunication);
+    writeToLog("Failed upgrade: timeout..", neova_dash::log::hubCommunication);
 
 	stopTimer();
 }
@@ -37,7 +37,7 @@ void UpgradeHandler::set_upgradeCommandReceived(bool st)
 	upgradeCommandReceived = st;
 }
 
-bool UpgradeHandler::get_upgradeCommandReceived()
+bool UpgradeHandler::get_upgradeCommandReceived() const
 {
 	return upgradeCommandReceived;
 }
@@ -47,7 +47,7 @@ void UpgradeHandler::setHubReleaseVersion(uint16_t version)
 	hubReleaseVersion = version;
 }
 
-uint16_t UpgradeHandler::getHubReleaseVersion()
+uint16_t UpgradeHandler::getHubReleaseVersion() const
 {
 	return hubReleaseVersion;
 }
@@ -57,7 +57,7 @@ void UpgradeHandler::setRingReleaseVersion(uint16_t version)
 	ringReleaseVersion = version;
 }
 
-uint16_t UpgradeHandler::getRingReleaseVersion()
+uint16_t UpgradeHandler::getRingReleaseVersion() const
 {
 	return ringReleaseVersion;
 }
@@ -69,54 +69,54 @@ void UpgradeHandler::setUpgradeState(int state)
 	if (upgradeState < 0) successiveUpgrade = false; // Stops the HUB from updating upon restart in case of a successive upgrade
 }
 
-int UpgradeHandler::getUpgradeState()
+int UpgradeHandler::getUpgradeState() const
 {
 	return upgradeState;
 }
 
-bool UpgradeHandler::waitsForSuccessiveUpgrade()
+bool UpgradeHandler::waitsForSuccessiveUpgrade() const
 {
     return successiveUpgrade;
 }
 
-bool UpgradeHandler::isUpgrading()
+bool UpgradeHandler::isUpgrading() const
 {
-	return (upgradeState > 0 && upgradeState != upgradeSuccessfull)|| successiveUpgrade;
+	return upgradeState > 0 && upgradeState != upgradeSuccessfull|| successiveUpgrade;
 }
 
 //==============================================================================
 
 VOID CALLBACK UpgradeHandler::childProcessExitCallback(PVOID lpParameter, BOOLEAN)
 {
-	UpgradeHandler* context = reinterpret_cast<UpgradeHandler*>(lpParameter);
+    const auto context = reinterpret_cast<UpgradeHandler*>(lpParameter);
 	context->closeNrfutil();
 }
 
 void UpgradeHandler::createChildOutputHandlers()
 {
     SECURITY_ATTRIBUTES sa;
-    sa.nLength = sizeof(sa);
-    sa.lpSecurityDescriptor = NULL;
+    sa.nLength = sizeof sa;
+    sa.lpSecurityDescriptor = nullptr;
     sa.bInheritHandle = TRUE;
 
-	String out_f = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childOutFileName;
-	String err_f = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childErrFileName;
+    const String out_f = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childOutFileName;
+    const String err_f = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childErrFileName;
 
-    childOut = CreateFileW((LPCWSTR)out_f.toWideCharPointer(),
+    childOut = CreateFileW(out_f.toWideCharPointer(),
         FILE_GENERIC_READ | FILE_GENERIC_WRITE,
         FILE_SHARE_WRITE | FILE_SHARE_READ,
         &sa,
         CREATE_ALWAYS,
         FILE_ATTRIBUTE_HIDDEN,
-        NULL);
+    nullptr);
 
-    childErr= CreateFileW((LPCWSTR)err_f.toWideCharPointer(),
+    childErr= CreateFileW(err_f.toWideCharPointer(),
         FILE_GENERIC_READ | FILE_GENERIC_WRITE,
         FILE_SHARE_WRITE | FILE_SHARE_READ,
         &sa,
         CREATE_ALWAYS,
         FILE_ATTRIBUTE_HIDDEN,
-        NULL);
+    nullptr);
 }
 
 void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * numCOM)
@@ -129,23 +129,23 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * numCOM)
 	uint8_t minor;
 	uint8_t major;
 
-	auto nrfutilPath = File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + nrfutilRelativePath;
+    const auto nrfutilPath = File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + nrfutilRelativePath;
 	String commandLine;
-    String portCOM = "COM" + String(*(uint8_t*)numCOM);
+    const String portCOM = "COM" + String(*numCOM);
 	
     if (FirmType == upgradeFirmRing)
 	{
 		minor = getRingReleaseVersion() & 0xFF;
-		major = (getRingReleaseVersion()>>8) & 0xFF;
-		
-		auto releasePath = "\"" + File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "\"" + releaseRelativePath + "ring_" + String(major) + "." + String(minor) + ".zip";
+		major = getRingReleaseVersion()>>8 & 0xFF;
+
+        const auto releasePath = "\"" + File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "\"" + releaseRelativePath + "ring_" + String(major) + "." + String(minor) + ".zip";
 		commandLine = upgradeRingCommandLine + releasePath + " -p " + portCOM;
 	}
 	else if (FirmType == upgradeFirmHub)
 	{
 		minor = getHubReleaseVersion() & 0xFF;
-		major = (getHubReleaseVersion() >> 8) & 0xFF;
-		auto releasePath = "\"" + File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "\"" + releaseRelativePath + "hub_" + String(major) + "." + String(minor) + ".zip";
+		major = getHubReleaseVersion() >> 8 & 0xFF;
+        const auto releasePath = "\"" + File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "\"" + releaseRelativePath + "hub_" + String(major) + "." + String(minor) + ".zip";
 		commandLine = upgradeHubCommandLine + releasePath + " -p " + portCOM;
 	}
 
@@ -154,24 +154,24 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * numCOM)
 
 	si.cb = sizeof(STARTUPINFOW);
 	si.dwFlags |= STARTF_USESTDHANDLES;
-	si.hStdInput = NULL;
+	si.hStdInput = nullptr;
 	si.hStdError = childErr;
 	si.hStdOutput = childOut;
 	
 	// Start the child process. 
-	if (!CreateProcessW((LPCWSTR)nrfutilPath.toWideCharPointer(),	// No module name (use command line)
+	if (!CreateProcessW(nrfutilPath.toWideCharPointer(),	// No module name (use command line)
 		(LPWSTR)commandLine.toWideCharPointer(),	// Command line (LPSTR)commandLine.toWideCharPointer()
-		NULL,	// Process handle not inheritable
-		NULL,	// Thread handle not inheritable
+                        nullptr,	// Process handle not inheritable
+                        nullptr,	// Thread handle not inheritable
 		TRUE,	// Set handle inheritance to FALSE	
 		CREATE_NO_WINDOW,	// No creation flags CREATE_NO_WINDOW
-		NULL,	// Use parent's environment block
-		NULL,	// Use parent's starting directory 
+                        nullptr,	// Use parent's environment block
+                        nullptr,	// Use parent's starting directory 
 		&si,	// Pointer to STARTUPINFO structure
 		&pi)	// Pointer to PROCESS_INFORMATION structure
 		)
 	{
-		neova_dash::log::writeToLog("Failed to launch upgrade process..", neova_dash::log::hubCommunication);
+        writeToLog("Failed to launch upgrade process..", neova_dash::log::hubCommunication);
 		setUpgradeState(err_upgradeLaunchFailed);
 		return;
 	}
@@ -182,31 +182,31 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * numCOM)
 	{
 		setUpgradeState(upgradeInProgress);
 		HANDLE hNewHandle;
-		RegisterWaitForSingleObject(&hNewHandle, pi.hProcess, (WAITORTIMERCALLBACK)UpgradeHandler::childProcessExitCallback, reinterpret_cast<void*>(this), INFINITE, WT_EXECUTEONLYONCE);
+		RegisterWaitForSingleObject(&hNewHandle, pi.hProcess, childProcessExitCallback, this, INFINITE, WT_EXECUTEONLYONCE);
 	}
 }
 
 void UpgradeHandler::closeNrfutil()
 {
-	File out_f = (LPCWSTR)(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childOutFileName).toWideCharPointer();
-	File err_f = (LPCWSTR)(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childErrFileName).toWideCharPointer();
+    const File out_f = (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childOutFileName).toWideCharPointer();
+    const File err_f = (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + logsRelativePath + childErrFileName).toWideCharPointer();
 
-	
-	int ouf_size = out_f.loadFileAsString().length();
-	int err_size = err_f.loadFileAsString().length();
+
+    const int ouf_size = out_f.loadFileAsString().length();
+    const int err_size = err_f.loadFileAsString().length();
 	
 	if (ouf_size > 0)
 	{
 		DBG(out_f.loadFileAsString());
 		setUpgradeState(upgradeSuccessfull);
-        neova_dash::log::writeToLog("Neova Upgraded succesfully !", neova_dash::log::hubCommunication);
+        writeToLog("Neova Upgraded succesfully !", neova_dash::log::hubCommunication);
 
 	}
 	else if (err_size > 0)
 	{
 		DBG(err_f.loadFileAsString());
 		setUpgradeState(err_upgradefailed);
-		neova_dash::log::writeToLog("Failed to upgrade Neova..", neova_dash::log::hubCommunication);
+        writeToLog("Failed to upgrade Neova..", neova_dash::log::hubCommunication);
     }
     else
     {
@@ -223,20 +223,20 @@ void UpgradeHandler::closeNrfutil()
 void UpgradeHandler::checkReleasesVersion()
 {
     setUpgradeState(checkingReleases);
-	
-	auto releasePath = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + releaseRelativePath;
-	File f(releasePath);
-	Array<File> hubFiles = f.findChildFiles(3, false, "hub*");
+
+    const auto releasePath = File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + releaseRelativePath;
+    const File f(releasePath);
+    const Array<File> hubFiles = f.findChildFiles(3, false, "hub*");
 	if (hubFiles.size() == 0)
 	{
 		setHubReleaseVersion(0);
 	}
 	else if (hubFiles.size() == 1)
 	{
-		String name = hubFiles.getFirst().getFileNameWithoutExtension();
-		uint8_t minor = (uint8_t)name.getTrailingIntValue();
-		uint8_t major = (uint8_t)name.upToLastOccurrenceOf(".", false, true).getTrailingIntValue();
-		uint16_t version = ((uint16_t)major << 8) | minor;
+        const String name = hubFiles.getFirst().getFileNameWithoutExtension();
+        const uint8_t minor = static_cast<uint8_t>(name.getTrailingIntValue());
+        const uint8_t major = static_cast<uint8_t>(name.upToLastOccurrenceOf(".", false, true).getTrailingIntValue());
+        const uint16_t version = static_cast<uint16_t>(major) << 8 | minor;
 		setHubReleaseVersion(version);
 	}
 	else
@@ -245,17 +245,17 @@ void UpgradeHandler::checkReleasesVersion()
 		setUpgradeState(err_unknow);
 	}
 
-	Array<File> ringFiles = f.findChildFiles(3, false, "ring*");
+    const Array<File> ringFiles = f.findChildFiles(3, false, "ring*");
 	if (ringFiles.size() == 0)
 	{
 		setRingReleaseVersion(0);
 	}
 	else if (ringFiles.size() == 1)
 	{
-		String name = ringFiles.getFirst().getFileNameWithoutExtension();
-		uint8_t minor = (uint8_t)name.getTrailingIntValue();
-		uint8_t major = (uint8_t)name.upToLastOccurrenceOf(".", false, true).getTrailingIntValue();
-		uint16_t version = ((uint16_t)major << 8) | minor;
+        const String name = ringFiles.getFirst().getFileNameWithoutExtension();
+        const uint8_t minor = static_cast<uint8_t>(name.getTrailingIntValue());
+        const uint8_t major = static_cast<uint8_t>(name.upToLastOccurrenceOf(".", false, true).getTrailingIntValue());
+        const uint16_t version = static_cast<uint16_t>(major) << 8 | minor;
 		setRingReleaseVersion(version);
 	}
 	else
@@ -274,8 +274,8 @@ void UpgradeHandler::launchUpgradeProcedure()
 
 void UpgradeHandler::startUpgrade()
 {
-	bool hubAvailable = getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16();
-	bool ringAvailable = (getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16()) && hubConfig.getRingIsConnected();
+    const bool hubAvailable = getHubReleaseVersion() > hubConfig.getHubFirmwareVersionUint16();
+    const bool ringAvailable = getRingReleaseVersion() > hubConfig.getRingFirmwareVersionUint16() && hubConfig.getRingIsConnected();
 
 	if (hubAvailable != ringAvailable)
 	{
@@ -302,7 +302,7 @@ void UpgradeHandler::startRingUpgrade()
 	{
 		//ask Hub for changing Mode (connectivity firm) 
 		uint8_t data[4];
-		memcpy(data, "ring", sizeof("ring"));
+		memcpy(data, "ring", sizeof"ring");
 		dPipe.sendString(data, 4);
 		
         //start Timer to track Timeout
@@ -318,7 +318,7 @@ void UpgradeHandler::startHubUpgrade()
 {
 	//ask Hub for changing Mode (bootloader)
 	uint8_t data[4];
-	memcpy(data, "upgr", sizeof("upgr"));
+	memcpy(data, "upgr", sizeof"upgr");
 	dPipe.sendString(data, 4);
 	
     //start Timer to track Timeout
@@ -348,8 +348,7 @@ bool UpgradeHandler::checkBatteryForUpgrade () const
 
 	if(percentBattery >= 0.2f)
 		return true;
-	else
-		return false;
+    return false;
 }
 
 //==============================================================================

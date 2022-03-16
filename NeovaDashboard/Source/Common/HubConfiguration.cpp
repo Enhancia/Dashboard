@@ -26,7 +26,7 @@ void HubConfiguration::setConfig(uint8_t * data)
     if (!configWasInitialized) configWasInitialized = true;
 }
 
-void HubConfiguration::getConfig(uint8_t * data, int buffer_size)
+void HubConfiguration::getConfig(uint8_t * data, int buffer_size) const
 {
     if (buffer_size >=  sizeof(ConfigData))
     {
@@ -41,12 +41,12 @@ void HubConfiguration::flashHub()
     commandManager.invokeDirectly (neova_dash::commands::flashHub, true);
 }
 
-bool HubConfiguration::wasConfigChangedSinceLastFlash()
+bool HubConfiguration::wasConfigChangedSinceLastFlash() const
 {
     return configWasChangedSinceLastFlash;
 }
 
-bool HubConfiguration::getConfigWasInitialized()
+bool HubConfiguration::getConfigWasInitialized() const
 {
     return configWasInitialized;
 }
@@ -75,7 +75,7 @@ void HubConfiguration::setMidiChannel (const int channelNumber, bool shouldChann
 
     if (shouldChannelBeOn)
     {
-        midiChannels |= (1 << channelNumber);
+        midiChannels |= 1 << channelNumber;
     }
     else
     {
@@ -95,7 +95,7 @@ void HubConfiguration::setMidiChannelExclusive (const int channelNumber, bool is
     uint16_t& midiChannels = isMidiInput ? getPresetData().midiChannelsIn
                                          : getPresetData().midiChannelsOut;
     
-    midiChannels = (1 << channelNumber);
+    midiChannels = 1 << channelNumber;
     
     if (uploadToHub)
     {
@@ -117,7 +117,7 @@ void HubConfiguration::toggleMidiChannel (const int channelNumber, bool isMidiIn
 		return;
 	}
     
-    midiChannels ^= (1 << channelNumber);
+    midiChannels ^= 1 << channelNumber;
 
     if (uploadToHub)
     {
@@ -141,7 +141,7 @@ const int HubConfiguration::getNumActiveMidiChannels (bool isMidiInput)
 
 	for (int numChannel = 0; numChannel < 16; numChannel++)
 	{
-		count += (midiChannels >> numChannel) & 1;
+		count += midiChannels >> numChannel & 1;
 	}
 
 	return count;
@@ -149,7 +149,7 @@ const int HubConfiguration::getNumActiveMidiChannels (bool isMidiInput)
 
 void HubConfiguration::setMidiThrough (bool shouldUseThrough, bool uploadToHub)
 {
-    config.midi_thru = (shouldUseThrough ? int (thruAdd) : int (thruOff));
+    config.midi_thru = shouldUseThrough ? static_cast<int>(thruAdd) : static_cast<int>(thruOff);
 
     if (uploadToHub)
     {
@@ -159,7 +159,7 @@ void HubConfiguration::setMidiThrough (bool shouldUseThrough, bool uploadToHub)
 }
 
 
-int HubConfiguration::getMidiThrough()
+int HubConfiguration::getMidiThrough() const
 {
     return config.midi_thru;
 }
@@ -230,11 +230,11 @@ void HubConfiguration::setDefaultGestureValues (const int gestureNumber, const n
 
     setGestureData (presetNumber, gestureNumber,
                                   1,
-                                  uint8_t (type),
+                                  static_cast<uint8_t>(type),
                                   0,
                                   127,
-                                  uint8_t ((type == neova_dash::gesture::none) ? 0 : findNextAvailableCC()),
-                                  neova_dash::gesture::ccMidi);
+                                  static_cast<uint8_t>(type == none ? 0 : findNextAvailableCC()),
+                                  ccMidi);
 
     switch (type)
     {
@@ -282,10 +282,10 @@ void HubConfiguration::setSavedGestureValues (const int gestureNumber, const neo
 
     setGestureData (presetNumber, gestureNumber,
                                   1,
-                                  uint8_t (type),
+                                  static_cast<uint8_t>(type),
                                   lastGestureConfig[type]->midiLow,
                                   lastGestureConfig[type]->midiHigh,
-                                  uint8_t (findNextAvailableCC()),
+                                  static_cast<uint8_t>(findNextAvailableCC()),
                                   neova_dash::gesture::ccMidi);
 
     setGestureParameters (presetNumber, gestureNumber, lastGestureConfig[type]->gestureParam0,
@@ -311,13 +311,13 @@ void HubConfiguration::setPreset (const int presetNumberToSelect)
 
 void HubConfiguration::setPreset (const int presetNumberToSelect, bool uploadToHub)
 {
-	neova_dash::log::writeToLog ("Bank #" + String (presetNumberToSelect) + " : Selecting", neova_dash::log::config);
+    writeToLog("Bank #" + String (presetNumberToSelect) + " : Selecting", neova_dash::log::config);
 
     if (presetNumberToSelect < 0 || presetNumberToSelect > neova_dash::gesture::NUM_PRESETS || presetNumberToSelect == selectedPreset) return;
 
     selectedPreset = presetNumberToSelect;
     selectFirstExistingGesture();
-    config.active_preset = uint8_t (presetNumberToSelect);
+    config.active_preset = static_cast<uint8_t>(presetNumberToSelect);
 
     if (uploadToHub)
     {
@@ -326,7 +326,7 @@ void HubConfiguration::setPreset (const int presetNumberToSelect, bool uploadToH
     }
 }
 
-const int HubConfiguration::getSelectedPreset()
+const int HubConfiguration::getSelectedPreset() const
 {
     return selectedPreset;
 }
@@ -363,9 +363,9 @@ HubConfiguration::GestureData& HubConfiguration::getGestureData (const int gestu
 
     switch (gestureNumber)
     {
-        case (1): return preset.gestureData1;
-        case (2): return preset.gestureData2;
-        case (3): return preset.gestureData3;
+        case 1: return preset.gestureData1;
+        case 2: return preset.gestureData2;
+        case 3: return preset.gestureData3;
         default:  return preset.gestureData0;
     }
 }
@@ -379,9 +379,9 @@ HubConfiguration::PresetData& HubConfiguration::getPresetData (const int presetN
 {
     switch (presetNumber)
     {
-        case (1): return config.presetData1;
-        case (2): return config.presetData2;
-        case (3): return config.presetData3;
+        case 1: return config.presetData1;
+        case 2: return config.presetData2;
+        case 3: return config.presetData3;
         default:  return config.presetData0;
     }
 }
@@ -409,7 +409,7 @@ void HubConfiguration::setSelectedGesture (const int gestureToSelect)
     selectedGesture = gestureToSelect;
 }
 
-const int HubConfiguration::getSelectedGesture()
+const int HubConfiguration::getSelectedGesture() const
 {
     return selectedGesture;
 }
@@ -453,12 +453,12 @@ const String HubConfiguration::getRingFirmwareVersionString ()
     return ringFirm;
 }
 
-uint16_t HubConfiguration::getHubFirmwareVersionUint16()
+uint16_t HubConfiguration::getHubFirmwareVersionUint16() const
 {
     return config.hub_firmware_version;
 }
 
-uint16_t HubConfiguration::getRingFirmwareVersionUint16()
+uint16_t HubConfiguration::getRingFirmwareVersionUint16() const
 {
     return config.ring_firmware_version;
 }
@@ -468,7 +468,7 @@ void HubConfiguration::setRingIsCharging (bool isCharging)
     ringIsCharging = isCharging;
 }
 
-bool HubConfiguration::getRingIsCharging()
+bool HubConfiguration::getRingIsCharging() const
 {
     return ringIsCharging;
 }
@@ -480,16 +480,16 @@ void HubConfiguration::setHubIsConnected (bool isConnected)
     if (isConnected)
     {
         checkHUBCompatibility();
-        neova_dash::log::writeToLog ("Hub connected : " + getHubFirmwareVersionString(),
-                                     neova_dash::log::hubCommunication);
+        writeToLog("Hub connected : " + getHubFirmwareVersionString(),
+                   neova_dash::log::hubCommunication);
     }
     else
     {
-        neova_dash::log::writeToLog ("Hub disconnected", neova_dash::log::hubCommunication);
+        writeToLog("Hub disconnected", neova_dash::log::hubCommunication);
     }
 }
 
-bool HubConfiguration::getHubIsConnected()
+bool HubConfiguration::getHubIsConnected() const
 {
     return hubIsConnected;
 }
@@ -504,17 +504,17 @@ void HubConfiguration::setRingIsConnected (bool isConnected)
     }
 }
 
-bool HubConfiguration::getRingIsConnected()
+bool HubConfiguration::getRingIsConnected() const
 {
     return ringIsConnected;
 }
 
-bool HubConfiguration::getHubIsCompatible()
+bool HubConfiguration::getHubIsCompatible() const
 {
     return hubIsCompatible == 0;
 }
 
-int HubConfiguration::getHubIsCompatibleInt()
+int HubConfiguration::getHubIsCompatibleInt() const
 {
     return hubIsCompatible;
 }
@@ -565,13 +565,13 @@ void HubConfiguration::setGestureData (int presetNum, int gestureNum,
 {
     GestureData& gesture = getGestureData (gestureNum, presetNum);
 
-    gesture.on       = (newType == neova_dash::gesture::none) ? 0 : newOn;
+    gesture.on       = newType == neova_dash::gesture::none ? 0 : newOn;
     gesture.type     = newType;
     gesture.midiLow  = newMidiLow;
     gesture.midiHigh = newMidiHigh;
     gesture.cc       = newCc;
-    gesture.midiType = ( newType == neova_dash::gesture::vibrato ||
-                         newType == neova_dash::gesture::pitchBend ) ? neova_dash::gesture::pitchMidi
+    gesture.midiType = newType == neova_dash::gesture::vibrato ||
+                       newType == neova_dash::gesture::pitchBend ? neova_dash::gesture::pitchMidi
                                                                      : newMidiType;
 
     if (uploadToHub) commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
@@ -622,9 +622,9 @@ void HubConfiguration::moveGestureToId (const int idToMoveFrom, const int idToMo
     if (getGestureData (idToMoveFrom).type == neova_dash::gesture::none ||
         getGestureData (idToMoveTo).type   != neova_dash::gesture::none   ) return;
 
-	  neova_dash::log::writeToLog ("Gesture " + neova_dash::gesture::getTypeString (getGestureData (idToMoveFrom).type, true)
-	  																				+ " (Id " + String (idToMoveFrom) + ") : Moving to id "
-	  																				+ String (idToMoveTo), neova_dash::log::config);
+    writeToLog("Gesture " + neova_dash::gesture::getTypeString (getGestureData (idToMoveFrom).type, true)
+               + " (Id " + String (idToMoveFrom) + ") : Moving to id "
+               + String (idToMoveTo), neova_dash::log::config);
 
     getGestureData (idToMoveTo) = getGestureData (idToMoveFrom);
     setDefaultGestureValues (idToMoveFrom, neova_dash::gesture::none);
@@ -635,11 +635,11 @@ void HubConfiguration::moveGestureToId (const int idToMoveFrom, const int idToMo
 
 void HubConfiguration::duplicateGesture (const int idToDuplicateFrom, const bool prioritizeHigherId)
 {
-    int idToDuplicateTo = findClosestIdToDuplicate (idToDuplicateFrom, prioritizeHigherId);
-	  
-	  neova_dash::log::writeToLog ("Gesture " + neova_dash::gesture::getTypeString (getGestureData (idToDuplicateFrom).type, true)
-	  																				+ " (Id " + String (idToDuplicateFrom) + ") : Duplicating to id "
-	  																				+ String (idToDuplicateTo), neova_dash::log::config);
+    const int idToDuplicateTo = findClosestIdToDuplicate (idToDuplicateFrom, prioritizeHigherId);
+
+    writeToLog("Gesture " + neova_dash::gesture::getTypeString (getGestureData (idToDuplicateFrom).type, true)
+               + " (Id " + String (idToDuplicateFrom) + ") : Duplicating to id "
+               + String (idToDuplicateTo), neova_dash::log::config);
 
     if (isIdAvailable (idToDuplicateFrom) || idToDuplicateTo == -1) return;
 
@@ -655,12 +655,12 @@ void HubConfiguration::swapGestures (const int firstId, const int secondId)
                                secondId < 0 || secondId >= neova_dash::gesture::NUM_GEST)
         return;
 
-	  neova_dash::log::writeToLog ("Gesture " + neova_dash::gesture::getTypeString (getGestureData (firstId).type, true)
-	  																				+ " (Id " + String (firstId) + ") : Swapping with Gesture "
-                                       			+  neova_dash::gesture::getTypeString (getGestureData (secondId).type, true)
-                                       			+ " (Id " + String (secondId) + ")", neova_dash::log::config);
+    writeToLog("Gesture " + neova_dash::gesture::getTypeString (getGestureData (firstId).type, true)
+               + " (Id " + String (firstId) + ") : Swapping with Gesture "
+               +  neova_dash::gesture::getTypeString (getGestureData (secondId).type, true)
+               + " (Id " + String (secondId) + ")", neova_dash::log::config);
 
-    GestureData secondGestureCopy (getGestureData (secondId));
+    const GestureData secondGestureCopy (getGestureData (secondId));
     
     // Replaces second gesture with first
     getGestureData (secondId) = getGestureData (firstId);
@@ -678,7 +678,7 @@ int HubConfiguration::findClosestIdToDuplicate (int idToDuplicateFrom, bool prio
     int lowerAvailableId = -1;
 
     for (int offset=1;
-        (idToDuplicateFrom + offset < neova_dash::gesture::NUM_GEST || idToDuplicateFrom - offset >= 0);
+        idToDuplicateFrom + offset < neova_dash::gesture::NUM_GEST || idToDuplicateFrom - offset >= 0;
         offset++)
     {
         if (isIdAvailable (idToDuplicateFrom + offset))
@@ -714,7 +714,7 @@ bool HubConfiguration::isIdAvailable (const int idToCheck)
 {
     if (idToCheck < 0 || idToCheck >= neova_dash::gesture::NUM_GEST) return false;
 
-    return (getGestureData (idToCheck).type == neova_dash::gesture::none);
+    return getGestureData (idToCheck).type == neova_dash::gesture::none;
 }
 
 int HubConfiguration::selectFirstExistingGesture()
@@ -757,7 +757,7 @@ int HubConfiguration::selectGestureLeft (bool loop)
         return selectedGesture;
     }
 
-    int newSlot = selectedGesture - neova_dash::gesture::NUM_GEST/2;
+    const int newSlot = selectedGesture - neova_dash::gesture::NUM_GEST/2;
 
     if (newSlot >= 0 && getGestureData (newSlot).type != neova_dash::gesture::none)
     {
@@ -782,7 +782,7 @@ int HubConfiguration::selectGestureRight (bool loop)
         return selectedGesture;
     }
 
-    int newSlot = selectedGesture + neova_dash::gesture::NUM_GEST/2;
+    const int newSlot = selectedGesture + neova_dash::gesture::NUM_GEST/2;
 
     if (newSlot < neova_dash::gesture::NUM_GEST && getGestureData (newSlot).type != neova_dash::gesture::none)
     {
@@ -883,9 +883,9 @@ int HubConfiguration::selectGestureDown (bool loop)
 
 const int HubConfiguration::findNextAvailableCC()
 {
-    Array<int> ccArray (neova_dash::midi::defaultCCs, sizeof(neova_dash::midi::defaultCCs));
+    Array<int> ccArray (neova_dash::midi::defaultCCs, sizeof neova_dash::midi::defaultCCs);
 
-    for (int defaultCc : ccArray)
+    for (const int defaultCc : ccArray)
     {
         bool isCcUnused = true;
         const int preset = selectedPreset;
@@ -912,15 +912,15 @@ void HubConfiguration::initialiseLastGestureConfigs()
         lastGestureConfig.add (new GestureData());
 
         lastGestureConfig.getLast()->on = 0;
-        lastGestureConfig.getLast()->type = uint8_t (gestType);
+        lastGestureConfig.getLast()->type = static_cast<uint8_t>(gestType);
     }
 }
 
-void HubConfiguration::saveGestureConfig (const GestureData& gestureDataToSave)
+void HubConfiguration::saveGestureConfig (const GestureData& gestureDataToSave) const
 {
     if (!neova_dash::gesture::isValidGestureType (gestureDataToSave.type)) return;
 
-    *(lastGestureConfig[gestureDataToSave.type]) = gestureDataToSave;
+    *lastGestureConfig[gestureDataToSave.type] = gestureDataToSave;
 
     lastGestureConfig[gestureDataToSave.type]->on = 1;
 }
@@ -959,7 +959,7 @@ void HubConfiguration::checkHUBCompatibility()
     }
 }
 
-bool HubConfiguration::isWaitingForRingCompatibility()
+bool HubConfiguration::isWaitingForRingCompatibility() const
 {
     return waitsForRingCompatibilityCheck;
 }

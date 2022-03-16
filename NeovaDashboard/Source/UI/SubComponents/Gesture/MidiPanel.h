@@ -35,8 +35,8 @@ public:
     };
 
     //==============================================================================
-    MidiRangeTuner (HubConfiguration& config, DataReader& reader, const int gestId);
-    ~MidiRangeTuner();
+    MidiRangeTuner (HubConfiguration& config, DataReader& reader, int gestId);
+    ~MidiRangeTuner() override;
 
     //==============================================================================
     void paint (Graphics& g) override;
@@ -59,11 +59,11 @@ public:
     void updateHighlightColour();
 
     //==============================================================================
-    void setRangeLow (float value, bool uploadToHub = true);
-    void setRangeHigh (float value, bool uploadToHub = true);
+    void setRangeLow (float value, bool uploadToHub = true) const;
+    void setRangeHigh (float value, bool uploadToHub = true) const;
     
-    float getRangeLow();
-    float getRangeHigh();
+    float getRangeLow() const;
+    float getRangeHigh() const;
 
     //==============================================================================
     const int id;
@@ -74,15 +74,15 @@ private:
     void createSliders();
 
     //==============================================================================
-    float getThumbX(DraggableObject thumb);
-    void setLabelBounds(Label& labelToResize);
+    float getThumbX(DraggableObject thumb) const;
+    void setLabelBounds(Label& labelToResize) const;
 
     void handleSliderClick(const MouseEvent& e);
-    DraggableObject getObjectToDrag(const MouseEvent& e);
+    DraggableObject getObjectToDrag(const MouseEvent& e) const;
 
     //==============================================================================
-    void drawCursor(Graphics& g);
-    void drawSliderBackground(Graphics& g);
+    void drawCursor(Graphics& g) const;
+    void drawSliderBackground(Graphics& g) const;
 
     //==============================================================================
     HubConfiguration& hubConfig;
@@ -111,8 +111,8 @@ class MidiPanel    : public Component,
                      private Button::Listener
 {
 public:
-    MidiPanel (HubConfiguration& config, DataReader& reader, const int gestId);
-    ~MidiPanel();
+    MidiPanel (HubConfiguration& config, DataReader& reader, int gestId);
+    ~MidiPanel() override;
 
     //==============================================================================
     void paint (Graphics& g) override;
@@ -125,10 +125,10 @@ public:
     void buttonClicked (Button* bttn) override;
     
     //==============================================================================
-    void updateComponents();
-    void updateDisplay();
+    void updateComponents() const;
+    void updateDisplay() const;
 
-    MidiRangeTuner& getTuner();
+    MidiRangeTuner& getTuner() const;
 
     //==============================================================================
     const int id;
@@ -138,7 +138,7 @@ private:
     void createComboBox();
     void createLabels();
     void createButton();
-    void setComponentsVisibility();
+    void setComponentsVisibility() const;
     
     //==============================================================================
     std::unique_ptr<ComboBox> midiTypeBox;

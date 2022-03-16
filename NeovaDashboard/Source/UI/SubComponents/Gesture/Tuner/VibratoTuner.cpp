@@ -15,10 +15,10 @@ VibratoTuner::VibratoTuner (HubConfiguration& config, const float& val,
 					                                  const float& vibratoIntensity, float maxIntens,
     				                                  const Range<float> gainMax, const Range<float> threshMax)
     : Tuner ("%",  neova_dash::gesture::getHighlightColour (gestureId, config.isGestureActive (gestureId))),
-      hubConfig (config),
-      value (val), gestureRange (gestRange), id (gestureId),
-      intensity (vibratoIntensity), maxIntensity (maxIntens),
-      parameterMaxGain (gainMax), parameterMaxThreshold (threshMax)
+      id (gestureId),
+      value (val), gestureRange (gestRange), intensity (vibratoIntensity),
+      maxIntensity (maxIntens), parameterMaxGain (gainMax),
+      parameterMaxThreshold (threshMax), hubConfig (config)
 {
     createSliders();
     createLabels();
@@ -71,7 +71,7 @@ void VibratoTuner::resized()
 	auto area = tunerArea;
 
 	gainSlider->setBounds (area.removeFromRight (area.getWidth()*2 / 3));
-	thresholdSlider->setBounds (area.withSizeKeepingCentre (area.getWidth(), (gainSlider->getHeight() / 2) + 10));
+	thresholdSlider->setBounds (area.withSizeKeepingCentre (area.getWidth(), gainSlider->getHeight() / 2 + 10));
 
 	updateLabelBounds(gainLabel.get());
 	updateLabelBounds(thresholdLabel.get());
@@ -82,10 +82,10 @@ void VibratoTuner::updateComponents()
 	if (gainSlider->getThumbBeingDragged() == -1)
     {
         // Sets slider value
-        gainSlider->setValue (static_cast<double>(getGain()), dontSendNotification);
+        gainSlider->setValue (getGain(), dontSendNotification);
         
         // Sets label text
-        if (!(gainLabel->isBeingEdited()))
+        if (!gainLabel->isBeingEdited())
 		{
 		    gainLabel->setText (String (static_cast<int>(getGain())) + valueUnit, dontSendNotification);
 		}
@@ -94,11 +94,11 @@ void VibratoTuner::updateComponents()
 	if (thresholdSlider->getThumbBeingDragged() == -1)
     {
         // Sets slider value
-        thresholdSlider->setValue (static_cast<double>(getThreshold()), dontSendNotification);
+        thresholdSlider->setValue (getThreshold(), dontSendNotification);
         //setThresholdSliderColour();
         
         // Sets label text
-        if (!(thresholdLabel->isBeingEdited()))
+        if (!thresholdLabel->isBeingEdited())
 		{
 		    thresholdLabel->setText (String (static_cast<int>(getThreshold())), dontSendNotification);
 		}
@@ -276,8 +276,8 @@ void VibratoTuner::createSliders()
     gainSlider->setColour (Slider::rotarySliderFillColourId, tunerColour);
     gainSlider->setColour (Slider::rotarySliderOutlineColourId, neova_dash::colour::tunerSliderBackground);
     gainSlider->setScrollWheelEnabled (false);
-    gainSlider->setRange (static_cast<double>(parameterMaxGain.getStart()), static_cast<double>(parameterMaxGain.getEnd()), 0.01);
-    gainSlider->setValue (static_cast<double>(getGain()));
+    gainSlider->setRange (parameterMaxGain.getStart(), parameterMaxGain.getEnd(), 0.01);
+    gainSlider->setValue (getGain());
     gainSlider->addListener (this);
     gainSlider->addMouseListener (this, false);
 
@@ -287,9 +287,9 @@ void VibratoTuner::createSliders()
     thresholdSlider->setColour (Slider::backgroundColourId, neova_dash::colour::tunerSliderBackground);
     thresholdSlider->setColour (Slider::trackColourId, tunerColour);
     thresholdSlider->setScrollWheelEnabled (false);
-    thresholdSlider->setRange (static_cast<double>(parameterMaxThreshold.getStart()),
-							   static_cast<double>(parameterMaxThreshold.getEnd()), 1.0);
-    thresholdSlider->setValue (static_cast<double>(getThreshold()));
+    thresholdSlider->setRange (parameterMaxThreshold.getStart(),
+							   parameterMaxThreshold.getEnd(), 1.0);
+    thresholdSlider->setValue (getThreshold());
     thresholdSlider->addListener (this);
     thresholdSlider->addMouseListener (this, false);
 }
@@ -321,18 +321,18 @@ void VibratoTuner::createLabels()
     setLabelSettings (*thresholdLabel);
 }
 
-void VibratoTuner::updateLabelBounds (Label* labelToUpdate)
+void VibratoTuner::updateLabelBounds (Label* labelToUpdate) const
 {
 	if (labelToUpdate == gainLabel.get())
 	{
-		float angle = static_cast<float>(gainSlider->getRotaryParameters().startAngleRadians
-		                  + ((gainSlider->getValue() - gainSlider->getMinimum())
-							     / gainSlider->getRange().getLength())
+        const float angle = static_cast<float>(gainSlider->getRotaryParameters().startAngleRadians
+		                  + (gainSlider->getValue() - gainSlider->getMinimum())
+                          / gainSlider->getRange().getLength()
                              *std::abs (gainSlider->getRotaryParameters().endAngleRadians
                              	- gainSlider->getRotaryParameters().startAngleRadians));
 
         // Slider radius with a 10-pixels offset
-        float radius = (jmin (gainSlider->getWidth(), gainSlider->getHeight()) - 10.0f) / 2.0f
+        const float radius = (jmin (gainSlider->getWidth(), gainSlider->getHeight()) - 10.0f) / 2.0f
         				   + 10.0f;
 
 		labelToUpdate->setCentrePosition (static_cast<int>(gainSlider->getBounds().getCentreX()
@@ -349,22 +349,22 @@ void VibratoTuner::updateLabelBounds (Label* labelToUpdate)
 	}
 }
 
-void VibratoTuner::setGain (float val)
+void VibratoTuner::setGain (float val) const
 {
 	hubConfig.setFloatValue (id, HubConfiguration::gestureParam0, val);
 }
 
-void VibratoTuner::setThreshold (float val)
+void VibratoTuner::setThreshold (float val) const
 {
 	hubConfig.setFloatValue (id, HubConfiguration::gestureParam1, val);
 }
 
-float VibratoTuner::getGain()
+float VibratoTuner::getGain() const
 {
     return hubConfig.getGestureData (id).gestureParam0;
 }
 
-float VibratoTuner::getThreshold()
+float VibratoTuner::getThreshold() const
 {
     return hubConfig.getGestureData (id).gestureParam1;
 }
@@ -373,16 +373,16 @@ void VibratoTuner::drawValueCursor (Graphics& g)
 {
 	lastValue = value;
 
-	float convertedValue = gestureRange.convertTo0to1 (value);
+    const float convertedValue = gestureRange.convertTo0to1 (value);
 
-	int offset = (intensity < getThreshold()) ? 0
-	                                          : static_cast<int>((convertedValue - 0.5f) * (gainSlider->getWidth() - 30)
-	                                                                    * (getGain())/50);
+    const int offset = intensity < getThreshold() ? 0
+                           : static_cast<int>((convertedValue - 0.5f) * (gainSlider->getWidth() - 30)
+                               * getGain()/50);
 
-	juce::Point<int> cursorPoint = {gainSlider->getBounds().getCentreX() + offset,
+    const Point<int> cursorPoint = {gainSlider->getBounds().getCentreX() + offset,
 							  gainSlider->getBounds().getCentreY()};
 
-    g.setColour ((intensity < getThreshold()) ? neova_dash::colour::tunerSliderBackground : tunerColour);
+    g.setColour (intensity < getThreshold() ? neova_dash::colour::tunerSliderBackground : tunerColour);
     g.fillEllipse (juce::Rectangle<float> (5.0f, 5.0f).withCentre (cursorPoint.toFloat()));
 }
 
@@ -390,10 +390,10 @@ void VibratoTuner::drawIntensityCursor (Graphics& g)
 {
 	lastIntensity = intensity;
 
-    juce::Point<float> cursorPoint (
-        static_cast<float>(thresholdSlider->getBounds ().getCentreX () - 10),
-        static_cast<float>(jmax (thresholdSlider->getBottom () - 10 - (thresholdSlider->getHeight () - 20) * smoothIntensity / maxIntensity,
-            static_cast<float>(thresholdSlider->getY () + 10)))
+    Point<float> cursorPoint (
+        thresholdSlider->getBounds ().getCentreX () - 10,
+        (jmax (thresholdSlider->getBottom () - 10 - (thresholdSlider->getHeight () - 20) * smoothIntensity / maxIntensity,
+               static_cast<float>(thresholdSlider->getY () + 10)))
     );
 
 	Path cursorPath;
@@ -401,20 +401,20 @@ void VibratoTuner::drawIntensityCursor (Graphics& g)
                             {cursorPoint.x + 3.0f, cursorPoint.y       },
                             {cursorPoint.x - 3.0f, cursorPoint.y + 3.0f});
 
-    g.setColour ((intensity < getThreshold()) ? neova_dash::colour::tunerSliderBackground : tunerColour);
+    g.setColour (intensity < getThreshold() ? neova_dash::colour::tunerSliderBackground : tunerColour);
     g.fillPath (cursorPath);
 }
 
 void VibratoTuner::setThresholdSliderColour()
 {
 	thresholdSlider->setColour (Slider::trackColourId,
-							    (intensity < getThreshold()) ? neova_dash::colour::tunerSliderBackground
+							    intensity < getThreshold() ? neova_dash::colour::tunerSliderBackground
 			                       							 : tunerColour);
 }
 
 void VibratoTuner::computeSmoothIntensity (float smoothnessRamp)
 {
-	float decrement = std::pow (smoothnessRamp, incrementalSmoothFactor);
+    const float decrement = std::pow (smoothnessRamp, incrementalSmoothFactor);
 
 	if (intensity > smoothIntensity - decrement)
 	{

@@ -13,7 +13,7 @@
 
 //==============================================================================
 DataReader::DataReader (ApplicationCommandManager& manager, HubConfiguration& config)
-    : InterprocessConnection (true, 0x6a6d626e), commandManager (manager), hubConfig (config)
+    : InterprocessConnection (true, 0x6a6d626e), hubConfig (config), commandManager (manager)
 {
     setSize (120, 50);
     connected = false;
@@ -67,8 +67,8 @@ void DataReader::timerCallback()
         hubConfig.setRingIsConnected (false);
         commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
 
-        neova_dash::log::writeToLog ("Ring disconnected",
-                                     neova_dash::log::hubCommunication);
+        writeToLog("Ring disconnected",
+                   neova_dash::log::hubCommunication);
     }
 
     stopTimer();
@@ -77,7 +77,7 @@ void DataReader::timerCallback()
 //==============================================================================
 bool DataReader::readData (String s)
 {
-	auto strArr = StringArray::fromTokens(s, " ", String());
+    const auto strArr = StringArray::fromTokens(s, " ", String());
 
     // Checks for full lines
     if (strArr.size() == DATA_SIZE)
@@ -89,17 +89,17 @@ bool DataReader::readData (String s)
         {
             hubConfig.setRingIsConnected (true);
             commandManager.invokeDirectly (neova_dash::commands::setStateAndUpdateDashInterface, true);
-            
-			Timer::callAfterDelay (300, [this]() {
-				neova_dash::log::writeToLog ("Ring connected : " + hubConfig.getRingFirmwareVersionString (), neova_dash::log::hubCommunication);
+
+            callAfterDelay(300, [this]() {
+                writeToLog("Ring connected : " + hubConfig.getRingFirmwareVersionString (), neova_dash::log::hubCommunication);
 				});
 
-			Timer::callAfterDelay (10000, [this]()
-				{
-					neova_dash::log::writeToLog ("Battery level : raw " +
-						std::to_string (this->getBatteryLevel (true)) +
-						" - percent " + std::to_string (this->getBatteryLevel (false)), neova_dash::log::hubCommunication);
-				});
+            callAfterDelay(10000, [this]()
+            {
+                writeToLog("Battery level : raw " +
+                           std::to_string (this->getBatteryLevel (true)) +
+                           " - percent " + std::to_string (this->getBatteryLevel (false)), neova_dash::log::hubCommunication);
+            });
 
         }
         // Ring was in chargeMode
@@ -137,16 +137,16 @@ bool DataReader::readData (String s)
             commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
 
 
-			Timer::callAfterDelay (300, [this]() {
-				neova_dash::log::writeToLog ("Ring connected : " + hubConfig.getRingFirmwareVersionString (), neova_dash::log::hubCommunication);
+            callAfterDelay(300, [this]() {
+                writeToLog("Ring connected : " + hubConfig.getRingFirmwareVersionString (), neova_dash::log::hubCommunication);
 				});
 
-			Timer::callAfterDelay (10000, [this]()
-				{
-					neova_dash::log::writeToLog ("Battery level : raw " +
-						std::to_string (this->getBatteryLevel (true)) +
-						" - percent " + std::to_string (this->getBatteryLevel (false)), neova_dash::log::hubCommunication);
-				});
+            callAfterDelay(10000, [this]()
+            {
+                writeToLog("Battery level : raw " +
+                           std::to_string (this->getBatteryLevel (true)) +
+                           " - percent " + std::to_string (this->getBatteryLevel (false)), neova_dash::log::hubCommunication);
+            });
         }
 
         // Notifies Ring wasn't charging
@@ -167,16 +167,16 @@ bool DataReader::readData (String s)
 	return false;
 }
 
-const String DataReader::getRawData (int index)
+const String DataReader::getRawData (int index) const
 {
     return (*data)[index];
 }
 
 const float& DataReader::getFloatValueReference (const neova_dash::data::HubData dataId)
 {
-    if (dataId == neova_dash::data::numDatas) return floatData.getReference (int (neova_dash::data::battery));
+    if (dataId == neova_dash::data::numDatas) return floatData.getReference (neova_dash::data::battery);
 
-    return floatData.getReference (int (dataId));
+    return floatData.getReference (dataId);
 }
 
 /**
@@ -186,16 +186,15 @@ const float& DataReader::getFloatValueReference (const neova_dash::data::HubData
 */
 float DataReader::getBatteryLevel (bool rawOrPercent)
 {
-	auto rawBattery = getFloatValueReference (neova_dash::data::battery);
-	auto percentBattery = neova_dash::data::convertRawBatteryToPercentage(rawBattery, hubConfig.getRingIsCharging());
+    const auto rawBattery = getFloatValueReference (neova_dash::data::battery);
+    const auto percentBattery = neova_dash::data::convertRawBatteryToPercentage(rawBattery, hubConfig.getRingIsCharging());
 
     if(rawOrPercent)
 	    return rawBattery;
-    else
-        return percentBattery;
+    return percentBattery;
 }
 
-bool DataReader::getRawDataAsFloatArray(Array<float>& arrayToFill)
+bool DataReader::getRawDataAsFloatArray(Array<float>& arrayToFill) const
 {
     // Checks that the array has the right amont and type of data
     if (arrayToFill.isEmpty() == false) return false;
@@ -234,7 +233,7 @@ bool DataReader::connectToExistingPipe(int nbPipe)
   #endif
 }
 
-bool DataReader::isConnected()
+bool DataReader::isConnected() const
 {
     return connected;
 }
