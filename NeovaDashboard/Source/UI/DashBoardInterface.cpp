@@ -473,7 +473,8 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
                             openFirmUpgradePanel,
                             openDashboardUpdatePanel,
                             checkAndUpdateNotifications,
-                            openBugReportPanel
+                            openBugReportPanel,
+                            openFactoryResetPanel
                        });
 }
 
@@ -511,6 +512,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
             break;
         case openBugReportPanel:
             result.setInfo ("Open Bug Report Panel", "Opens Panel To Bug Report Procedure", "Interface", 0);
+            break;
+        case openFactoryResetPanel:
+            result.setInfo ("Open Factory Reset Panel", "Opens Panel To Factory Reset Procedure", "Interface", 0);
             break;
         default:
             break;
@@ -587,6 +591,16 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             }
             
             bugReportPanel->resetAndOpenPanel();
+            return true;
+
+    case openFactoryResetPanel:
+            if (!optionsPanel->isVisible ())
+            {
+                optionsPanel->setVisible (true);
+            }
+
+            
+
             return true;
 
         default:

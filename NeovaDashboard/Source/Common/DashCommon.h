@@ -44,7 +44,8 @@ namespace neova_dash
             openFirmUpgradePanel            = 0x01000006, // Launches the firm upgrade panel
             openDashboardUpdatePanel        = 0x01000007, // Launches the soft update panel
             checkAndUpdateNotifications     = 0x01000008, // Updates and looks for data that should trigger notifications on the interface
-            openBugReportPanel              = 0x01000009  // Launches the bug report panel
+            openBugReportPanel              = 0x01000009, // Launches the bug report panel
+            openFactoryResetPanel           = 0x01000010  // Launches the factory reset panel
     	};
     };
 
