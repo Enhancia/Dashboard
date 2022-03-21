@@ -619,8 +619,8 @@ void GeneralPanel::resized()
     contactArea =   area.removeFromTop (area.getHeight()/5);
     reportArea =    area.removeFromTop (area.getHeight()/4);
     viewNotesArea = area.removeFromTop (area.getHeight()/3);
-    thruArea = area.removeFromTop (area.getHeight()/2);
-    factoryResetArea = area.removeFromTop (area.getHeight());
+    factoryResetArea = area.removeFromTop (area.getHeight()/2);
+    thruArea = area.removeFromTop (area.getHeight());
 
     auto resizeButtonToArea = [this](juce::Rectangle<int>& areaRef, Button& bttnRef)
     {

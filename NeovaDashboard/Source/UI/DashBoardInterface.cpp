@@ -605,7 +605,7 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             if (optionsPanel->isVisible ())
                 optionsPanel->setVisible (false);
 
-            createAndShowAlertPanel ("Factory Reset", "This will restore the factory settings. This will overwrite your preferences. Proceed?", "reset", true, DashAlertPanel::factoryReset);
+            createAndShowAlertPanel ("Factory Reset", "This will restore the factory settings. This will overwrite your preferences and cannot be undone. Proceed?", "Reset", true, DashAlertPanel::factoryReset);
             return true;
 
         default:

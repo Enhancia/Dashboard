@@ -523,27 +523,31 @@ void HubConfiguration::setDefaultConfig()
 {
     using namespace neova_dash::gesture;
 
-    // BANK 1 ====================================================================================================
-    //presetNum, gestureNum, newOn, newType, newMidiLow, newMidiHigh, newCc, newMidiType, uploadToHub
-    //presetNum, gestureNum, value0, value1, value2, value3, value4, value5, uploadToHub
-    setGestureData       (0, 0, 1, vibrato, 0, 127, 0, ccMidi);
-    setGestureParameters (0, 0, VIBRATO_RANGE_DEFAULT, VIBRATO_THRESH_DEFAULT);
+    //reset preset
+    setPreset(0);
 
-    setGestureData       (0, 1, 1, pitchBend, 0, 127, 0, ccMidi);
-	setGestureParameters (0, 1, PITCHBEND_DEFAULT_LEFTMIN, PITCHBEND_DEFAULT_LEFTMAX, PITCHBEND_DEFAULT_RIGHTMIN, PITCHBEND_DEFAULT_RIGHTMAX);
+    //reset gestures
+    {
+        // BANK 1 ====================================================================================================
+        setGestureData       (0, 0, 1, vibrato, 0, 127, 0, ccMidi);
+        setGestureParameters (0, 0, VIBRATO_RANGE_DEFAULT, VIBRATO_THRESH_DEFAULT);
 
-    setGestureData       (0, 2, 1, tilt, 0, 127, 0, ccMidi);
-    setGestureParameters (0, 2, TILT_DEFAULT_MIN, TILT_DEFAULT_MAX);
+        setGestureData       (0, 1, 1, pitchBend, 0, 127, 0, ccMidi);
+	    setGestureParameters (0, 1, PITCHBEND_DEFAULT_LEFTMIN, PITCHBEND_DEFAULT_LEFTMAX, PITCHBEND_DEFAULT_RIGHTMIN, PITCHBEND_DEFAULT_RIGHTMAX);
 
-    setGestureData       (0, 3, 1, roll, 0, 127, 0, ccMidi);
-    setGestureParameters (0, 3, ROLL_DEFAULT_MIN, ROLL_DEFAULT_MAX);
+        setGestureData       (0, 2, 1, tilt, 0, 127, 0, ccMidi);
+        setGestureParameters (0, 2, TILT_DEFAULT_MIN, TILT_DEFAULT_MAX);
 
-    // BANK 2, 3, 4 ====================================================================================================
-    for (int i = 1; i < 4; i++ )
-        for (int j = 0; j < 4; j++)
-            setGestureData (i, j, 0, none, 0, 127, 0, ccMidi);
+        setGestureData       (0, 3, 1, roll, 0, 127, 0, ccMidi);
+        setGestureParameters (0, 3, ROLL_DEFAULT_MIN, ROLL_DEFAULT_MAX);
 
-    // Reset MIDI in/out
+        // BANK 2, 3, 4 ====================================================================================================
+        for (int i = 1; i < 4; i++ )
+            for (int j = 0; j < 4; j++)
+                setGestureData (i, j, 0, none, 0, 127, 0, ccMidi);
+    }
+
+    //reset MIDI in/out
     setMidiChannel(0, true, false);
     setMidiChannel(0, true, true);
     for(int i = 1; i < 16; i++)
@@ -552,8 +556,10 @@ void HubConfiguration::setDefaultConfig()
         setMidiChannel(i, false, true);
     }
 
+    //reset midi thru
+    setMidiThrough (true, false);
+
     commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
-    setMidiThrough (true, true);
     resetConfigWasChanged();
     commandManager.invokeDirectly (neova_dash::commands::disallowUserToFlashHub, true);
 }
