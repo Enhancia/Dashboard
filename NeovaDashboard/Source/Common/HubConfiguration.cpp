@@ -521,37 +521,47 @@ int HubConfiguration::getHubIsCompatibleInt()
 
 void HubConfiguration::setDefaultConfig()
 {
-    setGestureData       (0, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureParameters (0, 0, 400.0f, 40.0f);
-    setGestureData       (0, 1, 1, neova_dash::gesture::pitchBend, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureParameters (0, 1, -50.0f, -20.0f, 30.0f, 60.0f);
-    setGestureData       (0, 2, 0, neova_dash::gesture::tilt, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureParameters (0, 2, 0.0f, 50.0f);
-    setGestureData       (0, 3, 0, neova_dash::gesture::roll, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureParameters (0, 3, -30.0f, 30.0f);
+    using namespace neova_dash::gesture;
 
-    setGestureData       (1, 0, 1, neova_dash::gesture::vibrato, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureParameters (1, 0, 450.0f, 20.0f);
-    setGestureData       (1, 1, 1, neova_dash::gesture::tilt, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureParameters (1, 1, 0.0f, 80.0f);
-    setGestureData       (1, 2, 0, neova_dash::gesture::none, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureData       (1, 3, 1, neova_dash::gesture::roll, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureParameters (1, 3, -50.0f, 20.0f);
+    //reset preset
+    setPreset(0);
 
-    setGestureData       (2, 0, 0, neova_dash::gesture::none, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureData       (2, 1, 0, neova_dash::gesture::none, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureData       (2, 2, 1, neova_dash::gesture::roll, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureParameters (2, 2, -10.0f, 90.0f);
-    setGestureData       (2, 3, 1, neova_dash::gesture::wave, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureParameters (2, 3, -50.0f, 20.0f);
+    //reset gestures
+    {
+        // BANK 1 ====================================================================================================
+        setGestureData       (0, 0, 1, vibrato, 0, 127, 0, ccMidi);
+        setGestureParameters (0, 0, VIBRATO_RANGE_DEFAULT, VIBRATO_THRESH_DEFAULT);
 
-    setGestureData       (3, 0, 0, neova_dash::gesture::none, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureData       (3, 1, 0, neova_dash::gesture::none, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureData       (3, 2, 1, neova_dash::gesture::tilt, 0, 127, 0, neova_dash::gesture::ccMidi);
-    setGestureParameters (3, 2, -10.0f, -5.0f);
-    setGestureData       (3, 3, 0, neova_dash::gesture::none, 0, 127, 0, neova_dash::gesture::ccMidi);
+        setGestureData       (0, 1, 1, pitchBend, 0, 127, 0, ccMidi);
+	    setGestureParameters (0, 1, PITCHBEND_DEFAULT_LEFTMIN, PITCHBEND_DEFAULT_LEFTMAX, PITCHBEND_DEFAULT_RIGHTMIN, PITCHBEND_DEFAULT_RIGHTMAX);
 
-    //commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+        setGestureData       (0, 2, 1, tilt, 0, 127, 0, ccMidi);
+        setGestureParameters (0, 2, TILT_DEFAULT_MIN, TILT_DEFAULT_MAX);
+
+        setGestureData       (0, 3, 1, roll, 0, 127, 0, ccMidi);
+        setGestureParameters (0, 3, ROLL_DEFAULT_MIN, ROLL_DEFAULT_MAX);
+
+        // BANK 2, 3, 4 ====================================================================================================
+        for (int i = 1; i < 4; i++ )
+            for (int j = 0; j < 4; j++)
+                setGestureData (i, j, 0, none, 0, 127, 0, ccMidi);
+    }
+
+    //reset MIDI in/out
+    setMidiChannel(0, true, false);
+    setMidiChannel(0, true, true);
+    for(int i = 1; i < 16; i++)
+    {
+        setMidiChannel(i, false, false);
+        setMidiChannel(i, false, true);
+    }
+
+    //reset midi thru
+    setMidiThrough (true, false);
+
+    commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
+    resetConfigWasChanged();
+    commandManager.invokeDirectly (neova_dash::commands::disallowUserToFlashHub, true);
 }
 
 void HubConfiguration::setGestureData (int presetNum, int gestureNum,
@@ -561,6 +571,7 @@ void HubConfiguration::setGestureData (int presetNum, int gestureNum,
                                                       uint8 newMidiHigh,
                                                       uint8 newCc,
                                                       uint8 newMidiType,
+                                                      bool newReverse,
                                                       bool uploadToHub)
 {
     GestureData& gesture = getGestureData (gestureNum, presetNum);
@@ -573,6 +584,7 @@ void HubConfiguration::setGestureData (int presetNum, int gestureNum,
     gesture.midiType = ( newType == neova_dash::gesture::vibrato ||
                          newType == neova_dash::gesture::pitchBend ) ? neova_dash::gesture::pitchMidi
                                                                      : newMidiType;
+    gesture.reverse = newReverse;
 
     if (uploadToHub) commandManager.invokeDirectly (neova_dash::commands::uploadConfigToHub, true);
 }

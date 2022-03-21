@@ -180,9 +180,9 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded (bool forceRepaint)
                                 0.0f);
     const float newRawBattery = batteryValueRef;
 
-    DBG ("----------------\nComputing battery level\nRaw      " << batteryValueRef
-                << "\nRounded  " << battery
-                << "\nCharging " << (lastChargeState ? "Yes" : "No"));
+    //DBG ("----------------\nComputing battery level\nRaw      " << batteryValueRef
+    //            << "\nRounded  " << battery
+    //            << "\nCharging " << (lastChargeState ? "Yes" : "No"));
 
     if (batteryValueRef < 3.4f && lastConnectionState)
     {

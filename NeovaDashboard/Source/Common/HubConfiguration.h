@@ -202,9 +202,9 @@ public:
     bool isWaitingForRingCompatibility();
     void stopWaitingForRingCompatibility();
 
+    void setDefaultConfig();
 private:
     //==============================================================================
-    void setDefaultConfig(); // TEST PURPOSE!! Maybe TO DELETE since the dashboard should match the hub anyways..
 
     void setGestureData (int presetNum, int gestureNum,
                                         uint8 newOn,
@@ -213,6 +213,7 @@ private:
                                         uint8 newMidiHigh,
                                         uint8 newCc,
                                         uint8 newMidiType,
+                                        bool newReverse = false,
                                         bool uploadToHub = false);
 
 
