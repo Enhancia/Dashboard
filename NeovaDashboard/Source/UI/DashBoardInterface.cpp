@@ -470,6 +470,7 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
                             updateInterfaceLEDs,
                             updateBatteryDisplay,
                             allowUserToFlashHub,
+                            disallowUserToFlashHub,
                             openFirmUpgradePanel,
                             openDashboardUpdatePanel,
                             checkAndUpdateNotifications,
@@ -498,6 +499,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
             break;
         case allowUserToFlashHub:
             result.setInfo ("Update Upload Button", "Allows Upload Button To Be Clicked", "Interface", 0);
+            break;
+        case disallowUserToFlashHub:
+            result.setInfo ("Update Upload Button", "Disallows Upload Button To Be Clicked", "Interface", 0);
             break;
         case openFirmUpgradePanel:
             result.setInfo ("Open Firm Upgrade Panel", "Opens Panel To Start Firm Upgrade Procedure", "Interface", 0);
@@ -559,6 +563,10 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             uploadButton->setActive();
             return true;
 
+        case disallowUserToFlashHub:
+            uploadButton->setActive (false);
+            return true;
+
         case openFirmUpgradePanel:
             if (!optionsPanel->isVisible())
             {
@@ -593,14 +601,11 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             bugReportPanel->resetAndOpenPanel();
             return true;
 
-    case openFactoryResetPanel:
-            if (!optionsPanel->isVisible ())
-            {
-                optionsPanel->setVisible (true);
-            }
+        case openFactoryResetPanel:
+            if (optionsPanel->isVisible ())
+                optionsPanel->setVisible (false);
 
-            
-
+            createAndShowAlertPanel ("Factory Reset", "This will restore the factory settings. This will overwrite your preferences. Proceed?", "reset", true, DashAlertPanel::factoryReset);
             return true;
 
         default:
@@ -830,6 +835,12 @@ void DashBoardInterface::executePanelAction (const int panelReturnValue)
             break;
         case DashAlertPanel::upgradePending:
             JUCEApplication::getInstance()->systemRequestedQuit();
+            break;
+        case DashAlertPanel::factoryReset:
+
+            DBG ("FACTORY RESET");
+            getCommandManager ().invokeDirectly (neova_dash::commands::factoryReset, true);
+
             break;
         default: // modalResult 0 or unknown
             break; 

@@ -148,7 +148,7 @@ void OptionsPanel::buttonClicked (Button* bttn)
 
     else if (bttn == factoryResetButton.get ())
     {
-        //commandManager.invokeDirectly (neova_dash::commands::openBugReportPanel, true);
+        commandManager.invokeDirectly (neova_dash::commands::openFactoryResetPanel, true);
     }
 }
 

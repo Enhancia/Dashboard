@@ -34,6 +34,7 @@ namespace neova_dash
             uploadConfigToHub           = 0x00000004, // Uploads config to HUB
             updatePresetModeState       = 0x00000005, // Updates the backend preset mode to fit the interface
             checkDashboardUpdate        = 0x00000006, // checks database for new dashboard updates
+            factoryReset                = 0x00000007,
 
             // Frontend commands
             updateDashInterface             = 0x01000001, // Updates Dash interface to match the HUB data
@@ -45,7 +46,8 @@ namespace neova_dash
             openDashboardUpdatePanel        = 0x01000007, // Launches the soft update panel
             checkAndUpdateNotifications     = 0x01000008, // Updates and looks for data that should trigger notifications on the interface
             openBugReportPanel              = 0x01000009, // Launches the bug report panel
-            openFactoryResetPanel           = 0x01000010  // Launches the factory reset panel
+            openFactoryResetPanel           = 0x01000010,  // Launches the factory reset panel
+            disallowUserToFlashHub          = 0x01000011,
     	};
     };
 
