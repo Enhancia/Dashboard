@@ -86,7 +86,7 @@ bool UpgradeHandler::isUpgrading()
 
 //==============================================================================
 
-VOID CALLBACK UpgradeHandler::childProcessExitCallback(PVOID lpParameter, BOOLEAN TimerOrWaitFired)
+VOID CALLBACK UpgradeHandler::childProcessExitCallback(PVOID lpParameter, BOOLEAN)
 {
 	UpgradeHandler* context = reinterpret_cast<UpgradeHandler*>(lpParameter);
 	context->closeNrfutil();
@@ -234,8 +234,8 @@ void UpgradeHandler::checkReleasesVersion()
 	else if (hubFiles.size() == 1)
 	{
 		String name = hubFiles.getFirst().getFileNameWithoutExtension();
-		uint8_t minor = name.getTrailingIntValue();
-		uint8_t major = name.upToLastOccurrenceOf(".", false, true).getTrailingIntValue();
+		uint8_t minor = (uint8_t)name.getTrailingIntValue();
+		uint8_t major = (uint8_t)name.upToLastOccurrenceOf(".", false, true).getTrailingIntValue();
 		uint16_t version = ((uint16_t)major << 8) | minor;
 		setHubReleaseVersion(version);
 	}
@@ -253,8 +253,8 @@ void UpgradeHandler::checkReleasesVersion()
 	else if (ringFiles.size() == 1)
 	{
 		String name = ringFiles.getFirst().getFileNameWithoutExtension();
-		uint8_t minor = name.getTrailingIntValue();
-		uint8_t major = name.upToLastOccurrenceOf(".", false, true).getTrailingIntValue();
+		uint8_t minor = (uint8_t)name.getTrailingIntValue();
+		uint8_t major = (uint8_t)name.upToLastOccurrenceOf(".", false, true).getTrailingIntValue();
 		uint16_t version = ((uint16_t)major << 8) | minor;
 		setRingReleaseVersion(version);
 	}

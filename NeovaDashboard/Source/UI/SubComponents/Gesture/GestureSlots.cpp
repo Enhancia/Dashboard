@@ -71,12 +71,12 @@ void GestureComponent::paint (Graphics& g)
 		                (hubConfig.getGestureData (draggedGesture).type,
                          hubConfig.isGestureActive (draggedGesture)));
 
-        g.drawRoundedRectangle (getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 3.0f);
+        g.drawRoundedRectangle (getLocalBounds().reduced (1).toFloat(), 10.0f, 3.0f);
     }
     else if (selected)
     {
         g.setColour (neova_dash::gesture::getHighlightColour (type, hubConfig.isGestureActive (id)));
-        g.drawRoundedRectangle (getLocalBounds().reduced (1.0f).toFloat(), 10.0f, 1.0f);
+        g.drawRoundedRectangle (getLocalBounds().reduced (1).toFloat(), 10.0f, 1.0f);
     }
 
     auto area = getLocalBounds().withTrimmedTop (30);
@@ -112,15 +112,15 @@ void GestureComponent::resized()
                                      .withSizeKeepingCentre (18, 18));
 }
 
-void GestureComponent::mouseEnter (const MouseEvent &event)
+void GestureComponent::mouseEnter (const MouseEvent&)
 {
     setHighlighted (true);
 }
-void GestureComponent::mouseExit (const MouseEvent &event)
+void GestureComponent::mouseExit (const MouseEvent&)
 {
     setHighlighted (false);
 }
-void GestureComponent::mouseDrag (const MouseEvent &event)
+void GestureComponent::mouseDrag (const MouseEvent&)
 {
 }
 
@@ -258,7 +258,7 @@ void EmptyGestureSlotComponent::paint (Graphics& g)
 {
     Path outline, plusIcon;
 
-    outline.addRoundedRectangle (getLocalBounds().reduced (1.0f), 10.0f);
+    outline.addRoundedRectangle (getLocalBounds().reduced (1), 10.0f);
 
     plusIcon.startNewSubPath ({getWidth()/2.0f - 10.0f, getHeight()/2.0f});
     plusIcon.lineTo          ({getWidth()/2.0f + 10.0f, getHeight()/2.0f});
@@ -321,16 +321,16 @@ void EmptyGestureSlotComponent::resized()
 {
 }
 
-void EmptyGestureSlotComponent::mouseEnter (const MouseEvent &event)
+void EmptyGestureSlotComponent::mouseEnter (const MouseEvent&)
 {
     highlighted = true;
     repaint();
 }
-void EmptyGestureSlotComponent::mouseExit (const MouseEvent &event)
+void EmptyGestureSlotComponent::mouseExit (const MouseEvent&)
 {
     highlighted = false;
     repaint();
 }
-void EmptyGestureSlotComponent::mouseDrag (const MouseEvent &event)
+void EmptyGestureSlotComponent::mouseDrag (const MouseEvent&)
 {
 }

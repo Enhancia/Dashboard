@@ -38,7 +38,7 @@ public:
 
     //==============================================================================
     void buttonClicked (Button* bttn) override;
-    bool keyPressed (const KeyPress& key) override;
+    bool keyPressed (const KeyPress& keyArg) override;
     void labelTextChanged (Label* lbl) override;
 
     //==============================================================================
