@@ -71,10 +71,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     bugReportPanel->setVisible (false);
     bugReportPanel->setAlwaysOnTop (true);
 
-    // Sets settings
-    juce::Rectangle<int> screenArea  = Desktop::getInstance().getDisplays()
-                                                       .getMainDisplay()
-                                                       .userArea;
+    const juce::Rectangle<int> screenArea =  Desktop::getInstance().getDisplays().getPrimaryDisplay()->userArea;
 
     int dashWidth = jmin (screenArea.getHeight()*63/60, // screenH * 9/10 * AspectRatio^-1 (= 7/6)
                           screenArea.getWidth()*3/4);
@@ -559,6 +556,9 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             if (!optionsPanel->isVisible())
             {
                 optionsPanel->setVisible (true);
+                if (!optionsPanel->hasKeyboardFocus (false) && (optionsPanel->isShowing () || optionsPanel->isOnDesktop ())) {
+                    optionsPanel->grabKeyboardFocus ();
+                }
             }
             
             firmUpgradePanel->setAndOpenPanel();
@@ -568,6 +568,9 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             if (!optionsPanel->isVisible())
             {
                 optionsPanel->setVisible (true);
+                if (!optionsPanel->hasKeyboardFocus (false) && (optionsPanel->isShowing () || optionsPanel->isOnDesktop ())) {
+                    optionsPanel->grabKeyboardFocus ();
+                }
             }
             
             updaterPanel->resetAndOpenPanel (hubConfig.getHubIsConnected() && hubConfig.getHubIsCompatibleInt() > 0);
@@ -584,6 +587,9 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             if (!optionsPanel->isVisible())
             {
                 optionsPanel->setVisible (true);
+                if (!optionsPanel->hasKeyboardFocus (false) && (optionsPanel->isShowing () || optionsPanel->isOnDesktop ())) {
+                    optionsPanel->grabKeyboardFocus ();
+                }
             }
             
             bugReportPanel->resetAndOpenPanel();

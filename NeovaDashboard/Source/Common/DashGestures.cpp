@@ -22,8 +22,8 @@ namespace gesture
                                                  float parameter1,
                                                  float parameter2,
                                                  float parameter3,
-                                                 float parameter4,
-                                                 float parameter5)
+                                                 float,
+                                                 float)
     {
         if (type == numTypes) return 0;
 
@@ -40,11 +40,11 @@ namespace gesture
             midiVal = (intensity < threshold) ? 64
                                               : map (value, -(maxRange - gain), (maxRange + 0.01f - gain), 0, 127);
 
-            /*
-            DBG ("Vibrato : " << " Send ? " << (intensity < threshold ? "N":"Y")
-                              << " | Val " << value
-                              << " | Int " << intensity
-                              << " | Midi Val : " << midiVal);*/
+            
+            // DBG ("Vibrato : " << " Send ? " << (intensity < threshold ? "N":"Y")
+            //                   << " | Val " << value
+            //                   << " | Int " << intensity
+            //                   << " | Midi Val : " << midiVal);
         }
         else if (type == int (pitchBend))
         {

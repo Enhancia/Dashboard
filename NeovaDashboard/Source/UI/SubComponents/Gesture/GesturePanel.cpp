@@ -443,7 +443,7 @@ void GesturePanel::swapGestures (int firstId, int secondId)
 {
     bool mustChangeSelection = (hubConfig.getSelectedGesture() == firstId
                                 || hubConfig.getSelectedGesture() == secondId);
-    int idToSelect;
+    int idToSelect = 0;
 
     if (mustChangeSelection)
     {

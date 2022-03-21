@@ -85,7 +85,7 @@ void FirmDownloader::getCurrentInstalledVersions()
 	}
 }
 
-void FirmDownloader::finished (URL::DownloadTask* task, bool success)
+void FirmDownloader::finished (URL::DownloadTask*, bool success)
 {
     state = downloadFinished;
     successful = success;
@@ -218,9 +218,13 @@ var FirmDownloader::fetchRepoJSON()
 {
     // Creating input stream to get file link
     int status;
-    std::unique_ptr<InputStream> urlInStream (REPO_URL.createInputStream (false, nullptr, nullptr,
-                                                                         "Authorization: token " + neova_dash::auth::MACHINE_TOKEN,
-                                                                         1000, nullptr, &status));
+    const std::unique_ptr<InputStream> urlInStream (REPO_URL.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+        .withProgressCallback (nullptr)
+        .withExtraHeaders ("Authorization: token " + neova_dash::auth::MACHINE_TOKEN)
+        .withConnectionTimeoutMs (1000)
+        .withResponseHeaders (nullptr)
+        .withStatusCode (&status)
+    ));
 
     if (urlInStream == nullptr || status != 200)
     {
@@ -272,15 +276,15 @@ bool FirmDownloader::fetchFilesURLAndVersions (DynamicObject& jsonRef)
     return hubExists || ringExists;
 }
 
-bool FirmDownloader::deleteCurrentFileforDevice (deviceFirmware& device)
+bool FirmDownloader::deleteCurrentFileforDevice (deviceFirmware& deviceArg)
 {
 	File fileToDelete;
 
-	if (device == hub && !currentVersionHub.isEmpty())
+	if (deviceArg == hub && !currentVersionHub.isEmpty())
 	{
 		fileToDelete = currentHubFile;
 	}
-	else if (device == ring && !currentVersionRing.isEmpty())
+	else if (deviceArg == ring && !currentVersionRing.isEmpty())
 	{
 		fileToDelete = currentRingFile;
 	}

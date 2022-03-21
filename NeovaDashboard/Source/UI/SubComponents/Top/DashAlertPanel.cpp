@@ -45,9 +45,6 @@ void DashAlertPanel::paint (Graphics& g)
     g.setGradientFill (gradOut);
     g.drawRoundedRectangle (panelArea.reduced (1).toFloat(), 10.0f, 1.0f);
 
-    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
-        grabKeyboardFocus ();
-    }
 }
 
 void DashAlertPanel::resized()
@@ -110,6 +107,10 @@ void DashAlertPanel::createAndAddLabel (const String& textToSet)
 
     titleLabel->setJustificationType (Justification::centred);
     titleLabel->setFont (neova_dash::font::dashFontBold.withHeight (20.0f).withExtraKerningFactor (0.03f));
+
+    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+        grabKeyboardFocus ();
+    }
 }
 
 void DashAlertPanel::createAndAddTextEditor (const String& textToSet)
@@ -118,6 +119,10 @@ void DashAlertPanel::createAndAddTextEditor (const String& textToSet)
     addAndMakeVisible (*bodyText);
 
     bodyText->setJustificationType (Justification::centred);
+
+    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+        grabKeyboardFocus ();
+    }
 }
 
 void DashAlertPanel::createAndAddButtons (const String& buttonText, const bool addCloseButton)
@@ -146,6 +151,10 @@ void DashAlertPanel::createAndAddButtons (const String& buttonText, const bool a
     closeButton->addListener (this);
 
     closeButton->setVisible (addCloseButton);
+
+    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+        grabKeyboardFocus ();
+    }
 }
 
 DashAlertPanel* DashAlertPanel::createSpecificAlertPanel (SpecificReturnValue panelType)
@@ -179,6 +188,5 @@ DashAlertPanel* DashAlertPanel::createSpecificAlertPanel (SpecificReturnValue pa
                                        0,
                                        false,
                                        "Ok");
-            return nullptr;
     }
 }
