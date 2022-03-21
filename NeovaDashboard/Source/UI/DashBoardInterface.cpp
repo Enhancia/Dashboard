@@ -837,10 +837,7 @@ void DashBoardInterface::executePanelAction (const int panelReturnValue)
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;
         case DashAlertPanel::factoryReset:
-
-            DBG ("FACTORY RESET");
             getCommandManager ().invokeDirectly (neova_dash::commands::factoryReset, true);
-
             break;
         default: // modalResult 0 or unknown
             break; 

@@ -202,7 +202,7 @@ public:
     bool isWaitingForRingCompatibility();
     void stopWaitingForRingCompatibility();
 
-    void setDefaultConfig(); // TEST PURPOSE!! Maybe TO DELETE since the dashboard should match the hub anyways..
+    void setDefaultConfig();
 private:
     //==============================================================================
 
@@ -213,6 +213,7 @@ private:
                                         uint8 newMidiHigh,
                                         uint8 newCc,
                                         uint8 newMidiType,
+                                        bool newReverse = false,
                                         bool uploadToHub = false);
 
 

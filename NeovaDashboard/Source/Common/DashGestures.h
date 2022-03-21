@@ -15,8 +15,8 @@ namespace neova_dash
 {
 	namespace gesture
     {
-        const int NUM_GEST = 4;
-        const int NUM_PRESETS = 4;
+        constexpr int NUM_GEST = 4;
+        constexpr int NUM_PRESETS = 4;
         //const int NUM_MAX_MIDI_CHANNELS = 4;
 
         enum GestureType
@@ -48,30 +48,30 @@ namespace neova_dash
         };
 
         // gesture max range values
-        const float VIBRATO_RANGE_MAX  = 100.0f;
-        const float VIBRATO_THRESH_MAX = 500.0f;
-        const float PITCHBEND_MIN = -180.0f;
-        const float PITCHBEND_MAX =  180.0f;
-        const float TILT_MIN = -180.0f;
-        const float TILT_MAX =  180.0f;
-        const float ROLL_MIN = -180.0f;
-        const float ROLL_MAX =  180.0f;
-        const float WAVE_MIN = -180.0f;
-        const float WAVE_MAX =  180.0f;
+        constexpr float VIBRATO_RANGE_MAX  = 100.0f;
+        constexpr float VIBRATO_THRESH_MAX = 500.0f;
+        constexpr float PITCHBEND_MIN = -80.0f;
+        constexpr float PITCHBEND_MAX =  80.0f;
+        constexpr float TILT_MIN = -80.0f;
+        constexpr float TILT_MAX =  80.0f;
+        constexpr float ROLL_MIN = -80.0f;
+        constexpr float ROLL_MAX =  80.0f;
+        constexpr float WAVE_MIN = -80.0f;
+        constexpr float WAVE_MAX =  80.0f;
 
         // Gesture default values
-        const float VIBRATO_RANGE_DEFAULT  = 50.0f;
-        const float VIBRATO_THRESH_DEFAULT = 40.0f;
-        const float PITCHBEND_DEFAULT_LEFTMIN = -40.0f;
-        const float PITCHBEND_DEFAULT_LEFTMAX = -20.0f;
-        const float PITCHBEND_DEFAULT_RIGHTMIN = 20.0f;
-        const float PITCHBEND_DEFAULT_RIGHTMAX = 40.0f;
-        const float TILT_DEFAULT_MIN =  0.0f;
-        const float TILT_DEFAULT_MAX =  60.0f;
-        const float ROLL_DEFAULT_MIN =  0.0f;
-        const float ROLL_DEFAULT_MAX =  60.0f;
-        const float WAVE_DEFAULT_MIN = -50.0f;
-        const float WAVE_DEFAULT_MAX =  50.0f;
+        constexpr float VIBRATO_RANGE_DEFAULT  = 50.0f;
+        constexpr float VIBRATO_THRESH_DEFAULT = 40.0f;
+        constexpr float PITCHBEND_DEFAULT_LEFTMIN = -40.0f;
+        constexpr float PITCHBEND_DEFAULT_LEFTMAX = -20.0f;
+        constexpr float PITCHBEND_DEFAULT_RIGHTMIN = 20.0f;
+        constexpr float PITCHBEND_DEFAULT_RIGHTMAX = 40.0f;
+        constexpr float TILT_DEFAULT_MIN =  0.0f;
+        constexpr float TILT_DEFAULT_MAX =  60.0f;
+        constexpr float ROLL_DEFAULT_MIN =  0.0f;
+        constexpr float ROLL_DEFAULT_MAX =  60.0f;
+        constexpr float WAVE_DEFAULT_MIN = -50.0f;
+        constexpr float WAVE_DEFAULT_MAX =  50.0f;
 
         // Helper methods for gestures
         extern GestureType intToGestureType (const int typeInt);
