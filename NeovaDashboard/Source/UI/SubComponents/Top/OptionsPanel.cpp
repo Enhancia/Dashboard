@@ -12,12 +12,18 @@
 
 //==============================================================================
 OptionsPanel::OptionsPanel (HubConfiguration& config, DashUpdater& updtr, UpgradeHandler& handler, ApplicationCommandManager& manager)
-    : hubConfig (config), commandManager (manager), updater (updtr), upgradeHandler (handler)
+    : hubConfig (config), updater(updtr), upgradeHandler(handler), commandManager(manager)
 {
     createButtons();
-    options.addTab (new GeneralPanel (*sendReportButton.get(), *midiThruToggle.get()), "General");
+    options.addTab (
+        new GeneralPanel (
+            *sendReportButton,
+            *midiThruToggle,
+            *factoryResetButton),
+        "General"
+    );
     options.addTab (new UpdateAndUpgradePanel (hubConfig, updater, upgradeHandler,
-											   *upgradeButton.get(), *updateButton.get()), "Updates");
+											   *upgradeButton, *updateButton), "Updates");
     options.addTab (new LegalPanel(), "Legal");
     //options.addTab (new LicensePanel(), "EULA");
 
@@ -136,6 +142,11 @@ void OptionsPanel::buttonClicked (Button* bttn)
     {
         hubConfig.setMidiThrough (midiThruToggle->getToggleState());
     }
+
+    else if (bttn == factoryResetButton.get ())
+    {
+        commandManager.invokeDirectly (neova_dash::commands::openFactoryResetPanel, true);
+    }
 }
 
 bool OptionsPanel::keyPressed (const KeyPress &key)
@@ -221,8 +232,12 @@ void OptionsPanel::createButtons()
     //Send Report button
     sendReportButton = std::make_unique <TextButton> ("Send");
     sendReportButton->addListener (this);
+
+    //Factory reset button
+    factoryResetButton = std::make_unique <TextButton> ("Reset");
+    factoryResetButton->addListener (this);
     
-    //Send Report button
+    //MIDI thru checkbox
     midiThruToggle = std::make_unique <ToggleButton> ();
     midiThruToggle->setToggleState (hubConfig.getMidiThrough() == 0, dontSendNotification);
     midiThruToggle->addListener (this);
@@ -558,21 +573,22 @@ OptionsPanel::TabbedOptions::Tab* OptionsPanel::TabbedOptions::getTabByName (con
 
 // ====================== GeneralPanel =========================
 
-GeneralPanel::GeneralPanel (TextButton& bugReportButton, ToggleButton& thruToggle)
-    : sendReportButton (bugReportButton), midiThruToggle (thruToggle)
+GeneralPanel::GeneralPanel (TextButton& bugReportButton, ToggleButton& thruToggle, TextButton& factoryResetButtonArg)
+    : factoryResetButton(factoryResetButtonArg), sendReportButton(bugReportButton), midiThruToggle(thruToggle)
 {
     //Contact button
     contactButton = std::make_unique <TextButton> ("Contact");
     addAndMakeVisible (*contactButton);
     contactButton->addListener (this);
     
-    //Contact button
+    //View notes button
     viewNotesButton = std::make_unique <TextButton> ("View");
     addAndMakeVisible (*viewNotesButton);
     viewNotesButton->addListener (this);
 
     addAndMakeVisible (sendReportButton);
     addAndMakeVisible (midiThruToggle);
+    addAndMakeVisible(factoryResetButton);
 }
 
 GeneralPanel::~GeneralPanel()
@@ -588,6 +604,7 @@ void GeneralPanel::paint (Graphics& g)
     g.drawText ("Send Bug Report :", reportArea, Justification::centredRight);
     g.drawText ("Dashboard Release Notes :", viewNotesArea, Justification::centredRight);
     g.drawText ("Use MIDI THRU :", thruArea, Justification::centredRight);
+    g.drawText ("Factory Reset :", factoryResetArea, Justification::centredRight);
 }
 
 void GeneralPanel::resized()
@@ -596,10 +613,11 @@ void GeneralPanel::resized()
                                           2*neova_dash::ui::MARGIN)
                                 .withTrimmedTop (neova_dash::ui::MARGIN);
 
-    contactArea =   area.removeFromTop (area.getHeight()/4);
-    reportArea =    area.removeFromTop (area.getHeight()/3);
-    viewNotesArea = area.removeFromTop (area.getHeight()/2);
-    thruArea = area;
+    contactArea =   area.removeFromTop (area.getHeight()/5);
+    reportArea =    area.removeFromTop (area.getHeight()/4);
+    viewNotesArea = area.removeFromTop (area.getHeight()/3);
+    factoryResetArea = area.removeFromTop (area.getHeight()/2);
+    thruArea = area.removeFromTop (area.getHeight());
 
     auto resizeButtonToArea = [this](juce::Rectangle<int>& areaRef, Button& bttnRef)
     {
@@ -613,6 +631,7 @@ void GeneralPanel::resized()
     resizeButtonToArea (reportArea, sendReportButton);
     resizeButtonToArea (viewNotesArea, *viewNotesButton);
     resizeButtonToArea (thruArea, midiThruToggle);
+    resizeButtonToArea (factoryResetArea, factoryResetButton);
 }
 
 void GeneralPanel::buttonClicked (Button* bttn)
@@ -632,7 +651,8 @@ void GeneralPanel::buttonClicked (Button* bttn)
 
 UpdateAndUpgradePanel::UpdateAndUpgradePanel (HubConfiguration& hubConfiguration, DashUpdater& updtr, UpgradeHandler& handler,
                                               TextButton& firmButton, TextButton& softButton)
-  : hubConfig (hubConfiguration), upgradeButton (firmButton), updateButton (softButton), updater (updtr), upgradeHandler (handler)
+  : hubConfig (hubConfiguration), upgradeHandler(handler), updater(updtr), upgradeButton(firmButton),
+    updateButton(softButton)
 {
     addAndMakeVisible (upgradeButton);
     addAndMakeVisible (updateButton);

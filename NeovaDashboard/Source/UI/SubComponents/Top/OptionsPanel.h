@@ -158,6 +158,7 @@ private:
     ApplicationCommandManager& commandManager;
     std::unique_ptr<TextButton> sendReportButton;
     std::unique_ptr<ToggleButton> midiThruToggle;
+    std::unique_ptr<TextButton> factoryResetButton;
     std::unique_ptr<TextButton> contactButton;
     std::unique_ptr<TextButton> upgradeButton;
     std::unique_ptr<TextButton> updateButton;
@@ -170,8 +171,8 @@ class GeneralPanel: public Component, Button::Listener
 {
 public:
     //==============================================================================
-    GeneralPanel (TextButton& bugReportButton, ToggleButton& trhuToggle);
-    ~GeneralPanel();
+    GeneralPanel (TextButton& bugReportButton, ToggleButton& thruToggle, TextButton& factoryResetButtonArg);
+    ~GeneralPanel() override;
 
     //==============================================================================
     void paint (Graphics& g) override;
@@ -184,6 +185,7 @@ private:
     //==============================================================================
     std::unique_ptr<TextButton> contactButton;
     std::unique_ptr<TextButton> viewNotesButton;
+    TextButton& factoryResetButton;
     TextButton& sendReportButton;
     ToggleButton& midiThruToggle;
 
@@ -193,6 +195,7 @@ private:
     juce::Rectangle<int> reportArea;
     juce::Rectangle<int> viewNotesArea;
     juce::Rectangle<int> thruArea;
+    juce::Rectangle<int> factoryResetArea;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralPanel)

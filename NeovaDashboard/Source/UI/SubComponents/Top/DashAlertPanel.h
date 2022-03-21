@@ -27,6 +27,7 @@ public:
         outdatedFirmware = 1,
         noUploadQuitting,
         upgradePending,
+        factoryReset,
         unknown
     };
 
