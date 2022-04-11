@@ -105,7 +105,7 @@ private:
     HANDLE childOut = NULL;
     HANDLE childErr = NULL;
     PROCESS_INFORMATION pi;
-    STARTUPINFO si;
+    STARTUPINFOW si;
     String childOutFileName = "nrfutilOut.log";
     String childErrFileName = "nrfutilErr.log";
     String nrfutilRelativePath = "\\Enhancia\\utilities\\nrfutil.exe";

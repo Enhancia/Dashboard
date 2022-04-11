@@ -15,38 +15,33 @@ namespace neova_dash
 {
 namespace gesture
 {
-    int computeMidiValue (int type, float value, int rangeLow,
-                                                 int rangeHigh,
-                                                 int reverse,
-                                                 float parameter0,
-                                                 float parameter1,
-                                                 float parameter2,
-                                                 float parameter3,
-                                                 float parameter4,
-                                                 float parameter5)
+    int computeMidiValue (const int type, const float value, const int rangeLow, const int rangeHigh, const int reverse,
+        const float parameter0,
+        const float parameter1,
+        const float parameter2,
+        const float parameter3,
+        float,
+        float)
     {
         if (type == numTypes) return 0;
 
         int midiVal = 0;
         bool reversed = reverse != 0;
 
-        if (type == int (vibrato))
+        if (type == static_cast<int>(vibrato))
         {
             const float gain = parameter0;
             const float threshold = parameter1;
             const float intensity = parameter2;
-            const float maxRange = float (VIBRATO_RANGE_MAX);
+            //const float maxRange = float (VIBRATO_RANGE_MAX);
+
+            const float normalizedValue = (value / (2 * 9.80665f) * gain / 200.0f * 0.5f + 0.5f);
 
             midiVal = (intensity < threshold) ? 64
-                                              : map (value, -(maxRange - gain), (maxRange + 0.01f - gain), 0, 127);
+                : map (normalizedValue, 0.0f, 1.0f, 0, 127);
 
-            /*
-            DBG ("Vibrato : " << " Send ? " << (intensity < threshold ? "N":"Y")
-                              << " | Val " << value
-                              << " | Int " << intensity
-                              << " | Midi Val : " << midiVal);*/
         }
-        else if (type == int (pitchBend))
+        else if (type == static_cast<int>(pitchBend))
         {
             // Right side
             if (value >= parameter2 && value < 140.0f)
@@ -64,15 +59,15 @@ namespace gesture
 
             else midiVal = 64;
         }
-        else if (type == int (tilt))
+        else if (type == static_cast<int>(tilt))
         {
             midiVal = map (value, parameter0, parameter1, 0, 127);
         }
-        else if (type == int (roll))
+        else if (type == static_cast<int>(roll))
         {
             midiVal = map (value, parameter0, parameter1, 0, 127);            
         }
-        else if (type == int (wave))
+        else if (type == static_cast<int>(wave))
         {
             midiVal = 0;
         }
@@ -84,23 +79,23 @@ namespace gesture
 
     bool isValueOutOfGestureRange (int type, float value)
     {
-        if (type == int (vibrato))
+        if (type == static_cast<int>(vibrato))
         {
             return (value < -VIBRATO_RANGE_MAX || value > VIBRATO_RANGE_MAX);
         }
-        if (type == int (pitchBend))
+        if (type == static_cast<int>(pitchBend))
         {
             return (value < PITCHBEND_MIN || value > PITCHBEND_MAX);
         }
-        if (type == int (tilt))
+        if (type == static_cast<int>(tilt))
         {
             return (value < TILT_MIN || value > TILT_MAX);
         }
-        if (type == int (roll))
+        if (type == static_cast<int>(roll))
         {
             return (value < ROLL_MIN || value > ROLL_MAX);
         }
-        if (type == int (wave))
+        if (type == static_cast<int>(wave))
         {
             return (value < WAVE_MIN || value > WAVE_MAX);
         }
@@ -115,7 +110,7 @@ namespace gesture
         if (val < minVal) return minNew;
         if (val > maxVal) return maxNew;
 
-        return (minNew + int ((maxNew - minNew)*(val - minVal)/(maxVal-minVal)));
+        return (minNew + static_cast<int>((maxNew - minNew) * (val - minVal) / (maxVal - minVal)));
     }
 
     int mapInt (int val, int minVal, int maxVal, int minNew, int maxNew)
@@ -133,18 +128,18 @@ namespace gesture
     {
         switch (typeInt)
         {
-            case int (neova_dash::gesture::vibrato):   return neova_dash::gesture::vibrato;
-            case int (neova_dash::gesture::pitchBend): return neova_dash::gesture::pitchBend;
-            case int (neova_dash::gesture::tilt):      return neova_dash::gesture::tilt;
-            case int (neova_dash::gesture::roll):      return neova_dash::gesture::roll;
-            case int (neova_dash::gesture::wave):      return neova_dash::gesture::wave;
+            case static_cast<int>(neova_dash::gesture::vibrato):   return neova_dash::gesture::vibrato;
+            case static_cast<int>(neova_dash::gesture::pitchBend): return neova_dash::gesture::pitchBend;
+            case static_cast<int>(neova_dash::gesture::tilt):      return neova_dash::gesture::tilt;
+            case static_cast<int>(neova_dash::gesture::roll):      return neova_dash::gesture::roll;
+            case static_cast<int>(neova_dash::gesture::wave):      return neova_dash::gesture::wave;
             default:                                   return neova_dash::gesture::none;
         }
     }
 
     bool isValidGestureType (const int typeInt)
     {
-        return (typeInt >= 0 && typeInt < int (neova_dash::gesture::numTypes));
+        return (typeInt >= 0 && typeInt < static_cast<int>(neova_dash::gesture::numTypes));
     }
 
     bool isValidGestureType (const neova_dash::gesture::GestureType type)

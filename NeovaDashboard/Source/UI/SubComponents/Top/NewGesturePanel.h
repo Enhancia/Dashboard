@@ -39,6 +39,7 @@ public:
     void mouseEnter (const MouseEvent &event) override;
     void mouseUp (const MouseEvent &event) override;
     void buttonClicked (Button* bttn) override;
+    bool keyPressed (const KeyPress& key) override;
     void labelTextChanged (Label* lbl) override;
     void editorShown (Label* lbl, TextEditor& ed) override;
 

@@ -36,10 +36,10 @@ void HeaderComponent::paint (Graphics& g)
     g.setColour (neova_dash::colour::mainText);
 
     g.setFont (neova_dash::font::neovaFont.withHeight (13.5f).withExtraKerningFactor (0.27f));
-    g.drawText ("NEOVA", area.removeFromTop (area.getHeight()/2).withTrimmedBottom (spacing/4), Justification::centredBottom, false);
+    g.drawText ("NEOVA", area.removeFromTop (area.getHeight () / 2).withTrimmedBottom (static_cast<int>(spacing / 4.0f)), Justification::centredBottom, false);
 
   	g.setFont(neova_dash::font::dashFontLight.withHeight (9.5f).withExtraKerningFactor (0.38f));
-  	g.drawText("DASHBOARD", area.withTrimmedTop (spacing*3/4), Justification::centredTop, false);
+    g.drawText ("DASHBOARD", area.withTrimmedTop (static_cast<int>(spacing * 3.0f / 4.0f)), Justification::centredTop, false);
 }
 
 void HeaderComponent::resized()
@@ -56,6 +56,9 @@ void HeaderComponent::buttonClicked (Button* bttn)
     if (bttn == optionsButton.get())
     {
         optionsPanel.setVisible (true);
+        if (!optionsPanel.hasKeyboardFocus (false) && (optionsPanel.isShowing () || optionsPanel.isOnDesktop ())) {
+            optionsPanel.grabKeyboardFocus ();
+        }
     }
 }
 
@@ -177,9 +180,9 @@ void HeaderComponent::BatteryComponent::repaintIfNeeded (bool forceRepaint)
                                 0.0f);
     const float newRawBattery = batteryValueRef;
 
-    DBG ("----------------\nComputing battery level\nRaw      " << batteryValueRef
-                << "\nRounded  " << battery
-                << "\nCharging " << (lastChargeState ? "Yes" : "No"));
+    //DBG ("----------------\nComputing battery level\nRaw      " << batteryValueRef
+    //            << "\nRounded  " << battery
+    //            << "\nCharging " << (lastChargeState ? "Yes" : "No"));
 
     if (batteryValueRef < 3.4f && lastConnectionState)
     {
@@ -263,7 +266,7 @@ void HeaderComponent::BatteryComponent::update()
 {
     if (hubConfig.getRingIsConnected() != lastConnectionState)
     {
-        repaintIfNeeded();
+        repaintIfNeeded(true);
     }
 
     if (hubConfig.getRingIsCharging() != lastChargeState)
@@ -316,11 +319,11 @@ void HeaderComponent::BatteryComponent::drawBatteryPath (Graphics& g, juce::Rect
                                                  : lastBattery < 0.4f ? Colours::yellow
                                                  : Colours::lime;
 
-    const int indicatorAreaWidth = area.getWidth()/4;
+    const int indicatorAreaWidth = static_cast<int>(area.getWidth () / 4);
 
     for (int indicator = 0; indicator < 4; indicator++)
     {
-        auto indicatorArea = area.removeFromLeft (indicatorAreaWidth);
+        auto indicatorArea = area.removeFromLeft (static_cast<float>(indicatorAreaWidth));
 
         if (indicator < numIndicators || numBlinkingIndicators == 4)
         {

@@ -12,12 +12,18 @@
 
 //==============================================================================
 OptionsPanel::OptionsPanel (HubConfiguration& config, DashUpdater& updtr, UpgradeHandler& handler, ApplicationCommandManager& manager)
-    : hubConfig (config), commandManager (manager), updater (updtr), upgradeHandler (handler)
+    : hubConfig (config), updater(updtr), upgradeHandler(handler), commandManager(manager)
 {
     createButtons();
-    options.addTab (new GeneralPanel (*sendReportButton.get(), *midiThruToggle.get()), "General");
+    options.addTab (
+        new GeneralPanel (
+            *sendReportButton,
+            *midiThruToggle,
+            *factoryResetButton),
+        "General"
+    );
     options.addTab (new UpdateAndUpgradePanel (hubConfig, updater, upgradeHandler,
-											   *upgradeButton.get(), *updateButton.get()), "Updates");
+											   *upgradeButton, *updateButton), "Updates");
     options.addTab (new LegalPanel(), "Legal");
     //options.addTab (new LicensePanel(), "EULA");
 
@@ -66,6 +72,7 @@ void OptionsPanel::paint (Graphics& g)
     auto area = optionsArea.reduced (neova_dash::ui::MARGIN*2);
 
     paintProductInformations (g, area.removeFromTop (area.getHeight()/3).reduced (neova_dash::ui::MARGIN));
+
 }
 
 void OptionsPanel::resized()
@@ -135,6 +142,21 @@ void OptionsPanel::buttonClicked (Button* bttn)
     {
         hubConfig.setMidiThrough (midiThruToggle->getToggleState());
     }
+
+    else if (bttn == factoryResetButton.get ())
+    {
+        commandManager.invokeDirectly (neova_dash::commands::openFactoryResetPanel, true);
+    }
+}
+
+bool OptionsPanel::keyPressed (const KeyPress &key)
+{
+    if (key == neova_dash::keyboard_shortcut::closeWindow)
+    {
+        setVisible (false);
+    }
+
+	return false;
 }
 
 void OptionsPanel::mouseUp (const MouseEvent& event)
@@ -210,8 +232,12 @@ void OptionsPanel::createButtons()
     //Send Report button
     sendReportButton = std::make_unique <TextButton> ("Send");
     sendReportButton->addListener (this);
+
+    //Factory reset button
+    factoryResetButton = std::make_unique <TextButton> ("Reset");
+    factoryResetButton->addListener (this);
     
-    //Send Report button
+    //MIDI thru checkbox
     midiThruToggle = std::make_unique <ToggleButton> ();
     midiThruToggle->setToggleState (hubConfig.getMidiThrough() == 0, dontSendNotification);
     midiThruToggle->addListener (this);
@@ -547,21 +573,22 @@ OptionsPanel::TabbedOptions::Tab* OptionsPanel::TabbedOptions::getTabByName (con
 
 // ====================== GeneralPanel =========================
 
-GeneralPanel::GeneralPanel (TextButton& bugReportButton, ToggleButton& thruToggle)
-    : sendReportButton (bugReportButton), midiThruToggle (thruToggle)
+GeneralPanel::GeneralPanel (TextButton& bugReportButton, ToggleButton& thruToggle, TextButton& factoryResetButtonArg)
+    : factoryResetButton(factoryResetButtonArg), sendReportButton(bugReportButton), midiThruToggle(thruToggle)
 {
     //Contact button
     contactButton = std::make_unique <TextButton> ("Contact");
     addAndMakeVisible (*contactButton);
     contactButton->addListener (this);
     
-    //Contact button
+    //View notes button
     viewNotesButton = std::make_unique <TextButton> ("View");
     addAndMakeVisible (*viewNotesButton);
     viewNotesButton->addListener (this);
 
     addAndMakeVisible (sendReportButton);
     addAndMakeVisible (midiThruToggle);
+    addAndMakeVisible(factoryResetButton);
 }
 
 GeneralPanel::~GeneralPanel()
@@ -577,6 +604,7 @@ void GeneralPanel::paint (Graphics& g)
     g.drawText ("Send Bug Report :", reportArea, Justification::centredRight);
     g.drawText ("Dashboard Release Notes :", viewNotesArea, Justification::centredRight);
     g.drawText ("Use MIDI THRU :", thruArea, Justification::centredRight);
+    g.drawText ("Factory Reset :", factoryResetArea, Justification::centredRight);
 }
 
 void GeneralPanel::resized()
@@ -585,10 +613,11 @@ void GeneralPanel::resized()
                                           2*neova_dash::ui::MARGIN)
                                 .withTrimmedTop (neova_dash::ui::MARGIN);
 
-    contactArea =   area.removeFromTop (area.getHeight()/4);
-    reportArea =    area.removeFromTop (area.getHeight()/3);
-    viewNotesArea = area.removeFromTop (area.getHeight()/2);
-    thruArea = area;
+    contactArea =   area.removeFromTop (area.getHeight()/5);
+    reportArea =    area.removeFromTop (area.getHeight()/4);
+    viewNotesArea = area.removeFromTop (area.getHeight()/3);
+    factoryResetArea = area.removeFromTop (area.getHeight()/2);
+    thruArea = area.removeFromTop (area.getHeight());
 
     auto resizeButtonToArea = [this](juce::Rectangle<int>& areaRef, Button& bttnRef)
     {
@@ -602,6 +631,7 @@ void GeneralPanel::resized()
     resizeButtonToArea (reportArea, sendReportButton);
     resizeButtonToArea (viewNotesArea, *viewNotesButton);
     resizeButtonToArea (thruArea, midiThruToggle);
+    resizeButtonToArea (factoryResetArea, factoryResetButton);
 }
 
 void GeneralPanel::buttonClicked (Button* bttn)
@@ -621,7 +651,8 @@ void GeneralPanel::buttonClicked (Button* bttn)
 
 UpdateAndUpgradePanel::UpdateAndUpgradePanel (HubConfiguration& hubConfiguration, DashUpdater& updtr, UpgradeHandler& handler,
                                               TextButton& firmButton, TextButton& softButton)
-  : hubConfig (hubConfiguration), upgradeButton (firmButton), updateButton (softButton), updater (updtr), upgradeHandler (handler)
+  : hubConfig (hubConfiguration), upgradeHandler(handler), updater(updtr), upgradeButton(firmButton),
+    updateButton(softButton)
 {
     addAndMakeVisible (upgradeButton);
     addAndMakeVisible (updateButton);
@@ -638,8 +669,9 @@ void UpdateAndUpgradePanel::paint (Graphics& g)
     paintSoftwareArea (g);
 
     g.setColour (neova_dash::colour::subText);
-    g.drawVerticalLine (softwareArea.getX(), getHeight() * 1.0 / 8,
-                                             getHeight() * 6.0 / 8);
+    g.drawVerticalLine (softwareArea.getX (),
+        static_cast<float>(getHeight () * 1.0f / 8.0f),
+        static_cast<float>(getHeight () * 6.0f / 8.0f));
 }
 
 void UpdateAndUpgradePanel::paintFirmwareArea (Graphics& g)
@@ -680,16 +712,16 @@ void UpdateAndUpgradePanel::paintFirmwareArea (Graphics& g)
     Path ringPath = neova_dash::path::createPath (neova_dash::path::ring);
     Path hubPath = neova_dash::path::createPath (neova_dash::path::hub);
 
-    ringPath.scaleToFit (ringArea.reduced (ringArea.getHeight()/4).getX(),
-                         ringArea.reduced (ringArea.getHeight()/4).getY(),
-                         ringArea.reduced (ringArea.getHeight()/4).getWidth(),
-                         ringArea.reduced (ringArea.getHeight()/4).getHeight(),
+    ringPath.scaleToFit (static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getX()),
+                         static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getY()),
+                         static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getWidth()),
+                         static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getHeight()),
                          true);
 
-    hubPath.scaleToFit (hubArea.reduced (hubArea.getHeight()/8).getX(),
-                        hubArea.reduced (hubArea.getHeight()/8).getY(),
-                        hubArea.reduced (hubArea.getHeight()/8).getWidth(),
-                        hubArea.reduced (hubArea.getHeight()/8).getHeight(),
+    hubPath.scaleToFit (static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getX()),
+                        static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getY()),
+                        static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getWidth()),
+                        static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getHeight()),
                         true);
 
     g.strokePath (ringPath, {1.0f, PathStrokeType::curved});
@@ -718,10 +750,10 @@ void UpdateAndUpgradePanel::paintSoftwareArea (Graphics& g)
 
     Path dashPath = neova_dash::path::createPath (neova_dash::path::dashIcon);
 
-    dashPath.scaleToFit (softAreaTemp.reduced (softAreaTemp.getHeight()/4).getX(),
-                         softAreaTemp.reduced (softAreaTemp.getHeight()/4).getY(),
-                         softAreaTemp.reduced (softAreaTemp.getHeight()/4).getWidth(),
-                         softAreaTemp.reduced (softAreaTemp.getHeight()/4).getHeight(),
+    dashPath.scaleToFit (static_cast<float>(softAreaTemp.reduced (softAreaTemp.getHeight()/4).getX()),
+                         static_cast<float>(softAreaTemp.reduced (softAreaTemp.getHeight()/4).getY()),
+                         static_cast<float>(softAreaTemp.reduced (softAreaTemp.getHeight()/4).getWidth()),
+                         static_cast<float>(softAreaTemp.reduced (softAreaTemp.getHeight()/4).getHeight()),
                          true);
 
     g.strokePath (dashPath, {1.0f, PathStrokeType::curved});
@@ -768,16 +800,16 @@ void LegalPanel::paint (Graphics& g)
     Path ringPath = neova_dash::path::createPath (neova_dash::path::ring);
     Path hubPath = neova_dash::path::createPath (neova_dash::path::hub);
 
-    ringPath.scaleToFit (ringArea.reduced (ringArea.getHeight()/4).getX(),
-                         ringArea.reduced (ringArea.getHeight()/4).getY(),
-                         ringArea.reduced (ringArea.getHeight()/4).getWidth(),
-                         ringArea.reduced (ringArea.getHeight()/4).getHeight(),
+    ringPath.scaleToFit (static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getX()),
+                         static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getY()),
+                         static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getWidth()),
+                         static_cast<float>(ringArea.reduced (ringArea.getHeight()/4).getHeight()),
                          true);
 
-    hubPath.scaleToFit (hubArea.reduced (hubArea.getHeight()/8).getX(),
-                        hubArea.reduced (hubArea.getHeight()/8).getY(),
-                        hubArea.reduced (hubArea.getHeight()/8).getWidth(),
-                        hubArea.reduced (hubArea.getHeight()/8).getHeight(),
+    hubPath.scaleToFit (static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getX()),
+                        static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getY()),
+                        static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getWidth()),
+                        static_cast<float>(hubArea.reduced (hubArea.getHeight()/8).getHeight()),
                         true);
 
     g.strokePath (ringPath, {1.0f, PathStrokeType::curved});
@@ -808,7 +840,7 @@ LicensePanel::~LicensePanel()
 {
 }
 
-void LicensePanel::paint (Graphics& g)
+void LicensePanel::paint (Graphics&)
 {
 }
 

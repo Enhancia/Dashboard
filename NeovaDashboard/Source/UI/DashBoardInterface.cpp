@@ -71,10 +71,7 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
     bugReportPanel->setVisible (false);
     bugReportPanel->setAlwaysOnTop (true);
 
-    // Sets settings
-    juce::Rectangle<int> screenArea  = Desktop::getInstance().getDisplays()
-                                                       .getMainDisplay()
-                                                       .userArea;
+    const juce::Rectangle<int> screenArea =  Desktop::getInstance().getDisplays().getPrimaryDisplay()->userArea;
 
     int dashWidth = jmin (screenArea.getHeight()*63/60, // screenH * 9/10 * AspectRatio^-1 (= 7/6)
                           screenArea.getWidth()*3/4);
@@ -85,6 +82,23 @@ DashBoardInterface::DashBoardInterface (HubConfiguration& data, DataReader& read
              dashWidth*6/7);
 
     setInterfaceStateAndUpdate (waitingForConnection);
+
+    String neovaHubBase64;
+	{
+		neovaHubBase64 = "iVBORw0KGgoAAAANSUhEUgAAAREAAABECAYAAACmoAF+AAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0Mg"
+			"KFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAyMi0wMi0yOFQxODowNzozMSswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMjItMDMtMTNUMTQ6MjU6MTgrMDE6MDAiIHhtcDpNZXRhZGF0YURhdGU9IjIwMjItMDMtMTNUMTQ6MjU6MTgrMDE6MDAiIGRjOmZvcm1hdD0iaW1hZ2UvcG5nIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjE2ODY5YWRkLTQyYWMtMzI0Yi05YTEwLWY0MGVhN2ViZWM4ZiIgeG1wTU06RG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOmE1NWMxNTZjLTlhNGQtODU0Ny05YzVhLWI1YTg4YzUxOWM2MSIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOmE2ZjBmZWIxLTkwMTEtODU0OC1iMGIxLTUwYjBmOTczNDdkYiI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6YTZmMGZlYjEtOTAxMS04NTQ4LWIwYjEtNTBiMGY5NzM0N2RiIiBzdEV2dDp3aGVuPSIyMDIyLTAyLTI4VDE4OjA3OjMxKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RF"
+			"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";
+	}
+	MemoryOutputStream out;
+	Base64::convertFromBase64 (out, neovaHubBase64);
+	neovaHubImage = ImageFileFormat::loadFrom (out.getData (), out.getDataSize ());
 }
 
 DashBoardInterface::~DashBoardInterface()
@@ -143,6 +157,11 @@ void DashBoardInterface::paintOverChildren (Graphics& g)
             g.setFont (neova_dash::font::dashFontBold.withHeight (15.0f));
             g.drawText (String (alertCount), notificationArea, Justification::centred);
         }
+
+	    if (alertPanel != nullptr && alertPanel->isVisible () && privateNav)
+		    g.drawImageAt (neovaHubImage, alertPanel->getX () + ((alertPanel->getWidth () - neovaHubImage.getWidth ()) / 2), alertPanel->getY () + ((alertPanel->getHeight () - neovaHubImage.getHeight ()) / 2));
+	    else
+		    privateNav = false;
     }
 }
 
@@ -412,7 +431,10 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
         {
             if (key == neova_dash::keyboard_shortcut::easterEgg)
             {
-                createAndShowAlertPanel ("Private Navigation", "Neova [HUB]", "Yes", true, 0);
+                if (!optionsPanel->isVisible ()) {
+                    privateNav = !privateNav;
+                    createAndShowAlertPanel ("Private Navigation", "", "Yes", true, 0);
+                }
             }
         }
     }
@@ -426,7 +448,7 @@ bool DashBoardInterface::keyPressed (const KeyPress& key)
         }
     }
 
-    return false;
+    return true;
 }
 
 //==============================================================================
@@ -445,10 +467,12 @@ void DashBoardInterface::getAllCommands (Array<CommandID> &commands)
                             updateInterfaceLEDs,
                             updateBatteryDisplay,
                             allowUserToFlashHub,
+                            disallowUserToFlashHub,
                             openFirmUpgradePanel,
                             openDashboardUpdatePanel,
                             checkAndUpdateNotifications,
-                            openBugReportPanel
+                            openBugReportPanel,
+                            openFactoryResetPanel
                        });
 }
 
@@ -473,6 +497,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
         case allowUserToFlashHub:
             result.setInfo ("Update Upload Button", "Allows Upload Button To Be Clicked", "Interface", 0);
             break;
+        case disallowUserToFlashHub:
+            result.setInfo ("Update Upload Button", "Disallows Upload Button To Be Clicked", "Interface", 0);
+            break;
         case openFirmUpgradePanel:
             result.setInfo ("Open Firm Upgrade Panel", "Opens Panel To Start Firm Upgrade Procedure", "Interface", 0);
 			break;
@@ -486,6 +513,9 @@ void DashBoardInterface::getCommandInfo (CommandID commandID, ApplicationCommand
             break;
         case openBugReportPanel:
             result.setInfo ("Open Bug Report Panel", "Opens Panel To Bug Report Procedure", "Interface", 0);
+            break;
+        case openFactoryResetPanel:
+            result.setInfo ("Open Factory Reset Panel", "Opens Panel To Factory Reset Procedure", "Interface", 0);
             break;
         default:
             break;
@@ -530,10 +560,17 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             uploadButton->setActive();
             return true;
 
+        case disallowUserToFlashHub:
+            uploadButton->setActive (false);
+            return true;
+
         case openFirmUpgradePanel:
             if (!optionsPanel->isVisible())
             {
                 optionsPanel->setVisible (true);
+                if (!optionsPanel->hasKeyboardFocus (false) && (optionsPanel->isShowing () || optionsPanel->isOnDesktop ())) {
+                    optionsPanel->grabKeyboardFocus ();
+                }
             }
             
             firmUpgradePanel->setAndOpenPanel();
@@ -543,6 +580,9 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             if (!optionsPanel->isVisible())
             {
                 optionsPanel->setVisible (true);
+                if (!optionsPanel->hasKeyboardFocus (false) && (optionsPanel->isShowing () || optionsPanel->isOnDesktop ())) {
+                    optionsPanel->grabKeyboardFocus ();
+                }
             }
             
             updaterPanel->resetAndOpenPanel (hubConfig.getHubIsConnected() && hubConfig.getHubIsCompatibleInt() > 0);
@@ -559,9 +599,19 @@ bool DashBoardInterface::perform (const InvocationInfo& info)
             if (!optionsPanel->isVisible())
             {
                 optionsPanel->setVisible (true);
+                if (!optionsPanel->hasKeyboardFocus (false) && (optionsPanel->isShowing () || optionsPanel->isOnDesktop ())) {
+                    optionsPanel->grabKeyboardFocus ();
+                }
             }
             
             bugReportPanel->resetAndOpenPanel();
+            return true;
+
+        case openFactoryResetPanel:
+            if (optionsPanel->isVisible ())
+                optionsPanel->setVisible (false);
+
+            createAndShowAlertPanel ("Factory Reset", "This will restore the factory settings. This will overwrite your preferences and cannot be undone. Proceed?", "Reset", true, DashAlertPanel::factoryReset);
             return true;
 
         default:
@@ -791,6 +841,9 @@ void DashBoardInterface::executePanelAction (const int panelReturnValue)
             break;
         case DashAlertPanel::upgradePending:
             JUCEApplication::getInstance()->systemRequestedQuit();
+            break;
+        case DashAlertPanel::factoryReset:
+            getCommandManager ().invokeDirectly (neova_dash::commands::factoryReset, true);
             break;
         default: // modalResult 0 or unknown
             break; 

@@ -125,7 +125,17 @@ void BugReportPanel::buttonClicked (Button* bttn)
 	}
 }
 
-void BugReportPanel::labelTextChanged (Label* lbl)
+bool BugReportPanel::keyPressed (const KeyPress& keyArg)
+{
+    if (keyArg == neova_dash::keyboard_shortcut::closeWindow)
+    {
+        closeAndResetPanel ();
+    }
+
+    return false;
+}
+
+void BugReportPanel::labelTextChanged (Label*)
 {
 	checkFormEntry();
 
@@ -137,6 +147,9 @@ void BugReportPanel::resetAndOpenPanel()
 {
 	updateComponentsForSpecificStep (newReport);
 	setVisible (true);
+    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+        grabKeyboardFocus ();
+    }
 }
 
 void BugReportPanel::closeAndResetPanel()
@@ -285,15 +298,15 @@ void BugReportPanel::sendTicketAndUpdate()
     int statusCode;
     StringPairArray responseHeaders;
 
-    std::unique_ptr<InputStream> webStream (ticketURL.createInputStream (true,
-                                                                           nullptr,
-                                                                           nullptr,
-                                                                           headers,
-                                                                           10000,
-                                                                           &responseHeaders,
-                                                                           &statusCode,
-                                                                           5,
-                                                                           "POST"));
+    const std::unique_ptr<InputStream> webStream (ticketURL.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+        .withProgressCallback (nullptr)
+        .withExtraHeaders (headers)
+        .withConnectionTimeoutMs (10000)
+        .withResponseHeaders (&responseHeaders)
+        .withStatusCode (&statusCode)
+        .withNumRedirectsToFollow (5)
+        .withHttpRequestCmd("POST")
+    ));
 
 
     if (webStream == nullptr)
@@ -322,7 +335,7 @@ void BugReportPanel::sendTicketAndUpdate()
 	updateComponentsForSpecificStep (reportSentOk);
 }
 
-URL BugReportPanel::createURLForTicket (const String& boundary)
+URL BugReportPanel::createURLForTicket (const String&)
 {
     URL happyFoxURL;
     happyFoxURL = happyFoxURL.withNewDomainAndPath ("https://enhancia.happyfox.com/api/1.1/json/tickets/");

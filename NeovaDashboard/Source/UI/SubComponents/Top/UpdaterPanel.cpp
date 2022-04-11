@@ -136,6 +136,17 @@ void UpdaterPanel::buttonClicked (Button* bttn)
         }
     }
 }
+
+bool UpdaterPanel::keyPressed (const KeyPress& key)
+{
+    if (key == neova_dash::keyboard_shortcut::closeWindow)
+    {
+        closeAndResetPanel();
+    }
+
+    return false;
+}
+
 void UpdaterPanel::resetAndOpenPanel (bool updateIsRequired)
 {
     if (currentProgress != inProgress)
@@ -146,6 +157,9 @@ void UpdaterPanel::resetAndOpenPanel (bool updateIsRequired)
                                                                                              : noDownloadAvailable);
 
         setVisible (true);
+        if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+            grabKeyboardFocus ();
+        }
     }
 }
 

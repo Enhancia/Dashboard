@@ -27,6 +27,7 @@ public:
         outdatedFirmware = 1,
         noUploadQuitting,
         upgradePending,
+        factoryReset,
         unknown
     };
 
@@ -43,6 +44,7 @@ public:
 
     //==============================================================================
     void buttonClicked (Button* bttn) override;
+    bool keyPressed (const KeyPress& key) override;
 
     //==============================================================================
     static DashAlertPanel* createSpecificAlertPanel (SpecificReturnValue panelType);

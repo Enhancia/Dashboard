@@ -117,6 +117,7 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 
 	else if (bttn == okButton.get())
 	{
+		unfocusAllComponents();
 		if (currentState == preInstallationWarning)
 		{
 			jassert (currentUpgrade != none);
@@ -147,11 +148,24 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 	}
 }
 
+bool FirmUpgradePanel::keyPressed (const KeyPress& key)
+{
+    if (key == neova_dash::keyboard_shortcut::closeWindow)
+    {
+        closeAndResetPanel ();
+    }
+
+    return false;
+}
+
 void FirmUpgradePanel::setAndOpenPanel()
 {
 	currentUpgrade = none;
 	updateComponentsForSpecificState (checkingReleases);
 	setVisible (true);
+    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+        grabKeyboardFocus ();
+    }
 }
 
 void FirmUpgradePanel::closeAndResetPanel()

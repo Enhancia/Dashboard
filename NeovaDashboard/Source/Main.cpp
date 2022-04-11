@@ -43,7 +43,7 @@ public:
     bool moreThanOneInstanceAllowed() override       { return false; }
 
     //==============================================================================
-    void initialise (const String& commandLine) override
+    void initialise (const String&) override
     {
         dashboardLogger.reset (FileLogger::createDefaultAppLogger ("Enhancia/NeovaDashboard/Logs/",
                                                               "neovaDashLog.txt",
@@ -107,7 +107,7 @@ public:
         quit();
     }
 
-    void anotherInstanceStarted (const String& commandLine) override
+    void anotherInstanceStarted (const String&) override
     {
     }
 
@@ -342,7 +342,8 @@ public:
                               upgradeRing,
                               uploadConfigToHub,
                               updatePresetModeState,
-                              checkDashboardUpdate
+                              checkDashboardUpdate,
+							  factoryReset
                            });
     }
 
@@ -378,6 +379,10 @@ public:
                 result.setInfo ("Check Dashboard Update", "Checks the Dashboard for new updates",
                                                           "Dashbaord Update", 0);
                 break;
+			case factoryReset:
+				result.setInfo ("Factory Reset", "Perform a factory reset",
+					"Hub Reset", 0);
+				break;
             default:
                 break;
         }
@@ -398,6 +403,7 @@ public:
 				memcpy(data + 8, &ctrl, sizeof(uint32_t));
 				dashPipe->sendString(data, 12);
 				return true;
+
             case uploadConfigToHub:
             	if (hubConfig.getConfigWasInitialized())
             	{
@@ -408,9 +414,11 @@ public:
 					dashPipe->sendString(data, 12 + hubConfig.CONFIGSIZE);
 				}
 				return true;
+
             case upgradeHub:
                 upgradeHandler->launchUpgradeProcedure();
                 return true;
+
 			case updatePresetModeState:
 			{
 				uint8_t newState = (uint8_t)dashInterface->getPresetModeState();
@@ -427,9 +435,13 @@ public:
 
             case checkDashboardUpdate:
             	updater->checkForNewAvailableVersion();
-            	
             	commandManager.invokeDirectly (neova_dash::commands::openDashboardUpdatePanel, true);
             	return true;
+
+			case factoryReset:
+				hubConfig.setDefaultConfig ();
+				dashInterface->update ();
+				return true;
 
             default:
                 return false;

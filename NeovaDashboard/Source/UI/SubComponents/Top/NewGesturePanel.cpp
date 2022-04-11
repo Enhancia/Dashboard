@@ -64,6 +64,10 @@ void NewGesturePanel::paint (Graphics& g)
 
     g.setGradientFill (gradOut);
     g.drawRoundedRectangle (panelArea.toFloat(), 10.0f, 1.0f);
+
+    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+        grabKeyboardFocus ();
+    }
 }
 
 void NewGesturePanel::resized()
@@ -137,6 +141,16 @@ void NewGesturePanel::buttonClicked (Button* bttn)
     }
 }
 
+bool NewGesturePanel::keyPressed (const KeyPress& key)
+{
+    if (key == neova_dash::keyboard_shortcut::closeWindow)
+    {
+        hidePanel (true);
+    }
+
+    return false;
+}
+
 void NewGesturePanel::createNewGesture()
 {
     using namespace neova_dash::gesture;
@@ -145,10 +159,10 @@ void NewGesturePanel::createNewGesture()
     updateInterface();
 }
 
-void NewGesturePanel::labelTextChanged (Label* lbl)
+void NewGesturePanel::labelTextChanged (Label*)
 {
 }
-void NewGesturePanel::editorShown (Label* lbl, TextEditor& ed)
+void NewGesturePanel::editorShown (Label*, TextEditor&)
 {
 }
 
@@ -311,12 +325,12 @@ void NewGesturePanel::GestureTypeSelector::resized()
 {
 }
 
-void NewGesturePanel::GestureTypeSelector::mouseEnter (const MouseEvent &event)
+void NewGesturePanel::GestureTypeSelector::mouseEnter (const MouseEvent &)
 {
     setHighlighted (true);
     repaint();
 }
-void NewGesturePanel::GestureTypeSelector::mouseExit (const MouseEvent &event)
+void NewGesturePanel::GestureTypeSelector::mouseExit (const MouseEvent &)
 {
     setHighlighted (false);
     repaint();

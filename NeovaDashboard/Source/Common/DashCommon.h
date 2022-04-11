@@ -34,6 +34,7 @@ namespace neova_dash
             uploadConfigToHub           = 0x00000004, // Uploads config to HUB
             updatePresetModeState       = 0x00000005, // Updates the backend preset mode to fit the interface
             checkDashboardUpdate        = 0x00000006, // checks database for new dashboard updates
+            factoryReset                = 0x00000007,
 
             // Frontend commands
             updateDashInterface             = 0x01000001, // Updates Dash interface to match the HUB data
@@ -44,7 +45,9 @@ namespace neova_dash
             openFirmUpgradePanel            = 0x01000006, // Launches the firm upgrade panel
             openDashboardUpdatePanel        = 0x01000007, // Launches the soft update panel
             checkAndUpdateNotifications     = 0x01000008, // Updates and looks for data that should trigger notifications on the interface
-            openBugReportPanel              = 0x01000009  // Launches the bug report panel
+            openBugReportPanel              = 0x01000009, // Launches the bug report panel
+            openFactoryResetPanel           = 0x01000010,  // Launches the factory reset panel
+            disallowUserToFlashHub          = 0x01000011,
     	};
     };
 
@@ -128,7 +131,6 @@ namespace neova_dash
             if (rawBatteryValue < 3.46f && !isCharging) return 0.0f;
             else if (rawBatteryValue > 4.12 && isCharging) return 1.0f;
 
-            const float cutThresh = 3.46f;
             Array<float> batteryTiers ( {3.52f, 3.58f, 3.61f, 3.64f,
                                          3.69f, 3.76f, 3.84f, 3.92f, 4.01f, 4.12f});
 
@@ -285,6 +287,8 @@ namespace neova_dash
 
     namespace keyboard_shortcut
     {
+        const KeyPress closeWindow           (KeyPress::escapeKey);
+
         const KeyPress selectGestureLeft     (KeyPress::leftKey);
         const KeyPress selectGestureRight    (KeyPress::rightKey);
         const KeyPress selectGestureUp       (KeyPress::upKey);
