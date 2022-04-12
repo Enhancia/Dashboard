@@ -110,12 +110,12 @@ void HubConfiguration::toggleMidiChannel (const int channelNumber, bool isMidiIn
     uint16_t& midiChannels = isMidiInput ? getPresetData().midiChannelsIn
                                          : getPresetData().midiChannelsOut;
 
-	if (getNumActiveMidiChannels (isMidiInput) == 1 && std::log2 (midiChannels) == channelNumber)
-	{
-		// TODO ajout message d'erreur log (décommenter & tester)
-		// neova_dash::log::writeToLog ("Cannot have 0 active midi channels.", neova_dash::log::hubConfiguration);
-		return;
-	}
+    if (isMidiInput)
+        if (getNumActiveMidiChannels (true) == 0 && std::log2 (midiChannels) == channelNumber)
+            return;
+    else
+        if (getNumActiveMidiChannels (false) == 1 && std::log2 (midiChannels) == channelNumber)
+            return;
     
     midiChannels ^= (1 << channelNumber);
 
