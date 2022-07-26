@@ -33,7 +33,7 @@ public:
         It then downloads the file using the redirect URL instead, with no HTTP headers.
         
     */
-    static URL::DownloadTask* downloadAsset (const URL& assetURL, const File& fileToDownloadTo, URL::DownloadTask::Listener* listenerPtr);
+    static std::unique_ptr<URL::DownloadTask> downloadAsset (const URL& assetURL, const File& fileToDownloadTo, URL::DownloadTask::Listener* listenerPtr);
     
 private:
     /**

@@ -5,6 +5,9 @@
 
   ==============================================================================
 */
+#include "../../JuceLibraryCode/JuceHeader.h"
+
+#if (JUCE_WINDOWS || defined(__OBJC__))
 
 #include "DataReader.h"
 
@@ -16,7 +19,7 @@ DataReader::DataReader (ApplicationCommandManager& manager, HubConfiguration& co
     connected = false;
     
     // Data initialization
-    data = new StringArray (StringArray::fromTokens ("0 0 0 0 0 0", " ", String()));
+    data = std::make_unique<StringArray> (StringArray::fromTokens ("0 0 0 0 0 0", " ", String()));
 
     for (int i=0; i<neova_dash::data::numDatas; i++)
     {
@@ -42,6 +45,8 @@ DataReader::~DataReader()
   #if JUCE_MAC
     statutPipe = nullptr;
   #endif
+    
+    disconnect();
 }
 
 //==============================================================================
@@ -61,6 +66,9 @@ void DataReader::timerCallback()
     {
         hubConfig.setRingIsConnected (false);
         commandManager.invokeDirectly (neova_dash::commands::updateDashInterface, true);
+
+        neova_dash::log::writeToLog ("Ring disconnected",
+                                     neova_dash::log::hubCommunication);
     }
 
     stopTimer();
@@ -81,6 +89,18 @@ bool DataReader::readData (String s)
         {
             hubConfig.setRingIsConnected (true);
             commandManager.invokeDirectly (neova_dash::commands::setStateAndUpdateDashInterface, true);
+            
+			Timer::callAfterDelay (300, [this]() {
+				neova_dash::log::writeToLog ("Ring connected : " + hubConfig.getRingFirmwareVersionString (), neova_dash::log::hubCommunication);
+				});
+
+			Timer::callAfterDelay (10000, [this]()
+				{
+					neova_dash::log::writeToLog ("Battery level : raw " +
+						std::to_string (this->getBatteryLevel (true)) +
+						" - percent " + std::to_string (this->getBatteryLevel (false)), neova_dash::log::hubCommunication);
+				});
+
         }
         // Ring was in chargeMode
         else if (hubConfig.getRingIsCharging())
@@ -115,6 +135,18 @@ bool DataReader::readData (String s)
             hubConfig.setRingIsCharging (true);
             commandManager.invokeDirectly (neova_dash::commands::setStateAndUpdateDashInterface, true);
             commandManager.invokeDirectly (neova_dash::commands::updateBatteryDisplay, true);
+
+
+			Timer::callAfterDelay (300, [this]() {
+				neova_dash::log::writeToLog ("Ring connected : " + hubConfig.getRingFirmwareVersionString (), neova_dash::log::hubCommunication);
+				});
+
+			Timer::callAfterDelay (10000, [this]()
+				{
+					neova_dash::log::writeToLog ("Battery level : raw " +
+						std::to_string (this->getBatteryLevel (true)) +
+						" - percent " + std::to_string (this->getBatteryLevel (false)), neova_dash::log::hubCommunication);
+				});
         }
 
         // Notifies Ring wasn't charging
@@ -145,6 +177,22 @@ const float& DataReader::getFloatValueReference (const neova_dash::data::HubData
     if (dataId == neova_dash::data::numDatas) return floatData.getReference (int (neova_dash::data::battery));
 
     return floatData.getReference (int (dataId));
+}
+
+/**
+ * @brief Return battery level
+ * @param rawOrPercent 
+ * @return if param is true return raw, else return percent
+*/
+float DataReader::getBatteryLevel (bool rawOrPercent)
+{
+	auto rawBattery = getFloatValueReference (neova_dash::data::battery);
+	auto percentBattery = neova_dash::data::convertRawBatteryToPercentage(rawBattery, hubConfig.getRingIsCharging());
+
+    if(rawOrPercent)
+	    return rawBattery;
+    else
+        return percentBattery;
 }
 
 bool DataReader::getRawDataAsFloatArray(Array<float>& arrayToFill)
@@ -181,6 +229,7 @@ bool DataReader::connectToExistingPipe(int nbPipe)
     //create namedpipe  with currentUID to enable multi user session
     return connectToPipe("mynamedpipe" + String (currentUID) + String(nbPipe), -1);
   #elif JUCE_WINDOWS
+    ignoreUnused (nbPipe);
 	return false;
   #endif
 }
@@ -232,5 +281,9 @@ void DataReader::changeListenerCallback (ChangeBroadcaster * source)
     connectToExistingPipe(nbPipeToConnect);
     statutPipe->disconnect();
     statutPipe.reset();
+  #else
+    ignoreUnused (source);
   #endif
 }
+
+#endif //JUCE WIN || OBJC

@@ -59,6 +59,7 @@ public:
     void editorHidden (Label* lbl, TextEditor& ted) override;
     void sliderValueChanged (Slider* sldr) override;
     void buttonClicked (Button* bttn) override;
+    void buttonStateChanged (Button* btn) override;
 
     //==============================================================================
     void mouseDown (const MouseEvent& e) override;
@@ -110,12 +111,12 @@ private:
     //==============================================================================
     const Range<float> parameterMax;
     
-    ScopedPointer<Slider> lowSlider;
-    ScopedPointer<Slider> highSlider;
-    ScopedPointer<Label> rangeLabelMin;
-    ScopedPointer<Label> rangeLabelMax;
-    ScopedPointer<TextButton> minAngleButton;
-    ScopedPointer<TextButton> maxAngleButton;
+    std::unique_ptr<Slider> lowSlider;
+    std::unique_ptr<Slider> highSlider;
+    std::unique_ptr<Label> rangeLabelMin;
+    std::unique_ptr<Label> rangeLabelMax;
+    std::unique_ptr<TextButton> minAngleButton;
+    std::unique_ptr<TextButton> maxAngleButton;
     
     //==============================================================================
     TunerStyle tunerStyle;
@@ -128,6 +129,8 @@ private:
     juce::Point<int> sliderCentre;
     float startAngle;
     float endAngle;
+    bool maxAngleBtnIsHovered = false;
+    bool minAngleBtnIsHovered = false;
 
     //==============================================================================
     HubConfiguration& hubConfig;

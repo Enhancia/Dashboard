@@ -5,6 +5,9 @@
 
   ==============================================================================
 */
+#include "../../JuceLibraryCode/JuceHeader.h"
+
+#if (JUCE_WINDOWS || defined(__OBJC__))
 
 #include "dashPipe.h"
 
@@ -23,20 +26,18 @@ DashPipe::DashPipe(): InterprocessConnection (true, 0x6a6d626e)
 
 DashPipe::~DashPipe()
 {
-	TRACE_IN;
+	   disconnect();
 }
 
 //==============================================================================
 void DashPipe::paint (Graphics& g)
 {
-	TRACE_IN;
 	g.fillAll (Colour (0x42000000));
 }
 
 void DashPipe::resized()
 {
-	TRACE_IN;
-}
+	}
 
 //==============================================================================
 bool DashPipe::readData (String s)
@@ -51,13 +52,13 @@ bool DashPipe::readData (String s)
         return true;
     }
     */
-	TRACE_IN;
-	return false;
+		return false;
 }
 
 const String DashPipe::getRawData (int index)
 {
-	TRACE_IN;
+    ignoreUnused (index);
+
 	String test = "test";
 	return test;
 	//return (*data)[index];
@@ -65,7 +66,6 @@ const String DashPipe::getRawData (int index)
 
 void DashPipe::getDataBuffer(uint8_t * buffer, int bytesToRead)
 {
-	TRACE_IN;
 	if (bytesToRead <= DATABUFFERSIZE)
 	{
 		memcpy(buffer, dataBuffer, bytesToRead);
@@ -74,8 +74,8 @@ void DashPipe::getDataBuffer(uint8_t * buffer, int bytesToRead)
 
 bool DashPipe::getRawDataAsFloatArray(Array<float>& arrayToFill)
 {
-	TRACE_IN;
-	/*
+    ignoreUnused (arrayToFill);
+		/*
 	// Checks that the array has the right amont and type of data
     if (arrayToFill.isEmpty() == false) return false;
     
@@ -93,17 +93,13 @@ bool DashPipe::getRawDataAsFloatArray(Array<float>& arrayToFill)
 //==============================================================================
 void  DashPipe::sendString(uint8_t * data, int data_size)
 {
-	TRACE_IN;
-	bool test = sendMessage(MemoryBlock(data, data_size));
+		bool test = sendMessage(MemoryBlock(data, data_size));
     DBG("Send string return :" + String(int(test)));
 }
 
 //==============================================================================
 bool DashPipe::connectToExistingPipe()
 {
-	TRACE_IN;
-	
-    
     #if JUCE_MAC
         //get current userID
         uid_t currentUID;
@@ -119,14 +115,12 @@ bool DashPipe::connectToExistingPipe()
 
 bool DashPipe::isConnected()
 {
-	TRACE_IN;
 	return connected;
 }
 
 //==============================================================================
 void DashPipe::connectionMade()
 {
-	TRACE_IN;
 	connected = true;
     
     #if JUCE_MAC
@@ -138,7 +132,6 @@ void DashPipe::connectionMade()
 
 void DashPipe::connectionLost()
 {
-	TRACE_IN;
 	connected = false;
     
     #if JUCE_MAC
@@ -150,7 +143,6 @@ void DashPipe::connectionLost()
 
 void DashPipe::messageReceived (const MemoryBlock &message)
 {
-	TRACE_IN;
 	uint64_t jeannine = *(uint64_t*)message.getData();
 	if (jeannine == 0x656E696E6E61656A && message.getSize() < DATABUFFERSIZE)
 	{
@@ -162,3 +154,5 @@ void DashPipe::messageReceived (const MemoryBlock &message)
 		Logger::writeToLog("Hub message : Error");
 	}
 }
+
+#endif // JUCE WIN || OBJC

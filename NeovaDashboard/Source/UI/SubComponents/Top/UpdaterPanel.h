@@ -43,6 +43,7 @@ public:
 
     //==============================================================================
     void buttonClicked (Button* bttn) override;
+    bool keyPressed (const KeyPress& key) override;
 
     //==============================================================================
     void resetAndOpenPanel (bool updateIsRequired = false);
@@ -60,6 +61,7 @@ private:
     std::unique_ptr<Label> titleLabel;
     std::unique_ptr<DashShapeButton> closeButton;
     std::unique_ptr<TextButton> bottomButton;
+    std::unique_ptr<TextButton> viewNotesButton;
 
     //==============================================================================
     downloadProgress currentProgress = downloadAvailable;

@@ -18,8 +18,6 @@ HubComponent::HubComponent (HubConfiguration& config, NewGesturePanel& newGest,
     : hubConfig (config), commandManager (manager),
       newGesturePanel (newGest), presetModeState (presetState), dashboardState (dashState)
 {
-	TRACE_IN;
-
 	currentPreset = hubConfig.getSelectedPreset();
 
 	// Creates Bottom Buttons And Lights
@@ -41,8 +39,6 @@ HubComponent::HubComponent (HubConfiguration& config, NewGesturePanel& newGest,
 
 HubComponent::~HubComponent()
 {
-	TRACE_IN;
-
 	for (int i =0; i < buttons.size(); i++)
 	{
 		buttons[i]->removeListener (this);
@@ -294,10 +290,10 @@ void HubComponent::GestureLED::paint (Graphics& g)
 	g.setGradientFill (lightingGrad);
 	g.fillEllipse (ledArea.withSizeKeepingCentre (ledArea.getWidth()*lightingSizePercent, ledArea.getHeight()*lightingSizePercent)
 						  /*.translated (lightingDeltaX, lightingDeltaY)*/);
-  
-	ColourGradient shadowGrad (Colours::black.withAlpha (0.8f), getLocalBounds().getCentre().toFloat(),
-							   Colours::black.withAlpha (0.0f), getLocalBounds().getCentre().translated (0, ledArea.getWidth()/3).toFloat(),
-							   true);
+
+	ColourGradient shadowGrad(Colours::black.withAlpha(0.8f), getLocalBounds().getCentre().toFloat(),
+							  Colours::black.withAlpha(0.0f), getLocalBounds().getCentre().translated(0, static_cast<int>(ledArea.getWidth() / 3)).toFloat(),
+							  true);
 	shadowGrad.addColour (0.6, Colours::black.withAlpha (0.15f));
 	g.setGradientFill (shadowGrad);
 	g.fillEllipse (ledArea);
@@ -316,9 +312,9 @@ void HubComponent::GestureLED::paint (Graphics& g)
 			                  hubConfig.getGestureData (id).on == 0 ? false : true);
 		}
 
-		ColourGradient ledGrad (ledColour.withAlpha (0.4f), getLocalBounds().getCentre().toFloat(),
-								ledColour.withAlpha (0.0f), getLocalBounds().getCentre().translated (0, ledArea.getWidth()/2).toFloat(),
-								true);
+		ColourGradient ledGrad(ledColour.withAlpha(0.4f), getLocalBounds().getCentre().toFloat(),
+							   ledColour.withAlpha(0.0f), getLocalBounds().getCentre().translated(0, static_cast<int>(ledArea.getWidth() / 2)).toFloat(),
+							   true);
 
 		g.setColour (ledColour);
 		g.fillEllipse (Rectangle<float>(ledArea.getWidth()/4, ledArea.getWidth()/4).withCentre (ledArea.getCentre()));

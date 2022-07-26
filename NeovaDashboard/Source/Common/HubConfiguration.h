@@ -48,9 +48,11 @@ public:
 
     struct PresetData
     {
-        uint16_t align_to_word;
+        PresetData() = default;
+        PresetData (PresetData& other);
 
-        uint16_t midiChannels = 1;
+        uint16_t midiChannelsIn = 0xffff;
+        uint16_t midiChannelsOut = 1;
 
     	GestureData gestureData0;
     	GestureData gestureData1;
@@ -66,7 +68,7 @@ public:
 		uint16_t ring_firmware_version;
 
 		uint8_t active_preset = 0; //Ne sert à rien pour l'instant juste pour s'aligner au buffer du zub
-		uint8_t midiChannel = 0;
+		uint8_t midi_thru = int (thruOff);
 
     	PresetData presetData0;
     	PresetData presetData1;
@@ -95,6 +97,13 @@ public:
     	gestureParam3,
     	gestureParam4,
     	gestureParam5
+    };
+
+    enum midiThruId
+    {
+        thruAdd= 0,
+        thruOff,
+        thruPure
     };
 
     //==============================================================================
@@ -133,9 +142,11 @@ public:
     void swapGestures (const int id1, const int id2);
     
     //==============================================================================
-    void setPreset (const int gestureNumberToSelect);
-	void setPreset (const int gestureNumberToSelect, bool uploadToHub);
+    void setPreset (const int presetNumberToSelect);
+	void setPreset (const int presetNumberToSelect, bool uploadToHub);
     const int getSelectedPreset();
+    void clearPreset (const int presetNumberToClear, const bool uploadToHub = true);
+    void duplicatePreset (const int idToDuplicateFrom, const int idToDuplicateTo,  const bool uploadToHub = true);
 
     PresetData& getPresetData (const int presetNumber);
     PresetData& getPresetData();
@@ -158,10 +169,14 @@ public:
     const int getSelectedGesture();
 
     //==============================================================================
-    void setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool uploadToHub = true);
-    void setMidiChannelExclusive (const int channelNumber, bool uploadToHub = true);
-    void toggleMidiChannel (const int channelNumber, bool uploadToHub = true);
-    int getMidiChannels();
+    void setMidiChannel (const int channelNumber, bool shouldChannelBeOn, bool isMidiInput = false, bool uploadToHub = true);
+    void setMidiChannelExclusive (const int channelNumber, bool isMidiInput = false, bool uploadToHub = true);
+    void toggleMidiChannel (const int channelNumber, bool isMidiInput = false, bool uploadToHub = true);
+    int getMidiChannels (bool isMidiInput = false);
+    const int getNumActiveMidiChannels (bool isMidiInput = false);
+    void setMidiThrough (bool shouldUseThrough, bool uploadToHub = true);
+    int getMidiThrough();
+
 
     //==============================================================================
     //const neova_dash::gesuture::GestureType getGestureType (const int gestureNumber, const int presetNumber);
@@ -187,9 +202,9 @@ public:
     bool isWaitingForRingCompatibility();
     void stopWaitingForRingCompatibility();
 
+    void setDefaultConfig();
 private:
     //==============================================================================
-    void setDefaultConfig(); // TEST PURPOSE!! Maybe TO DELETE since the dashboard should match the hub anyways..
 
     void setGestureData (int presetNum, int gestureNum,
                                         uint8 newOn,
@@ -198,6 +213,7 @@ private:
                                         uint8 newMidiHigh,
                                         uint8 newCc,
                                         uint8 newMidiType,
+                                        bool newReverse = false,
                                         bool uploadToHub = false);
 
 
@@ -211,7 +227,7 @@ private:
 
     int findClosestIdToDuplicate (int idToDuplicateFrom, bool prioritizeHigherId);
     bool isIdAvailable (const int idToCheck);
-    const int findAvailableUndefinedCC();
+    const int findNextAvailableCC();
 
     //==============================================================================
 	ApplicationCommandManager& commandManager = getCommandManager();

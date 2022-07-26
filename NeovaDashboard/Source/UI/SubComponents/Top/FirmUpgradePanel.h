@@ -59,7 +59,7 @@ public:
 	};
 
     //==============================================================================
-    FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler, ApplicationCommandManager& manager);
+    FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler, ApplicationCommandManager& manager, DataReader& dataReaderRef);
     ~FirmUpgradePanel();
 
     //==============================================================================
@@ -71,6 +71,7 @@ public:
 
     //==============================================================================
     void buttonClicked (Button* bttn) override;
+    bool keyPressed (const KeyPress& key) override;
 
     //==============================================================================
     void setAndOpenPanel();
@@ -108,6 +109,7 @@ private:
     UpgradeHandler& upgradeHandler;
     HubConfiguration& hubConfig;
     ApplicationCommandManager& commandManager;
+    DataReader& dataReader;
     UpgradeState currentState = checkingReleases; // Follows upgradeHandler upgradeState enum
     FirmUpgradeType currentUpgrade = none; // Follows upgradeHandler upgradeState enum
 

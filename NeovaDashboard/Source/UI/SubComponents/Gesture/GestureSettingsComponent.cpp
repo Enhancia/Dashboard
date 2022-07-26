@@ -14,8 +14,6 @@ GestureSettingsComponent::GestureSettingsComponent (const int gestId, HubConfigu
                                                     ApplicationCommandManager& manager, DataReader& reader)
 	: gestureId (gestId), hubConfig (config), commandManager (manager), dataReader (reader)
 {
-    TRACE_IN;
-
 	createTuner();
 	createToggles();
     createMidiPanel();
@@ -23,8 +21,6 @@ GestureSettingsComponent::GestureSettingsComponent (const int gestId, HubConfigu
 
 GestureSettingsComponent::~GestureSettingsComponent()
 {
-    TRACE_IN;
-
     gestTuner = nullptr;
 	midiPanel = nullptr;
 }

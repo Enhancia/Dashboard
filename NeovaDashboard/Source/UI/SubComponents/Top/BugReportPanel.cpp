@@ -125,7 +125,17 @@ void BugReportPanel::buttonClicked (Button* bttn)
 	}
 }
 
-void BugReportPanel::labelTextChanged (Label* lbl)
+bool BugReportPanel::keyPressed (const KeyPress& keyArg)
+{
+    if (keyArg == neova_dash::keyboard_shortcut::closeWindow)
+    {
+        closeAndResetPanel ();
+    }
+
+    return false;
+}
+
+void BugReportPanel::labelTextChanged (Label*)
 {
 	checkFormEntry();
 
@@ -137,6 +147,9 @@ void BugReportPanel::resetAndOpenPanel()
 {
 	updateComponentsForSpecificStep (newReport);
 	setVisible (true);
+    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+        grabKeyboardFocus ();
+    }
 }
 
 void BugReportPanel::closeAndResetPanel()
@@ -285,15 +298,15 @@ void BugReportPanel::sendTicketAndUpdate()
     int statusCode;
     StringPairArray responseHeaders;
 
-    std::unique_ptr<InputStream> webStream (ticketURL.createInputStream (true,
-                                                                           nullptr,
-                                                                           nullptr,
-                                                                           headers,
-                                                                           10000,
-                                                                           &responseHeaders,
-                                                                           &statusCode,
-                                                                           5,
-                                                                           "POST"));
+    const std::unique_ptr<InputStream> webStream (ticketURL.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+        .withProgressCallback (nullptr)
+        .withExtraHeaders (headers)
+        .withConnectionTimeoutMs (10000)
+        .withResponseHeaders (&responseHeaders)
+        .withStatusCode (&statusCode)
+        .withNumRedirectsToFollow (5)
+        .withHttpRequestCmd("POST")
+    ));
 
 
     if (webStream == nullptr)
@@ -322,15 +335,10 @@ void BugReportPanel::sendTicketAndUpdate()
 	updateComponentsForSpecificStep (reportSentOk);
 }
 
-URL BugReportPanel::createURLForTicket (const String& boundary)
+URL BugReportPanel::createURLForTicket (const String&)
 {
     URL happyFoxURL;
-
-    #if JUCE_WINDOWS
     happyFoxURL = happyFoxURL.withNewDomainAndPath ("https://enhancia.happyfox.com/api/1.1/json/tickets/");
-    #elif JUCE_MAC
-    happyFoxURL = happyFoxURL.withNewDomainAndPath ("http://enhancia.happyfox.com/api/1.1/json/tickets/"); // TODO change when we have SSL certificate
-    #endif
 
     // Fills file array
     Array<File> filesToAttach;
@@ -392,6 +400,8 @@ void BugReportPanel::getFilestoAttach (Array<File>& fileArrayToFill)
 	// NRFUTIL Log File
 	fileStrings.add (File::getSpecialLocation (File::userApplicationDataDirectory).getFullPathName()
 							+ "\\Enhancia\\NeovaDashboard\\Logs\\nrfutilErr.log");
+	fileStrings.add (File::getSpecialLocation (File::userApplicationDataDirectory).getFullPathName()
+							+ "\\Enhancia\\NeovaDashboard\\Logs\\nrfutilOut.log");
 	// Daemon Log File
 	fileStrings.add (File::getSpecialLocation (File::globalApplicationsDirectoryX86).getFullPathName()
 							+ "\\Enhancia\\Enhancia_Service_Reader\\Enhancia_Service_Reader_Log.txt");
@@ -404,9 +414,13 @@ void BugReportPanel::getFilestoAttach (Array<File>& fileArrayToFill)
 	// NRFUTIL Log File
 	fileStrings.add (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName()
 							+ "/Logs/Enhancia/NeovaDashboard/Logs/nrfutilErr.txt");
+	fileStrings.add (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName()
+							+ "/Logs/Enhancia/NeovaDashboard/Logs/nrfutilOut.txt");
 	// Daemon Log File
 	fileStrings.add (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName()
 							+ "/Caches/DaemonSeriaPort_MacOS/EnhanciaDaemonlog.txt");
+	fileStrings.add (File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName()
+							+ "/Caches/DaemonSeriaPort_MacOS/EnhanciaDaemonlog_previous.txt");
 
 	#endif
 

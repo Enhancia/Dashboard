@@ -39,6 +39,7 @@ public:
     // Component
     void paint (Graphics&) override;
     void paintOverChildren (Graphics&) override;
+    void paintDragAndDropSnapshot (Graphics& g);
     void resized() override;
     
     //==============================================================================
@@ -71,12 +72,13 @@ private:
 
     //==============================================================================
     void createMenuForGestureId (int id);
+    static void menuCallback (int result, GesturePanel* gPanel, int id);
     void handleMenuResult (int gestureId, const int menuResult);
     void handleLeftClickUp (const MouseEvent &event);
     void handleLeftClickDrag (const MouseEvent &event);
 
     //==============================================================================
-    void startDragMode (int slotBeingDragged);
+    void startDragMode (GestureComponent& gestureComponent);
     void endDragMode();
 
     //==============================================================================
@@ -104,6 +106,9 @@ private:
     bool dragMode = false;
     int draggedGestureComponentId = -1;
     int draggedOverSlotId = -1;
+
+    juce::Rectangle<int> draggedImgPosition;
+    const int64 hashCode = 420;
 
     //==============================================================================
     HubConfiguration& hubConfig;

@@ -18,8 +18,6 @@ GesturePanel::GesturePanel (HubConfiguration& data, DataReader& reader,
                               newGesturePanel (newGest),commandManager (manager),
                               freq (freqHz)
 {
-    TRACE_IN;
-
     setComponentID ("gesturePanel");
 
     gestureSettings = std::make_unique<GestureSettingsComponent> (int (hubConfig.getGestureData
@@ -35,8 +33,7 @@ GesturePanel::GesturePanel (HubConfiguration& data, DataReader& reader,
 
 GesturePanel::~GesturePanel()
 {
-    TRACE_IN;
-
+    
     stopTimer();
     unselectCurrentGesture();
     newGesturePanel.hidePanel (true);
@@ -107,7 +104,7 @@ void GesturePanel::paintShadows (Graphics& g)
     shadow.drawForPath (g, shadowPath);
 }
 
-void GesturePanel::paintOverChildren (Graphics&)
+void GesturePanel::paintOverChildren (Graphics& g)
 {
     /* TODO paint the component snapshot during a drag.
        Get a snapshot of the component being dragged (might wanna cache it so it is not 
@@ -120,7 +117,17 @@ void GesturePanel::paintOverChildren (Graphics&)
         //g.drawImage (gestureComponentImage, Rectangle_that_is_the_size_of_the_image);
     }
     */
+
+    paintDragAndDropSnapshot (g);
 }
+
+void GesturePanel::paintDragAndDropSnapshot (Graphics& g)
+{
+    if (ImageCache::getFromHashCode (hashCode).isValid ()) {
+        g.setOpacity (0.4f);
+        g.drawImage (ImageCache::getFromHashCode (hashCode), draggedImgPosition.toFloat ());
+    }
+} 
 
 void GesturePanel::resized()
 {
@@ -181,9 +188,16 @@ void GesturePanel::mouseDrag (const MouseEvent& event)
         if (auto* gestureComponent = dynamic_cast<GestureComponent*> (relativeEvent.originalComponent))
         {
             if (!dragMode)
-            {
-                startDragMode (gestureComponent->id);
-            }
+                startDragMode (*gestureComponent);
+
+            repaint (draggedImgPosition);
+
+            draggedImgPosition.setPosition (
+                static_cast<int> (relativeEvent.position.getX () - gestureComponent->getWidth () / 2.0f),
+                static_cast<int> (relativeEvent.position.getY () - gestureComponent->getHeight () / 2.0f)
+            );
+
+            repaint (draggedImgPosition);
 
 			int formerDraggedOverId = draggedOverSlotId;
 
@@ -446,7 +460,7 @@ void GesturePanel::swapGestures (int firstId, int secondId)
 {
     bool mustChangeSelection = (hubConfig.getSelectedGesture() == firstId
                                 || hubConfig.getSelectedGesture() == secondId);
-    int idToSelect;
+    int idToSelect = 0;
 
     if (mustChangeSelection)
     {
@@ -600,11 +614,19 @@ void GesturePanel::createMenuForGestureId (int id)
     gestureMenu.addItem (2, "Delete", true);
     gestureMenu.addItem (3, (hubConfig.getGestureData (id).on == 1) ? "Mute" : "Unmute", true);
     
-    handleMenuResult (id,
-                      gestureMenu.showMenu (PopupMenu::Options().withParentComponent (getParentComponent())
+    gestureMenu.showMenuAsync (PopupMenu::Options().withParentComponent (getParentComponent())
                                                                 .withMaximumNumColumns (3)
                                                                 .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
-                                                                .withStandardItemHeight (20)));
+                                                                .withStandardItemHeight (20),
+                               ModalCallbackFunction::forComponent (menuCallback, this, id));
+}
+
+void GesturePanel::menuCallback (int result, GesturePanel* gPanel, int id)
+{
+    if (gPanel != nullptr)
+    {
+        gPanel->handleMenuResult (id, result);
+    }
 }
 
 void GesturePanel::handleMenuResult (int gestureId, const int menuResult)
@@ -630,16 +652,23 @@ void GesturePanel::handleMenuResult (int gestureId, const int menuResult)
     }
 }
 
-void GesturePanel::startDragMode (int slotBeingDragged)
+void GesturePanel::startDragMode (GestureComponent& gestureComponent)
 {
     dragMode = true;
-    draggedGestureComponentId = slotBeingDragged;
+    draggedGestureComponentId = gestureComponent.id;
     draggedOverSlotId = -1;
 
     for (auto* slot : gestureSlots)
     {
         slot->repaint();
     }
+
+    ImageCache::addImageToCache (gestureComponent.createComponentSnapshot (gestureComponent.getLocalBounds (), false), hashCode);
+
+    draggedImgPosition.setSize (
+        ImageCache::getFromHashCode (hashCode).getWidth (),
+        ImageCache::getFromHashCode (hashCode).getHeight ()
+    );
 }
 
 void GesturePanel::endDragMode()
@@ -652,4 +681,7 @@ void GesturePanel::endDragMode()
     {
         slot->repaint();
     }
+
+    ImageCache::releaseUnusedImages ();
+    repaint ();
 }

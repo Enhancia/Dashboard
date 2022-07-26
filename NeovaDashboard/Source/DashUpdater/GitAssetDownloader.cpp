@@ -10,7 +10,7 @@
 
 #include "GitAssetDownloader.h"
 
-URL::DownloadTask* GitAssetDownloader::downloadAsset (const URL& assetURL, const File& fileToDownloadTo,
+std::unique_ptr<URL::DownloadTask> GitAssetDownloader::downloadAsset (const URL& assetURL, const File& fileToDownloadTo,
 																  	   URL::DownloadTask::Listener* listenerPtr)
 {
 	URL serverURL;
@@ -18,7 +18,9 @@ URL::DownloadTask* GitAssetDownloader::downloadAsset (const URL& assetURL, const
 	{
 		jassert (!serverURL.isEmpty() && serverURL.isWellFormed());
 
-		return serverURL.downloadToFile (fileToDownloadTo, "", listenerPtr);
+		return serverURL.downloadToFile (fileToDownloadTo, URL::DownloadTaskOptions()
+			.withListener(listenerPtr)
+		);
 	}
 
 	return nullptr;
@@ -34,9 +36,15 @@ bool GitAssetDownloader::getRedirectURL (const URL& assetURL, URL& redirectURL)
 	StringPairArray responseHeaders;
 
 	// Num redirects to follow is set to 0: no redirect is followed and response headers tell what the redirect URL was.
-    std::unique_ptr<WebInputStream> gitAssetStream (dynamic_cast<WebInputStream*> (assetURL.createInputStream (false, nullptr, nullptr,
-																	 		 		 						   headers, 0, &responseHeaders,
-																	 		 		 						   &status, 0)));
+    const std::unique_ptr<InputStream> gitAssetStream (assetURL.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+        .withProgressCallback (nullptr)
+        .withExtraHeaders (headers)
+        .withConnectionTimeoutMs (1000)
+        .withResponseHeaders (&responseHeaders)
+        .withStatusCode (&status)
+        .withNumRedirectsToFollow (0)
+    ));
+
 	if (gitAssetStream == nullptr || status != 302) // Error or no redirect
 	{
 		if (status == 200)

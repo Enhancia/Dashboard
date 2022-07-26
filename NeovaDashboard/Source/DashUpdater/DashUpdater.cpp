@@ -56,7 +56,7 @@ void DashUpdater::checkForNewAvailableVersion()
     }
 }
 
-void DashUpdater::finished (URL::DownloadTask* task, bool success)
+void DashUpdater::finished (URL::DownloadTask*, bool success)
 {
     state = downloadFinished;
     successful = success;
@@ -69,7 +69,7 @@ void DashUpdater::finished (URL::DownloadTask* task, bool success)
 	DBG ("Download finished " << (successful ? "Successfully" : "Unsuccessfully"));
 }
 
-void DashUpdater::progress (URL::DownloadTask* task,
+void DashUpdater::progress (URL::DownloadTask*,
                             int64 bytesDownloaded,
                             int64 totalLength )
 {
@@ -112,7 +112,7 @@ void DashUpdater::startDownloadProcess()
                                                             fileToDownloadString.fromFirstOccurrenceOf (".", true, true));
     
     //downloadTask.reset (assetURL.downloadToFile (downloadedFile, "\r\nAccept: application/octet-stream\r\n", this));
-    downloadTask.reset (GitAssetDownloader::downloadAsset (fileToDownloadURL, downloadedFile, this));
+    downloadTask = GitAssetDownloader::downloadAsset (fileToDownloadURL, downloadedFile, this);
 }
 
 bool DashUpdater::hasNewAvailableVersion()
@@ -190,9 +190,13 @@ var DashUpdater::fetchRepoJSON()
 {
     // Creating input stream to get file link
     int status;
-    std::unique_ptr<InputStream> urlInStream (REPO_URL.createInputStream (false, nullptr, nullptr,
-                                                                         "Authorization: token " + neova_dash::auth::MACHINE_TOKEN,
-                                                                         1000, nullptr, &status));
+    const std::unique_ptr<InputStream> urlInStream (REPO_URL.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+        .withProgressCallback (nullptr)
+        .withExtraHeaders ("Authorization: token " + neova_dash::auth::MACHINE_TOKEN)
+        .withConnectionTimeoutMs (1000)
+        .withResponseHeaders (nullptr)
+        .withStatusCode (&status)
+    ));
 
     if (urlInStream == nullptr || status != 200)
     {

@@ -11,8 +11,8 @@
 #include "FirmUpgradePanel.h"
 
 //==============================================================================
-FirmUpgradePanel::FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler, ApplicationCommandManager& manager)
-	: hubConfig (config), upgradeHandler (handler), commandManager (manager)
+FirmUpgradePanel::FirmUpgradePanel (HubConfiguration& config, UpgradeHandler& handler, ApplicationCommandManager& manager, DataReader& dataReaderRef)
+	: hubConfig (config), upgradeHandler (handler), commandManager (manager), dataReader(dataReaderRef)
 {
     createLabels();
     createButtons();
@@ -117,11 +117,16 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 
 	else if (bttn == okButton.get())
 	{
+		unfocusAllComponents();
 		if (currentState == preInstallationWarning)
 		{
 			jassert (currentUpgrade != none);
 			if (upgradeHandler.getUpgradeState() != int (checkingReleases))
 				updateComponentsForSpecificState (upgradeHandler.getUpgradeState());
+			
+			neova_dash::log::writeToLog ("Battery level before upgrade : raw " +
+				std::to_string (dataReader.getBatteryLevel (true)) +
+				" - percent " + std::to_string (dataReader.getBatteryLevel (false)), neova_dash::log::hubCommunication);
 
 			upgradeHandler.startUpgrade();
 
@@ -143,11 +148,24 @@ void FirmUpgradePanel::buttonClicked (Button* bttn)
 	}
 }
 
+bool FirmUpgradePanel::keyPressed (const KeyPress& key)
+{
+    if (key == neova_dash::keyboard_shortcut::closeWindow)
+    {
+        closeAndResetPanel ();
+    }
+
+    return false;
+}
+
 void FirmUpgradePanel::setAndOpenPanel()
 {
 	currentUpgrade = none;
 	updateComponentsForSpecificState (checkingReleases);
 	setVisible (true);
+    if (!hasKeyboardFocus (false) && (isShowing () || isOnDesktop ())) {
+        grabKeyboardFocus ();
+    }
 }
 
 void FirmUpgradePanel::closeAndResetPanel()
@@ -310,6 +328,13 @@ void FirmUpgradePanel::updateComponentsForSpecificState (UpgradeState upgradeSta
 						if (ringAvailable)
 						{
 							bodyTextString += "Upgrade Available : (v" + getFormattedVersionString (upgradeHandler.getRingReleaseVersion()) + ")";
+
+							if(!upgradeHandler.checkBatteryForUpgrade())
+							{
+								bodyTextString += "\n\nInsufficient battery level to perform upgrade, please charge it and retry !";
+								upgradeButton->setAlpha(0.5f);
+								upgradeButton->setEnabled(false);
+							}
 						}
 						else
 						{

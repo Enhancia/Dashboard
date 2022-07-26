@@ -39,6 +39,7 @@ public:
     void mouseEnter (const MouseEvent &event) override;
     void mouseUp (const MouseEvent &event) override;
     void buttonClicked (Button* bttn) override;
+    bool keyPressed (const KeyPress& key) override;
     void labelTextChanged (Label* lbl) override;
     void editorShown (Label* lbl, TextEditor& ed) override;
 
@@ -109,8 +110,8 @@ private:
     ApplicationCommandManager& commandManager;
     
     //==============================================================================
-    ScopedPointer<DashShapeButton> closeButton;
-    ScopedPointer<TextEditor> descriptionTextEditor;
+    std::unique_ptr<DashShapeButton> closeButton;
+    std::unique_ptr<TextEditor> descriptionTextEditor;
     OwnedArray<GestureTypeSelector> gestureSelectors;
 
     //==============================================================================

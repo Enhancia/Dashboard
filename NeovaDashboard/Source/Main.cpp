@@ -43,20 +43,16 @@ public:
     bool moreThanOneInstanceAllowed() override       { return false; }
 
     //==============================================================================
-    void initialise (const String& commandLine) override
+    void initialise (const String&) override
     {
-        dashboardLogger = FileLogger::createDefaultAppLogger ("Enhancia/NeovaDashboard/Logs/",
+        dashboardLogger.reset (FileLogger::createDefaultAppLogger ("Enhancia/NeovaDashboard/Logs/",
                                                               "neovaDashLog.txt",
-                                                              "Neova Dashboard Log | OS :"
-                                                            #if JUCE_MAC
-                                                              " MAC "
-                                                            #elif JUCE_WINDOWS
-                                                              " Windows "
-                                                            #endif
-                                                              "| Neova Dashboard v" + getApplicationVersion()
-                                                                                    + " \n");
+                                                              "Neova Dashboard Log | OS : " + SystemStats::getOperatingSystemName() +
+                                                              " | Neova Dashboard v" + getApplicationVersion()
+                                                                                    + " \n"));
     
-        Logger::setCurrentLogger (dashboardLogger);
+		
+        Logger::setCurrentLogger (dashboardLogger.get());
 
 		dataReader = std::make_unique<DataReader>(commandManager, hubConfig);
 		dataReader->addChangeListener(this);
@@ -64,7 +60,7 @@ public:
 		dashPipe = std::make_unique<DashPipe>();
 		dashPipe->addChangeListener(this);
 
-		upgradeHandler = std::make_unique<UpgradeHandler>(*dashPipe, hubConfig, commandManager);
+		upgradeHandler = std::make_unique<UpgradeHandler>(*dashPipe, hubConfig, commandManager, *dataReader);
 		updater = std::make_unique<DashUpdater>();
 		firmDownloader = std::make_unique<FirmDownloader> (commandManager);
 
@@ -111,7 +107,7 @@ public:
         quit();
     }
 
-    void anotherInstanceStarted (const String& commandLine) override
+    void anotherInstanceStarted (const String&) override
     {
     }
 
@@ -301,6 +297,8 @@ public:
                                     DocumentWindow::allButtons),
               dashboardInterface (*dashInterface), hubConfig (config)
         {
+        	neova_dash::log::writeToLog ("Creating Dashboard main window.", neova_dash::log::general);
+
             setUsingNativeTitleBar (true);
             setContentOwned (dashInterface, true);
             
@@ -344,7 +342,8 @@ public:
                               upgradeRing,
                               uploadConfigToHub,
                               updatePresetModeState,
-                              checkDashboardUpdate
+                              checkDashboardUpdate,
+							  factoryReset
                            });
     }
 
@@ -380,6 +379,10 @@ public:
                 result.setInfo ("Check Dashboard Update", "Checks the Dashboard for new updates",
                                                           "Dashbaord Update", 0);
                 break;
+			case factoryReset:
+				result.setInfo ("Factory Reset", "Perform a factory reset",
+					"Hub Reset", 0);
+				break;
             default:
                 break;
         }
@@ -388,7 +391,9 @@ public:
     bool perform (const InvocationInfo& info) override
     {
         using namespace neova_dash::commands;
-        Logger::writeToLog ("Back performs : " + String (commandManager.getNameOfCommand (info.commandID)));
+
+        if (info.commandID != updatePresetModeState)
+        	neova_dash::log::writeToLog ("Executing Backend Command : " + String (commandManager.getNameOfCommand (info.commandID)), neova_dash::log::general);
 
         switch (info.commandID)
         {
@@ -398,6 +403,7 @@ public:
 				memcpy(data + 8, &ctrl, sizeof(uint32_t));
 				dashPipe->sendString(data, 12);
 				return true;
+
             case uploadConfigToHub:
             	if (hubConfig.getConfigWasInitialized())
             	{
@@ -408,9 +414,11 @@ public:
 					dashPipe->sendString(data, 12 + hubConfig.CONFIGSIZE);
 				}
 				return true;
+
             case upgradeHub:
                 upgradeHandler->launchUpgradeProcedure();
                 return true;
+
 			case updatePresetModeState:
 			{
 				uint8_t newState = (uint8_t)dashInterface->getPresetModeState();
@@ -427,9 +435,13 @@ public:
 
             case checkDashboardUpdate:
             	updater->checkForNewAvailableVersion();
-            	
             	commandManager.invokeDirectly (neova_dash::commands::openDashboardUpdatePanel, true);
             	return true;
+
+			case factoryReset:
+				hubConfig.setDefaultConfig ();
+				dashInterface->update ();
+				return true;
 
             default:
                 return false;
@@ -451,7 +463,7 @@ private:
 	std::unique_ptr<DashUpdater> updater;
 	std::unique_ptr<FirmDownloader> firmDownloader;
 
-    ScopedPointer<FileLogger> dashboardLogger;
+    std::unique_ptr<FileLogger> dashboardLogger;
 
     //==============================================================================
 	uint8_t hubPowerState = POWER_OFF;

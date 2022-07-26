@@ -56,6 +56,7 @@ public:
     void editorHidden (Label* lbl, TextEditor& ted) override;
     void sliderValueChanged (Slider* sldr) override;
     void buttonClicked (Button* bttn) override;
+    void buttonStateChanged (Button* btn) override;
     
     //==============================================================================
     void mouseDown (const MouseEvent& e) override;
@@ -112,20 +113,20 @@ private:
     const Range<float> parameterMax;
     
     //==============================================================================
-    ScopedPointer<Slider> leftLowSlider;
-    ScopedPointer<Slider> leftHighSlider;
-    ScopedPointer<Slider> rightLowSlider;
-    ScopedPointer<Slider> rightHighSlider;
+    std::unique_ptr<Slider> leftLowSlider;
+    std::unique_ptr<Slider> leftHighSlider;
+    std::unique_ptr<Slider> rightLowSlider;
+    std::unique_ptr<Slider> rightHighSlider;
     
-    ScopedPointer<Label> rangeLabelMinLeft;
-    ScopedPointer<Label> rangeLabelMaxLeft;
-    ScopedPointer<Label> rangeLabelMinRight;
-    ScopedPointer<Label> rangeLabelMaxRight;
+    std::unique_ptr<Label> rangeLabelMinLeft;
+    std::unique_ptr<Label> rangeLabelMaxLeft;
+    std::unique_ptr<Label> rangeLabelMinRight;
+    std::unique_ptr<Label> rangeLabelMaxRight;
 
-    ScopedPointer<TextButton> minLeftAngleButton;
-    ScopedPointer<TextButton> maxLeftAngleButton;
-    ScopedPointer<TextButton> minRightAngleButton;
-    ScopedPointer<TextButton> maxRightAngleButton;
+    std::unique_ptr<TextButton> minLeftAngleButton;
+    std::unique_ptr<TextButton> maxLeftAngleButton;
+    std::unique_ptr<TextButton> minRightAngleButton;
+    std::unique_ptr<TextButton> maxRightAngleButton;
     
     //==============================================================================
     DraggableObject objectBeingDragged = none;
@@ -136,6 +137,10 @@ private:
     juce::Point<int> sliderCentre;
     float startAngle;
     float endAngle;
+    bool maxLeftAngleBtnIsHovered = false;
+    bool minLeftAngleBtnIsHovered = false;
+    bool maxRightAngleBtnIsHovered = false;
+    bool minRightAngleBtnIsHovered = false;
 
     //==============================================================================
     HubConfiguration& hubConfig;

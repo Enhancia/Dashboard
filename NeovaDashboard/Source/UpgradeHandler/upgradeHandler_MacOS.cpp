@@ -6,17 +6,17 @@
  ==============================================================================
  */
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "../../JuceLibraryCode/JuceHeader.h"
 
-#if JUCE_MAC
+#if (JUCE_MAC && defined(__OBJC__))
 
 #include "upgradeHandler_MacOS.h"
 
 UpgradeHandler * UpgradeHandler::instanceUp = nullptr;
 
 //==============================================================================
-UpgradeHandler::UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config, ApplicationCommandManager& manager)
-    : dPipe (dashPipe), hubConfig(config), commandManager (manager)
+UpgradeHandler::UpgradeHandler(DashPipe& dashPipe, HubConfiguration& config, ApplicationCommandManager& manager, DataReader& dataReaderRef)
+    : dPipe (dashPipe), hubConfig(config), commandManager (manager), dataReader(dataReaderRef)
 {
     instanceUp = this;
     checkReleasesVersion();
@@ -28,6 +28,8 @@ void UpgradeHandler::timerCallback()
 {
 	set_upgradeCommandReceived(false);
 	setUpgradeState(err_waitingForUpgradeFirmTimeOut);
+    neova_dash::log::writeToLog("Failed upgrade: timeout..", neova_dash::log::hubCommunication);
+
 	stopTimer();
 }
 
@@ -106,6 +108,7 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * portCOM)
     String releasePath;
     char const * arr[5+7] = {nrfutilPath.getCharPointer()};
     int commandLineSize=0;
+
     
     //Recupère les path des fichiers release et la ligne de commande nrfutil en fonction du firm à upgrade
     if (FirmType == upgradeFirmRing)
@@ -135,6 +138,7 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * portCOM)
     pipe(out_pipe); //create a pipe to get stdout & stderr of the child
     pipe(err_pipe);
     
+
     //Launch nrfutil as a child process & set a callback to monitor its status
     signal(SIGCHLD, childProcessExitCallback);
     if(!(childPid = fork())) //spawn child
@@ -145,7 +149,10 @@ void UpgradeHandler::launchNrfutil(UpgradeFirm FirmType, uint8_t * portCOM)
         // redirect stdout and stderr to the write end of the pipe
         dup2(out_pipe[1], STDOUT_FILENO);
         dup2(err_pipe[1], STDERR_FILENO);
+        
+        setenv("LANG", "en_US.UTF-8",1);
         execv(arr[0], (char **)arr); //child will terminate here, replaced by nrfutil
+
     }
     //Only parent gets here. Close write end of the pipe
     close(out_pipe[1]);
@@ -181,10 +188,13 @@ void UpgradeHandler::closeNrfutil()
         if (exit_status==0)
         {
             setUpgradeState(upgradeSuccessfull);
+            neova_dash::log::writeToLog("Neova Upgraded succesfully !", neova_dash::log::hubCommunication);
+
         }
         else
         {
             setUpgradeState(err_upgradefailed);
+            neova_dash::log::writeToLog("Failed to upgrade Neova..", neova_dash::log::hubCommunication);
         }
     }
 
@@ -340,5 +350,20 @@ void UpgradeHandler::checkForSuccessiveUpgrade()
         startHubUpgrade();
     }
 }
+
+/**
+ * @brief check battery level before upgrade
+ * @return true if battery level is greater than 20%.
+*/
+bool UpgradeHandler::checkBatteryForUpgrade () const
+{
+	const auto percentBattery = dataReader.getBatteryLevel(false);
+
+	if(percentBattery >= 0.2f)
+		return true;
+	else
+		return false;
+}
+
 //==============================================================================
 #endif //JUCE_MAC

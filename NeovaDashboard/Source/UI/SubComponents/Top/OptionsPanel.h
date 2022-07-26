@@ -39,6 +39,7 @@ public:
     
     //==============================================================================
     void buttonClicked (Button* bttn) override;
+    bool keyPressed (const KeyPress& key) override;
     void mouseUp (const MouseEvent& event) override;
     void visibilityChanged() override;
 
@@ -156,6 +157,8 @@ private:
     UpgradeHandler& upgradeHandler; /**< \brief Reference to the internal UpgradeHandler object. */
     ApplicationCommandManager& commandManager;
     std::unique_ptr<TextButton> sendReportButton;
+    std::unique_ptr<ToggleButton> midiThruToggle;
+    std::unique_ptr<TextButton> factoryResetButton;
     std::unique_ptr<TextButton> contactButton;
     std::unique_ptr<TextButton> upgradeButton;
     std::unique_ptr<TextButton> updateButton;
@@ -164,12 +167,12 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OptionsPanel)
 };
 
-class ContactPanel: public Component, Button::Listener
+class GeneralPanel: public Component, Button::Listener
 {
 public:
     //==============================================================================
-    ContactPanel (TextButton& bugReportButton);
-    ~ContactPanel();
+    GeneralPanel (TextButton& bugReportButton, ToggleButton& thruToggle, TextButton& factoryResetButtonArg);
+    ~GeneralPanel() override;
 
     //==============================================================================
     void paint (Graphics& g) override;
@@ -181,15 +184,21 @@ public:
 private:
     //==============================================================================
     std::unique_ptr<TextButton> contactButton;
+    std::unique_ptr<TextButton> viewNotesButton;
+    TextButton& factoryResetButton;
     TextButton& sendReportButton;
+    ToggleButton& midiThruToggle;
 
     //==============================================================================
     juce::Rectangle<int> aboutArea;
     juce::Rectangle<int> contactArea;
-    juce::Rectangle<int> creditsArea;
+    juce::Rectangle<int> reportArea;
+    juce::Rectangle<int> viewNotesArea;
+    juce::Rectangle<int> thruArea;
+    juce::Rectangle<int> factoryResetArea;
     
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ContactPanel)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralPanel)
 };
 
 class LegalPanel: public Component

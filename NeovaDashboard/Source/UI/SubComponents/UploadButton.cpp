@@ -13,14 +13,11 @@
 UploadButton::UploadButton (HubConfiguration& config, ApplicationCommandManager& cm, const bool shouldBeActive)
 	: Button ("Upload Button"), commandManager (cm), hubConfig (config), active (shouldBeActive)
 {
-	TRACE_IN;
-
-	setInterceptsMouseClicks (active, false);
+	  setInterceptsMouseClicks (active, false);
 }
 
 UploadButton::~UploadButton()
 {
-	TRACE_IN;
 }
 
 void UploadButton::resized()
@@ -107,8 +104,8 @@ void UploadButton::paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted,
 	// Upload Path Draw
 	Path uploadPath = neova_dash::path::createPath (neova_dash::path::upload);
 	textArea = textArea.withSizeKeepingCentre (textArea.getWidth(), 16);
-	uploadPath.scaleToFit (textArea.getX(), textArea.getY(),
-                           textArea.getWidth(), textArea.getHeight(), true);
+	uploadPath.scaleToFit (static_cast<float>(textArea.getX()), static_cast<float>(textArea.getY()),
+                           static_cast<float>(textArea.getWidth()), static_cast<float>(textArea.getHeight()), true);
 
   	g.fillPath (uploadPath);
 

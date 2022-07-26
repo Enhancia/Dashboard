@@ -36,7 +36,7 @@ void FirmDownloader::checkForNewAvailableVersion()
         	{
 				if (!currentVersionHub.isEmpty() && currentVersionHub.containsOnly(".0123456789"))
 				{
-					availableHub = latestVersionHub.removeCharacters(".").getIntValue() > currentVersionHub.removeCharacters(".").getIntValue();
+					availableHub = latestVersionHub.removeCharacters(".").getIntValue() != currentVersionHub.removeCharacters(".").getIntValue();
 				}
 				else availableHub = true;
         	}
@@ -45,7 +45,7 @@ void FirmDownloader::checkForNewAvailableVersion()
         	{
         		if (!currentVersionRing.isEmpty() && currentVersionRing.containsOnly (".0123456789"))
         		{
-        			availableRing = latestVersionRing.removeCharacters(".").getIntValue() > currentVersionRing.removeCharacters(".").getIntValue();
+        			availableRing = latestVersionRing.removeCharacters(".").getIntValue() != currentVersionRing.removeCharacters(".").getIntValue();
         		}
 				else availableRing = true;
         	}
@@ -85,7 +85,7 @@ void FirmDownloader::getCurrentInstalledVersions()
 	}
 }
 
-void FirmDownloader::finished (URL::DownloadTask* task, bool success)
+void FirmDownloader::finished (URL::DownloadTask*, bool success)
 {
     state = downloadFinished;
     successful = success;
@@ -115,6 +115,8 @@ void FirmDownloader::progress (URL::DownloadTask* task,
                             int64 bytesDownloaded,
                             int64 totalLength )
 {
+    ignoreUnused(task);
+
     DBG ("Downloading ... " << float (bytesDownloaded)/1000 << " / "
                             << float (totalLength)/1000 << " Ko\n");
 
@@ -184,7 +186,7 @@ void FirmDownloader::downloadForDevice (deviceFirmware& deviceToDownloadFor)
 
     downloadedFile = downloadFolder.getNonexistentChildFile (fileToDownloadString, "");
     //downloadTask.reset (assetURL.downloadToFile (downloadedFile, "\r\nAccept: application/octet-stream\r\n", this));
-    downloadTask.reset (GitAssetDownloader::downloadAsset (fileToDownloadURL, downloadedFile, this));
+    downloadTask = GitAssetDownloader::downloadAsset (fileToDownloadURL, downloadedFile, this);
 }
 
 bool FirmDownloader::hasNewAvailableVersion()
@@ -216,9 +218,13 @@ var FirmDownloader::fetchRepoJSON()
 {
     // Creating input stream to get file link
     int status;
-    std::unique_ptr<InputStream> urlInStream (REPO_URL.createInputStream (false, nullptr, nullptr,
-                                                                         "Authorization: token " + neova_dash::auth::MACHINE_TOKEN,
-                                                                         1000, nullptr, &status));
+    const std::unique_ptr<InputStream> urlInStream (REPO_URL.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+        .withProgressCallback (nullptr)
+        .withExtraHeaders ("Authorization: token " + neova_dash::auth::MACHINE_TOKEN)
+        .withConnectionTimeoutMs (1000)
+        .withResponseHeaders (nullptr)
+        .withStatusCode (&status)
+    ));
 
     if (urlInStream == nullptr || status != 200)
     {
@@ -270,15 +276,15 @@ bool FirmDownloader::fetchFilesURLAndVersions (DynamicObject& jsonRef)
     return hubExists || ringExists;
 }
 
-bool FirmDownloader::deleteCurrentFileforDevice (deviceFirmware& device)
+bool FirmDownloader::deleteCurrentFileforDevice (deviceFirmware& deviceArg)
 {
 	File fileToDelete;
 
-	if (device == hub && !currentVersionHub.isEmpty())
+	if (deviceArg == hub && !currentVersionHub.isEmpty())
 	{
 		fileToDelete = currentHubFile;
 	}
-	else if (device == ring && !currentVersionRing.isEmpty())
+	else if (deviceArg == ring && !currentVersionRing.isEmpty())
 	{
 		fileToDelete = currentRingFile;
 	}
