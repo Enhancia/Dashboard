@@ -78,9 +78,8 @@ private:
 	String latestVersion = "";
 
 	//==============================================================================
-    const String AUTH_TOKEN = "1ebaae86812185390234259e630e73b92c38da4a"; /*std::getenv ("MACHINE_ENHANCIA_OAUTH");*/
-    const URL REPO_URL = URL (neova_dash::compatibility::isTestVersion() ? "https://api.github.com/repos/Enhancia/Firmware_Releases_Internal/releases/latest"
-                                                                         : "https://api.github.com/repos/Enhancia/Firmware_Releases/releases/latest"); /*std::getenv ("REALEASE_REPO_PATH");*/
+    const String AUTH_TOKEN = ""; // Replace with a an auth token allowed to read from the release repo.
+    const URL REPO_URL = URL (""); // Replace with a github repo in which to add new versions.
 
     //==============================================================================
     String fileToDownloadHubURL = "";
